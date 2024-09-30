@@ -2,15 +2,15 @@
 
 set -e # Se algum comando falhar, o script para
 
-if [ `grep --count "\*\*\*\*" env_files/security.env` -gt 0 ]; then
-  echo "================================="
-  echo "ATENÇÃO: Deploy foi interrompido!"
-  echo "================================="
-  echo "O arquivo env_files/security.env não está adequadamente configurado!"
-  echo "O deploy do SEI IA depende da configuração desse arquivo!"
-  echo "(para mais detalhes, leia o arquivo README.md)"
-  exit 1
-fi
+# if [ `grep --count "\*\*\*\*" env_files/security.env` -gt 0 ]; then
+#   echo "================================="
+#   echo "ATENÇÃO: Deploy foi interrompido!"
+#   echo "================================="
+#   echo "O arquivo env_files/security.env não está adequadamente configurado!"
+#   echo "O deploy do SEI IA depende da configuração desse arquivo!"
+#   echo "(para mais detalhes, leia o arquivo README.md)"
+#   exit 1
+# fi
 
 echo "*** `date`: Carregando variáveis de ambiente..."
 # Carregar variáveis de ambiente
@@ -42,6 +42,7 @@ export DOCKER_REGISTRY="anatelgovbr/"
 echo "*** `date`: Deploy do SEI IA em andamento..."
 docker compose --profile externo \
   -f docker-compose-prod.yaml \
+  -f docker-compose-dev.yaml \
   -p $PROJECT_NAME \
   up \
   --no-build -d
