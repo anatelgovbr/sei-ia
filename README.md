@@ -8,7 +8,7 @@
 ## Orientações preliminares
 A instalação das aplicações de backend do módulo SEI IA foi projetada tendo como objetivo principal a simplificação máxima do processo, automatizando todos os procedimentos possíveis. Ainda assim, há alguns procedimentos que, ou por segurança ou por estarem relacionados ao ambiente de instalação, necessitam ser manualmente realizados pelo usuário.
 
-Sendo assim, sugere-se fortemente que, antes de iniciar a instalação do SEI IA, seja feita uma leitura integral desse manual, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas pela leitura prévia das orientações que constam nesse manual.
+Sendo assim, sugere-se fortemente que, antes de iniciar a instalação do SEI IA, seja feita uma leitura integral desse manual, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas pela leitura completa das orientações que constam nesse manual.
 
 ## Procedimentos para Instalação
 
