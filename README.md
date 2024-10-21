@@ -74,7 +74,6 @@ Editar e preencher no arquivo `env_files/security.env` as variáveis de ambiente
 |-----------------------------------|-------------------------------------------------------------------------------------|
 | `ENVIRONMENT`                     | Define o ambiente de execução da aplicação. Valores suportados: dev \| homol \| prod|
 | `GID_DOCKER`²                     | GID do grupo Docker no host².                                                       |
-| `GIT_TOKEN`                       | **Não altere essa variável, pois ela já está devidamente preenchida.**              |
 | `DB_SEI_USER`                     | Usuário do banco de dados do SEI com permissão de leitura.                          |
 | `DB_SEI_PWD`                      | Senha do usuário do banco de dados do SEI com permissão de leitura.                 |
 | `DB_SEI_HOST`                     | Nome do host do banco de dados do SEI.                                              |
