@@ -85,7 +85,6 @@ Editar e preencher no arquivo `env_files/security.env` as variáveis de ambiente
 | `SEI_SOLR_CORE`                   | Core do servidor Solr utilizado para armazenar os documentos do SEI.                |
 | `SEI_IAWS_URL`                    | URL de acesso à API IAWS do SEI.                                                    |
 | `SEI_IAWS_KEY`                    | Chave de acesso à API IAWS do SEI.                                                  |
-| `POSTGRES_DATABASE`               | **Não altere essa variável, pois ela já está devidamente preenchida.**              |
 | `POSTGRES_USER`                   | Usuário do banco de dados Postgres da aplicação.                                    |
 | `ASSISTENTE_PGVECTOR_USER`        | **Não altere essa variável, pois ela já está devidamente preenchida.**              |
 | `ASSISTENTE_PGVECTOR_PWD`         | **Não altere essa variável, pois ela já está devidamente preenchida.**              |
