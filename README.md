@@ -86,9 +86,9 @@ Editar e preencher no arquivo `env_files/security.env` as variáveis de ambiente
 | `SEI_IAWS_URL`                    | URL de acesso à API IAWS do SEI.                                                    |
 | `SEI_IAWS_KEY`                    | Chave de acesso à API IAWS do SEI.                                                  |
 | `POSTGRES_USER`                   | Usuário do banco de dados Postgres da aplicação.                                    |
+| `POSTGRES_PASSWORD`               | Senha do banco de dados Postgres da aplicação.                                      |
 | `ASSISTENTE_PGVECTOR_USER`        | **Não altere essa variável, pois ela já está devidamente preenchida.**              |
 | `ASSISTENTE_PGVECTOR_PWD`         | **Não altere essa variável, pois ela já está devidamente preenchida.**              |
-| `POSTGRES_PASSWORD`               | Senha do banco de dados Postgres da aplicação.                                      |
 | `OPENAI_API_VERSION`              | Versão da API da OpenAI.                                                            |
 | `AZURE_OPENAI_ENDPOINT`           | Endpoint da Azure OpenAI.                                                           |
 | `AZURE_OPENAI_ENDPOINT_GPT4o`     | Endpoint da API na Azure OpenAI para o modelo GPT-4o.                               |
