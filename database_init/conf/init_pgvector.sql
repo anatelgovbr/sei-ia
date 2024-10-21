@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS "version_register" (
 );
 
 -- o funcionamento das DAGs para os externos depende da existência de pelo menos 1 registro nessa tabela
-INSERT INTO version_register
-        (hash, branch, tag, url)
-        VALUES('HASH_EXTERNOS','BRANCH_EXTERNOS','TAG_EXTERNOS','EXTERNOS/jobs.git');
+-- INSERT INTO version_register
+--         (hash, branch, tag, url)
+--         VALUES('HASH_EXTERNOS','BRANCH_EXTERNOS','TAG_EXTERNOS','EXTERNOS/jobs.git');
 
 -- *****************************************
 -- ASSISTENTE

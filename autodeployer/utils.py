@@ -7,7 +7,7 @@ from subprocess import PIPE, Popen
 from typing import Any, Dict
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read("autodeployer/setup.cfg")
+CONFIG.read(Path().absolute() / Path("autodeployer/setup.cfg"))
 root_path = Path().absolute() / Path(CONFIG["repo_local_path"]["root_path"])
 
 

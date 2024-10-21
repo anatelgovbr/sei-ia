@@ -7,8 +7,7 @@ Checking If there has been a new merge since the last recorded merge.
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
-
+from typing import Any, Dict, List, Optional, Tuple
 import requests
 import xmltodict
 from utils import root_path
@@ -16,22 +15,23 @@ from utils import root_path
 logging.basicConfig(level=logging.INFO)
 
 
-def get_last_merge_requests_merged_from_rss(url_rss: str) -> Optional[dict]:
+def get_entries_from_rss(url_rss: str) -> Optional[dict]:
     """Recuperar o último merge usando RSS do repositorio.
 
-    :param url_rss: URL rss feed.
+    :param url_rss: URL rss feed dos merges no git.
     :return: Dicionário representando o último merge requests merged, se disponível; caso contrário, None.
     """
-    try:
-        response = requests.get(url_rss, timeout=10)
-        rss_feed = xmltodict.parse(response.text).get("feed")
-        last_merged_rss = rss_feed.get("entry") if rss_feed else None
+    response = requests.get(url_rss, timeout=10)
+    entries = xmltodict.parse(response.text).get("feed").get("entry")
 
-    except KeyError as e:  # pragma: no cover
-        logging.info("Last merge not found", exc_info=e)
-        last_merged_rss = None
-
-    return last_merged_rss
+    if entries is None:
+        logging.error("Nenhum merge foi encontrado no feed RSS")
+        raise ValueError("Nenhum merge foi encontrado no feed RSS")
+    
+    if isinstance(entries,dict):
+        entries = [entries]
+    
+    return entries
 
 
 def check_new_merge_from_rss(url_rss: str, url_last_merge: Optional[str]) -> Tuple[bool, Optional[str]]:
@@ -41,7 +41,7 @@ def check_new_merge_from_rss(url_rss: str, url_last_merge: Optional[str]) -> Tup
     :param url_last_merge: URL rss feed do último merge registrado.
     :return: Uma tupla contendo um booleano indicando se há um novo merge e a URL do merge atual.
     """
-    last_merge_requests = get_last_merge_requests_merged_from_rss(url_rss)
+    last_merge_requests = get_entries_from_rss(url_rss)
     url_current_merge = None
     if last_merge_requests:
         url_current_merge = last_merge_requests[0]["link"]["@href"]

@@ -61,3 +61,6 @@ docker compose --profile externo \
 
 echo "*** `date`:Ativando as DAGs do SEI IA no Airflow..."
 docker compose -f docker-compose-prod.yaml -p $PROJECT_NAME exec airflow-webserver-pd /bin/bash -c "airflow dags list | awk '{print \$1}' | grep -v 'DAG_ID' | xargs -I {} airflow dags unpause {}; exit 0"
+
+#adicionar registro na tabela version_register no banco sei_similaridade
+sh insert_row_version_register.sh
