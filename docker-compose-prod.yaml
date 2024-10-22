@@ -406,7 +406,7 @@ services:
     profiles:
       - all
       - externo
-    image: ${DOCKER_REGISTRY:-}api-sei:${API_SEI_IMAGE}
+    image: ${DOCKER_REGISTRY:-}api_sei:${API_SEI_IMAGE}
     build:
       context: .
       dockerfile: ./api_sei.dockerfile

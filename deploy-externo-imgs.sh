@@ -42,13 +42,13 @@ echo "*** `date`: Criando pasta de storage para o SEI IA caso não exista..."
 echo "*** `date`: Configurando variáveis de ambiente para instalação do SEI IA..."
 export PROJECT_NAME=sei_ia
 
-export API_SEI_IMAGE="0.2-RC"
-export API_ASSISTENTE_VERSION="0.2.1-RC"
-export NGINX_ASSISTENTE_VERSION="0.2-RC"
-export AIRFLOW_IMAGE_NAME="0.2-RC"
-export APP_API="0.2-RC"
-export SOLR_CONTAINER="0.2-RC"
-export POSTGRES_IMAGE="0.2.1-RC"
+export API_SEI_IMAGE="0.3-RC"
+export API_ASSISTENTE_VERSION="0.3-RC"
+export NGINX_ASSISTENTE_VERSION="0.3-RC"
+export AIRFLOW_IMAGE_NAME="0.3-RC"
+export APP_API="0.3-RC"
+export SOLR_CONTAINER="0.3-RC"
+export POSTGRES_IMAGE="0.3-RC"
 
 export DOCKER_REGISTRY="anatelgovbr/"
 
