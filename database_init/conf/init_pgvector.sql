@@ -7,8 +7,8 @@ CREATE DATABASE "${POSTGRES_DB_SIMILARIDADE}";
 
 CREATE EXTENSION IF NOT EXISTS vector;
 
-ALTER DATABASE ${POSTGRES_DB_SIMILARIDADE} SET search_path TO public;
-ALTER USER ${POSTGRES_USER} IN DATABASE ${POSTGRES_DB_SIMILARIDADE} SET search_path TO public;
+ALTER DATABASE "${POSTGRES_DB_SIMILARIDADE}" SET search_path TO public;
+ALTER USER ${POSTGRES_USER} IN DATABASE "${POSTGRES_DB_SIMILARIDADE}" SET search_path TO public;
 
 CREATE TABLE IF NOT EXISTS "version_register" (
     id SERIAL PRIMARY KEY,
@@ -21,13 +21,13 @@ CREATE TABLE IF NOT EXISTS "version_register" (
 );
 
 -- o funcionamento das DAGs para os externos depende da existência de pelo menos 1 registro nessa tabela
--- INSERT INTO version_register
---         (hash, branch, tag, url)
---         VALUES('HASH_EXTERNOS','BRANCH_EXTERNOS','TAG_EXTERNOS','EXTERNOS/jobs.git');
+INSERT INTO version_register
+        (hash, branch, tag, url)
+        VALUES('HASH_EXTERNOS','BRANCH_EXTERNOS','TAG_EXTERNOS','EXTERNOS/jobs.git');
 
 -- *****************************************
 -- ASSISTENTE
-CREATE DATABASE "${POSTGRES_DB}";
+-- CREATE DATABASE "${POSTGRES_DB}";
 
 -- Switch to the target database context
 \c "${POSTGRES_DB}"
@@ -36,10 +36,10 @@ CREATE SCHEMA "${POSTGRES_DB_ASSISTENTE_SCHEMA}";
 
 CREATE EXTENSION IF NOT EXISTS vector;
 
-ALTER DATABASE ${POSTGRES_DB} SET search_path TO ${POSTGRES_DB}, public;
-ALTER USER ${POSTGRES_USER} IN DATABASE ${POSTGRES_DB} SET search_path TO ${POSTGRES_DB}, public;
+ALTER DATABASE "${POSTGRES_DB}" SET search_path TO "${POSTGRES_DB_ASSISTENTE_SCHEMA}", public;
+ALTER USER ${POSTGRES_USER} IN DATABASE "${POSTGRES_DB}" SET search_path TO "${POSTGRES_DB_ASSISTENTE_SCHEMA}", public;
 
-SET search_path TO ${POSTGRES_DB}, public;
+SET search_path TO "${POSTGRES_DB_ASSISTENTE_SCHEMA}", public;
 
 CREATE TABLE IF NOT EXISTS "models" (
     id SERIAL PRIMARY KEY,
