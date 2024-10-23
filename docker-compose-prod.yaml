@@ -709,6 +709,9 @@ services:
       TOKEN_MAX: 4096
       SEI_IAWS_URL : ${SEI_IAWS_URL}
       SEI_IAWS_KEY : ${SEI_IAWS_KEY}
+      LD_LIBRARY_PATH: /opt/oracle
+      ORACLE_HOME: /opt/oracle
+      ORACLE_VERSION: 19.25
 
     # ports:
     #   - "8088:8088"
