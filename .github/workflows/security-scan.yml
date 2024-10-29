@@ -1,0 +1,23 @@
+name: Security Scan
+
+on:
+  workflow_dispatch:  # Permite execução manual
+
+jobs:
+  analyze:
+    name: Run CodeQL Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: taiga_903  # Especifica a branch
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ['python']  # Adicione as linguagens usadas no seu projeto
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
