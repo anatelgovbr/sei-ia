@@ -146,7 +146,7 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    sudo bash deploy-externo-imgs.sh 
    ```
 
-   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens.
+   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr), logo se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
 
    Resultado da finalização do deploy:
 
