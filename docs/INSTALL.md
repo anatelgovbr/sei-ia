@@ -168,13 +168,7 @@ Caso um longo tempo tenha se passado e ainda não tenha obtido o status **health
 
 Após a finalização do deploy, o Airflow iniciará a indexação dos documentos. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
 
-## Backup periódico dos dados do Servidor de Soluções do SEI IA
-
-Um ponto importante em relação ao uso do módulo SEI IA e consequentemente do  Servidor de Soluções do SEI IA, é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao Servidor de Soluções do SEI IA:
-
-```bash
-docker volume ls | grep "^sei_ia-"
-```
+Nas seções a seguir apresentamos como testar e validar os resultados da instalação e configuração. 
 
 ## Testes de Acessos
 
@@ -460,6 +454,15 @@ Ao escalar a solução, considere os seguintes pontos:
    |-----------------------------|----------------------------------------------------------------|
    | `PGVECTOR_MEM_LIMIT=8g`     | Define o limite de memória para Pgvector como 8 GB.           |
    | `PGVECTOR_CPU_LIMIT='2'`    | Define o limite de CPU para Pgvector como 2 unidades de CPU.  |
+
+
+## Backup periódico dos dados do Servidor de Soluções do SEI IA
+
+Um ponto importante em relação ao uso do módulo SEI IA e consequentemente do  Servidor de Soluções do SEI IA, é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao Servidor de Soluções do SEI IA:
+
+```bash
+docker volume ls | grep "^sei_ia-"
+```
 
 ## ANEXOS:
 ### **Instalar Git - OPCIONAL**
