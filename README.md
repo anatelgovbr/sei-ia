@@ -27,16 +27,15 @@ O *Docker Host* deve atender aos requisitos mínimos descritos abaixo. Além dis
 
 ## Download
 
-O download do pacote de instalação do *Servidor de Soluções de IA* deve ser obtido em [seção Releases deste projeto no GitHub](https://github.com/anatelgovbr/sei-ia/releases). 
-- **[DOWNLOAD DO PACOTE DE INSTALAÇÃO DO SERVIDOR DE SOLUÇÕES DE IA](https://github.com/anatelgovbr/sei-ia/releases)**
+O download do pacote de instalação do *Servidor de Soluções de IA* deve ser obtido na [seção Releases deste projeto no GitHub](https://github.com/anatelgovbr/sei-ia/releases).
 
 ## Instalação
 
-As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[MANUAL DE INSTALAÇÃO](docs/INSTALL.md)**
+As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[Manual de Instalação](docs/INSTALL.md)**
 
 ## Documentação
 
-Uma documentaçao simplificada das APIS pode ser encontrada na pasta `docs/` ou diretamente em **[DOCUMENTAÇÃO SIMPLIFICADA DAS APIs](docs/API_MANUAL.md)**.
+Uma documentaçao simplificada das APIS pode ser encontrada na pasta `docs/` ou diretamente em **[Docmentação Simplificada das APIs](docs/API_MANUAL.md)**.
 
 ## Suporte
 
