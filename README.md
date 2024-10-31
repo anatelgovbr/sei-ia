@@ -21,11 +21,11 @@ Os requisitos aqui apresentados são exclusivamente relacionados ao *Servidor de
 O *Servidor de Soluções de IA* é baseado em Docker, com todos os containers instalados e executados em um *Docker Host*. 
 
 O *Docker Host* deve atender aos requisitos mínimos descritos abaixo. Além disso, a solução foi homologada com uma versão específica do SEI, não sendo uma versão mínima, mas sim a versão exata homologada.
-- **Versão homologada do SEI**: SEI 4.0.12
-- **Docker**: Docker Community Edition (versão >= 27.1.1)
+- **Versão homologada do SEI**: SEI 4.0.12.
+- **Docker**: Docker Community Edition (versão >= 27.1.1).
 - **Hardware**:
-  - **CPU**: 16 cores com 2.10GHz
-  - **RAM**: 128 GB
+  - **CPU**: 16 cores com 2.10GHz;
+  - **RAM**: 128 GB.
 
 ## Download
 
@@ -33,7 +33,7 @@ O download do pacote de instalação do *Servidor de Soluções de IA* deve ser 
 
 ## Instalação
 
-As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[Manual de Instalação](docs/INSTALL.md)**
+As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[Manual de Instalação](docs/INSTALL.md)**.
 
 ## Documentação
 
