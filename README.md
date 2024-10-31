@@ -1,8 +1,8 @@
-# Servidor de Soluções de IA do Módulo SEI IA - Aplicações de Backend
+# Soluções IA do Módulo SEI IA 
 
-O *Servidor de Soluções de IA* do Módulo SEI IA contém as ferramentas necessárias para o funcionamento do [módulo de IA do SEI](https://github.com/anatelgovbr/mod-sei-ia). Este projeto tem como objetivo o funcionamento do backend do Módulo SEI IA, composto, de forma simplificada, pelas ferramentas:
+As Soluções de IA do Módulo SEI IA contém as ferramentas necessárias para o funcionamento do [módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia), composto, de forma simplificada, pelos sub-módulos:
 - SEI-IA-SIMILARIDADE: Responsável pela recomendação de processos similares e de documentos similares;
-- SEI-IA-ASSISTENTE: Responsável pelo funcionamento do Assistente do Módulo SEI IA, utilizando Inteligência Artificial Generativa (GenAI) para responder a questionamentos dos usuários e interagir com documentos do SEI.
+- SEI-IA-ASSISTENTE: Responsável pelo Assistente baseado em Inteligência Artificial Generativa (GenAI), para responder a questionamentos dos usuários e interagir com documentos do SEI.
 
 ## Orientações Preliminares
 
