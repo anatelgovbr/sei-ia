@@ -6,7 +6,9 @@ O *Servidor de Soluções de IA* contém as ferramentas necessárias para o func
 
 ## Orientações Preliminares
 
-A instalação do *Servidor de Soluções de IA* foi projetada para ser simples, automatizando todos os procedimentos possíveis. No entanto, há alguns procedimentos que, por questões de segurança ou por estarem relacionados ao ambiente onde a instalação está sendo feita, precisam ser realizados manualmente pelo administrador do ambiente computacional. Para melhor entendimento do manual, é **mandatório** seja feita uma leitura integral deste README e do MANUAL DE INSTALAÇÃO antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
+A instalação do *Servidor de Soluções de IA* foi projetada para ser simples, automatizando todos os procedimentos possíveis. No entanto, há alguns procedimentos que, por questões de segurança ou por estarem relacionados ao ambiente onde a instalação está sendo feita, precisam ser realizados manualmente pelo administrador do ambiente computacional. 
+
+Para melhor entendimento do manual, é **mandatório** seja feita uma leitura integral deste README e do MANUAL DE INSTALAÇÃO antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
 
 ## O repositorio
 
