@@ -18,12 +18,12 @@ Este repositório no GitHub é o local oficial onde será mantido todo o desenvo
 
 Os requisitos aqui apresentados são exclusivamente relacionados ao *Servidor de Soluções de IA*, não se confundindo com a infraestrutura alocada para o core ou módulos do SEI.
 
-O *Servidor de Soluções de IA* é baseado em Docker, com todos os containers instalados e executados em um *Docker Host*. 
+O *Servidor de Soluções de IA* é baseado em Docker, com todos os containers instalados e executados em um *Docker Host* de um servidor Linux. Não recomendamos a utilização de servidores Windows com WSL em ambiente produtivo. 
 
 O *Docker Host* deve atender aos requisitos mínimos descritos abaixo. Além disso, a solução foi homologada com uma versão específica do SEI, não sendo uma versão mínima, mas sim a versão exata homologada.
 - **Versão homologada do SEI**: SEI 4.0.12.
 - **Docker**: Docker Community Edition (versão >= 27.1.1).
-- **Hardware**:
+- **Servidor Linux com**:
   - **CPU**: 16 cores com 2.10GHz;
   - **RAM**: 128 GB.
 
