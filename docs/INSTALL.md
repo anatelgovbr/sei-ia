@@ -9,15 +9,15 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
 - **CPU**:
   - Provisionado: 16 Cores com 2.10GHz
   - Consumo na ANATEL (Produção):
-    - médio: 7%
-    - máximo: 25%
+    - médio: 60%
+    - máximo: 100%
 - **MEMÓRIA**:
-  - Provisionado: 128GB*
+  - Provisionado: 128GB
   - Consumo na ANATEL (Produção):
-    - mínimo: 12GB
-    - máximo: 30GB
+    - mínimo: 64GB
+    - máximo: 115GB
 - **ESPAÇO EM DISCO**:
-  - Provisionado: de 50 GB + Espaço usado pelo SEI para embedding de documentos + Espaço do SOLR + filesystem.
+  - Provisionado: 600GB.
   - Consumo na ANATEL (Em ambiente de produção):
   
       | Aplicação  | Caminho                                          | Tamanho em disco |
