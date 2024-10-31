@@ -199,8 +199,8 @@ Após finalizar o deploy, você poderá realizar os testes acessando:
 | API SEI-IA Feedback                        | http://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
 | API SEI-IA Assistente                      | http://[Servidor_Solucoes_IA]:8088     | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
 |                                            |                                        |                                                                                                | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA do SEI   | http://[Servidor_Solucoes_IA]:8084     | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            |                                                                                       |
-| Banco de Dados SEI                         | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.                                                       |
+| Solr do Servidor de Soluções de IA do SEI   | http://[Servidor_Solucoes_IA]:8084     | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.     |
+| Banco de Dados SEI                         | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.        |
 
 ### Airflow
 
