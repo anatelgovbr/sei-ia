@@ -40,7 +40,7 @@ Antes de começar a instalação, certifique-se de que os seguintes pacotes este
 
 Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/]) e [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
 
-1. **Criar a pasta para o SEI-IA**
+1. **Criar a pasta para o SEI IA**
 
    ```bash
    sudo mkdir /opt/seiia
@@ -59,14 +59,14 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
 
 3. **Preparar o ambiente**
 
-   Crie um usuário específico para o SEI-IA:
+   Crie um usuário específico para o SEI IA:
 
    ```bash
    sudo mkdir /opt/sei-ia-storage
    sudo chmod 777 /opt/sei-ia-storage
    ```
 
-5. **Clonar o repositório SEI-IA**
+5. **Clonar o repositório SEI IA**
 
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux).
    
@@ -104,7 +104,7 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
 | Variável                   | Descrição                                                                                   | Exemplo                             |
 |----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
 | ENVIRONMENT                | Define o tipo do ambiente                                                    | `prod`                              |
-| LOG_LEVEL                  | Define o nível de log do SEI-IA; opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
+| LOG_LEVEL                  | Define o nível de log do SEI IA; opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
 | GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                              |
 | DB_SEI_USER                | Usuário para acessar o banco de dados SEI.                                                  | `sei_user`                          |
 | DB_SEI_PWD                 | Senha para o banco de dados SEI.                                                            | `senha_sei`                         |
@@ -115,20 +115,19 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
 | DATABASE_TYPE              | Tipo de banco de dados (ex: mssql, mysql, oracle).                                         | `mssql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                 | `http://192.168.0.10:8983`          |
 | SEI_SOLR_CORE              | Nome do core do Solr do SEI.                                                                | `sei_protocolos`                          |
-| POSTGRES_USER              | Usuário do banco de dados SQL do SEI-IA.                                                    | `sei_llm`                     |
-| POSTGRES_PASSWORD          | Senha para o banco de dados PGVector do SEI-IA.                                            | `postgres_password`                 |
-| ASSISTENTE_PGVECTOR_USER   | Mesmo usuário do BD SQL do SEI-IA (variável POSTGRES_USER).                                 | `$POSTGRES_USER`                    |
+| POSTGRES_USER              | Usuário do banco de dados SQL do SEI IA.                                                    | `sei_llm`                     |
+| POSTGRES_PASSWORD          | Senha para o banco de dados PGVector do SEI IA.                                            | `postgres_password`                 |
+| ASSISTENTE_PGVECTOR_USER   | Mesmo usuário do BD SQL do SEI IA (variável POSTGRES_USER).                                 | `$POSTGRES_USER`                    |
 | ASSISTENTE_PGVECTOR_PWD    | Senha para o banco de dados PGVector do Assistente.                                         | `$POSTGRES_PASSWORD`                |
 
 7. **Configurações adicionais**
 
-   Adicione os parâmetros `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`.
-   Esses parâmetros não são essenciais para a instalação do SEI-IA, mas serão necessários para o uso.
+   Adicione variáveis abaixo de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`. Essas variáveis não são essenciais para a instalação do SEI IA, mas serão necessários para o uso do **SEI-IA-ASSISTENTE**.
 
 | Variável                          | Descrição                                                                                                                                           | Exemplo                                  |
 |-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| SEI_IAWS_URL                      | URL do serviço web do SEI-IAWS. Deve ser no formato `http://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`.                                      | `http://meuservidor/sei/modulos/ia/ws/IaWS.php` |
-| SEI_IAWS_SIGLA_SISTEMA            | Sigla do sistema criado automaticamente pelo script de instalação do módulo SEI-IA.                                                                 | `Usuario_IA` *(comentado, não é obrigatório)* |
+| SEI_IAWS_URL                      | URL do serviço web do SEI IAWS. Deve ser no formato `http://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`.                                      | `http://meuservidor/sei/modulos/ia/ws/IaWS.php` |
+| SEI_IAWS_SIGLA_SISTEMA            | Sigla do sistema criado automaticamente pelo script de instalação do módulo SEI IA.                                                                 | `Usuario_IA` *(comentado, não é obrigatório)* |
 | SEI_IAWS_KEY                      | Chave de Acesso gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`                 |
 | AZURE_OPENAI_ENDPOINT             | Endpoint do Azure OpenAI.                                                                                                                         | `https://meuendpoint.openai.azure.com`  |
 | AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4 no Azure.                                                                                                          | `https://meuendpointgpt4.openai.azure.com` |
@@ -167,9 +166,9 @@ O comando acima deverá retornar algo semelhante à imagem abaixo:
 
 Após a finalização do deploy, o Airflow iniciará a indexação dos documentos. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
 
-## Backup periódico dos dados do Servidor de Soluções do SEI-IA
+## Backup periódico dos dados do Servidor de Soluções do SEI IA
 
-Um ponto importante em relação ao uso do módulo SEI-IA e consequentemente do  Servidor de Soluções do SEI-IA, é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI-IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao Servidor de Soluções do SEI-IA:
+Um ponto importante em relação ao uso do módulo SEI IA e consequentemente do  Servidor de Soluções do SEI IA, é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao Servidor de Soluções do SEI IA:
 
 ```bash
 docker volume ls | grep "^sei_ia-"
@@ -184,12 +183,12 @@ Após finalizar o deploy, você poderá realizar os testes acessando:
 | Airflow                                     | http://[Servidor_Solucoes_IA]:8081    | Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings. | - Alterar a senha do Airflow                                                          |
 |                                             |                                        |                                                                                                | - Preferencialmente, bloquear o acesso de rede, exceto para o administrador do SEI.   |
 |                                             |                                        |                                                                                                | - Necessita comunicação com banco de dados e Solr do SEI.                             |
-| API SEI-IA                                  | http://[Servidor_Solucoes_IA]:8082    | API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI. | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI-IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs| API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI-IA Assistente                       | http://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
+| API SEI IA                                  | http://[Servidor_Solucoes_IA]:8082    | API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI. | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
+| API SEI IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs| API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
+| API SEI IA Assistente                       | http://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
 |                                             |                                        |                                                                                                | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA do SEI-IA | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.                                                       |
-| Banco de Dados do Servidor de Soluções de IA do SEI-IA (PostgreSQL) | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.                                                       |
+| Solr do Servidor de Soluções de IA do SEI IA | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.                                                       |
+| Banco de Dados do Servidor de Soluções de IA do SEI IA (PostgreSQL) | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.                                                       |
 
 **Observação:**
 * Por padrão, as portas de acesso externo ao Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
@@ -231,7 +230,7 @@ O Airflow é um orquestrador de tarefas que gera os insumos necessários para o 
 - **process_external_docs_count_token_v1**: Gera a contagem de tokens para os documentos externos do SEI.
 - **process_update_index_v1**: Cria a fila para indexar os processos e documentos no Solr.
 - **system_clean_airflow_logs_v1**: Realiza a limpeza de logs do Airflow.
-- **system_create_mlt_weights_config_v1**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI-IA.
+- **system_create_mlt_weights_config_v1**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI IA.
 
 Ao acessar o Airflow, será apresentada a tela:
 
@@ -250,8 +249,8 @@ No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
 ![Airflow troca de senha - Passo 3](image/airflow_4.png)
 - Sua senha foi alterada com sucesso.
 
-### API de Recomendação de Processos e Documentos do SEI-IA
-![Tela da API de Recomendação de Processos do SEI-IA](image/API_SEIIA.png)
+### API de Recomendação de Processos e Documentos do SEI IA
+![Tela da API de Recomendação de Processos do SEI IA](image/API_SEIIA.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8082
 - **Descrição**: API do SEI que utiliza o Solr para encontrar processos semelhantes.
 - **Health Check**:
@@ -302,8 +301,8 @@ No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
       }
       ```
 
-### API SEI-IA Feedback de Processos
-![Tela da API de Feedback de Processos do SEI-IA](image/API_SEIIA_feedback.png)
+### API SEI IA Feedback de Processos
+![Tela da API de Feedback de Processos do SEI IA](image/API_SEIIA_feedback.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8086/docs
 - **Descrição**: API que grava o feedback do usuário sobre uma recomendação feita pela API SEI.
 - **Health Check**:
@@ -318,8 +317,8 @@ No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
    }
    ```
 
-### API SEI-IA Assistente
-![Tela do Assistente de IA do SEI-IA](image/API_SEIIA_ASSISTENTE.png)
+### API SEI IA Assistente
+![Tela do Assistente de IA do SEI IA](image/API_SEIIA_ASSISTENTE.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8088
 - **Descrição**: API do Assistente de IA do SEI.
 - **Health Check**: 
