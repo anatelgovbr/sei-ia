@@ -1,6 +1,6 @@
-# Servidor de Soluções de IA do Módulo SEI IA 
+# Servidor de Soluções de IA do Módulo SEI-IA 
 
-O *Servidor de Soluções de IA* contém as ferramentas necessárias para o funcionamento do [módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia), composto, de forma simplificada, pelos sub-módulos:
+O *Servidor de Soluções de IA* contém as ferramentas necessárias para o funcionamento do [módulo SEI-IA](https://github.com/anatelgovbr/mod-sei-ia), composto, de forma simplificada, pelos sub-módulos:
 - SEI-IA-SIMILARIDADE: Responsável pela recomendação de processos similares e de documentos similares;
 - SEI-IA-ASSISTENTE: Responsável pelo Assistente baseado em Inteligência Artificial Generativa (GenAI), para responder a questionamentos dos usuários e interagir com documentos do SEI.
 
@@ -12,7 +12,7 @@ Para melhor entendimento do manual, é **mandatório** seja feita uma leitura in
 
 ## O repositorio
 
-Este repositório no GitHub é o local oficial onde será mantido todo o desenvolvimento do *Servidor de Soluções de IA* do Módulo SEI IA.
+Este repositório no GitHub é o local oficial onde será mantido todo o desenvolvimento do *Servidor de Soluções de IA* do Módulo SEI-IA.
 
 ## Requisitos Mínimos
 
