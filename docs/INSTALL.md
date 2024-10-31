@@ -1,18 +1,23 @@
-# Instalação do Servidor de Soluções do SEI IA em Ambiente Linux
+# Instalação do Servidor de Soluções de IA do módulo do SEI IA
 
 Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 
 ## Pré-requisitos
 
-- **CPU**: Intel(R) Xeon(R) 2.10GHz (16 threads)
-  - Consumo na ANATEL (Em ambiente de desenvolvimento):
+Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, considerando os dados e a carga de trabalho da Anatel. Outras configurações de alocação de recursos podem ser avalidas por pessoas devidamente capacitadas.
+
+- **CPU**:
+  - Provisionado: 16 Cores com 2.10GHz
+  - Consumo na ANATEL (Produção):
     - médio: 7%
     - máximo: 25%
-- **MEMÓRIA**: Mínimo de 128GB*
-  - Consumo na ANATEL (Em ambiente de desenvolvimento):
+- **MEMÓRIA**:
+  - Provisionado: 128GB*
+  - Consumo na ANATEL (Produção):
     - mínimo: 12GB
     - máximo: 30GB
-- **ESPAÇO EM DISCO**: Mínimo de 50 GB + Espaço usado pelo SEI para embedding de documentos + Espaço do SOLR + filesystem.
+- **ESPAÇO EM DISCO**:
+  - Provisionado: de 50 GB + Espaço usado pelo SEI para embedding de documentos + Espaço do SOLR + filesystem.
   - Consumo na ANATEL (Em ambiente de produção):
   
       | Aplicação  | Caminho                                          | Tamanho em disco |
