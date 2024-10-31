@@ -12,13 +12,13 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
     - médio: 60%
     - máximo: 100%
 
-- **MEMÓRIA**:
+- **Memória**:
   - Provisionado: 128GB
   - Consumo na ANATEL (Produção):
     - mínimo: 64GB
     - máximo: 115GB
   
-- **ESPAÇO EM DISCO**:
+- **Espaço em Disco**:
   - Provisionado: 600GB.
   - Consumo na ANATEL (Produção):
   
@@ -29,29 +29,29 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
       | Filesystem | /opt/sei-ia-storage/                             | 40 GB            |
       | Docker     | /var/lib/docker/                                 | 50 GB            |
 
-### Regras de Firewall Necessárias
+### Configurações de Rede
 
-Para garantir a comunicação entre os serviços do Servidor de Soluções de IA e o SEI, configure as seguintes regras de firewall:
+Para garantir a comunicação entre os serviços do *Servidor de Soluções de IA* e o SEI, são necessárias as seguintes permissões de conexões de rede:
 
-1. **Servidor de Soluções de IA para SEI**:
-   - **Banco de Dados SEI**: Permitir acesso a porta configurada do banco de dados do SEI (p. ex., 5432 para PostgreSQL ou 3306 para MySQL).
-   - **Solr do SEI**: Permitir acesso à porta onde o Solr do SEI está hospedado (p. ex., 8983).
-   - **HTTP do SEI**: Liberar o acesso HTTP ao SEI (p. ex., 8000).
+1. **Do Servidor de Soluções de IA para SEI**:
+   - **Banco de Dados SEI**: Permissão de acesso ao host e porta configurada do banco de dados do SEI (p. ex., 192.168.2.17:5432 para PostgreSQL ou 192.168.2.17:3306 para MySQL, sendo 192.168.2.17: um exemplo fictício).
+   - **Solr do SEI**: Permissão de acesso ao host e porta porta onde o Solr do SEI está hospedado (p. ex., 192.168.2.17:8983).
+   - **HTTP do SEI**: Permissão de acesso ao host e porta da API do SEI (p. ex., 192.168.2.17:8000).
 
-2. **SEI para Servidor de Soluções de IA**:
+2. **Do servidor do SEI para o Servidor de Soluções de IA**:
    - **Portas Necessárias**:
       - **Airflow**: Porta 8081 - pode ser liberado para o administrador do SEI, para ter acesso as DAGS
       - **API SEI-IA**: Porta 8082
       - **API SEI-IA Feedback**: Porta 8086
       - **API SEI-IA Assistente**: Porta 8088
 
-Essas configurações de firewall são essenciais para o funcionamento correto dos módulos de recomendação e de processamento de documentos do SEI IA.
+Essas configurações de rede são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA.
 
 > **Observações**:
 > - Ao final do manual, são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
 > - Caso necessário, consulte o pequeno tutorial de instalação do Docker na seção de anexos deste manual.
 
-**TODOS OS COMANDOS ILUSTRADOS NESTE DOCUMENTO SÃO DADOS VIA TERMINAL**
+**TODOS OS COMANDOS ILUSTRADOS NESTE MANUAL SÃO EXEMPLOS DE COMANDOS VIA TERMINAL**
 
 ## Passos para Instalação
 
