@@ -12,7 +12,7 @@ O módulo do servidor de soluções do SEI IA contém as ferramentas necessária
 
 ## O REPOSITÓRIO
 
-Este repositório no GitHub é o local oficial onde será mantido todo o desenvolvimento do módulo de integração. Além do código-fonte, também podem ser encontrados o pacote de distribuição para instalação do SEI, questões ou problemas em aberto e o planejamento de novas versões.
+Este repositório no GitHub é o local oficial onde será mantido todo o desenvolvimento do servidor de soluções do SEI IA.
 
 ## DOWNLOAD
 
@@ -22,7 +22,7 @@ O download do pacote de instalação/atualização do servidor de soluções do 
 
 ## DOCUMENTAÇÃO
 
-As instruções de instalação e atualização do módulo, assim como o manual de utilização do usuário, podem ser encontradas na pasta `docs/`.
+As instruções de instalação e atualização do módulo, assim como uma documentaçao simplificada dos endpoints das APIS, podem ser encontradas na pasta `docs/`.
 
 * **[MANUAL DE INSTALAÇÃO](docs/INSTALL.md)**
 * **[DOCUMENTAÇÃO SIMPLIFICADA DAS APIs](docs/API_MANUAL.md)**
