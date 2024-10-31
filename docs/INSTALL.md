@@ -51,8 +51,6 @@ Essas configurações de rede são essenciais para o funcionamento correto dos s
 > - Ao final do manual, são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
 > - Caso necessário, consulte o pequeno tutorial de instalação do Docker na seção de anexos deste manual.
 
-**TODOS OS COMANDOS ILUSTRADOS NESTE MANUAL SÃO EXEMPLOS DE COMANDOS VIA TERMINAL**
-
 ## Passos para Instalação
 
 Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no sistema:
@@ -60,6 +58,9 @@ Antes de começar a instalação, certifique-se de que os seguintes pacotes este
 - Docker Compose >= 2.29
 
 Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
+
+> **Observação**:
+> - Todos os comandos ilustrados neste manual são exemplos de comandos executados via terminal/console/CLI.
 
 1. **Criar a pasta para o SEI IA**
 
