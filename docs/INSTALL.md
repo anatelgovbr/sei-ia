@@ -11,11 +11,13 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
   - Consumo na ANATEL (Produção):
     - médio: 60%
     - máximo: 100%
+
 - **MEMÓRIA**:
   - Provisionado: 128GB
   - Consumo na ANATEL (Produção):
     - mínimo: 64GB
     - máximo: 115GB
+  
 - **ESPAÇO EM DISCO**:
   - Provisionado: 600GB.
   - Consumo na ANATEL (Produção):
@@ -27,8 +29,27 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
       | Filesystem | /opt/sei-ia-storage/                             | 40 GB            |
       | Docker     | /var/lib/docker/                                 | 50 GB            |
 
-Observações:
-- Ao final do manual, trazemos algumas dicas de escalabilidade.
+### Regras de Firewall Necessárias
+
+Para garantir a comunicação entre os serviços do Servidor de Soluções de IA e o SEI, configure as seguintes regras de firewall:
+
+1. **Servidor de Soluções de IA para SEI**:
+   - **Banco de Dados SEI**: Permitir acesso a porta configurada do banco de dados do SEI (p. ex., 5432 para PostgreSQL ou 3306 para MySQL).
+   - **Solr do SEI**: Permitir acesso à porta onde o Solr do SEI está hospedado (p. ex., 8983).
+   - **HTTP do SEI**: Liberar o acesso HTTP ao SEI (p. ex., 8000).
+
+2. **SEI para Servidor de Soluções de IA**:
+   - **Portas Necessárias**:
+      - **Airflow**: Porta 8081 - pode ser liberado para o administrador do SEI, para ter acesso as DAGS
+      - **API SEI-IA**: Porta 8082
+      - **API SEI-IA Feedback**: Porta 8086
+      - **API SEI-IA Assistente**: Porta 8088
+
+Essas configurações de firewall são essenciais para o funcionamento correto dos módulos de recomendação e de processamento de documentos do SEI IA.
+
+> **Observações**:
+> - Ao final do manual, são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
+> - Caso necessário, consulte o pequeno tutorial de instalação do Docker na seção de anexos deste manual.
 
 **TODOS OS COMANDOS ILUSTRADOS NESTE DOCUMENTO SÃO DADOS VIA TERMINAL**
 
@@ -38,7 +59,7 @@ Antes de começar a instalação, certifique-se de que os seguintes pacotes este
 - Docker >= 27.1.1
 - Docker Compose >= 2.29
 
-Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/]) e [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
+Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
 
 1. **Criar a pasta para o SEI IA**
 
@@ -186,8 +207,8 @@ Após finalizar o deploy, você poderá realizar os testes acessando:
 | Solr do Servidor de Soluções de IA do SEI IA | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.                                                       |
 | Banco de Dados do Servidor de Soluções de IA do SEI IA (PostgreSQL) | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.                                                       |
 
-**Observação:**
-* Por padrão, as portas de acesso externo ao Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
+> **Observação:**
+> * Por padrão, as portas de acesso externo ao Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
 
 ```bash
 [...]
@@ -235,27 +256,6 @@ Ao acessar o Airflow, será apresentada a tela:
 No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
 
 **ESSA SENHA DEVE SER ALTERADA!**
-
-#### Monitoramento de DAGs
-
-Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, que usam um esquema de cores para indicar o estado atual de cada uma:
-
-- **Verde escuro**: Execução bem-sucedida, indicando que a DAG foi concluída sem erros.
-- **Verde claro**: DAG em execução. Caso esteja em execução por um longo período, pode indicar um possível atraso ou alta carga de processamento.
-- **Vermelho**: Falha na execução. Verifique e corrija o erro para evitar impacto nas recomendações e na criação de embeddings para o RAG.
-- **Cinza**: DAG sem execução agendada ou manual. Pode ser normal em processos que são executados apenas em intervalos específicos.
-- **Amarelo**: Indica que a execução foi interrompida antes de sua conclusão. Necessita ser retomada ou reiniciada conforme necessário.
-
-#### Como Obter o Log de Execução em Caso de Falha (DAG Vermelha)
-
-Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante a execução. Para investigar o problema:
-
-1. **Clique no nome da DAG** para abrir uma visão detalhada.
-2. Navegue até a execução com falha (marcada em vermelho no diagrama).
-3. **Clique na tarefa específica que falhou** para acessar as opções de log.
-4. Selecione a aba **Log** para ver o histórico detalhado de execução e identificar o erro.
-
-Essa análise dos logs ajudará a entender a causa da falha e facilitará a correção do problema antes de reiniciar a DAG.
 
 #### Alterando a senha do Airflow
 - Inicialmente, você deve acessar `Your Profile`
@@ -417,7 +417,7 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
 
 * Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `env_files/prod.env` – não devem ser alteradas para valores menores, pois isso afetará o funcionamento do sistema.
 
-## Pontos de Montagem de Volumes
+### Pontos de Montagem de Volumes
 
 Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/volumes/`. * Esses volumes tendem a crescer de acordo com a quantidade de documentos e processos armazenados, conforme descrito nos requisitos de sistema.
 
@@ -488,7 +488,8 @@ docker volume ls | grep "^sei_ia-"
 ## ANEXOS:
 ### **Instalar Git - OPCIONAL**
    
-   **OBSERVAÇÃO**: É possível instalar sem o Git, apenas tenha certeza de manter a estrutura do GitHub dentro da pasta /opt/seiia/sei-ia.
+>   **OBSERVAÇÃO**: 
+> * É possível instalar sem o Git, apenas tenha certeza de manter a estrutura do GitHub dentro da pasta /opt/seiia/sei-ia.
    
    Siga a documentação oficial para instalar o Git: [Documentação Git](https://git-scm.com/book/pt-br/v2/Come%C3%A7ando-Instalando-o-Git)
 
