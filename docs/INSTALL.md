@@ -1,6 +1,6 @@
-# Instalação do Servidor de Soluções do SEI-IA em Ambiente Linux
+# Instalação do Servidor de Soluções do SEI IA em Ambiente Linux
 
-Este guia descreve os passos para instalar o Servidor de Soluções do SEI-IA em um ambiente Linux.
+Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 
 ## Pré-requisitos
 
