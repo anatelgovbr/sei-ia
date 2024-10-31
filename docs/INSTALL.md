@@ -90,10 +90,43 @@ Observações:
 
    **Importante:** As variáveis acima de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` são obrigatórias durante a instalação. 
 
+| Variável                   | Descrição                                                                                   | Exemplo                             |
+|----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
+| ENVIRONMENT                | Define o tipo do ambiente                                                    | `prod`                              |
+| LOG_LEVEL                  | Define o nível de log do SEI-IA; opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
+| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                              |
+| DB_SEI_USER                | Usuário para acessar o banco de dados SEI.                                                  | `sei_user`                          |
+| DB_SEI_PWD                 | Senha para o banco de dados SEI.                                                            | `senha_sei`                         |
+| DB_SEI_HOST                | Endereço do host do banco de dados SEI.                                                     | `192.168.0.10`                      |
+| DB_SEI_DATABASE            | Nome do banco de dados SEI.                                                                 | `sei_db`                            |
+| DB_SEI_PORT                | Porta de conexão do banco de dados SEI.                                                     | `5432`                              |
+| DB_SEI_SCHEMA              | Esquema do banco de dados SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
+| DATABASE_TYPE              | Tipo de banco de dados (ex: mssql, mysql, oracle).                                         | `mssql`                             |
+| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                 | `http://192.168.0.10:8983`          |
+| SEI_SOLR_CORE              | Nome do core do Solr do SEI.                                                                | `sei_protocolos`                          |
+| POSTGRES_USER              | Usuário do banco de dados SQL do SEI-IA.                                                    | `sei_llm`                     |
+| POSTGRES_PASSWORD          | Senha para o banco de dados PGVector do SEI-IA.                                            | `postgres_password`                 |
+| ASSISTENTE_PGVECTOR_USER   | Mesmo usuário do BD SQL do SEI-IA (variável POSTGRES_USER).                                 | `$POSTGRES_USER`                    |
+| ASSISTENTE_PGVECTOR_PWD    | Senha para o banco de dados PGVector do Assistente.                                         | `$POSTGRES_PASSWORD`                |
+
 7. **Configurações adicionais**
 
    Adicione os parâmetros `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`.
    Esses parâmetros não são essenciais para a instalação do SEI-IA, mas serão necessários para o uso.
+
+| Variável                          | Descrição                                                                                                                                           | Exemplo                                  |
+|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| SEI_IAWS_URL                      | URL do serviço web do SEI-IAWS. Deve ser no formato `http://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`.                                      | `http://meuservidor/sei/modulos/ia/ws/IaWS.php` |
+| SEI_IAWS_SIGLA_SISTEMA            | Sigla do sistema criado automaticamente pelo script de instalação do módulo SEI-IA.                                                                 | `Usuario_IA` *(comentado, não é obrigatório)* |
+| SEI_IAWS_KEY                      | Chave de Acesso gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`                 |
+| AZURE_OPENAI_ENDPOINT             | Endpoint do Azure OpenAI.                                                                                                                         | `https://meuendpoint.openai.azure.com`  |
+| AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4 no Azure.                                                                                                          | `https://meuendpointgpt4.openai.azure.com` |
+| AZURE_OPENAI_KEY_GPT4o           | Chave de acesso para GPT-4 no Azure.                                                                                                              | `minha_chave_gpt4`                      |
+| GPT_MODEL_4o_128k                | Nome do modelo GPT-4 com 128k tokens.                                                                                                            | `gpt-4-128k`                            |
+| AZURE_OPENAI_ENDPOINT_GPT4o_mini | Endpoint específico para GPT-4 Mini no Azure.                                                                                                     | `https://meuendpointgpt4mini.openai.azure.com` |
+| AZURE_OPENAI_KEY_GPT4o_mini      | Chave de acesso para GPT-4 Mini no Azure.                                                                                                         | `minha_chave_gpt4_mini`                 |
+| GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4 Mini com 128k tokens.                                                                                                        | `gpt-4-mini-128k`                       |
+| OPENAI_API_VERSION                | Versão da API da OpenAI.                                                                                                                          | `2024-02-01`                            |
 
 8. **Executar o deploy**
 
