@@ -177,9 +177,31 @@ Após finalizar o deploy, você poderá realizar os testes acessando:
 | API SEI-IA Feedback                        | http://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
 | API SEI-IA Assistente                      | http://[Servidor_Solucoes_IA]:8088     | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
 |                                            |                                        |                                                                                                | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA do SEI   | http://[Servidor_Solucoes_IA]:8084     | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.     |
-| Banco de Dados SEI                         | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.        |
+| Solr do Servidor de Soluções de IA do SEI-IA   | http://[Servidor_Solucoes_IA]:8084     | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.*     |
+| Banco de Dados do Servidor de Soluções de IA do SEI-IA (PostgreSQL)                         | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.*        |
 
+Observacão:
+* Por padrao, as portas de acesso externo ao Solr e Postgree nao possuem direcionamento para o ambiente externo. Para permitir o acesso deve-se alterar o script de deploy (localizado no arquivo:`deploy-externo-imgs.sh`) de:
+```bash
+[...]
+docker compose --profile externo \
+  -f docker-compose-prod.yaml \
+  -p $PROJECT_NAME \
+  up \
+  --no-build -d
+[...]
+```
+para:
+```bash
+[...]
+docker compose --profile externo \
+  -f docker-compose-prod.yaml \
+  -f docker-compose-dev.yaml \
+  -p $PROJECT_NAME \
+  up \
+  --no-build -d
+[...]
+```
 ### Airflow
 
 O Airflow é um orquestrador de tarefas que gera os insumos necessários para o funcionamento da recomendação de documentos e para a criação de embeddings para RAG.
