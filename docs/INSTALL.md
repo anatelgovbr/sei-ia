@@ -162,7 +162,9 @@ O comando acima deverá retornar algo semelhante à imagem abaixo:
 
 ![Docker Status](image/docker_status.png)
 
-* **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de Health.**
+* **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de Healthy.**
+
+Caso um longo tempo tenha se passado e ainda não tenha obtido o status **healthy**, favor rever os passos anteriores e reportar eventuais problemas que permaneçam.
 
 Após a finalização do deploy, o Airflow iniciará a indexação dos documentos. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
 
