@@ -1,19 +1,19 @@
-# Instalação do SEI-IA em Ambiente Linux
+# Instalação do Servidor de Soluções do SEI-IA em Ambiente Linux
 
-Este guia descreve os passos para instalar o SEI-IA em um servidor Linux.
+Este guia descreve os passos para instalar o Servidor de Soluções do SEI-IA em um ambiente Linux.
 
 ## Pré-requisitos
 
 - **CPU**: Intel(R) Xeon(R) 2.10GHz (16 threads)
-  - Consumo na ANATEL:
+  - Consumo na ANATEL (Em ambiente de desenvolvimento):
     - médio: 7%
     - máximo: 25%
 - **MEMÓRIA**: Mínimo de 128GB*
-  - Consumo na ANATEL:
+  - Consumo na ANATEL (Em ambiente de desenvolvimento):
     - mínimo: 12GB
     - máximo: 30GB
 - **ESPAÇO EM DISCO**: Mínimo de 50 GB + Espaço usado pelo SEI para embedding de documentos + Espaço do SOLR + filesystem.
-  - Consumo na ANATEL:
+  - Consumo na ANATEL (Em ambiente de produção):
   
       | Aplicação  | Caminho                                          | Tamanho em disco |
       |------------|--------------------------------------------------|------------------|
@@ -27,7 +27,7 @@ Antes de começar a instalação, certifique-se de que os seguintes pacotes este
 - Docker Compose >= 2.29
 
 Observações:
-Ao final do manual, trazemos algumas dicas de escalabilidade.
+- Ao final do manual, trazemos algumas dicas de escalabilidade.
 
 **TODOS OS COMANDOS ILUSTRADOS NESTE DOCUMENTO SÃO DADOS VIA TERMINAL**
 
@@ -41,62 +41,7 @@ Ao final do manual, trazemos algumas dicas de escalabilidade.
    cd /opt/seiia
    ```
 
-2. **Instalar Git - OPCIONAL**
-   
-   **OBSERVAÇÃO**: É possível instalar sem o Git, apenas tenha certeza de manter a estrutura do GitHub dentro da pasta /opt/seiia/sei-ia.
-   
-   Siga a documentação oficial para instalar o Git: [Documentação Git](https://git-scm.com/book/pt-br/v2/Come%C3%A7ando-Instalando-o-Git)
-
-   Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-
-   ```bash
-   sudo apt-get update
-   sudo apt-get install git
-   ```
-
-   Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-
-   ```bash
-   sudo yum install git-all
-   ```
-
-3. **Instalar Docker - CASO AINDA NÃO ESTEJA INSTALADO**
-
-   Siga a documentação oficial para instalar o Docker: [Documentação Docker](https://docs.docker.com/engine/install/)
-
-   Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-
-   ```bash
-   for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-
-   # Adicionar a chave GPG oficial do Docker:
-   sudo apt-get update
-   sudo apt-get install ca-certificates curl
-   sudo install -m 0755 -d /etc/apt/keyrings
-   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-   sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-   # Adicionar o repositório do Docker:
-   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-   # Instalar o Docker
-   sudo apt-get update
-   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-   ```
-
-   Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-
-   ```bash
-   # Remover pacotes antigos do Docker, caso existam
-   for pkg in docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine podman containerd runc; do sudo yum remove $pkg; done
-
-   # Instalar o Docker
-   sudo yum install -y yum-utils
-   sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-   sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-   ```
-
-4. **Iniciar o Docker**
+2. **Iniciar o Docker**
 
    Inicie o serviço do Docker.
 
@@ -105,7 +50,7 @@ Ao final do manual, trazemos algumas dicas de escalabilidade.
    docker --version
    ```
 
-5. **Preparar o ambiente**
+3. **Preparar o ambiente**
 
    Instale o Docker e o Git conforme descrito anteriormente. Crie um usuário específico para o SEI-IA:
 
@@ -114,7 +59,7 @@ Ao final do manual, trazemos algumas dicas de escalabilidade.
    sudo chmod 777 /opt/sei-ia-storage
    ```
 
-6. **Clonar o repositório SEI-IA**
+4. **Clonar o repositório SEI-IA**
 
    Troque para o usuário criado e clone o repositório via SSH:
 
@@ -123,7 +68,7 @@ Ao final do manual, trazemos algumas dicas de escalabilidade.
    cd sei-ia
    ```
 
-7. **Criar a rede Docker**
+5. **Criar a rede Docker**
 
    Crie uma rede Docker customizada para a instalação:
 
@@ -139,18 +84,18 @@ Ao final do manual, trazemos algumas dicas de escalabilidade.
    docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge # TROCAR OS IPs DE ACORDO COM A SUA NECESSIDADE
    ```
 
-8. **Configurar o arquivo `env_files/security.env`**
+6. **Configurar o arquivo `env_files/security.env`**
 
    Certifique-se de conhecer o tipo de banco de dados utilizado na instalação do SEI. Preencha os campos no arquivo `env_files/security.env` conforme descrito em cada variável. 
 
    **Importante:** As variáveis acima de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` são obrigatórias durante a instalação. 
 
-9. **Configurações adicionais**
+7. **Configurações adicionais**
 
    Adicione os parâmetros `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`.
    Esses parâmetros não são essenciais para a instalação do SEI-IA, mas serão necessários para o uso.
 
-10. **Executar o deploy**
+8. **Executar o deploy**
 
     Execute o script de deploy:
 
@@ -178,9 +123,9 @@ O comando acima deverá retornar algo semelhante à imagem abaixo:
 
 Após a finalização do deploy, o Airflow iniciará a indexação dos documentos. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
 
-## Backup periódico dos dados das aplicações do SEI-IA
+## Backup periódico dos dados do Servidor de Soluções do SEI-IA
 
-Um ponto importante em relação ao uso do módulo SEI-IA é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI-IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados às aplicações de backend do módulo SEI-IA:
+Um ponto importante em relação ao uso do módulo SEI-IA e consequentemente do  Servidor de Soluções do SEI-IA, é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI-IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao Servidor de Soluções do SEI-IA:
 
 ```bash
 docker volume ls | grep "^sei_ia-"
@@ -446,3 +391,59 @@ Ao escalar a solução, considere os seguintes pontos:
    |-----------------------------|----------------------------------------------------------------|
    | `PGVECTOR_MEM_LIMIT=8g`     | Define o limite de memória para Pgvector como 8 GB.           |
    | `PGVECTOR_CPU_LIMIT='2'`    | Define o limite de CPU para Pgvector como 2 unidades de CPU.  |
+
+## ANEXOS:
+### **Instalar Git - OPCIONAL**
+   
+   **OBSERVAÇÃO**: É possível instalar sem o Git, apenas tenha certeza de manter a estrutura do GitHub dentro da pasta /opt/seiia/sei-ia.
+   
+   Siga a documentação oficial para instalar o Git: [Documentação Git](https://git-scm.com/book/pt-br/v2/Come%C3%A7ando-Instalando-o-Git)
+
+   Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get install git
+   ```
+
+   Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
+
+   ```bash
+   sudo yum install git-all
+   ```
+
+### **Instalar Docker - CASO AINDA NÃO ESTEJA INSTALADO**
+
+   Siga a documentação oficial para instalar o Docker: [Documentação Docker](https://docs.docker.com/engine/install/)
+
+   Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
+
+   ```bash
+   for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+   # Adicionar a chave GPG oficial do Docker:
+   sudo apt-get update
+   sudo apt-get install ca-certificates curl
+   sudo install -m 0755 -d /etc/apt/keyrings
+   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+   sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+   # Adicionar o repositório do Docker:
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+   # Instalar o Docker
+   sudo apt-get update
+   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   ```
+
+   Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
+
+   ```bash
+   # Remover pacotes antigos do Docker, caso existam
+   for pkg in docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine podman containerd runc; do sudo yum remove $pkg; done
+
+   # Instalar o Docker
+   sudo yum install -y yum-utils
+   sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+   sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   ```
