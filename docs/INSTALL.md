@@ -18,7 +18,7 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
     - máximo: 115GB
 - **ESPAÇO EM DISCO**:
   - Provisionado: 600GB.
-  - Consumo na ANATEL (Em ambiente de produção):
+  - Consumo na ANATEL (Produção):
   
       | Aplicação  | Caminho                                          | Tamanho em disco |
       |------------|--------------------------------------------------|------------------|
@@ -27,16 +27,18 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
       | Filesystem | /opt/sei-ia-storage/                             | 40 GB            |
       | Docker     | /var/lib/docker/                                 | 50 GB            |
 
-Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no sistema:
-- Docker >= 27.1.1
-- Docker Compose >= 2.29
-
 Observações:
 - Ao final do manual, trazemos algumas dicas de escalabilidade.
 
 **TODOS OS COMANDOS ILUSTRADOS NESTE DOCUMENTO SÃO DADOS VIA TERMINAL**
 
 ## Passos para Instalação
+
+Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no sistema:
+- Docker >= 27.1.1
+- Docker Compose >= 2.29
+
+Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/]) e [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
 
 1. **Criar a pasta para o SEI-IA**
 
@@ -57,15 +59,17 @@ Observações:
 
 3. **Preparar o ambiente**
 
-   Instale o Docker e o Git conforme descrito anteriormente. Crie um usuário específico para o SEI-IA:
+   Crie um usuário específico para o SEI-IA:
 
    ```bash
    sudo mkdir /opt/sei-ia-storage
    sudo chmod 777 /opt/sei-ia-storage
    ```
 
-4. **Clonar o repositório SEI-IA**
+5. **Clonar o repositório SEI-IA**
 
+   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux).
+   
    Troque para o usuário criado e clone o repositório via SSH:
 
    ```bash
@@ -73,7 +77,7 @@ Observações:
    cd sei-ia
    ```
 
-5. **Criar a rede Docker**
+7. **Criar a rede Docker**
 
    Crie uma rede Docker customizada para a instalação:
 
@@ -81,7 +85,7 @@ Observações:
    docker network create --driver=bridge docker-host-bridge 
    ```
 
-   Em alguns casos, é importante definir o range de distribuição dos IPs para evitar conflitos com outros computadores e/ou serviços.
+   Em muitos casos, é importante definir o range de distribuição dos IPs da rede Docker, para evitar conflitos com outros computadores e/ou serviços do ambiente onde está sendo feita a instalação.
 
    Exemplo:
 
@@ -89,9 +93,11 @@ Observações:
    docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge # TROCAR OS IPs DE ACORDO COM A SUA NECESSIDADE
    ```
 
-6. **Configurar o arquivo `env_files/security.env`**
+8. **Configurar o arquivo `env_files/security.env`**
 
-   Certifique-se de conhecer o tipo de banco de dados utilizado na instalação do SEI. Preencha os campos no arquivo `env_files/security.env` conforme descrito em cada variável. 
+   Certifique-se de conhecer o tipo de banco de dados utilizado na instalação do SEI.
+
+   Preencha os campos no arquivo `env_files/security.env` conforme descrito em cada variável. 
 
    **Importante:** As variáveis acima de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` são obrigatórias durante a instalação. 
 
