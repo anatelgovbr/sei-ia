@@ -47,7 +47,7 @@ Observações:
 
    ```bash
    sudo service docker start
-   docker --version
+   docker --version # deve aparecer algo como Docker version 27.2.0, build 3ab4256
    ```
 
 3. **Preparar o ambiente**
