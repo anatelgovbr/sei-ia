@@ -257,6 +257,29 @@ No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
 
 **ESSA SENHA DEVE SER ALTERADA!**
 
+#### Monitoramento e Significado das Cores das DAGs
+
+Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, que usam um esquema de cores para indicar o estado atual de cada uma:
+
+- **Verde escuro**: Execução bem-sucedida, indicando que a DAG foi concluída sem erros.
+- **Verde claro**: DAG em execução. Caso esteja em execução por um longo período, pode indicar um possível atraso ou alta carga de processamento.
+- **Vermelho**: Falha na execução. Verifique e corrija o erro para evitar impacto nas recomendações e na criação de embeddings para o RAG.
+- **Cinza**: DAG sem execução agendada ou manual. Pode ser normal em processos que são executados apenas em intervalos específicos.
+- **Amarelo**: Indica que a execução foi interrompida antes de sua conclusão. Necessita ser retomada ou reiniciada conforme necessário.
+
+#### Como Obter o Log de Execução em Caso de Falha (DAG Vermelha)
+
+Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante a execução. Para investigar o problema:
+
+1. **Clique no nome da DAG** para abrir uma visão detalhada.
+2. Navegue até a execução com falha (marcada em vermelho no diagrama).
+3. **Clique na tarefa específica que falhou** para acessar as opções de log.
+4. Selecione a aba **Log** para ver o histórico detalhado de execução e identificar o erro.
+
+Essa análise dos logs ajudará a entender a causa da falha e facilitará a correção do problema antes de reiniciar a DAG.
+
+**ESSA SENHA DEVE SER ALTERADA!**
+
 #### Alterando a senha do Airflow
 - Inicialmente, você deve acessar `Your Profile`
 ![Airflow troca de senha - Passo 1](image/airflow_2.png)   
