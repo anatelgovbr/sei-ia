@@ -22,7 +22,7 @@ O *Servidor de Soluções de IA* é baseado em Docker, com todos os containers i
 
 O *Docker Host* deve atender aos requisitos mínimos descritos abaixo. Além disso, a solução foi homologada com uma versão específica do SEI, não sendo uma versão mínima, mas sim a versão exata homologada.
 - **Versão homologada do SEI**: SEI 4.0.12.
-- **Docker**: Docker Community Edition (versão >= 27.1.1).
+- **Docker**: Docker Community Edition (versão >= 27.1.1) e o Docker Compose >= 2.29.
 - **Servidor Linux com**:
   - **CPU**: 16 cores com 2.10GHz;
   - **RAM**: 128 GB.
