@@ -33,27 +33,26 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
   - **Quantidade de Documentos Gerados** (Editor do SEI - salvos no banco): 4.2 milhões
   - **Quantidade de Documentos Externos** (Filesystem do SEI): 8 milhões
   - **Usuários Internos**: cerca de 1.800, dentre servidores públicos e colaboradores em geral
-
-- **Realidade de Cada Órgão**:
-  - A partir dos dados acima cada órgão deve avaliar seu ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL que possuem um crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
+> **Realidade de Cada Órgão**:
+>  - A partir dos dados acima, cada órgão deve avaliar o ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL, pois essas duas aplicações na arquitetura apresentam crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
 
 ### Configurações de Rede
 
 Para garantir a comunicação entre os serviços do *Servidor de Soluções de IA* e o SEI, são necessárias as seguintes permissões de conexões de rede:
 
-1. **Do Servidor de Soluções de IA para SEI**:
-   - **Banco de Dados SEI**: Permissão de acesso ao host e porta configurada do banco de dados do SEI (p. ex., 192.168.2.17:5432 para PostgreSQL ou 192.168.2.17:3306 para MySQL, sendo 192.168.2.17: um exemplo fictício).
-   - **Solr do SEI**: Permissão de acesso ao host e porta porta onde o Solr do SEI está hospedado (p. ex., 192.168.2.17:8983).
-   - **HTTP do SEI**: Permissão de acesso ao host e porta da API do SEI (p. ex., 192.168.2.17:8000).
+1. **Do Servidor de Soluções de IA para o SEI**:
+   - **Banco de Dados do SEI**: Permissão de acesso ao host e porta configurada do banco de dados do SEI (p. ex. 192.168.2.17:3306 para MySQL, sendo 192.168.2.17: um exemplo fictício).
+   - **Solr do SEI**: Permissão de acesso ao host e porta do Solr do SEI (p. ex., 192.168.2.17:8983).
+   - **HTTP do SEI**: Permissão de acesso ao host e porta do SEI, para permitir acesso ao Webservice do Módulo SEI IA (p. ex., 192.168.2.17:8000).
 
 2. **Do servidor do SEI para o Servidor de Soluções de IA**:
    - **Portas Necessárias**:
-      - **Airflow**: Porta 8081 - pode ser liberado para o administrador do SEI, para ter acesso as DAGS
+      - **Airflow**: Porta 8081 - pode ser liberado para o Administrador do ambiente computacional do SEI, para ter acesso às DAGS de toda a arquitetura de Soluções de IA rodando no servidor.
       - **API SEI IA**: Porta 8082
       - **API SEI IA Feedback**: Porta 8086
       - **API SEI IA Assistente**: Porta 8088
 
-Essas configurações de rede são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA.
+As configurações de rede acima são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA, além do Assistente.
 
 > **Observações**:
 > - Ao final do manual, são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
