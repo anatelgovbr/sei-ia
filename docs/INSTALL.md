@@ -1,4 +1,4 @@
-# Instalação do Servidor de Soluções de IA do módulo do SEI IA
+# Manual de Instalação do Servidor de Soluções de IA do módulo do SEI IA
 
 Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 
@@ -35,6 +35,8 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
   - **Usuários Internos**: cerca de 1.800, dentre servidores públicos e colaboradores em geral
 > **Realidade de Cada Órgão**:
 >  - A partir dos dados acima, cada órgão deve avaliar o ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL, pois essas duas aplicações na arquitetura apresentam crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
+> - Ao final deste Manual são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
+> - Caso necessário, consulte o pequeno tutorial de instalação do Docker na seção de anexos deste Manual.
 
 ### Configurações de Rede
 
@@ -54,22 +56,18 @@ Para garantir a comunicação entre os serviços do *Servidor de Soluções de I
 
 As configurações de rede acima são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA, além do Assistente.
 
-> **Observações**:
-> - Ao final do manual, são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
-> - Caso necessário, consulte o pequeno tutorial de instalação do Docker na seção de anexos deste manual.
-
 ## Passos para Instalação
 
-Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no sistema:
+Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no Linux do servidor:
 - Docker >= 27.1.1
 - Docker Compose >= 2.29
 
-Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
+Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
 
 > **Observação**:
-> - Todos os comandos ilustrados neste manual são exemplos de comandos executados via terminal/console/CLI.
+> - Todos os comandos ilustrados neste Manual são exemplos de comandos executados via terminal/console/CLI.
 
-1. **Criar a pasta para o SEI IA**
+1. **Criar a pasta para armazenar os códigos-fonte do *Servidor de Soluções de IA***
 
    ```bash
    sudo mkdir /opt/seiia
@@ -88,23 +86,26 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
 
 3. **Preparar o ambiente**
 
-   Crie um usuário específico para o SEI IA:
+   Crie um usuário específico: - Nei Jobson: não entendi esse passo, pois não está criando um Usuário com o comando.
 
    ```bash
    sudo mkdir /opt/sei-ia-storage
    sudo chmod 777 /opt/sei-ia-storage
    ```
 
-5. **Clonar o repositório SEI IA**
+5. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux).
    
-   Troque para o usuário criado e clone o repositório via SSH:
+   Troque para o usuário expecífico criado e clone o repositório via SSH: - Nei Jobson: Não seria melhor orientar o clone pela Tag de versão?
 
    ```bash
    git clone git@github.com:anatelgovbr/sei-ia.git
    cd sei-ia
    ```
+> **Observação**:
+> - Aqui consta apenas um exemplo, fazendo o clone direto do projeto no GitHub.
+> - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
 
 7. **Criar a rede Docker**
 
@@ -114,7 +115,7 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    docker network create --driver=bridge docker-host-bridge 
    ```
 
-   Em muitos casos, é importante definir o range de distribuição dos IPs da rede Docker, para evitar conflitos com outros computadores e/ou serviços do ambiente onde está sendo feita a instalação.
+   Em muitos casos, é importante definir o range de distribuição dos IPs da rede Docker, para evitar conflitos com outros computadores ou serviços do ambiente onde está sendo feita a instalação.
 
    Exemplo:
 
@@ -122,50 +123,50 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge # TROCAR OS IPs DE ACORDO COM A SUA NECESSIDADE
    ```
 
-8. **Configurar o arquivo `env_files/security.env`**
+8. **Configurar o arquivo `env_files/security.env` do ambiente**
 
-   Certifique-se de conhecer o tipo de banco de dados utilizado na instalação do SEI.
+   Certifique-se de conhecer o tipo de banco de dados utilizado pelo SEI do órgão.
 
-   Preencha os campos no arquivo `env_files/security.env` conforme descrito em cada variável. 
+   Preencha os campos no arquivo `env_files/security.env` conforme comentário sobre cada variável.
 
-   **Importante:** As variáveis acima de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` são obrigatórias durante a instalação. 
+   **Importante:** As variáveis da seção `# ESSENCIAIS NO MOMENTO DA INSTALACAO:` no arquivo `env_files/security.env` são obrigatórias durante a instalação inicial .
 
 | Variável                   | Descrição                                                                                   | Exemplo                             |
 |----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
 | ENVIRONMENT                | Define o tipo do ambiente                                                    | `prod`                              |
 | LOG_LEVEL                  | Define o nível de log do SEI IA; opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
-| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                              |
-| DB_SEI_USER                | Usuário para acessar o banco de dados SEI.                                                  | `sei_user`                          |
-| DB_SEI_PWD                 | Senha para o banco de dados SEI.                                                            | `senha_sei`                         |
-| DB_SEI_HOST                | Endereço do host do banco de dados SEI.                                                     | `192.168.0.10`                      |
-| DB_SEI_DATABASE            | Nome do banco de dados SEI.                                                                 | `sei_db`                            |
-| DB_SEI_PORT                | Porta de conexão do banco de dados SEI.                                                     | `5432`                              |
-| DB_SEI_SCHEMA              | Esquema do banco de dados SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
-| DATABASE_TYPE              | Tipo de banco de dados (ex: mssql, mysql, oracle).                                         | `mssql`                             |
+| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                     |
+| DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.    | `sei_user`                          |
+| DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                | `senha_sei`                         |
+| DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                     | `192.168.0.10`                      |
+| DB_SEI_DATABASE            | Nome do banco de dados do SEI.                                                                 | `sei_db`                            |
+| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI.                                                     | `5432`                              |
+| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
+| DATABASE_TYPE              | Tipo de banco de dados do SEI (ex: mssql, mysql, oracle).                                         | `mssql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                 | `http://192.168.0.10:8983`          |
-| SEI_SOLR_CORE              | Nome do core do Solr do SEI.                                                                | `sei_protocolos`                          |
-| POSTGRES_USER              | Usuário do banco de dados SQL do SEI IA.                                                    | `sei_llm`                     |
-| POSTGRES_PASSWORD          | Senha para o banco de dados PGVector do SEI IA.                                            | `postgres_password`                 |
-| ASSISTENTE_PGVECTOR_USER   | Mesmo usuário do BD SQL do SEI IA (variável POSTGRES_USER).                                 | `$POSTGRES_USER`                    |
-| ASSISTENTE_PGVECTOR_PWD    | Senha para o banco de dados PGVector do Assistente.                                         | `$POSTGRES_PASSWORD`                |
+| SEI_SOLR_CORE              | Nome do core de protocolos no Solr do SEI.                                                 | `sei_protocolos`                    |
+| POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
+| POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
+| ASSISTENTE_PGVECTOR_USER   | Repetir a informação da variável POSTGRES_USER, acima.                                 | `$POSTGRES_USER`                    |
+| ASSISTENTE_PGVECTOR_PWD    | Senha para o banco de dados PGVector do Assistente. - Nei Jobson: Não entendi. Deve ser outra senha?  | `$POSTGRES_PASSWORD`                |
 
 7. **Configurações adicionais**
 
-   Adicione variáveis abaixo de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`. Essas variáveis não são essenciais para a instalação do SEI IA, mas serão necessários para o uso do **SEI IA ASSISTENTE**.
+   No arquivo `env_files/security.env`, preencha as variáveis da seção `# NAO ESSENCIAIS NO MOMENTO DA INSTALACAO:`. Essas variáveis não são essenciais durante a instalação inicial do Servidor de Soluções de IA do módulo SEI IA, mas serão necessárias para o uso do **ASSISTENTE**.
 
-| Variável                          | Descrição                                                                                                                                           | Exemplo                                  |
-|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| SEI_IAWS_URL                      | URL do serviço web do SEI IAWS. Deve ser no formato `http://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`.                                      | `http://meuservidor/sei/modulos/ia/ws/IaWS.php` |
-| SEI_IAWS_SIGLA_SISTEMA            | Sigla do sistema criado automaticamente pelo script de instalação do módulo SEI IA.                                                                 | `Usuario_IA` *(comentado, não é obrigatório)* |
-| SEI_IAWS_KEY                      | Chave de Acesso gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`                 |
-| AZURE_OPENAI_ENDPOINT             | Endpoint do Azure OpenAI.                                                                                                                         | `https://meuendpoint.openai.azure.com`  |
-| AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4 no Azure.                                                                                                          | `https://meuendpointgpt4.openai.azure.com` |
-| AZURE_OPENAI_KEY_GPT4o           | Chave de acesso para GPT-4 no Azure.                                                                                                              | `minha_chave_gpt4`                      |
-| GPT_MODEL_4o_128k                | Nome do modelo GPT-4 com 128k tokens.                                                                                                            | `gpt-4-128k`                            |
-| AZURE_OPENAI_ENDPOINT_GPT4o_mini | Endpoint específico para GPT-4 Mini no Azure.                                                                                                     | `https://meuendpointgpt4mini.openai.azure.com` |
-| AZURE_OPENAI_KEY_GPT4o_mini      | Chave de acesso para GPT-4 Mini no Azure.                                                                                                         | `minha_chave_gpt4_mini`                 |
-| GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4 Mini com 128k tokens.                                                                                                        | `gpt-4-mini-128k`                       |
-| OPENAI_API_VERSION                | Versão da API da OpenAI.                                                                                                                          | `2024-02-01`                            |
+| Variável                          | Descrição                                                                                                      | Exemplo                                  |
+|-----------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| SEI_IAWS_URL                      | URL do serviço web do SEI IAWS. Deve ser no formato `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`.  | `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`  |
+| SEI_IAWS_SIGLA_SISTEMA            | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                       | `Usuario_IA` |
+| SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
+| AZURE_OPENAI_ENDPOINT            | Endpoint do Azure OpenAI Service.                                                                       | `https://meuendpoint.openai.azure.com`  |
+| AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4o no Azure OpenAI Service.                                                | `https://meuendpointgpt4.openai.azure.com`  |
+| AZURE_OPENAI_KEY_GPT4o           | Chave de acesso para GPT-4o no Azure OpenAI Service.                                                    | `minha_chave_gpt4`                      |
+| GPT_MODEL_4o_128k                | Nome do modelo GPT-4o com 128k tokens.                                                                  | `gpt-4-128k`                            |
+| AZURE_OPENAI_ENDPOINT_GPT4o_mini | Endpoint específico para GPT-4o-mini no Azure OpenAI Service.                                           | `https://meuendpointgpt4mini.openai.azure.com`  |
+| AZURE_OPENAI_KEY_GPT4o_mini      | Chave de acesso para GPT-4o-mini no Azure OpenAI Service.                                               | `minha_chave_gpt4_mini`                 |
+| GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4-mini-128k`                       |
+| OPENAI_API_VERSION               | Versão da API da OpenAI no Azure OpenAI Service.                                                        | `2024-02-01`                            |
 
 8. **Executar o deploy**
 
