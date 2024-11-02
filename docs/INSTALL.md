@@ -1,4 +1,4 @@
-# Manual de Instalação do Servidor de Soluções de IA do módulo do SEI IA
+# Instalação do Servidor de Soluções de IA do módulo do SEI IA
 
 Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 
