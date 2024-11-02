@@ -36,7 +36,6 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
 > **Realidade de Cada Órgão**:
 >  - A partir dos dados acima, cada órgão deve avaliar o ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL, pois essas duas aplicações na arquitetura apresentam crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
 > - Ao final deste Manual são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
-> - Caso necessário, consulte o pequeno tutorial de instalação do Docker na seção de anexos deste Manual.
 
 ### Configurações de Rede
 
@@ -59,10 +58,11 @@ As configurações de rede acima são essenciais para o funcionamento correto do
 ## Passos para Instalação
 
 Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no Linux do servidor:
-- Docker >= 27.1.1
-- Docker Compose >= 2.29
+- Docker Engine (versão >= 27.1.1).
+- Docker Compose (versão >= 2.29).
 
-Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
+Caso não estejam instalados, consulte o pequeno tutorial de instalação do Docker na seção de Anexos deste Manual.
+- Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
 
 > **Observação**:
 > - Todos os comandos ilustrados neste Manual são exemplos de comandos executados via terminal/console/CLI.
@@ -104,8 +104,10 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    cd sei-ia
    ```
 > **Observação**:
-> - Aqui consta apenas um exemplo, fazendo o clone direto do projeto no GitHub.
+> - Aqui consta apenas um exemplo, fazendo o clone direto do projeto no GitHub para o Servidor.
+>   - Vide na seção de Anexos deste Manual como instalar o Git no Servidor.
 > - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
+>   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
 
 7. **Criar a rede Docker**
 
@@ -517,20 +519,19 @@ docker volume ls | grep "^sei_ia-"
 ## ANEXOS:
 ### **Instalar Git - OPCIONAL**
    
->   **OBSERVAÇÃO**: 
-> * É possível instalar sem o Git, apenas tenha certeza de manter a estrutura do GitHub dentro da pasta /opt/seiia/sei-ia.
+> **Observação**:
+> - É possível instalar sem o Git, sobretudo caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
+> - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
    
    Siga a documentação oficial para instalar o Git: [Documentação Git](https://git-scm.com/book/pt-br/v2/Come%C3%A7ando-Instalando-o-Git)
 
    Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-
    ```bash
    sudo apt-get update
    sudo apt-get install git
    ```
 
    Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-
    ```bash
    sudo yum install git-all
    ```
@@ -540,7 +541,6 @@ docker volume ls | grep "^sei_ia-"
    Siga a documentação oficial para instalar o Docker: [Documentação Docker](https://docs.docker.com/engine/install/)
 
    Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-
    ```bash
    for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
@@ -560,7 +560,6 @@ docker volume ls | grep "^sei_ia-"
    ```
 
    Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-
    ```bash
    # Remover pacotes antigos do Docker, caso existam
    for pkg in docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine podman containerd runc; do sudo yum remove $pkg; done
