@@ -1,6 +1,6 @@
-# Instalação do Servidor de Soluções de IA do módulo do SEI-IA
+# Instalação do Servidor de Soluções de IA do módulo do SEI IA
 
-Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI-IA, em um ambiente Linux.
+Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 
 ## Pré-requisitos
 
@@ -41,9 +41,9 @@ Para garantir a comunicação entre os serviços do *Servidor de Soluções de I
 2. **Do servidor do SEI para o Servidor de Soluções de IA**:
    - **Portas Necessárias**:
       - **Airflow**: Porta 8081 - pode ser liberado para o administrador do SEI, para ter acesso as DAGS
-      - **API SEI-IA**: Porta 8082
-      - **API SEI-IA Feedback**: Porta 8086
-      - **API SEI-IA Assistente**: Porta 8088
+      - **API SEI IA**: Porta 8082
+      - **API SEI IA Feedback**: Porta 8086
+      - **API SEI IA Assistente**: Porta 8088
 
 Essas configurações de rede são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA.
 
@@ -144,7 +144,7 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
 
 7. **Configurações adicionais**
 
-   Adicione variáveis abaixo de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`. Essas variáveis não são essenciais para a instalação do SEI IA, mas serão necessários para o uso do **SEI-IA-ASSISTENTE**.
+   Adicione variáveis abaixo de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`. Essas variáveis não são essenciais para a instalação do SEI IA, mas serão necessários para o uso do **SEI IA ASSISTENTE**.
 
 | Variável                          | Descrição                                                                                                                                           | Exemplo                                  |
 |-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
