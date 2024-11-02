@@ -245,7 +245,8 @@ docker compose --profile externo \
 
 ### Airflow
 
-O Airflow é um orquestrador de tarefas que gera os insumos necessários para o funcionamento da recomendação de documentos e para a criação de embeddings para RAG.
+- **URL**: http://[Servidor_Solucoes_IA]:8081
+- **Descrição**: Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings.
 
 **Recomendamos bloquear o acesso de rede, exceto para o administrador do ambiente computacional. O Airflow necessita de acessos ao banco de dados do SEI e ao Solr do SEI.**
 
@@ -261,13 +262,12 @@ O Airflow é um orquestrador de tarefas que gera os insumos necessários para o 
 - **system_create_mlt_weights_config_v1**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI IA.
 
 Ao acessar o Airflow, será apresentada a tela:
-
 ![Airflow Interface](image/airflow_interface.png)
 
-No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`. ESSA SENHA DEVE SER ALTERADA!
+No primeiro acesso, o usuário é `airflow` e a senha é `airflow`.
 
-Seguir os passos abaixo para alterar a senha padrão do Airflow.
-  - Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum canto mais? Não precisa alterar em algum arquivo .ENV não?
+A senha padrão acima **deve ser alterada**! Seguir os passos abaixo para alterar a senha padrão do Airflow.
+  - Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum lugar? Não precisa alterar em algum arquivo .ENV não?
   - Inicialmente, você deve acessar `Your Profile`
   ![Airflow troca de senha - Passo 1](image/airflow_2.png)   
   - Em seguida, clique em `Reset my password`
@@ -276,10 +276,9 @@ Seguir os passos abaixo para alterar a senha padrão do Airflow.
   ![Airflow troca de senha - Passo 3](image/airflow_4.png)
   - Sua senha foi alterada com sucesso.
 
-#### Monitoramento e Significado das Cores das DAGs - Nei Jobson parou AQUI... continuar depois.
+#### Monitoramento e Significado das Cores das DAGs
 
 Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, que usam um esquema de cores para indicar o estado atual de cada uma:
-
 - **Verde escuro**: Execução bem-sucedida, indicando que a DAG foi concluída sem erros.
 - **Verde claro**: DAG em execução. Caso esteja em execução por um longo período, pode indicar um possível atraso ou alta carga de processamento.
 - **Vermelho**: Falha na execução. Verifique e corrija o erro para evitar impacto nas recomendações e na criação de embeddings para o RAG.
@@ -289,7 +288,6 @@ Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, q
 #### Como Obter o Log de Execução em Caso de Falha (DAG Vermelha)
 
 Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante a execução. Para investigar o problema:
-
 1. **Clique no nome da DAG** para abrir uma visão detalhada.
 2. Navegue até a execução com falha (marcada em vermelho no diagrama).
 3. **Clique na tarefa específica que falhou** para acessar as opções de log.
@@ -298,9 +296,9 @@ Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante 
 Essa análise dos logs ajudará a entender a causa da falha e facilitará a correção do problema antes de reiniciar a DAG.
 
 ### API de Recomendação de Processos e Documentos do SEI IA
-![Tela da API de Recomendação de Processos do SEI IA](image/API_SEIIA.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8082
-- **Descrição**: API do SEI que utiliza o Solr para encontrar processos semelhantes.
+- **Descrição**: API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI.
+![Tela da API de Recomendação de Processos do SEI IA](image/API_SEIIA.png)
 - **Health Check**:
   - API
       ```bash
