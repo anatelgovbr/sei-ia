@@ -95,6 +95,12 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 5. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
+> **Observação**:
+> - Aqui consta apenas um exemplo, fazendo o clone direto do projeto no GitHub para o Servidor.
+>   - Vide na seção de Anexos deste Manual como instalar o Git no Servidor.
+> - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
+>   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
+
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux).
    
    Troque para o usuário expecífico criado e clone o repositório via SSH: - Nei Jobson: Não seria melhor orientar o clone pela Tag de versão?
@@ -103,11 +109,6 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    git clone git@github.com:anatelgovbr/sei-ia.git
    cd sei-ia
    ```
-> **Observação**:
-> - Aqui consta apenas um exemplo, fazendo o clone direto do projeto no GitHub para o Servidor.
->   - Vide na seção de Anexos deste Manual como instalar o Git no Servidor.
-> - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
->   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
 
 7. **Criar a rede Docker**
 
