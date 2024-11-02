@@ -21,13 +21,21 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
 - **Espaço em Disco**:
   - Provisionado: 600GB.
   - Consumo na ANATEL (Produção):
-  
       | Aplicação  | Caminho                                          | Tamanho em disco |
       |------------|--------------------------------------------------|------------------|
       | Solr       | /var/lib/docker/volumes/sei_ia_solr-db-volume    | 100 GB           |
       | PostgreSQL | /var/lib/docker/volumes/sei_ia_pgvector-db-volume-all | 300 GB      |
       | Filesystem | /opt/sei-ia-storage/                             | 40 GB            |
       | Docker     | /var/lib/docker/                                 | 50 GB            |
+
+- **ATENÇÃO**: As informações acima sobre **"Consumo na ANATEL (Produção)"**, em 04/11/2024, possuem como contexto os números abaixo do SEI de Produção na Agência:
+  - **Quantidade de Processos**: 1.5 milhão
+  - **Quantidade de Documentos Gerados** (Editor do SEI - salvos no banco): 4.2 milhões
+  - **Quantidade de Documentos Externos** (Filesystem do SEI): 8 milhões
+  - **Usuários Internos**: cerca de 1.800, dentre servidores públicos e colaboradores em geral
+
+- **Realidade de Cada Órgão**:
+  - A partir dos dados acima cada órgão deve avaliar seu ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL que possuem um crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
 
 ### Configurações de Rede
 
