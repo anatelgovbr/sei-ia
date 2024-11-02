@@ -21,9 +21,11 @@ Os requisitos aqui apresentados são exclusivamente relacionados ao *Servidor de
 O *Servidor de Soluções de IA* é baseado em Docker, com todos os containers instalados e executados em um *Docker Host* de um servidor Linux. Não recomendamos a utilização de servidores Windows com WSL em ambiente produtivo.
 
 O *Docker Host* deve atender aos requisitos mínimos descritos abaixo:
-- **Docker**: Docker Community Edition (versão >= 27.1.1) e o Docker Compose (versão >= 2.29).
+- **Docker**:
+  - Docker Engine (versão >= 27.1.1).
+  - Docker Compose (versão >= 2.29).
 - **Servidor Linux com**:
-  - **CPU**: 16 cores com 2.10GHz;
+  - **CPU**: 16 cores com 2.10GHz.
   - **RAM**: 128 GB.
 
  **Requisito Mínimo do SEI**: v4.0.12
