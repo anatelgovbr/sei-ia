@@ -262,9 +262,17 @@ Ao acessar o Airflow, será apresentada a tela:
 
 ![Airflow Interface](image/airflow_interface.png)
 
-No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
+No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`. ESSA SENHA DEVE SER ALTERADA!
 
-  - **ESSA SENHA DEVE SER ALTERADA!** Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum canto mais? Não precisa alterar em algum arquivo .ENV não?
+Seguir os passos abaixo para alterar a senha padrão do Airflow.
+  - **** Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum canto mais? Não precisa alterar em algum arquivo .ENV não?
+  - Inicialmente, você deve acessar `Your Profile`
+  ![Airflow troca de senha - Passo 1](image/airflow_2.png)   
+  - Em seguida, clique em `Reset my password`
+  ![Airflow troca de senha - Passo 2](image/airflow_3.png)
+  - Por fim, insira sua nova senha (`password`), confirme-a (`confirm password`) e clique em `save`
+  ![Airflow troca de senha - Passo 3](image/airflow_4.png)
+  - Sua senha foi alterada com sucesso.
 
 #### Monitoramento e Significado das Cores das DAGs
 
@@ -286,17 +294,6 @@ Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante 
 4. Selecione a aba **Log** para ver o histórico detalhado de execução e identificar o erro.
 
 Essa análise dos logs ajudará a entender a causa da falha e facilitará a correção do problema antes de reiniciar a DAG.
-
-**ESSA SENHA DEVE SER ALTERADA!**
-
-#### Alterando a senha do Airflow
-- Inicialmente, você deve acessar `Your Profile`
-![Airflow troca de senha - Passo 1](image/airflow_2.png)   
-- Em seguida, clique em `Reset my password`
-![Airflow troca de senha - Passo 2](image/airflow_3.png)
-- Por fim, insira sua nova senha (`password`), confirme-a (`confirm password`) e clique em `save`
-![Airflow troca de senha - Passo 3](image/airflow_4.png)
-- Sua senha foi alterada com sucesso.
 
 ### API de Recomendação de Processos e Documentos do SEI IA
 ![Tela da API de Recomendação de Processos do SEI IA](image/API_SEIIA.png)
