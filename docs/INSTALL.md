@@ -142,11 +142,11 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                | `senha_sei`                         |
 | DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                     | `192.168.0.10`                      |
 | DB_SEI_DATABASE            | Nome do banco de dados do SEI.                                                                 | `sei_db`                            |
-| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI.                                                     | `5432`                              |
+| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI.                                                     | `3306`                              |
 | DB_SEI_SCHEMA              | Esquema do banco de dados do SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
-| DATABASE_TYPE              | Tipo de banco de dados do SEI (ex: mssql, mysql, oracle).                                         | `mssql`                             |
-| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                 | `http://192.168.0.10:8983`          |
-| SEI_SOLR_CORE              | Nome do core de protocolos no Solr do SEI.                                                 | `sei_protocolos`                    |
+| DATABASE_TYPE              | Tipo de banco de dados do SEI (ex: mssql, mysql, oracle).                                      | `mysql`                             |
+| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                     | `http://192.168.0.10:8983`          |
+| SEI_SOLR_CORE              | Nome do core de protocolos no Solr do SEI.                                                     | `sei_protocolos`                    |
 | POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
 | POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
 | ASSISTENTE_PGVECTOR_USER   | Repetir a informação da variável POSTGRES_USER, acima.                                 | `$POSTGRES_USER`                    |
@@ -215,8 +215,8 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 | API SEI IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
 | API SEI IA Assistente                       | http://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
 |                                             |                                        |                                                                                                | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA  | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                                    | - Por padrão, já vem bloqueado.                                                 |
-| Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                   | - Por padrão, já vem bloqueado.                                                 |
+| Solr do Servidor de Soluções de IA  | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.                                    | - Por padrão, já vem bloqueado.                                                 |
+| Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.                   | - Por padrão, já vem bloqueado.                                                 |
 
 > **Observação:**
 > Nei Jobson: qual é a necessidade dessa observação?
@@ -244,7 +244,6 @@ docker compose --profile externo \
 ```
 
 ### Airflow
-
 - **URL**: http://[Servidor_Solucoes_IA]:8081
 - **Descrição**: Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings.
 
@@ -348,9 +347,9 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
       ```
 
 ### API SEI IA Feedback de Processos
-![Tela da API de Feedback de Processos do SEI IA](image/API_SEIIA_feedback.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8086/docs
-- **Descrição**: API que grava o feedback do usuário sobre uma recomendação feita pela API SEI.
+- **Descrição**: API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.
+![Tela da API de Feedback de Processos do SEI IA](image/API_SEIIA_feedback.png)
 - **Health Check**:
    ```bash
    curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8086/health' -H 'accept: application/json'
@@ -364,9 +363,9 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
    ```
 
 ### API SEI IA Assistente
-![Tela do Assistente de IA do SEI IA](image/API_SEIIA_ASSISTENTE.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8088
-- **Descrição**: API do Assistente de IA do SEI.
+- **Descrição**: API que fornece funcionalidades do Assistente de IA do SEI.
+![Tela do Assistente de IA do SEI IA](image/API_SEIIA_ASSISTENTE.png)
 - **Health Check**: 
    ```bash
    curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8088/health' -H 'accept: application/json'
@@ -378,18 +377,17 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
 
 ### Bancos de Dados
 
-#### Solr
-![Tela do Solr do Servidor de Soluções de IA do SEI](image/Solr_SEIIA.png)
+#### Solr do Servidor de Soluções de IA
 - **URL**: http://[Servidor_Solucoes_IA]:8084
-- **Descrição**: Interface do Solr do Servidor de Soluções de IA do SEI, utilizado na recomendação de processos.
+- **Descrição**: Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.
+![Tela do Solr do Servidor de Soluções de IA do SEI](image/Solr_SEIIA.png)
 
 #### PostgreSQL
 - **URL**: [Servidor_Solucoes_IA]:5432
-- **Descrição**: Acesso ao banco de dados pgvector, utilizando a senha criada no passo 8:
-  - Usuário: `sei_llm`
-  - Senha:   `ASSISTENTE_PGVECTOR_PWD`
+- **Descrição**: Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.
 
-## Resolução de Problemas
+
+## Resolução de Problemas Conhecidos
 
 - **Erro de montagem de arquivo**:
 
@@ -444,16 +442,19 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
 
 ## Pontos de Atenção para Escalabilidade
 
-* Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `env_files/prod.env` – não devem ser alteradas para valores menores, pois isso afetará o funcionamento do sistema.
+* Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `env_files/prod.env`.
+* Não devem ser alteradas para valores menores, pois isso afetará o funcionamento do sistema.
 
 ### Pontos de Montagem de Volumes
 
-Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/volumes/`. * Esses volumes tendem a crescer de acordo com a quantidade de documentos e processos armazenados, conforme descrito nos requisitos de sistema.
+Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/volumes/`.
+* Esses volumes tendem a crescer de acordo com a quantidade de documentos e processos armazenados, conforme descrito nos requisitos de sistema.
 
-É possível também alterar os pontos de montagem dos volumes Docker modificando o arquivo `daemon.json`. Mais informações podem ser encontradas na [documentação do Docker](https://docs.docker.com/reference/cli/dockerd/#configure-runtimes-using-daemonjson). Como alternativa, pode-se criar links simbólicos para cada um dos volumes, ou para todos.
+É possível também alterar os pontos de montagem dos volumes Docker modificando o arquivo `daemon.json`. Mais informações podem ser encontradas na [documentação do Docker](https://docs.docker.com/reference/cli/dockerd/#configure-runtimes-using-daemonjson).
+  - Como alternativa, pode-se criar links simbólicos para cada um dos volumes.
 
 - Exemplo de criação de um link simbólico para `/var/lib/docker/volumes/sei_ia_pgvector-db-volume-all`:
-  - Pare o Docker para evitar problemas durante a movimentação dos dados:
+  - Deve parar o Docker para evitar problemas durante a movimentação dos dados:
 
    ```bash
    sudo systemctl stop docker
@@ -487,8 +488,8 @@ Ao escalar a solução, considere os seguintes pontos:
   - Aumente a alocação de memória se houver necessidade de lidar com uma maior quantidade de documentos ou consultas simultâneas. Uma boa prática é aumentar a memória em incrementos de 2 GB.
   - Para isso, altere no arquivo `env_files/prod.env`:
 
-   | Variável                   | Descrição                                                                                      |
-   |----------------------------|------------------------------------------------------------------------------------------------|
+   | Variável                        | Descrição                                                                                  |
+   |---------------------------------|--------------------------------------------------------------------------------------------|
    | `SOLR_JAVA_MEM="-Xms2g -Xmx8g"` | Define as opções de memória Java para Solr, com um mínimo de 2 GB e um máximo de 8 GB.     |
    | `SOLR_MEM_LIMIT=10g`            | Define o limite de memória para Solr como 10 GB.                                           |
    | `SOLR_CPU_LIMIT='2'`            | Define o limite de CPU para Solr como 2 unidades de CPU.                                   |
@@ -500,21 +501,22 @@ Ao escalar a solução, considere os seguintes pontos:
 - **Postgres**:
   - Para aumentar o desempenho, considere aumentar a memória disponível. Monitore o uso de disco e ajuste conforme necessário.
 
-   | Variável                    | Descrição                                                    |
-   |-----------------------------|----------------------------------------------------------------|
+   | Variável                    | Descrição                                                     |
+   |-----------------------------|---------------------------------------------------------------|
    | `PGVECTOR_MEM_LIMIT=8g`     | Define o limite de memória para Pgvector como 8 GB.           |
    | `PGVECTOR_CPU_LIMIT='2'`    | Define o limite de CPU para Pgvector como 2 unidades de CPU.  |
 
 
-## Backup periódico dos dados do Servidor de Soluções do SEI IA
+## Backup periódico dos dados do Servidor de Soluções de IA
 
-Um ponto importante em relação ao uso do módulo SEI IA e consequentemente do  Servidor de Soluções do SEI IA, é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao Servidor de Soluções do SEI IA:
+Um ponto importante em relação ao Servidor de Soluções de IA é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao servidor:
 
 ```bash
 docker volume ls | grep "^sei_ia-"
 ```
 
 ## ANEXOS:
+
 ### **Instalar Git - OPCIONAL**
    
 > **Observação**:
