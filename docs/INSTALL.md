@@ -265,7 +265,7 @@ Ao acessar o Airflow, será apresentada a tela:
 No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`. ESSA SENHA DEVE SER ALTERADA!
 
 Seguir os passos abaixo para alterar a senha padrão do Airflow.
-  - **** Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum canto mais? Não precisa alterar em algum arquivo .ENV não?
+  - Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum canto mais? Não precisa alterar em algum arquivo .ENV não?
   - Inicialmente, você deve acessar `Your Profile`
   ![Airflow troca de senha - Passo 1](image/airflow_2.png)   
   - Em seguida, clique em `Reset my password`
@@ -274,7 +274,7 @@ Seguir os passos abaixo para alterar a senha padrão do Airflow.
   ![Airflow troca de senha - Passo 3](image/airflow_4.png)
   - Sua senha foi alterada com sucesso.
 
-#### Monitoramento e Significado das Cores das DAGs
+#### Monitoramento e Significado das Cores das DAGs - Nei Jobson parou AQUI... continuar depois.
 
 Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, que usam um esquema de cores para indicar o estado atual de cada uma:
 
