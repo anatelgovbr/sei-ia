@@ -1,10 +1,10 @@
-# Documentação da API do Servidor de Soluções do SEI IA
+# Documentação da API do Servidor de Soluções de IA
 
 Aqui você pode encontrar uma breve descrição dos endpoints das APIs do servidor de soluções do SEI IA. O sistema é composto por:
 
-- API Assistente de IA do servidor de soluções do SEI IA
-- API de Recomendação de Processos e Documentos do servidor de soluções do SEI IA
-- API SEI IA Feedback de Processos do servidor de soluções do SEI IA
+- API Assistente de IA do servidor de soluções de IA
+- API de Recomendação de Processos e Documentos do servidor de soluções de IA
+- API SEI IA Feedback de Processos do servidor de soluções de IA
 
 ---
 
