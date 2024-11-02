@@ -176,7 +176,7 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    sudo bash deploy-externo-imgs.sh 
    ```
 
-   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr), logo se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
+   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr). Logo, se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
 
    Resultado da finalização do deploy:
 
@@ -192,31 +192,32 @@ O comando acima deverá retornar algo semelhante à imagem abaixo:
 
 ![Docker Status](image/docker_status.png)
 
-* **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de Healthy.**
+* **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de "healthy".** Então, espere esse tempo e confira novamente.
 
 Caso um longo tempo tenha se passado e ainda não tenha obtido o status **healthy**, favor rever os passos anteriores e reportar eventuais problemas que permaneçam.
 
-Após a finalização do deploy, o Airflow iniciará a indexação dos documentos. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
+Após a finalização do deploy, o Airflow iniciará a indexação dos documentos já existentes no SEI do ambinete correspondente. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
 
 Nas seções a seguir apresentamos como testar e validar os resultados da instalação e configuração. 
 
 ## Testes de Acessos
 
-Após finalizar o deploy, você poderá realizar os testes acessando:
+Após finalizar o deploy, você poderá realizar testes acessando cada solução da arquitetura:
 
-| Solução                                     | URL de Acesso                          | Descrição                                                                                       | Recomendações                                                                         |
-|---------------------------------------------|----------------------------------------|------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| Airflow                                     | http://[Servidor_Solucoes_IA]:8081    | Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings. | - Alterar a senha do Airflow                                                          |
-|                                             |                                        |                                                                                                | - Preferencialmente, bloquear o acesso de rede, exceto para o administrador do SEI.   |
-|                                             |                                        |                                                                                                | - Necessita comunicação com banco de dados e Solr do SEI.                             |
+| Solução                                     | URL de Acesso                          | Descrição                                                                                   | Recomendações                                                                       |
+|---------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| Airflow                                     | http://[Servidor_Solucoes_IA]:8081    | Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings. | - Alterar a senha do Airflow                                                   |
+|                                             |                                        |                                                                                               | - Preferencialmente, bloquear o acesso de rede, exceto para o administrador do SEI. |
+|                                             |                                        |                                                                                                | - Necessita comunicação com banco de dados e Solr do SEI.                          |
 | API SEI IA                                  | http://[Servidor_Solucoes_IA]:8082    | API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI. | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs| API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
+| API SEI IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
 | API SEI IA Assistente                       | http://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
 |                                             |                                        |                                                                                                | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA do SEI IA | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.                                                       |
-| Banco de Dados do Servidor de Soluções de IA do SEI IA (PostgreSQL) | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.                                                       |
+| Solr do Servidor de Soluções de IA  | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                                    | - Por padrão, já vem bloqueado.                                                 |
+| Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                   | - Por padrão, já vem bloqueado.                                                 |
 
 > **Observação:**
+> Nei Jobson: qual é a necessidade dessa observação?
 > * Por padrão, as portas de acesso externo ao Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
 
 ```bash
@@ -244,10 +245,9 @@ docker compose --profile externo \
 
 O Airflow é um orquestrador de tarefas que gera os insumos necessários para o funcionamento da recomendação de documentos e para a criação de embeddings para RAG.
 
-**Recomendamos bloquear o acesso de rede, exceto para o administrador do SEI. O Airflow necessita de acessos ao banco de dados do SEI e ao Solr do SEI.**
+**Recomendamos bloquear o acesso de rede, exceto para o administrador do ambiente computacional. O Airflow necessita de acessos ao banco de dados do SEI e ao Solr do SEI.**
 
 #### Principais DAGs
-
 - **dag_embeddings_start**: Cria a fila para gerar os embeddings para RAG.
 - **document_create_index_v1**: Processa os documentos para serem indexados no Solr para recomendação.
 - **indexing_embedding_document**: Processa a fila de embeddings, gerando os embeddings para RAG.
@@ -264,7 +264,7 @@ Ao acessar o Airflow, será apresentada a tela:
 
 No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
 
-**ESSA SENHA DEVE SER ALTERADA!**
+  - **ESSA SENHA DEVE SER ALTERADA!** Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum canto mais? Não precisa alterar em algum arquivo .ENV não?
 
 #### Monitoramento e Significado das Cores das DAGs
 
