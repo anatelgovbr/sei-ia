@@ -86,7 +86,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 3. **Preparar o ambiente**
 
-   Crie a pasta necessãria para cache do Servidor de soluções de IA do SEI.
+   Crie a pasta necessária para cache do Servidor de Soluções de IA.
 
    ```bash
    sudo mkdir /opt/sei-ia-storage
@@ -96,7 +96,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 5. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
   > **Observação**:
-  > - Aqui consta apenas um exemplo, fazendo o clone direto do projeto no GitHub para o Servidor.
+  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v.1.0.0`.
   > - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
   >   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
 
@@ -133,9 +133,9 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 | Variável                   | Descrição                                                                                   | Exemplo                             |
 |----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
-| ENVIRONMENT                | Define o tipo do ambiente                                                    | `prod`                              |
-| LOG_LEVEL                  | Define o nível de log do SEI IA; opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
-| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                     |
+| ENVIRONMENT                | Define o tipo do ambiente da instalação. Opções disponíveis: dev, homol, prod.              | `prod`                              |
+| LOG_LEVEL                  | Define o nível de log do SEI IA. Opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
+| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host do ambiente de instalação.                         | `1001`                              |
 | DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.    | `sei_user`                          |
 | DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                | `senha_sei`                         |
 | DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                     | `192.168.0.10`                      |
@@ -147,6 +147,8 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
 | POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
 
+> **Observação**:
+> - Sobre a variável `GID_DOCKER`, Group ID do ambiente de instalação correspondente deve ser obtido executando o comando: `cat /etc/group | grep ^docker: | cut -d: -f3`.
 
 7. **Configurações adicionais**
 
@@ -166,9 +168,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4-mini-128k`                       |
 | OPENAI_API_VERSION               | Versão da API da OpenAI no Azure OpenAI Service.                                                        | `2024-02-01`                            |
 
-Note que existem varia que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` as quais não podem ser alteradas.
-
-
+Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` que não podem ser alteradas.
 
 8. **Executar o deploy**
 
@@ -219,7 +219,7 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 | Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.                   | - Por padrão, já vem bloqueado.                                                 |
 
 > **Observação:**
-> * Por padrão, as portas de acesso externo ao Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
+> * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação às aplicações Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso externo à rede Docker, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
 
 ```bash
 [...]
@@ -235,12 +235,13 @@ para:
 [...]
 docker compose --profile externo \
   -f docker-compose-prod.yaml \
-  -f docker-compose-dev.yaml \
+  -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura da porta para acesso externo à rede Docker.
   -p $PROJECT_NAME \
   up \
   --no-build -d
 [...]
 ```
+Nei Jobson: Adicionar o que precisa ser feito no ambiente para a alteração acima ser aplicada de fato.
 
 ### Airflow
 - **URL**: http://[Servidor_Solucoes_IA]:8081
