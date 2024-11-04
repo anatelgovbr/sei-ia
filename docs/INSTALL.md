@@ -86,7 +86,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 3. **Preparar o ambiente**
 
-   Crie um usuário específico: - Nei Jobson: não entendi esse passo, pois não está criando um Usuário com o comando.
+   Crie a pasta necessãria para cache do Servidor de soluções de IA do SEI.
 
    ```bash
    sudo mkdir /opt/sei-ia-storage
@@ -102,10 +102,8 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de Anexos deste Manual que orienta a instalar o Git no Servidor.
    
-   Troque para o usuário expecífico criado no passo anterior e clone o repositório via SSH: - Nei Jobson: Não seria melhor orientar o clone pela Tag de versão?
-
    ```bash
-   git clone git@github.com:anatelgovbr/sei-ia.git
+   git clone --branch v.1.0.0 --single-branch git@github.com:anatelgovbr/sei-ia.git
    cd sei-ia
    ```
 
@@ -146,11 +144,9 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | DB_SEI_SCHEMA              | Esquema do banco de dados do SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
 | DATABASE_TYPE              | Tipo de banco de dados do SEI (ex: mssql, mysql, oracle).                                      | `mysql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                     | `http://192.168.0.10:8983`          |
-| SEI_SOLR_CORE              | Nome do core de protocolos no Solr do SEI.                                                     | `sei_protocolos`                    |
 | POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
 | POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
-| ASSISTENTE_PGVECTOR_USER   | Repetir a informação da variável POSTGRES_USER, acima.                                 | `$POSTGRES_USER`                    |
-| ASSISTENTE_PGVECTOR_PWD    | Senha para o banco de dados PGVector do Assistente. - Nei Jobson: Não entendi. Deve ser outra senha?  | `$POSTGRES_PASSWORD`                |
+
 
 7. **Configurações adicionais**
 
@@ -169,6 +165,10 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | AZURE_OPENAI_KEY_GPT4o_mini      | Chave de acesso para GPT-4o-mini no Azure OpenAI Service.                                               | `minha_chave_gpt4_mini`                 |
 | GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4-mini-128k`                       |
 | OPENAI_API_VERSION               | Versão da API da OpenAI no Azure OpenAI Service.                                                        | `2024-02-01`                            |
+
+Note que existem varia que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` as quais não podem ser alteradas.
+
+
 
 8. **Executar o deploy**
 
@@ -219,7 +219,6 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 | Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.                   | - Por padrão, já vem bloqueado.                                                 |
 
 > **Observação:**
-> Nei Jobson: qual é a necessidade dessa observação?
 > * Por padrão, as portas de acesso externo ao Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
 
 ```bash
@@ -266,7 +265,6 @@ Ao acessar o Airflow, será apresentada a tela:
 No primeiro acesso, o usuário é `airflow` e a senha é `airflow`.
 
 A senha padrão acima **deve ser alterada**! Seguir os passos abaixo para alterar a senha padrão do Airflow.
-  - Nei Jobson: vai orientar alterar mesmo? Se sim, a aplicação usa esse usuário em algum lugar? Não precisa alterar em algum arquivo .ENV não?
   - Inicialmente, você deve acessar `Your Profile`
   ![Airflow troca de senha - Passo 1](image/airflow_2.png)   
   - Em seguida, clique em `Reset my password`
