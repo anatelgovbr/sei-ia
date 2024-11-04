@@ -21,7 +21,6 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
 - **Espaço em Disco**:
   - Provisionado: 600GB.
   - Consumo na ANATEL (Produção):
-  
       | Aplicação  | Caminho                                          | Tamanho em disco |
       |------------|--------------------------------------------------|------------------|
       | Solr       | /var/lib/docker/volumes/sei_ia_solr-db-volume    | 100 GB           |
@@ -29,40 +28,46 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
       | Filesystem | /opt/sei-ia-storage/                             | 40 GB            |
       | Docker     | /var/lib/docker/                                 | 50 GB            |
 
+- **ATENÇÃO**: As informações acima sobre **"Consumo na ANATEL (Produção)"**, em 04/11/2024, possuem como contexto os números abaixo do SEI de Produção na Agência:
+  - **Quantidade de Processos**: 1.5 milhão
+  - **Quantidade de Documentos Gerados** (Editor do SEI - salvos no banco): 4.2 milhões
+  - **Quantidade de Documentos Externos** (Filesystem do SEI): 8 milhões
+  - **Usuários Internos**: cerca de 1.800, dentre servidores públicos e colaboradores em geral
+> **Realidade de Cada Órgão**:
+>  - A partir dos dados acima, cada órgão deve avaliar o ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL, pois essas duas aplicações na arquitetura apresentam crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
+> - Ao final deste Manual são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
+
 ### Configurações de Rede
 
 Para garantir a comunicação entre os serviços do *Servidor de Soluções de IA* e o SEI, são necessárias as seguintes permissões de conexões de rede:
 
-1. **Do Servidor de Soluções de IA para SEI**:
-   - **Banco de Dados SEI**: Permissão de acesso ao host e porta configurada do banco de dados do SEI (p. ex., 192.168.2.17:5432 para PostgreSQL ou 192.168.2.17:3306 para MySQL, sendo 192.168.2.17: um exemplo fictício).
-   - **Solr do SEI**: Permissão de acesso ao host e porta porta onde o Solr do SEI está hospedado (p. ex., 192.168.2.17:8983).
-   - **HTTP do SEI**: Permissão de acesso ao host e porta da API do SEI (p. ex., 192.168.2.17:8000).
+1. **Do Servidor de Soluções de IA para o SEI**:
+   - **Banco de Dados do SEI**: Permissão de acesso ao host e porta configurada do banco de dados do SEI (p. ex. 192.168.2.17:3306 para MySQL, sendo 192.168.2.17: um exemplo fictício).
+   - **Solr do SEI**: Permissão de acesso ao host e porta do Solr do SEI (p. ex., 192.168.2.17:8983).
+   - **HTTP do SEI**: Permissão de acesso ao host e porta do SEI, para permitir acesso ao Webservice do Módulo SEI IA (p. ex., 192.168.2.17:8000).
 
 2. **Do servidor do SEI para o Servidor de Soluções de IA**:
    - **Portas Necessárias**:
-      - **Airflow**: Porta 8081 - pode ser liberado para o administrador do SEI, para ter acesso as DAGS
+      - **Airflow**: Porta 8081 - pode ser liberado para o Administrador do ambiente computacional do SEI, para ter acesso às DAGS de toda a arquitetura de Soluções de IA rodando no servidor.
       - **API SEI IA**: Porta 8082
       - **API SEI IA Feedback**: Porta 8086
       - **API SEI IA Assistente**: Porta 8088
 
-Essas configurações de rede são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA.
-
-> **Observações**:
-> - Ao final do manual, são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
-> - Caso necessário, consulte o pequeno tutorial de instalação do Docker na seção de anexos deste manual.
+As configurações de rede acima são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA, além do Assistente.
 
 ## Passos para Instalação
 
-Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no sistema:
-- Docker >= 27.1.1
-- Docker Compose >= 2.29
+Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no Linux do servidor:
+- Docker Engine (versão >= 27.1.1).
+- Docker Compose (versão >= 2.29).
 
-Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos do tutorial de instalação do Docker, na seção Anexos. Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
+Caso não estejam instalados, consulte o pequeno tutorial de instalação do Docker na seção de Anexos deste Manual.
+- Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
 
 > **Observação**:
-> - Todos os comandos ilustrados neste manual são exemplos de comandos executados via terminal/console/CLI.
+> - Todos os comandos ilustrados neste Manual são exemplos de comandos executados via terminal/console/CLI.
 
-1. **Criar a pasta para o SEI IA**
+1. **Criar a pasta para armazenar os códigos-fonte do *Servidor de Soluções de IA***
 
    ```bash
    sudo mkdir /opt/seiia
@@ -81,21 +86,24 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
 
 3. **Preparar o ambiente**
 
-   Crie um usuário específico para o SEI IA:
+   Crie a pasta necessãria para cache do Servidor de soluções de IA do SEI.
 
    ```bash
    sudo mkdir /opt/sei-ia-storage
    sudo chmod 777 /opt/sei-ia-storage
    ```
 
-5. **Clonar o repositório SEI IA**
+5. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
-   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux).
+  > **Observação**:
+  > - Aqui consta apenas um exemplo, fazendo o clone direto do projeto no GitHub para o Servidor.
+  > - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
+  >   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
+
+   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de Anexos deste Manual que orienta a instalar o Git no Servidor.
    
-   Troque para o usuário criado e clone o repositório via SSH:
-
    ```bash
-   git clone git@github.com:anatelgovbr/sei-ia.git
+   git clone --branch v.1.0.0 --single-branch git@github.com:anatelgovbr/sei-ia.git
    cd sei-ia
    ```
 
@@ -107,7 +115,7 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    docker network create --driver=bridge docker-host-bridge 
    ```
 
-   Em muitos casos, é importante definir o range de distribuição dos IPs da rede Docker, para evitar conflitos com outros computadores e/ou serviços do ambiente onde está sendo feita a instalação.
+   Em muitos casos, é importante definir o range de distribuição dos IPs da rede Docker, para evitar conflitos com outros computadores ou serviços do ambiente onde está sendo feita a instalação.
 
    Exemplo:
 
@@ -115,50 +123,52 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge # TROCAR OS IPs DE ACORDO COM A SUA NECESSIDADE
    ```
 
-8. **Configurar o arquivo `env_files/security.env`**
+8. **Configurar o arquivo `env_files/security.env` do ambiente**
 
-   Certifique-se de conhecer o tipo de banco de dados utilizado na instalação do SEI.
+   Certifique-se de conhecer o tipo de banco de dados utilizado pelo SEI do órgão.
 
-   Preencha os campos no arquivo `env_files/security.env` conforme descrito em cada variável. 
+   Preencha os campos no arquivo `env_files/security.env` conforme comentário sobre cada variável.
 
-   **Importante:** As variáveis acima de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` são obrigatórias durante a instalação. 
+   **Importante:** As variáveis da seção `# ESSENCIAIS NO MOMENTO DA INSTALACAO:` no arquivo `env_files/security.env` são obrigatórias durante a instalação inicial .
 
 | Variável                   | Descrição                                                                                   | Exemplo                             |
 |----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
 | ENVIRONMENT                | Define o tipo do ambiente                                                    | `prod`                              |
 | LOG_LEVEL                  | Define o nível de log do SEI IA; opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
-| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                              |
-| DB_SEI_USER                | Usuário para acessar o banco de dados SEI.                                                  | `sei_user`                          |
-| DB_SEI_PWD                 | Senha para o banco de dados SEI.                                                            | `senha_sei`                         |
-| DB_SEI_HOST                | Endereço do host do banco de dados SEI.                                                     | `192.168.0.10`                      |
-| DB_SEI_DATABASE            | Nome do banco de dados SEI.                                                                 | `sei_db`                            |
-| DB_SEI_PORT                | Porta de conexão do banco de dados SEI.                                                     | `5432`                              |
-| DB_SEI_SCHEMA              | Esquema do banco de dados SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
-| DATABASE_TYPE              | Tipo de banco de dados (ex: mssql, mysql, oracle).                                         | `mssql`                             |
-| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                 | `http://192.168.0.10:8983`          |
-| SEI_SOLR_CORE              | Nome do core do Solr do SEI.                                                                | `sei_protocolos`                          |
-| POSTGRES_USER              | Usuário do banco de dados SQL do SEI IA.                                                    | `sei_llm`                     |
-| POSTGRES_PASSWORD          | Senha para o banco de dados PGVector do SEI IA.                                            | `postgres_password`                 |
-| ASSISTENTE_PGVECTOR_USER   | Mesmo usuário do BD SQL do SEI IA (variável POSTGRES_USER).                                 | `$POSTGRES_USER`                    |
-| ASSISTENTE_PGVECTOR_PWD    | Senha para o banco de dados PGVector do Assistente.                                         | `$POSTGRES_PASSWORD`                |
+| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                     |
+| DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.    | `sei_user`                          |
+| DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                | `senha_sei`                         |
+| DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                     | `192.168.0.10`                      |
+| DB_SEI_DATABASE            | Nome do banco de dados do SEI.                                                                 | `sei_db`                            |
+| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI.                                                     | `3306`                              |
+| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
+| DATABASE_TYPE              | Tipo de banco de dados do SEI (ex: mssql, mysql, oracle).                                      | `mysql`                             |
+| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                     | `http://192.168.0.10:8983`          |
+| POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
+| POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
+
 
 7. **Configurações adicionais**
 
-   Adicione variáveis abaixo de `# NÃO ESSENCIAIS NO MOMENTO DA INSTALAÇÃO:` no arquivo `env_files/security.env`. Essas variáveis não são essenciais para a instalação do SEI IA, mas serão necessários para o uso do **SEI IA ASSISTENTE**.
+   No arquivo `env_files/security.env`, preencha as variáveis da seção `# NAO ESSENCIAIS NO MOMENTO DA INSTALACAO:`. Essas variáveis não são essenciais durante a instalação inicial do Servidor de Soluções de IA do módulo SEI IA, mas serão necessárias para o uso do **ASSISTENTE**.
 
-| Variável                          | Descrição                                                                                                                                           | Exemplo                                  |
-|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| SEI_IAWS_URL                      | URL do serviço web do SEI IAWS. Deve ser no formato `http://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`.                                      | `http://meuservidor/sei/modulos/ia/ws/IaWS.php` |
-| SEI_IAWS_SIGLA_SISTEMA            | Sigla do sistema criado automaticamente pelo script de instalação do módulo SEI IA.                                                                 | `Usuario_IA` *(comentado, não é obrigatório)* |
-| SEI_IAWS_KEY                      | Chave de Acesso gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`                 |
-| AZURE_OPENAI_ENDPOINT             | Endpoint do Azure OpenAI.                                                                                                                         | `https://meuendpoint.openai.azure.com`  |
-| AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4 no Azure.                                                                                                          | `https://meuendpointgpt4.openai.azure.com` |
-| AZURE_OPENAI_KEY_GPT4o           | Chave de acesso para GPT-4 no Azure.                                                                                                              | `minha_chave_gpt4`                      |
-| GPT_MODEL_4o_128k                | Nome do modelo GPT-4 com 128k tokens.                                                                                                            | `gpt-4-128k`                            |
-| AZURE_OPENAI_ENDPOINT_GPT4o_mini | Endpoint específico para GPT-4 Mini no Azure.                                                                                                     | `https://meuendpointgpt4mini.openai.azure.com` |
-| AZURE_OPENAI_KEY_GPT4o_mini      | Chave de acesso para GPT-4 Mini no Azure.                                                                                                         | `minha_chave_gpt4_mini`                 |
-| GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4 Mini com 128k tokens.                                                                                                        | `gpt-4-mini-128k`                       |
-| OPENAI_API_VERSION                | Versão da API da OpenAI.                                                                                                                          | `2024-02-01`                            |
+| Variável                          | Descrição                                                                                                      | Exemplo                                  |
+|-----------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| SEI_IAWS_URL                      | URL do serviço web do SEI IAWS. Deve ser no formato `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`.  | `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`  |
+| SEI_IAWS_SIGLA_SISTEMA            | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                       | `Usuario_IA` |
+| SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
+| AZURE_OPENAI_ENDPOINT            | Endpoint do Azure OpenAI Service.                                                                       | `https://meuendpoint.openai.azure.com`  |
+| AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4o no Azure OpenAI Service.                                                | `https://meuendpointgpt4.openai.azure.com`  |
+| AZURE_OPENAI_KEY_GPT4o           | Chave de acesso para GPT-4o no Azure OpenAI Service.                                                    | `minha_chave_gpt4`                      |
+| GPT_MODEL_4o_128k                | Nome do modelo GPT-4o com 128k tokens.                                                                  | `gpt-4-128k`                            |
+| AZURE_OPENAI_ENDPOINT_GPT4o_mini | Endpoint específico para GPT-4o-mini no Azure OpenAI Service.                                           | `https://meuendpointgpt4mini.openai.azure.com`  |
+| AZURE_OPENAI_KEY_GPT4o_mini      | Chave de acesso para GPT-4o-mini no Azure OpenAI Service.                                               | `minha_chave_gpt4_mini`                 |
+| GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4-mini-128k`                       |
+| OPENAI_API_VERSION               | Versão da API da OpenAI no Azure OpenAI Service.                                                        | `2024-02-01`                            |
+
+Note que existem varia que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` as quais não podem ser alteradas.
+
+
 
 8. **Executar o deploy**
 
@@ -168,7 +178,7 @@ Caso não estejam instalados, recomendamos que sejam seguidos os procedimentos d
    sudo bash deploy-externo-imgs.sh 
    ```
 
-   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr), logo se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
+   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr). Logo, se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
 
    Resultado da finalização do deploy:
 
@@ -184,29 +194,29 @@ O comando acima deverá retornar algo semelhante à imagem abaixo:
 
 ![Docker Status](image/docker_status.png)
 
-* **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de Healthy.**
+* **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de "healthy".** Então, espere esse tempo e confira novamente.
 
 Caso um longo tempo tenha se passado e ainda não tenha obtido o status **healthy**, favor rever os passos anteriores e reportar eventuais problemas que permaneçam.
 
-Após a finalização do deploy, o Airflow iniciará a indexação dos documentos. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
+Após a finalização do deploy, o Airflow iniciará a indexação dos documentos já existentes no SEI do ambinete correspondente. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
 
 Nas seções a seguir apresentamos como testar e validar os resultados da instalação e configuração. 
 
 ## Testes de Acessos
 
-Após finalizar o deploy, você poderá realizar os testes acessando:
+Após finalizar o deploy, você poderá realizar testes acessando cada solução da arquitetura:
 
-| Solução                                     | URL de Acesso                          | Descrição                                                                                       | Recomendações                                                                         |
-|---------------------------------------------|----------------------------------------|------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| Airflow                                     | http://[Servidor_Solucoes_IA]:8081    | Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings. | - Alterar a senha do Airflow                                                          |
-|                                             |                                        |                                                                                                | - Preferencialmente, bloquear o acesso de rede, exceto para o administrador do SEI.   |
-|                                             |                                        |                                                                                                | - Necessita comunicação com banco de dados e Solr do SEI.                             |
+| Solução                                     | URL de Acesso                          | Descrição                                                                                   | Recomendações                                                                       |
+|---------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| Airflow                                     | http://[Servidor_Solucoes_IA]:8081    | Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings. | - Alterar a senha do Airflow                                                   |
+|                                             |                                        |                                                                                               | - Preferencialmente, bloquear o acesso de rede, exceto para o administrador do SEI. |
+|                                             |                                        |                                                                                                | - Necessita comunicação com banco de dados e Solr do SEI.                          |
 | API SEI IA                                  | http://[Servidor_Solucoes_IA]:8082    | API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI. | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs| API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
+| API SEI IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
 | API SEI IA Assistente                       | http://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
 |                                             |                                        |                                                                                                | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA do SEI IA | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr, usada para indexar e pesquisar documentos no SEI.                            | - Por padrão, já vem bloqueado.                                                       |
-| Banco de Dados do Servidor de Soluções de IA do SEI IA (PostgreSQL) | [Servidor_Solucoes_IA]:5432            | Acesso ao banco de dados PostgreSQL que armazena as informações do SEI.                         | - Por padrão, já vem bloqueado.                                                       |
+| Solr do Servidor de Soluções de IA  | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.                                    | - Por padrão, já vem bloqueado.                                                 |
+| Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.                   | - Por padrão, já vem bloqueado.                                                 |
 
 > **Observação:**
 > * Por padrão, as portas de acesso externo ao Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
@@ -233,13 +243,12 @@ docker compose --profile externo \
 ```
 
 ### Airflow
+- **URL**: http://[Servidor_Solucoes_IA]:8081
+- **Descrição**: Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings.
 
-O Airflow é um orquestrador de tarefas que gera os insumos necessários para o funcionamento da recomendação de documentos e para a criação de embeddings para RAG.
-
-**Recomendamos bloquear o acesso de rede, exceto para o administrador do SEI. O Airflow necessita de acessos ao banco de dados do SEI e ao Solr do SEI.**
+**Recomendamos bloquear o acesso de rede, exceto para o administrador do ambiente computacional. O Airflow necessita de acessos ao banco de dados do SEI e ao Solr do SEI.**
 
 #### Principais DAGs
-
 - **dag_embeddings_start**: Cria a fila para gerar os embeddings para RAG.
 - **document_create_index_v1**: Processa os documentos para serem indexados no Solr para recomendação.
 - **indexing_embedding_document**: Processa a fila de embeddings, gerando os embeddings para RAG.
@@ -251,17 +260,22 @@ O Airflow é um orquestrador de tarefas que gera os insumos necessários para o 
 - **system_create_mlt_weights_config_v1**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI IA.
 
 Ao acessar o Airflow, será apresentada a tela:
-
 ![Airflow Interface](image/airflow_interface.png)
 
-No primeiro acesso, o usuário é: `airflow` e a senha é: `airflow`.
+No primeiro acesso, o usuário é `airflow` e a senha é `airflow`.
 
-**ESSA SENHA DEVE SER ALTERADA!**
+A senha padrão acima **deve ser alterada**! Seguir os passos abaixo para alterar a senha padrão do Airflow.
+  - Inicialmente, você deve acessar `Your Profile`
+  ![Airflow troca de senha - Passo 1](image/airflow_2.png)   
+  - Em seguida, clique em `Reset my password`
+  ![Airflow troca de senha - Passo 2](image/airflow_3.png)
+  - Por fim, insira sua nova senha (`password`), confirme-a (`confirm password`) e clique em `save`
+  ![Airflow troca de senha - Passo 3](image/airflow_4.png)
+  - Sua senha foi alterada com sucesso.
 
 #### Monitoramento e Significado das Cores das DAGs
 
 Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, que usam um esquema de cores para indicar o estado atual de cada uma:
-
 - **Verde escuro**: Execução bem-sucedida, indicando que a DAG foi concluída sem erros.
 - **Verde claro**: DAG em execução. Caso esteja em execução por um longo período, pode indicar um possível atraso ou alta carga de processamento.
 - **Vermelho**: Falha na execução. Verifique e corrija o erro para evitar impacto nas recomendações e na criação de embeddings para o RAG.
@@ -271,7 +285,6 @@ Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, q
 #### Como Obter o Log de Execução em Caso de Falha (DAG Vermelha)
 
 Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante a execução. Para investigar o problema:
-
 1. **Clique no nome da DAG** para abrir uma visão detalhada.
 2. Navegue até a execução com falha (marcada em vermelho no diagrama).
 3. **Clique na tarefa específica que falhou** para acessar as opções de log.
@@ -279,21 +292,10 @@ Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante 
 
 Essa análise dos logs ajudará a entender a causa da falha e facilitará a correção do problema antes de reiniciar a DAG.
 
-**ESSA SENHA DEVE SER ALTERADA!**
-
-#### Alterando a senha do Airflow
-- Inicialmente, você deve acessar `Your Profile`
-![Airflow troca de senha - Passo 1](image/airflow_2.png)   
-- Em seguida, clique em `Reset my password`
-![Airflow troca de senha - Passo 2](image/airflow_3.png)
-- Por fim, insira sua nova senha (`password`), confirme-a (`confirm password`) e clique em `save`
-![Airflow troca de senha - Passo 3](image/airflow_4.png)
-- Sua senha foi alterada com sucesso.
-
 ### API de Recomendação de Processos e Documentos do SEI IA
-![Tela da API de Recomendação de Processos do SEI IA](image/API_SEIIA.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8082
-- **Descrição**: API do SEI que utiliza o Solr para encontrar processos semelhantes.
+- **Descrição**: API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI.
+![Tela da API de Recomendação de Processos do SEI IA](image/API_SEIIA.png)
 - **Health Check**:
   - API
       ```bash
@@ -343,9 +345,9 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
       ```
 
 ### API SEI IA Feedback de Processos
-![Tela da API de Feedback de Processos do SEI IA](image/API_SEIIA_feedback.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8086/docs
-- **Descrição**: API que grava o feedback do usuário sobre uma recomendação feita pela API SEI.
+- **Descrição**: API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.
+![Tela da API de Feedback de Processos do SEI IA](image/API_SEIIA_feedback.png)
 - **Health Check**:
    ```bash
    curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8086/health' -H 'accept: application/json'
@@ -359,9 +361,9 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
    ```
 
 ### API SEI IA Assistente
-![Tela do Assistente de IA do SEI IA](image/API_SEIIA_ASSISTENTE.png)
 - **URL**: http://[Servidor_Solucoes_IA]:8088
-- **Descrição**: API do Assistente de IA do SEI.
+- **Descrição**: API que fornece funcionalidades do Assistente de IA do SEI.
+![Tela do Assistente de IA do SEI IA](image/API_SEIIA_ASSISTENTE.png)
 - **Health Check**: 
    ```bash
    curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8088/health' -H 'accept: application/json'
@@ -373,18 +375,17 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
 
 ### Bancos de Dados
 
-#### Solr
-![Tela do Solr do Servidor de Soluções de IA do SEI](image/Solr_SEIIA.png)
+#### Solr do Servidor de Soluções de IA
 - **URL**: http://[Servidor_Solucoes_IA]:8084
-- **Descrição**: Interface do Solr do Servidor de Soluções de IA do SEI, utilizado na recomendação de processos.
+- **Descrição**: Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.
+![Tela do Solr do Servidor de Soluções de IA do SEI](image/Solr_SEIIA.png)
 
 #### PostgreSQL
 - **URL**: [Servidor_Solucoes_IA]:5432
-- **Descrição**: Acesso ao banco de dados pgvector, utilizando a senha criada no passo 8:
-  - Usuário: `sei_llm`
-  - Senha:   `ASSISTENTE_PGVECTOR_PWD`
+- **Descrição**: Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.
 
-## Resolução de Problemas
+
+## Resolução de Problemas Conhecidos
 
 - **Erro de montagem de arquivo**:
 
@@ -439,16 +440,19 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
 
 ## Pontos de Atenção para Escalabilidade
 
-* Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `env_files/prod.env` – não devem ser alteradas para valores menores, pois isso afetará o funcionamento do sistema.
+* Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `env_files/prod.env`.
+* Não devem ser alteradas para valores menores, pois isso afetará o funcionamento do sistema.
 
 ### Pontos de Montagem de Volumes
 
-Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/volumes/`. * Esses volumes tendem a crescer de acordo com a quantidade de documentos e processos armazenados, conforme descrito nos requisitos de sistema.
+Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/volumes/`.
+* Esses volumes tendem a crescer de acordo com a quantidade de documentos e processos armazenados, conforme descrito nos requisitos de sistema.
 
-É possível também alterar os pontos de montagem dos volumes Docker modificando o arquivo `daemon.json`. Mais informações podem ser encontradas na [documentação do Docker](https://docs.docker.com/reference/cli/dockerd/#configure-runtimes-using-daemonjson). Como alternativa, pode-se criar links simbólicos para cada um dos volumes, ou para todos.
+É possível também alterar os pontos de montagem dos volumes Docker modificando o arquivo `daemon.json`. Mais informações podem ser encontradas na [documentação do Docker](https://docs.docker.com/reference/cli/dockerd/#configure-runtimes-using-daemonjson).
+  - Como alternativa, pode-se criar links simbólicos para cada um dos volumes.
 
 - Exemplo de criação de um link simbólico para `/var/lib/docker/volumes/sei_ia_pgvector-db-volume-all`:
-  - Pare o Docker para evitar problemas durante a movimentação dos dados:
+  - Deve parar o Docker para evitar problemas durante a movimentação dos dados:
 
    ```bash
    sudo systemctl stop docker
@@ -482,8 +486,8 @@ Ao escalar a solução, considere os seguintes pontos:
   - Aumente a alocação de memória se houver necessidade de lidar com uma maior quantidade de documentos ou consultas simultâneas. Uma boa prática é aumentar a memória em incrementos de 2 GB.
   - Para isso, altere no arquivo `env_files/prod.env`:
 
-   | Variável                   | Descrição                                                                                      |
-   |----------------------------|------------------------------------------------------------------------------------------------|
+   | Variável                        | Descrição                                                                                  |
+   |---------------------------------|--------------------------------------------------------------------------------------------|
    | `SOLR_JAVA_MEM="-Xms2g -Xmx8g"` | Define as opções de memória Java para Solr, com um mínimo de 2 GB e um máximo de 8 GB.     |
    | `SOLR_MEM_LIMIT=10g`            | Define o limite de memória para Solr como 10 GB.                                           |
    | `SOLR_CPU_LIMIT='2'`            | Define o limite de CPU para Solr como 2 unidades de CPU.                                   |
@@ -495,37 +499,37 @@ Ao escalar a solução, considere os seguintes pontos:
 - **Postgres**:
   - Para aumentar o desempenho, considere aumentar a memória disponível. Monitore o uso de disco e ajuste conforme necessário.
 
-   | Variável                    | Descrição                                                    |
-   |-----------------------------|----------------------------------------------------------------|
+   | Variável                    | Descrição                                                     |
+   |-----------------------------|---------------------------------------------------------------|
    | `PGVECTOR_MEM_LIMIT=8g`     | Define o limite de memória para Pgvector como 8 GB.           |
    | `PGVECTOR_CPU_LIMIT='2'`    | Define o limite de CPU para Pgvector como 2 unidades de CPU.  |
 
 
-## Backup periódico dos dados do Servidor de Soluções do SEI IA
+## Backup periódico dos dados do Servidor de Soluções de IA
 
-Um ponto importante em relação ao uso do módulo SEI IA e consequentemente do  Servidor de Soluções do SEI IA, é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor de soluções do SEI IA são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao Servidor de Soluções do SEI IA:
+Um ponto importante em relação ao Servidor de Soluções de IA é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao servidor:
 
 ```bash
 docker volume ls | grep "^sei_ia-"
 ```
 
 ## ANEXOS:
+
 ### **Instalar Git - OPCIONAL**
    
->   **OBSERVAÇÃO**: 
-> * É possível instalar sem o Git, apenas tenha certeza de manter a estrutura do GitHub dentro da pasta /opt/seiia/sei-ia.
+> **Observação**:
+> - É possível instalar sem o Git, sobretudo caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
+> - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
    
    Siga a documentação oficial para instalar o Git: [Documentação Git](https://git-scm.com/book/pt-br/v2/Come%C3%A7ando-Instalando-o-Git)
 
    Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-
    ```bash
    sudo apt-get update
    sudo apt-get install git
    ```
 
    Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-
    ```bash
    sudo yum install git-all
    ```
@@ -535,7 +539,6 @@ docker volume ls | grep "^sei_ia-"
    Siga a documentação oficial para instalar o Docker: [Documentação Docker](https://docs.docker.com/engine/install/)
 
    Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-
    ```bash
    for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
@@ -555,7 +558,6 @@ docker volume ls | grep "^sei_ia-"
    ```
 
    Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-
    ```bash
    # Remover pacotes antigos do Docker, caso existam
    for pkg in docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine podman containerd runc; do sudo yum remove $pkg; done
