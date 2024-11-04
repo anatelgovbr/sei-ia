@@ -133,9 +133,9 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 | Variável                   | Descrição                                                                                   | Exemplo                             |
 |----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
-| ENVIRONMENT                | Define o tipo do ambiente                                                    | `prod`                              |
-| LOG_LEVEL                  | Define o nível de log do SEI IA; opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
-| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host; obtido com "cat /etc/group | grep ^docker: | cut -d: -f3". | `1001`                     |
+| ENVIRONMENT                | Define o tipo do ambiente da instalação. Opções disponíveis: dev, homol, prod.              | `prod`                              |
+| LOG_LEVEL                  | Define o nível de log do SEI IA. Opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
+| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host do ambiente de instalação.                         | `1001`                              |
 | DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.    | `sei_user`                          |
 | DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                | `senha_sei`                         |
 | DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                     | `192.168.0.10`                      |
@@ -147,6 +147,8 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
 | POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
 
+> **Observação**:
+> - Sobre a variável `GID_DOCKER`, Group ID do ambiente de instalação correspondente deve ser obtido executando o comando: `cat /etc/group | grep ^docker: | cut -d: -f3`.
 
 7. **Configurações adicionais**
 
