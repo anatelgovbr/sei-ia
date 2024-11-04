@@ -133,21 +133,21 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
    **Recomendação**: Os arquivos `env_files/*.env` são de configurações de ambiente. Deve adicionar `env_files/*.env` ao `.gitignore` local para não serem substituídos acidentalmente no ambiente correspondente nos próximos deploys de código.
 
-| Variável                   | Descrição                                                                                   | Exemplo                             |
-|----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
-| ENVIRONMENT                | Define o tipo do ambiente da instalação. Opções disponíveis: dev, homol, prod.              | `prod`                              |
-| LOG_LEVEL                  | Define o nível de log do SEI IA. Opções disponíveis: INFO, DEBUG, WARNING, ERROR.           | `INFO`                              |
-| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host do ambiente de instalação.                         | `1001`                              |
-| DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.    | `sei_user`                          |
-| DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                | `senha_sei`                         |
-| DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                     | `192.168.0.10`                      |
-| DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                                                 | `sei_db`                            |
-| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                                    | `3306`                              |
-| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_schema`                        |
-| DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções: `mysql`, `mssql` e `oracle`.                                                 | `mysql`                             |
-| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                     | `http://192.168.0.10:8983`          |
-| POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
-| POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
+| Variável                   | Descrição                                                                                                        | Exemplo                             |
+|----------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------|
+| ENVIRONMENT                | Define o tipo do ambiente da instalação. Opções disponíveis: `dev`, `homol`, `prod`.                             | `prod`                              |
+| LOG_LEVEL                  | Define o nível do ambiente da instalação. Opções disponíveis: `INFO`, `DEBUG`, `WARNING`, `ERROR`.               | `INFO`                              |
+| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host do ambiente de instalação.                                              | `1001`                              |
+| DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.              | `sei_user`                          |
+| DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                          | `senha_sei`                         |
+| DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                                       | `192.168.0.10`                      |
+| DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_db`                            |
+| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.           | `3306`                              |
+| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                     | `sei_schema`                        |
+| DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções disponíveis: `mysql`, `mssql` e `oracle`.                                  | `mysql`                             |
+| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `https://IP_OU_HOSTNAME:8983`.                                      | `https://192.168.0.10:8983`         |
+| POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.   | `sei_llm`                           |
+| POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                   | `postgres_password`                 |
 
 > **Observação**:
 > - Sobre a variável `GID_DOCKER`, Group ID do ambiente de instalação correspondente deve ser obtido executando o comando: `cat /etc/group | grep ^docker: | cut -d: -f3`.
@@ -158,7 +158,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 | Variável                          | Descrição                                                                                                      | Exemplo                                  |
 |-----------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| SEI_IAWS_URL                      | URL do serviço web do SEI IAWS. Deve ser no formato `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`.  | `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`  |
+| SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  | `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  |
 | SEI_IAWS_SIGLA_SISTEMA            | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                       | `Usuario_IA` |
 | SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
 | AZURE_OPENAI_ENDPOINT            | Endpoint do Azure OpenAI Service.                                                                       | `https://meuendpoint.openai.azure.com`  |
