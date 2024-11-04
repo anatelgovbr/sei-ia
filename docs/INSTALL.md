@@ -131,7 +131,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
    **Importante**: As variáveis da seção `# ESSENCIAIS NO MOMENTO DA INSTALACAO:` no arquivo `env_files/security.env` são obrigatórias durante a instalação inicial.
 
-   **Recomendação**: Recomendamos que os arquivos contidos em `env_files/*.env` sejam adicionados ao `.gitignore` para evitar a substituição acidental e preservar as configurações de segurança.
+   **Recomendação**: Os arquivos `env_files/*.env` são de configurações de ambiente. Deve adicionar `env_files/*.env` ao `.gitignore` local para não serem substituídos acidentalmente no ambiente correspondente nos próximos deploys de código.
 
 | Variável                   | Descrição                                                                                   | Exemplo                             |
 |----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
