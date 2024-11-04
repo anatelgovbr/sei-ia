@@ -93,7 +93,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    sudo chmod 777 /opt/sei-ia-storage
    ```
 
-5. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
+4. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
   > **Observação**:
   > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v.1.0.0`.
@@ -107,7 +107,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    cd sei-ia
    ```
 
-7. **Criar a rede Docker**
+5. **Criar a rede Docker**
 
    Crie uma rede Docker customizada para a instalação:
 
@@ -123,13 +123,15 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge # TROCAR OS IPs DE ACORDO COM A SUA NECESSIDADE
    ```
 
-8. **Configurar o arquivo `env_files/security.env` do ambiente**
-
+6. **Configurar o arquivo `env_files/security.env` do ambiente**
+   
    Certifique-se de conhecer o tipo de banco de dados utilizado pelo SEI do órgão.
 
-   Preencha os campos no arquivo `env_files/security.env` conforme comentário sobre cada variável.
+   Preencha os campos no arquivo `env_files/security.env` conforme descrito nos comentários sobre cada variável.
 
-   **Importante:** As variáveis da seção `# ESSENCIAIS NO MOMENTO DA INSTALACAO:` no arquivo `env_files/security.env` são obrigatórias durante a instalação inicial .
+   **Importante**: As variáveis da seção `# ESSENCIAIS NO MOMENTO DA INSTALACAO:` no arquivo `env_files/security.env` são obrigatórias durante a instalação inicial.
+
+   **Recomendação**: Recomendamos que os arquivos contidos em `env_files/*.env` sejam adicionados ao `.gitignore` para evitar a substituição acidental e preservar as configurações de segurança.
 
 | Variável                   | Descrição                                                                                   | Exemplo                             |
 |----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
@@ -139,10 +141,10 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.    | `sei_user`                          |
 | DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                | `senha_sei`                         |
 | DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                     | `192.168.0.10`                      |
-| DB_SEI_DATABASE            | Nome do banco de dados do SEI.                                                                 | `sei_db`                            |
-| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI.                                                     | `3306`                              |
-| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI (para MySQL, mesmo valor de database).                        | `sei_schema`                        |
-| DATABASE_TYPE              | Tipo de banco de dados do SEI (ex: mssql, mysql, oracle).                                      | `mysql`                             |
+| DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                                                 | `sei_db`                            |
+| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                                    | `3306`                              |
+| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_schema`                        |
+| DATABASE_TYPE              | Tipo de banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                      | `mysql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                     | `http://192.168.0.10:8983`          |
 | POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
 | POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
@@ -241,7 +243,14 @@ docker compose --profile externo \
   --no-build -d
 [...]
 ```
-Nei Jobson: Adicionar o que precisa ser feito no ambiente para a alteração acima ser aplicada de fato.
+
+Em seguida faça o redeploy do servidor de solução de IA.
+
+```bash
+sudo bash deploy-externo-imgs.sh 
+```
+
+Aguarde o `FIM` do deploy e em seguida prossiga com os testes.
 
 ### Airflow
 - **URL**: http://[Servidor_Solucoes_IA]:8081
