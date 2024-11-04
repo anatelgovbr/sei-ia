@@ -144,7 +144,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                                                 | `sei_db`                            |
 | DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                                    | `3306`                              |
 | DB_SEI_SCHEMA              | Esquema do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_schema`                        |
-| DATABASE_TYPE              | Tipo de banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                                      | `mysql`                             |
+| DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções: `mysql`, `mssql` e `oracle`.                                                 | `mysql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `http://IP_OU_HOSTNAME:8983`.                     | `http://192.168.0.10:8983`          |
 | POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.  | `sei_llm`            |
 | POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima.                  | `postgres_password`  |
