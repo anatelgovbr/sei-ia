@@ -28,11 +28,11 @@ O *Docker Host* deve atender aos requisitos mínimos descritos abaixo:
   - **CPU**: 16 cores com 2.10GHz.
   - **RAM**: 128 GB.
 
- **Requisito Mínimo do SEI**: v4.0.12
+ **Requisito Mínimo do SEI**: v4.0.12 ou v4.1.4
   - Não é compatível com versões anteriores e em versões mais recentes é necessário conferir antes se possui compatibilidade.
- **É necessário possuir o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) instalado e configurado.**
+  - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é necessário ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
  > Observação:
- > - É necessário configurar os documentos relevantes antes de prosseguir com a instalação do *Servidor de Soluções de IA do Módulo SEI IA*
+ > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 
 ## Download
 
