@@ -158,8 +158,8 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 | Variável                          | Descrição                                                                                                      | Exemplo                                  |
 |-----------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  | `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  |
-| SEI_IAWS_SIGLA_SISTEMA            | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                       | `Usuario_IA` |
+| SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`  | `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`  |
+| SEI_IAWS_SISTEMA            | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                       | `Usuario_IA` |
 | SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
 | AZURE_OPENAI_ENDPOINT            | Endpoint do Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.                             | `https://meuendpoint.openai.azure.com`  |
 | AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4o no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.      | `https://meuendpointgpt4.openai.azure.com`  |
@@ -222,35 +222,35 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 
 > **Observação:**
 > * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação às aplicações Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso externo à rede Docker, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
-
-```bash
-[...]
-docker compose --profile externo \
-  -f docker-compose-prod.yaml \
-  -p $PROJECT_NAME \
-  up \
-  --no-build -d
-[...]
-```
-para:
-```bash
-[...]
-docker compose --profile externo \
-  -f docker-compose-prod.yaml \
-  -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura da porta para acesso externo à rede Docker.
-  -p $PROJECT_NAME \
-  up \
-  --no-build -d
-[...]
-```
-
-Em seguida faça o redeploy do servidor de solução de IA.
-
-```bash
-sudo bash deploy-externo-imgs.sh 
-```
-
-Aguarde o `FIM` do deploy e em seguida prossiga com os testes.
+> 
+> ```bash
+> [...]
+> docker compose --profile externo \
+>   -f docker-compose-prod.yaml \
+>   -p $PROJECT_NAME \
+>   up \
+>   --no-build -d
+> [...]
+> ```
+> para:
+> ```bash
+> [...]
+> docker compose --profile externo \
+>   -f docker-compose-prod.yaml \
+>   -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura da porta para acesso externo à rede Docker.
+>   -p $PROJECT_NAME \
+>   up \
+>   --no-build -d
+> [...]
+> ```
+> 
+> Em seguida faça o redeploy do servidor de solução de IA.
+> 
+> ```bash
+> sudo bash deploy-externo-imgs.sh 
+> ```
+> 
+> Aguarde o `FIM` do deploy e em seguida prossiga com os testes.
 
 ### Airflow
 - **URL**: http://[Servidor_Solucoes_IA]:8081
