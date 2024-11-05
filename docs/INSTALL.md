@@ -156,23 +156,26 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
    No arquivo `env_files/security.env`, preencha as variáveis da seção `# NAO ESSENCIAIS NO MOMENTO DA INSTALACAO:`. Essas variáveis não são essenciais durante a instalação inicial do Servidor de Soluções de IA do módulo SEI IA, mas serão necessárias para o uso do **ASSISTENTE**.
 
-| Variável                          | Descrição                                                                                                      | Exemplo                                  |
-|-----------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`  | `http://[dominio_servidor]/sei/controlador_ws.php?servico=wsia`  |
-| SEI_IAWS_SISTEMA            | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                       | `Usuario_IA` |
+| Variável                          | Descrição                                                                                                        | Exemplo                                  |
+|-----------------------------------|------------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  | `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  |
+| SEI_IAWS_SISTEMA                  | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                  | `Usuario_IA` |
 | SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
-| AZURE_OPENAI_ENDPOINT            | Endpoint do Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.                             | `https://meuendpoint.openai.azure.com`  |
-| AZURE_OPENAI_ENDPOINT_GPT4o      | Endpoint específico para GPT-4o no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.      | `https://meuendpointgpt4.openai.azure.com`  |
-| AZURE_OPENAI_KEY_GPT4o           | Chave de acesso para GPT-4o no Azure OpenAI Service.                                                    | `minha_chave_gpt4o`                      |
-| GPT_MODEL_4o_128k                | Nome do modelo GPT-4o com 128k tokens.                                                                  | `gpt-4o-128k`                            |
-| AZURE_OPENAI_ENDPOINT_GPT4o_mini | Endpoint específico para GPT-4o-mini no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint. | `https://meuendpointgpt4mini.openai.azure.com`  |
-| AZURE_OPENAI_KEY_GPT4o_mini      | Chave de acesso para GPT-4o-mini no Azure OpenAI Service.                                               | `minha_chave_gpt4o_mini`                 |
-| GPT_MODEL_4o_mini_128k           | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4o-mini-128k`                       |
-| OPENAI_API_VERSION               | Versão da API da OpenAI no Azure OpenAI Service.                                                        | `2024-10-21`                            |
+| AZURE_OPENAI_ENDPOINT             | Endpoint do Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.                             | `https://meuendpoint.openai.azure.com`  |
+| AZURE_OPENAI_ENDPOINT_GPT4o       | Endpoint específico para GPT-4o no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.      | `https://meuendpointgpt4.openai.azure.com`  |
+| AZURE_OPENAI_KEY_GPT4o            | Chave de acesso para GPT-4o no Azure OpenAI Service.                                                    | `minha_chave_gpt4o`                      |
+| GPT_MODEL_4o_128k                 | Nome do modelo GPT-4o com 128k tokens.                                                                  | `gpt-4o-128k`                            |
+| AZURE_OPENAI_ENDPOINT_GPT4o_mini  | Endpoint específico para GPT-4o-mini no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint. | `https://meuendpointgpt4mini.openai.azure.com`  |
+| AZURE_OPENAI_KEY_GPT4o_mini       | Chave de acesso para GPT-4o-mini no Azure OpenAI Service.                                               | `minha_chave_gpt4o_mini`                 |
+| GPT_MODEL_4o_mini_128k            | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4o-mini-128k`                       |
+| OPENAI_API_VERSION                | Versão da API da OpenAI no Azure OpenAI Service.                                                        | `2024-10-21`                            |
 
 Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` que não podem ser alteradas.
 
 8. **Executar o deploy**
+ > **ATENÇÃO**:
+ > - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é necessário ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
+ > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 
     Execute o script de deploy:
 
