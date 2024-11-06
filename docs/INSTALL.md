@@ -177,8 +177,7 @@ Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARI
  > - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é necessário ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
  > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 
-    Execute o script de deploy:
-
+   Execute o script de deploy:
    ```bash
    sudo bash deploy-externo-imgs.sh 
    ```
