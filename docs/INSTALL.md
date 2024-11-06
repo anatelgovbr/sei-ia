@@ -96,14 +96,14 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 4. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
   > **Observação**:
-  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v.1.0.0`.
+  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v1.0.0`.
   > - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
   >   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
 
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de Anexos deste Manual que orienta a instalar o Git no Servidor.
    
    ```bash
-   git clone --branch v.1.0.0 --single-branch git@github.com:anatelgovbr/sei-ia.git
+   git clone --branch v1.0.0 --single-branch git@github.com:anatelgovbr/sei-ia.git
    cd sei-ia
    ```
 
