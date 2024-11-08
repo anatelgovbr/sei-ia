@@ -115,6 +115,13 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    cd sei-ia
    ```
 
+> **Observação**
+> Para clonar o repositório com um usuário específico, substitua `USERNAME` pelo usuário autorizado:
+> ```bash
+> git clone --branch v1.0.0 --single-branch git@USERNAME@github.com:anatelgovbr/sei-ia.git
+> cd sei-ia
+> ```
+
 5. **Criar a rede Docker**
 
    Crie uma rede Docker customizada para a instalação:
