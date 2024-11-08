@@ -97,8 +97,16 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
   > **Observação**:
   > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v1.0.0`.
-  > - Contudo, caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
+> - Contudo, caso o órgão possua procedimentos e ferramentas de deploy próprias para seu ambiente computacional, como GitLab e Jenkins, deve adaptar esse passo aos seus próprios procedimentos. Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
+> ```bash
+> sudo mkdir /opt/sei-ia
+> sudo chmod 777 /opt/sei-ia
+> # Coloque o arquivo da release neste diretório
+> cd /opt/sei-ia
+> unzip sei-ia-v.1.0.0.zip . # o nome do arquivo pode mudar.
+> ```
   >   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
+>     - Enquanto o projeto estiver privado, para realizar o clone é necessário utilizar as credenciais do ponto focal que possui acesso ao repositório.
 
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de Anexos deste Manual que orienta a instalar o Git no Servidor.
    
