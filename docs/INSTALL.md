@@ -105,8 +105,8 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 > cd /opt/sei-ia
 > unzip sei-ia-v.1.0.0.zip . # o nome do arquivo pode mudar.
 > ```
-  >   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
->     - Enquanto o projeto estiver privado, para realizar o clone é necessário utilizar as credenciais do ponto focal que possui acesso ao repositório.
+>   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
+>     - Enquanto o projeto estiver privado, para realizar o clone é necessário utilizar as credenciais do usuário do GitHub que possua acesso autorizado no repositório.
 
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de Anexos deste Manual que orienta a instalar o Git no Servidor.
    
