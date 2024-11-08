@@ -97,18 +97,19 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
   > **Observação**:
   > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v1.0.0`.
-> - Contudo, caso o órgão possua procedimentos e ferramentas de deploy próprias para seu ambiente computacional, como GitLab e Jenkins, deve adaptar esse passo aos seus próprios procedimentos. Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
+> - Contudo, caso o órgão possua procedimentos e ferramentas de deploy próprias para seu ambiente computacional, como GitLab e Jenkins, deve adaptar esse passo aos seus próprios procedimentos.
+> - Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
 > ```bash
 > sudo mkdir /opt/sei-ia
 > sudo chmod 777 /opt/sei-ia
 > # Coloque o arquivo da release neste diretório
 > cd /opt/sei-ia
-> unzip sei-ia-v.1.0.0.zip . # o nome do arquivo pode mudar.
+> unzip sei-ia-v.1.0.0.zip . # O nome do arquivo pode mudar. ATENÇÃO: para subir o arquivo zip antes no servidor.
 > ```
 >   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
->     - Enquanto o projeto estiver privado, para realizar o clone é necessário utilizar as credenciais do usuário do GitHub que possua acesso autorizado no repositório.
+>   - Enquanto o projeto estiver privado, para realizar o clone é necessário utilizar as credenciais do usuário do GitHub que possua acesso autorizado no repositório.
 
-   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de Anexos deste Manual que orienta a instalar o Git no Servidor.
+   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de [Anexos deste Manual](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALL.md#anexos) que orienta a instalar o Git no Servidor.
    
    ```bash
    git clone --branch v1.0.0 --single-branch git@github.com:anatelgovbr/sei-ia.git
@@ -116,11 +117,12 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    ```
 
 > **Observação**
-> Para clonar o repositório com um usuário específico, substitua `USERNAME` pelo usuário autorizado:
+> Para clonar o repositório com um usuário específico, enquanto o repositório está provado no GitHub, substitua `USERNAME` pelo usuário autorizado:
 > ```bash
 > git clone --branch v1.0.0 --single-branch git@USERNAME@github.com:anatelgovbr/sei-ia.git
 > cd sei-ia
 > ```
+> - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
 
 5. **Criar a rede Docker**
 
@@ -218,6 +220,13 @@ O comando acima deverá retornar algo semelhante à imagem abaixo:
 Caso um longo tempo tenha se passado e ainda não tenha obtido o status **healthy**, favor rever os passos anteriores e reportar eventuais problemas que permaneçam.
 
 Após a finalização do deploy, o Airflow iniciará a indexação dos documentos já existentes no SEI do ambinete correspondente. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
+
+Se a instalação não for concluída com sucesso, conforme acima, **e for exclusivamente a primeira instalação**, é importante levantar informações sobre qualquer erro apresentado durante o deploy e realizar a limpeza completa do ambiente para eliminar qualquer lixo que a instalação com erro possa deixar no ambiente. Utilize o comando abaixo para a limpeza total do ambiente:
+
+```bash
+docker ps -q --filter "name=sei_ia" | xargs -r docker stop
+docker ps -a -q --filter "name=sei_ia" | xargs -r docker rm -v
+```
 
 Nas seções a seguir apresentamos como testar e validar os resultados da instalação e configuração. 
 
