@@ -103,7 +103,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 > sudo chmod 777 /opt/sei-ia
 > # Coloque o arquivo da release neste diretório
 > cd /opt/sei-ia
-> unzip sei-ia-v.1.0.0.zip .
+> unzip sei-ia-v.1.0.0.zip . # o nome do arquivo pode mudar.
 > ```
   >   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
 >     - Enquanto o projeto estiver privado, para realizar o clone é necessário utilizar as credenciais do ponto focal que possui acesso ao repositório.
