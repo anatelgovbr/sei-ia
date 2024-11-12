@@ -258,9 +258,13 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 | Solr do Servidor de Soluções de IA  | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.                                    | - Por padrão, já vem bloqueado.                                                 |
 | Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.                   | - Por padrão, já vem bloqueado.                                                 |
 
-> **Observação:**
-> * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação às aplicações Solr e PostgreSQL não possuem direcionamento para o ambiente externo. Para permitir o acesso externo à rede Docker, deve-se alterar o script de deploy (localizado no arquivo: `deploy-externo-imgs.sh`) de:
-> 
+> **Observações:**
+> * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação **às aplicações Solr e PostgreSQL** não possuem direcionamento para ambiente externo. E não deve ter esse redirecionamento! Essas duas aplicações **são totalmente internas** e armazenam dados indexados dos documentos do SEI. Ou seja, são os bancos de dados das soluções de IA rodando no servidor e o acesso a eles deve ter alta restrição, sendo recomendável manter acessível apenas internamente no servidor.
+> * Seria uma falha de segurança abrir um acesso externo a essas duas aplicações sem controle, sem restringir o acesso em nível de rede local do órgão para apenas quem pode acessar.
+> * Consideramos que o o Administrador do ambiente computacional do SEI, caso precise conferir algo no Solr e PostgreSQL interno do Servidor de Soluções de IA, pode acessar diretamente a partir do acesso dele ao próprio servidor.
+> * Exepcionalmente, em ambiente que não seja de Produção e devendo restringir acesso em nível de rede local do órgão, é possível permitir o acesso externo à rede Docker. Para isso é necessário adicionar a linha afeta ao `docker-compose-dev.yaml` no script de deploy, localizado no arquivo: `deploy-externo-imgs.sh`:
+>
+> DE:
 > ```bash
 > [...]
 > docker compose --profile externo \
@@ -270,19 +274,19 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 >   --no-build -d
 > [...]
 > ```
-> para:
+> PARA:
 > ```bash
 > [...]
 > docker compose --profile externo \
 >   -f docker-compose-prod.yaml \
->   -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura da porta para acesso externo à rede Docker.
+>   -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura do acesso externo à rede Docker.
 >   -p $PROJECT_NAME \
 >   up \
 >   --no-build -d
 > [...]
 > ```
 > 
-> Em seguida faça o redeploy do servidor de solução de IA.
+> Em seguida faça o redeploy do servidor de solução de IA, conforme abaixo:
 > 
 > ```bash
 > sudo bash deploy-externo-imgs.sh 
