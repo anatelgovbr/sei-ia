@@ -48,7 +48,8 @@ Para garantir a comunicação entre os serviços do *Servidor de Soluções de I
 
 2. **Do servidor do SEI para o Servidor de Soluções de IA**:
    - **Portas Necessárias**:
-      - **Airflow**: Porta 8081 - pode ser liberado para o Administrador do ambiente computacional do SEI, para ter acesso às DAGS de toda a arquitetura de Soluções de IA rodando no servidor.
+      - **Airflow**: Porta 8081
+        - Também pode ser liberada a conexão para o Administrador do ambiente computacional do SEI, para ter acesso às DAGS das tasks de toda a arquitetura de Soluções de IA.
       - **API SEI IA**: Porta 8082
       - **API SEI IA Feedback**: Porta 8086
       - **API SEI IA Assistente**: Porta 8088
