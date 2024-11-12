@@ -176,7 +176,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | Variável                          | Descrição                                                                                                        | Exemplo                                  |
 |-----------------------------------|------------------------------------------------------------------------------------------------------------------|------------------------------------------|
 | SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  | `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  |
-| SEI_IAWS_SISTEMA                  | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA.                                  | `Usuario_IA` |
+| SEI_IAWS_SISTEMA                  | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA. Não alterar.                     | `Usuario_IA` |
 | SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
 | AZURE_OPENAI_ENDPOINT             | Endpoint do Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.                             | `https://meuendpoint.openai.azure.com`  |
 | AZURE_OPENAI_ENDPOINT_GPT4o       | Endpoint específico para GPT-4o no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.      | `https://meuendpointgpt4.openai.azure.com`  |
@@ -185,7 +185,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | AZURE_OPENAI_ENDPOINT_GPT4o_mini  | Endpoint específico para GPT-4o-mini no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint. | `https://meuendpointgpt4mini.openai.azure.com`  |
 | AZURE_OPENAI_KEY_GPT4o_mini       | Chave de acesso para GPT-4o-mini no Azure OpenAI Service.                                               | `minha_chave_gpt4o_mini`                 |
 | GPT_MODEL_4o_mini_128k            | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4o-mini-128k`                       |
-| OPENAI_API_VERSION                | Versão da API da OpenAI no Azure OpenAI Service.                                                        | `2024-10-21`                            |
+| OPENAI_API_VERSION                | Versão da API da OpenAI no Azure OpenAI Service. Não alterar                                            | `2024-10-21`                            |
 
 Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` que não podem ser alteradas.
 
