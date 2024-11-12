@@ -56,6 +56,10 @@ Para garantir a comunicação entre os serviços do *Servidor de Soluções de I
 
 As configurações de rede acima são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA, além do Assistente.
 
+**ATENÇÃO**: Se as configurações de conexões na rede local do órgão não forem efetivadas, conforme acima, antes dos "Passos para Instalação", abaixo, e não for garantido que estão funcionando adequadamente, poderá ter problemas no meio do deploy do servidor ou durante o funcionamento de algumas das aplicações. Assim, criadas as conexões indicadas é importante testá-las a partir do servidor correspondente, antes de seguir para os "Passos para Instalação". Seguir para a instalação somente depois que confirmar que as conexões nos sentidos corretos estão funcionando.
+
+Pode dar erros no Deploy do servidor OU de funcionamento, principalmente nas DAGs das tasks do AirFlow
+
 ## Passos para Instalação
 
 Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no Linux do servidor:
