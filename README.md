@@ -2,13 +2,15 @@
 
 O *Servidor de Soluções de IA* contém as ferramentas necessárias para o funcionamento do [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia), composto, de forma simplificada, pelos sub-módulos:
 - SEI-IA-SIMILARIDADE: Responsável pela recomendação de processos similares e de documentos similares;
-- SEI-IA-ASSISTENTE: Responsável pelo Assistente baseado em Inteligência Artificial Generativa (GenAI), para responder a questionamentos dos usuários e interagir com documentos do SEI.
+- SEI-IA-ASSISTENTE: Responsável pelo Assistente baseado em Inteligência Artificial Generativa (GenAI), para executar *prompts* dos usuários e interagir com documentos do SEI.
 
 ## Orientações Preliminares
 
 A instalação do *Servidor de Soluções de IA* foi projetada para ser simples, automatizando todos os procedimentos possíveis. No entanto, há alguns procedimentos que, por questões de segurança ou por estarem relacionados ao ambiente onde a instalação é realizada, precisam ser realizados manualmente pelo administrador do ambiente computacional. 
 
-Para melhor entendimento do manual, é **mandatório** que seja feita uma leitura integral deste README e do MANUAL DE INSTALAÇÃO antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
+Para melhor entendimento do manual, é **mandatório** que seja feita uma leitura integral deste README e do **[Manual de Instalação](docs/INSTALL.md)** antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
+
+- **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
 
 ## Repositorio
 
@@ -28,9 +30,11 @@ O *Docker Host* deve atender aos requisitos mínimos descritos abaixo:
   - **CPU**: 16 cores com 2.10GHz.
   - **RAM**: 128 GB.
 
- **Requisito Mínimo do SEI**: v4.0.12 ou v4.1.4
-  - Não é compatível com versões anteriores e em versões mais recentes é necessário conferir antes se possui compatibilidade.
-  - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é necessário ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
+ **Requisito Mínimo do SEI**: 
+  - Versões v4.0.12 ou v4.1.4
+  - Não é compatível com versões anteriores do SEI.
+  - Para utilizar versões mais recentes do SEI, é necessário conferir previamente a compatibilidade.
+  - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
  > Observação:
  > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 

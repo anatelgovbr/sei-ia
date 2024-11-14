@@ -1,6 +1,8 @@
 # Instalação do Servidor de Soluções de IA do módulo do SEI IA
 
-Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
+- Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
+- É importante observar que este manual não tem como objetivo fornecer conhecimento sobre as tecnologias adotadas. Para isto recomendamos buscar fontes mais apropriadas.
+- **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
 
 ## Pré-requisitos
 
@@ -129,19 +131,52 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 5. **Criar a rede Docker**
 
-   Crie uma rede Docker customizada para a instalação:
+   O Docker utiliza como default a faixa de IP `172.17.*.*`, que pode ser utilizada internamente por uma organização e causar conflitos. Desta forma, se faz necessária a utilização de uma faixa de IPs dedicadas para os containers Docker rodando no Servidor, com objetivo de evitar erros de roteamento causados pela sobreposição de endereços IP.
+
+   A restrição da subnet deve ser feita através da criação de *user defined bridge network*. Também deve remover a default bridge, como forma de evitar o uso de uma bridge fora da subnet, dado que novos containers adotam a default bridge por padrão se uma rede não for especificada e se a default bridge estiver disponível.
+
+   Para os seguintes procedimentos, é necessário assegurar que o Docker está instalado e parado.
 
    ```bash
-   docker network create --driver=bridge docker-host-bridge 
+   systemctl stop docker
    ```
 
-   Em muitos casos, é importante definir o range de distribuição dos IPs da rede Docker, para evitar conflitos com outros computadores ou serviços do ambiente onde está sendo feita a instalação.
-
-   Exemplo:
+   A remoção da default bridge é feita através de uma configuração do daemon.json, através de:
 
    ```bash
-   docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge # TROCAR OS IPs DE ACORDO COM A SUA NECESSIDADE
+   vim /etc/docker/daemon.json
    ```
+
+   Deve ser configurado o daemon.json com o seguinte conteúdo:
+
+   ```bash
+   {
+        "bridge": "none"
+   }
+   ``` 
+
+   Após a configuração é necessário Inicializar o Docker e verificar o resultado obtido:
+
+   ```bash
+   sudo systemctl start docker
+   docker network ls
+   ```
+
+   O resultado deve exibir uma lista de docker networks, sem a presença da bridge, conforme abaixo:
+
+   ```bash
+   NETWORK ID     NAME                 DRIVER    SCOPE
+   7cee8287f256   host                 host      local
+   0355f600e1d7   none                 null      local
+   ```
+
+   O próximo passo é a criação da *user defined bridge network* com a definição da subnet e gateway em conformidade com a política de endereçamento do órgão, semelhante ao comando:
+   
+   ```bash
+   docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge
+   ```
+
+   É mandatório que os valores de *--subnet*, *--iprange* e *--gateway* sejam adequadamente definidos pelo órgão, podendo adotar os valores do exemplo acima apenas se houver certeza de inexistência de conflito de endereços.
 
 6. **Configurar o arquivo `env_files/security.env` do ambiente**
    
@@ -166,8 +201,8 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | DB_SEI_SCHEMA              | Esquema do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                     | `sei_schema`                        |
 | DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções disponíveis: `mysql`, `mssql` e `oracle`.                                  | `mysql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `https://IP_OU_HOSTNAME:8983`.                                      | `https://192.168.0.10:8983`         |
-| POSTGRES_USER              | Informe o nome de usuário a ser criado automaticamente no banco de dados PostgreSQL interno do Servidor de IA.   | `sei_llm`                           |
-| POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforma variável acima. **Não deve conter** "`@`" ou "`\`".                   | `iJIH*Y&**Tuygb`                 |
+| POSTGRES_USER              | Nome de usuário já existente de acesso ao banco de dados PostgreSQL interno do Servidor de IA. Não alterar.   | `sei_llm`                           |
+| POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforme a variável acima. **Não deve conter**: "`'`" (aspas simples), "`"`" (aspas duplas), "`\`", "` `" (espaço), "`$`", "`(`", "`)`", "`:`", "`@`", "`;`", "`` ` ``" (crase), "`&`", "`*`", "`+`" (mais), "`-`" (menos), "`=`", "`/`", "`?`", "`!`", "`[`", "`]`", "`{`", "`}`", "`<`", "`>`", "`\|`", "`%`", "`^`", "`~`".                   | `iJI_YTuygb`                 |
 
 > **Observação**:
 > - Sobre a variável `GID_DOCKER`, Group ID do ambiente de instalação correspondente deve ser obtido executando o comando: `cat /etc/group | grep ^docker: | cut -d: -f3`.
@@ -264,7 +299,7 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 > **Observações:**
 > * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação **às aplicações Solr e PostgreSQL** não possuem direcionamento para ambiente externo. E não deve ter esse redirecionamento! Essas duas aplicações **são totalmente internas** e armazenam dados indexados dos documentos do SEI. Ou seja, são os bancos de dados das soluções de IA rodando no servidor e o acesso a eles deve ter alta restrição, sendo recomendável manter acessível apenas internamente no servidor.
 > * Seria uma falha de segurança abrir um acesso externo a essas duas aplicações sem controle, sem restringir o acesso em nível de rede local do órgão para apenas quem pode acessar.
-> * Consideramos que o o Administrador do ambiente computacional do SEI, caso precise conferir algo no Solr e PostgreSQL interno do Servidor de Soluções de IA, pode acessar diretamente a partir do acesso dele ao próprio servidor.
+> * Consideramos que o Administrador do ambiente computacional do SEI, caso precise conferir algo no Solr e PostgreSQL interno do Servidor de Soluções de IA, pode acessar diretamente a partir do acesso dele ao próprio servidor.
 > * Exepcionalmente, em ambiente que não seja de Produção e devendo restringir acesso em nível de rede local do órgão, é possível permitir o acesso externo à rede Docker. Para isso é necessário adicionar a linha afeta ao `docker-compose-dev.yaml` no script de deploy, localizado no arquivo: `deploy-externo-imgs.sh`:
 >
 > DE:
