@@ -62,9 +62,9 @@ As configurações de rede acima são essenciais para o funcionamento correto do
 
 ### Ajustar Permissão por IP no Solr do SEI
 
-Conforme orientado no Manual de Instalação do SEI até sua versão 4.1.0, o Solr do SEI é configurado com limitação de acesso por IPs. Assim, além de rota de rede adequada do Servidor de Soluções de IA até o Solr do SEI, conforme tópico anterior, é necessário acessar o arquivo `/opt/solr/server/etc/jetty.xml` no Solr do SEI **para adicionar o IP do Servidor de Soluções de IA**, tão quanto já deve constar no mencionado arquivo os IPs dos nós de aplicação do SEI do correspondente ambiente.
+Conforme orientado no Manual de Instalação do SEI até sua versão 4.1.0, o Solr do SEI é configurado com limitação de acesso por IPs. Assim, além de rota de rede adequada do Servidor de Soluções de IA até o Solr do SEI, conforme tópico anterior, é necessário editar o arquivo `/opt/solr/server/etc/jetty.xml` no Solr do SEI **para adicionar o IP do Servidor de Soluções de IA**, tão quanto já deve constar no mencionado arquivo os IPs dos nós de aplicação do SEI do correspondente ambiente.
 
-Por mais que tenha rota na rede local do órgão configurada, depois do deploy do servidor de soluçõea de IA, caso não tenha a permissão por IP limerada no Solr do SEI, algumas DAGs no AirFlow ficarão com erro por falta de permissão de acesso à aplicação em si do Solr do SEI.
+Por mais que exista rota na rede local do órgão configurada, depois do deploy do Servidor de Soluções de IA, caso não tenha a permissão por IP liberada no Solr do SEI, algumas DAGs no AirFlow ficarão com erro por falta de permissão de acesso à aplicação em si do Solr do SEI.
 
 ## Passos para Instalação
 
