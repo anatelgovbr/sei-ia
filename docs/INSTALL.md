@@ -1,4 +1,4 @@
-# Instalação do Servidor de Soluções de IA do módulo do SEI IA
+# Instalação do Servidor de Soluções de IA do módulo SEI IA
 
 - Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 - É importante observar que este manual não tem como objetivo fornecer conhecimento sobre as tecnologias adotadas. Para isto recomendamos buscar fontes mais apropriadas.
@@ -59,6 +59,12 @@ Para garantir a comunicação entre os serviços do *Servidor de Soluções de I
 As configurações de rede acima são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA, além do Assistente.
 
 **ATENÇÃO**: Se as configurações de conexões na rede local do órgão não forem efetivadas, conforme acima, antes dos "Passos para Instalação", abaixo, e não for garantido que estão funcionando adequadamente, poderá ter problemas no meio do deploy do servidor ou durante o funcionamento de algumas das aplicações. Assim, criadas as conexões indicadas, é importante testá-las a partir do servidor correspondente, antes de seguir para os "Passos para Instalação". Seguir para a instalação somente depois que confirmar que as conexões nos sentidos corretos estão efetivamente funcionando.
+
+### Ajustar Permissão por IP no Solr do SEI
+
+Conforme orientado no Manual de Instalação do SEI até sua versão 4.1.0, o Solr do SEI é configurado com limitação de acesso por IPs. Assim, além de rota de rede adequada do Servidor de Soluções de IA até o Solr do SEI, conforme tópico anterior, é necessário editar o arquivo `/opt/solr/server/etc/jetty.xml` no Solr do SEI **para adicionar o IP do Servidor de Soluções de IA**, tão quanto já deve constar no mencionado arquivo os IPs dos nós de aplicação do SEI do correspondente ambiente.
+
+Por mais que exista rota na rede local do órgão configurada, depois do deploy do Servidor de Soluções de IA, caso não tenha a permissão por IP liberada no Solr do SEI, algumas DAGs no AirFlow ficarão com erro por falta de permissão de acesso à aplicação em si do Solr do SEI.
 
 ## Passos para Instalação
 
@@ -122,7 +128,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    ```
 
 > **Observação**
-> Para clonar o repositório com um usuário específico, enquanto o repositório está provado no GitHub, substitua `USERNAME` pelo usuário autorizado:
+> Para clonar o repositório com um usuário específico, enquanto o repositório está privado no GitHub, substitua `USERNAME` pelo usuário autorizado:
 > ```bash
 > git clone --branch v1.0.0 --single-branch git@USERNAME@github.com:anatelgovbr/sei-ia.git
 > cd sei-ia
@@ -265,7 +271,16 @@ Se a instalação não for concluída com sucesso, conforme acima, **e for exclu
 docker ps -q --filter "name=sei_ia" | xargs -r docker stop
 docker ps -a -q --filter "name=sei_ia" | xargs -r docker rm -v
 ```
-9. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
+
+9. **Ampliar permissão dentro da pasta `sei-ia-storage` depois do deploy do servidor**
+
+Depois que o deploy do Servidor de Soluções de IA é concluído com sucesso, é necessário ampliar as permissões dentro da pasta `sei-ia-storage` criada no passo 3 da Instalação, mais acima. Execute o comando abaixo:
+
+```bash
+sudo chmod 777 -R /opt/sei-ia-storage/*
+```
+
+10. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
 
 Conforme consta orientado no [README do Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia?tab=readme-ov-file#orienta%C3%A7%C3%B5es-negociais), somente com tudo configurado na Administração do módulo no SEI do ambiente correspondente será possível o uso adequado de toda a solução.
  
