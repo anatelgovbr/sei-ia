@@ -1,16 +1,14 @@
--- *****************************************
--- SEI SIMILARIDADE
-CREATE DATABASE "${POSTGRES_DB_SIMILARIDADE}";
+CREATE DATABASE sei_similaridade;
 
 -- Switch to the target database context
-\c "${POSTGRES_DB_SIMILARIDADE}"
+\c sei_similaridade
 
 CREATE EXTENSION IF NOT EXISTS vector;
 
-ALTER DATABASE "${POSTGRES_DB_SIMILARIDADE}" SET search_path TO public;
-ALTER USER ${POSTGRES_USER} IN DATABASE "${POSTGRES_DB_SIMILARIDADE}" SET search_path TO public;
+ALTER DATABASE sei_similaridade SET search_path TO public;
+ALTER USER sei_llm IN DATABASE sei_similaridade SET search_path TO public;
 
-CREATE TABLE IF NOT EXISTS "version_register" (
+CREATE TABLE IF NOT EXISTS version_register (
     id SERIAL PRIMARY KEY,
     hash VARCHAR(255),
     branch VARCHAR(255),
@@ -25,23 +23,21 @@ INSERT INTO version_register
         (hash, branch, tag, url)
         VALUES('HASH_EXTERNOS','BRANCH_EXTERNOS','TAG_EXTERNOS','EXTERNOS/jobs.git');
 
--- *****************************************
--- ASSISTENTE
--- CREATE DATABASE "${POSTGRES_DB}";
+CREATE DATABASE SEI_LLM;
 
 -- Switch to the target database context
-\c "${POSTGRES_DB}"
+\c SEI_LLM
 
-CREATE SCHEMA "${POSTGRES_DB_ASSISTENTE_SCHEMA}";
+CREATE SCHEMA SEI_LLM;
 
 CREATE EXTENSION IF NOT EXISTS vector;
 
-ALTER DATABASE "${POSTGRES_DB}" SET search_path TO "${POSTGRES_DB_ASSISTENTE_SCHEMA}", public;
-ALTER USER ${POSTGRES_USER} IN DATABASE "${POSTGRES_DB}" SET search_path TO "${POSTGRES_DB_ASSISTENTE_SCHEMA}", public;
+ALTER DATABASE SEI_LLM SET search_path TO SEI_LLM, public;
+ALTER USER sei_llm IN DATABASE SEI_LLM SET search_path TO SEI_LLM, public;
 
-SET search_path TO "${POSTGRES_DB_ASSISTENTE_SCHEMA}", public;
+SET search_path TO SEI_LLM, public;
 
-CREATE TABLE IF NOT EXISTS "models" (
+CREATE TABLE IF NOT EXISTS models (
     id SERIAL PRIMARY KEY,
     modelo VARCHAR(255) NOT NULL,
     created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -72,7 +68,7 @@ INSERT INTO models
         (modelo, created_on)
         VALUES('GPT-4o-mini-128k', CURRENT_TIMESTAMP);
 
-CREATE TABLE IF NOT EXISTS "requests" (
+CREATE TABLE IF NOT EXISTS requests (
     id SERIAL PRIMARY KEY,
     endpoint_name VARCHAR NOT NULL,
     request TEXT,
@@ -86,7 +82,7 @@ CREATE TABLE IF NOT EXISTS "requests" (
     created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "messages" (
+CREATE TABLE IF NOT EXISTS messages (
     id SERIAL PRIMARY KEY,
     id_usuario INTEGER,
     id_modelo INTEGER,
@@ -99,7 +95,7 @@ CREATE TABLE IF NOT EXISTS "messages" (
     created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "ip_message" (
+CREATE TABLE IF NOT EXISTS ip_message (
     id SERIAL PRIMARY KEY,
     full_req TEXT,
     id_message INTEGER,
@@ -112,7 +108,7 @@ CREATE TABLE IF NOT EXISTS "ip_message" (
     created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "feedback" (
+CREATE TABLE IF NOT EXISTS feedback (
     id SERIAL PRIMARY KEY,
     id_mensagem INTEGER REFERENCES messages(id),
     stars INTEGER,
@@ -120,7 +116,7 @@ CREATE TABLE IF NOT EXISTS "feedback" (
     created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "embeddings_400_50" (
+CREATE TABLE IF NOT EXISTS embeddings_400_50 (
   id_documento INT,
   chunk_id INT,
   embedding VECTOR,

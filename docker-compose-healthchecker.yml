@@ -1,0 +1,38 @@
+services:
+  healthchecker:
+    build: 
+      context: .
+      network: host
+      dockerfile: healthchecker.dockerfile
+      args:
+        DOCKER_REGISTRY: ${DOCKER_REGISTRY}
+        API_ASSISTENTE_VERSION: ${API_ASSISTENTE_VERSION}
+    env_file:
+      - env_files/default.env
+      - env_files/prod.env
+      - env_files/security.env
+    environment:
+      STORAGE_PROJ_DIR: ${STORAGE_PROJ_DIR}
+      LD_LIBRARY_PATH: /opt/oracle
+      ORACLE_HOME: /opt/oracle
+      ORACLE_VERSION: 19.25
+    command: ["python", "teste.py"]
+    networks:
+      - network1
+    deploy:
+      resources:
+        limits:
+          memory: ${ASSISTENTE_MEM_LIMIT}
+          cpus: ${ASSISTENTE_CPU_LIMIT}
+    volumes:
+      - ${STORAGE_PROJ_DIR}:${STORAGE_PROJ_DIR}
+      - ./:/opt/healthchecker
+      - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    privileged: true  
+
+networks:
+  network1:
+    name: docker-host-bridge
+    external: true

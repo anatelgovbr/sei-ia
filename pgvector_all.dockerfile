@@ -14,18 +14,13 @@ RUN echo "America/Sao_Paulo" > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata
 
 # Copie os arquivos necessários
-COPY ./database_init/conf/init_pgvector.sql /docker-entrypoint-initdb.d/init_pgvector.sql.template
+COPY ./database_init/conf/init_pgvector.sql /docker-entrypoint-initdb.d/init_pgvector.sql
 COPY ./backup/volumes/backup_project.sh /backup.sh
 
 # Crie o entrypoint customizado para inicializar o cron e o PostgreSQL
 RUN \
     cd /usr/local/bin && \
     echo "#!/usr/bin/env bash" > sei_ia-entrypoint.sh && \
-    echo "echo '`date` LOG: Gerando arquivo /docker-entrypoint-initdb.d/init_pgvector.sql'" >> sei_ia-entrypoint.sh && \
-    echo "envsubst '\${POSTGRES_USER} \${POSTGRES_DB} \${POSTGRES_DB_SIMILARIDADE} \${POSTGRES_DB_ASSISTENTE_SCHEMA}' \
-                < /docker-entrypoint-initdb.d/init_pgvector.sql.template \
-                > /docker-entrypoint-initdb.d/init_pgvector.sql" \
-         >> sei_ia-entrypoint.sh && \
     echo "echo '`date` LOG: Iniciando o serviço cron'" >> sei_ia-entrypoint.sh && \
     echo "cron" >> sei_ia-entrypoint.sh && \
     echo "echo '`date` LOG: Executando entrypoint original da imagem pgvector/pgvector:pg16'" >> sei_ia-entrypoint.sh && \

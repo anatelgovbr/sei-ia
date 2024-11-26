@@ -406,7 +406,7 @@ services:
     profiles:
       - all
       - externo
-    image: ${DOCKER_REGISTRY:-}api_sei:${API_SEI_IMAGE}
+    image: ${DOCKER_REGISTRY:-}api-sei:${API_SEI_IMAGE}
     build:
       context: .
       dockerfile: ./api_sei.dockerfile
@@ -709,9 +709,6 @@ services:
       TOKEN_MAX: 4096
       SEI_IAWS_URL : ${SEI_IAWS_URL}
       SEI_IAWS_KEY : ${SEI_IAWS_KEY}
-      LD_LIBRARY_PATH: /opt/oracle
-      ORACLE_HOME: /opt/oracle
-      ORACLE_VERSION: 19.25
 
     # ports:
     #   - "8088:8088"

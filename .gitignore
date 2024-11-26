@@ -135,6 +135,7 @@ autodeployer/shared
 
 # Docker files
 
+*.csv
+*.zip
 
 externo/
-tests/
