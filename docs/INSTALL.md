@@ -3,6 +3,7 @@
 - Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 - É importante observar que este manual não tem como objetivo fornecer conhecimento sobre as tecnologias adotadas. Para isto recomendamos buscar fontes mais apropriadas.
 - **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
+- Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
 
 ## Pré-requisitos
 
@@ -204,7 +205,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                                       | `192.168.0.10`                      |
 | DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_db`                            |
 | DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.           | `3306`                              |
-| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                     | `sei_schema`                        |
+| DB_SEI_SCHEMA              | Nome do Schema do banco de dados do SEI. Se for MySQL, repetir o nome do banco de dados do SEI.                     | `sei_schema`                        |
 | DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções disponíveis: `mysql`, `mssql` e `oracle`.                                  | `mysql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `https://IP_OU_HOSTNAME:8983`.                                      | `https://192.168.0.10:8983`         |
 | POSTGRES_USER              | Nome de usuário já existente de acesso ao banco de dados PostgreSQL interno do Servidor de IA. Não alterar.   | `sei_llm`                           |
@@ -235,7 +236,7 @@ Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARI
 
 8. **Executar o deploy**
  > **ATENÇÃO**:
- > - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é necessário ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
+ > - Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
  > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 
    Execute o script de deploy:
@@ -294,6 +295,16 @@ Se o SEI não se conectar com sucesso ao Servidor de Soluções de IA que acabou
 ![Mapeamento das Integrações não OK na Administração do SEI](image/mod_sei_Validar_Integracao_com_Servidor_2.png)
 
 Nas seções a seguir apresentamos como testar e validar os resultados da instalação e configuração. 
+
+## Health Checker Geral do Ambiente
+
+Após concluir o deploy, você pode realizar testes automatizados de todo o ambiente utilizando o seguinte comando:
+
+```bash
+docker compose -f docker-compose-healthchecker.yml up --build
+```
+
+Aguarde a finalização dos testes. Os logs estarão disponíveis em `/opt/sei-ia-storage/logs/{DATA}`. Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
 
 ## Testes de Acessos
 
