@@ -143,7 +143,7 @@ su seiia
 8. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
   > **Observação**:
-  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v1.0.0`.
+  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. Trocar no comando de exemplo abaixo do `git clone` o trecho `[identificacao_release_estavel]` pela identificação correta da Release estável de interesse, constante na [página de Releases do projeto](https://github.com/anatelgovbr/sei-ia/releases), por exemplo, `v1.0.0`, `v1.0.1`, `v1.2.0` etc.
 > - Contudo, caso o órgão possua procedimentos e ferramentas de deploy próprias para seu ambiente computacional, como GitLab e Jenkins, deve adaptar esse passo aos seus próprios procedimentos.
 > - Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
 > ```bash
@@ -159,14 +159,14 @@ su seiia
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de [Anexos deste Manual](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALL.md#anexos) que orienta a instalar o Git no Servidor.
    
    ```bash
-   git clone --branch v1.0.0 --single-branch git@github.com:anatelgovbr/sei-ia.git
+   git clone --branch [identificacao_release_estavel] --single-branch git@github.com:anatelgovbr/sei-ia.git
    cd sei-ia
    ```
 
 > **Observação**
 > Para clonar o repositório com um usuário específico, enquanto o repositório está privado no GitHub, substitua `USERNAME` pelo usuário autorizado:
 > ```bash
-> git clone --branch v1.0.0 --single-branch git@USERNAME@github.com:anatelgovbr/sei-ia.git
+> git clone --branch [identificacao_release_estavel] --single-branch git@USERNAME@github.com:anatelgovbr/sei-ia.git
 > cd sei-ia
 > ```
 > - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
