@@ -1,7 +1,7 @@
 ARG DOCKER_REGISTRY
 ARG API_ASSISTENTE_VERSION
 
-FROM ${DOCKER_REGISTRY:-}api_assistente:${API_ASSISTENTE_VERSION}
+FROM anatelgovbr/api_assistente:0.3.1-RC
 
 WORKDIR /opt/healthchecker
 
