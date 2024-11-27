@@ -3,7 +3,6 @@
 - Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 - É importante observar que este manual não tem como objetivo fornecer conhecimento sobre as tecnologias adotadas. Para isto recomendamos buscar fontes mais apropriadas.
 - **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
-- Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
 
 ## Pré-requisitos
 
@@ -79,15 +78,59 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 > **Observação**:
 > - Todos os comandos ilustrados neste Manual são exemplos de comandos executados via terminal/console/CLI.
 
-1. **Criar a pasta para armazenar os códigos-fonte do *Servidor de Soluções de IA***
+1. **Criar o usuário:**
+   
+```bash
+sudo useradd -m -s /bin/bash seiia
+```
 
-   ```bash
-   sudo mkdir /opt/seiia
-   sudo chmod 777 /opt/seiia
-   cd /opt/seiia
-   ```
+2. **Adicionar o usuário ao grupo docker:**
+   
+```bash
+sudo usermod -aG docker seiia
+```
 
-2. **Iniciar o Docker**
+3. **Adicionar o usuário ao grupo root:**
+
+Nesse caso deve-se atentar ao sistema operacional usado.
+
+**Debian/Ubuntu**
+
+```bash
+sudo usermod -aG sudo seiia
+```
+
+**RHEL/CentOS/Fedora**
+
+```bash
+sudo usermod -aG wheel seiia
+```
+
+4. **Criar as pastas necessárias:**
+
+```bash
+sudo mkdir -p /opt/seiia
+sudo mkdir -p /opt/sei-ia-storage
+```
+
+5. **Corrigir as permissoes de pastas:**
+
+```bash
+sudo chown -R seiia:docker /opt/seiia
+sudo chown -R seiia:docker /opt/sei-ia-storage
+sudo chmod -R 770 /opt/seiia
+sudo chmod -R 770 /opt/sei-ia-storage
+```
+
+6. **Acessar o usuario:**
+
+Antes de iniciar a instalação tenha certeza de que está no usuário correto.
+
+```bash
+su seiia
+```
+
+7. **Iniciar o Docker:**
 
    Inicie o serviço do Docker.
 
@@ -96,16 +139,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
    docker --version # deve aparecer algo como Docker version 27.2.0, build 3ab4256
    ```
 
-3. **Preparar o ambiente**
-
-   Crie a pasta necessária para cache do Servidor de Soluções de IA.
-
-   ```bash
-   sudo mkdir /opt/sei-ia-storage
-   sudo chmod 777 /opt/sei-ia-storage
-   ```
-
-4. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
+8. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
   > **Observação**:
   > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. No exemplo abaixo, a Tag de Release estável é indicada como `v1.0.0`.
@@ -136,7 +170,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 > ```
 > - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
 
-5. **Criar a rede Docker**
+9. **Criar a rede Docker**
 
    O Docker utiliza como default a faixa de IP `172.17.*.*`, que pode ser utilizada internamente por uma organização e causar conflitos. Desta forma, se faz necessária a utilização de uma faixa de IPs dedicadas para os containers Docker rodando no Servidor, com objetivo de evitar erros de roteamento causados pela sobreposição de endereços IP.
 
@@ -185,7 +219,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
    É mandatório que os valores de *--subnet*, *--iprange* e *--gateway* sejam adequadamente definidos pelo órgão, podendo adotar os valores do exemplo acima apenas se houver certeza de inexistência de conflito de endereços.
 
-6. **Configurar o arquivo `env_files/security.env` do ambiente**
+10. **Configurar o arquivo `env_files/security.env` do ambiente**
    
    Certifique-se de conhecer o tipo de banco de dados utilizado pelo SEI do órgão.
 
@@ -205,7 +239,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 | DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                                       | `192.168.0.10`                      |
 | DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_db`                            |
 | DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.           | `3306`                              |
-| DB_SEI_SCHEMA              | Nome do Schema do banco de dados do SEI. Se for MySQL, repetir o nome do banco de dados do SEI.                     | `sei_schema`                        |
+| DB_SEI_SCHEMA              | Esquema do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                     | `sei_schema`                        |
 | DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções disponíveis: `mysql`, `mssql` e `oracle`.                                  | `mysql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `https://IP_OU_HOSTNAME:8983`.                                      | `https://192.168.0.10:8983`         |
 | POSTGRES_USER              | Nome de usuário já existente de acesso ao banco de dados PostgreSQL interno do Servidor de IA. Não alterar.   | `sei_llm`                           |
@@ -214,7 +248,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 > **Observação**:
 > - Sobre a variável `GID_DOCKER`, Group ID do ambiente de instalação correspondente deve ser obtido executando o comando: `cat /etc/group | grep ^docker: | cut -d: -f3`.
 
-7. **Configurações adicionais**
+11. **Configurações adicionais**
 
    No arquivo `env_files/security.env`, preencha as variáveis da seção `# NAO ESSENCIAIS NO MOMENTO DA INSTALACAO:`. Essas variáveis não são essenciais durante a instalação inicial do Servidor de Soluções de IA do módulo SEI IA, mas serão necessárias para o uso do **ASSISTENTE**.
 
@@ -234,9 +268,9 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 
 Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` que não podem ser alteradas.
 
-8. **Executar o deploy**
+12. **Executar o deploy**
  > **ATENÇÃO**:
- > - Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
+ > - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é necessário ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
  > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 
    Execute o script de deploy:
@@ -273,15 +307,15 @@ docker ps -q --filter "name=sei_ia" | xargs -r docker stop
 docker ps -a -q --filter "name=sei_ia" | xargs -r docker rm -v
 ```
 
-9. **Ampliar permissão dentro da pasta `sei-ia-storage` depois do deploy do servidor**
+13. **Ampliar permissão dentro da pasta `sei-ia-storage` depois do deploy do servidor**
 
-Depois que o deploy do Servidor de Soluções de IA é concluído com sucesso, é necessário ampliar as permissões dentro da pasta `sei-ia-storage` criada no passo 3 da Instalação, mais acima. Execute o comando abaixo:
+Depois que o deploy do Servidor de Soluções de IA é concluído com sucesso, em alguns casos, é necessário ampliar as permissões dentro da pasta `sei-ia-storage` criada no passo 4 da instalação, mais acima. Execute o comando abaixo:
 
 ```bash
-sudo chmod 777 -R /opt/sei-ia-storage/*
+sudo chmod 770 -R /opt/sei-ia-storage/*
 ```
 
-10. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
+14. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
 
 Conforme consta orientado no [README do Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia?tab=readme-ov-file#orienta%C3%A7%C3%B5es-negociais), somente com tudo configurado na Administração do módulo no SEI do ambiente correspondente será possível o uso adequado de toda a solução.
  
@@ -295,16 +329,6 @@ Se o SEI não se conectar com sucesso ao Servidor de Soluções de IA que acabou
 ![Mapeamento das Integrações não OK na Administração do SEI](image/mod_sei_Validar_Integracao_com_Servidor_2.png)
 
 Nas seções a seguir apresentamos como testar e validar os resultados da instalação e configuração. 
-
-## Health Checker Geral do Ambiente
-
-Após concluir o deploy, você pode realizar testes automatizados de todo o ambiente utilizando o seguinte comando:
-
-```bash
-docker compose -f docker-compose-healthchecker.yml up --build
-```
-
-Aguarde a finalização dos testes. Os logs estarão disponíveis em `/opt/sei-ia-storage/logs/{DATA}`. Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
 
 ## Testes de Acessos
 
