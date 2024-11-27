@@ -312,6 +312,7 @@ docker ps -a -q --filter "name=sei_ia" | xargs -r docker rm -v
 Depois que o deploy do Servidor de Soluções de IA é concluído com sucesso, em alguns casos, é necessário ampliar as permissões dentro da pasta `sei-ia-storage` criada no passo 4 da instalação, mais acima. Execute o comando abaixo:
 
 ```bash
+sudo chown -R seiia:docker /opt/sei-ia-storage
 sudo chmod 770 -R /opt/sei-ia-storage/*
 ```
 
