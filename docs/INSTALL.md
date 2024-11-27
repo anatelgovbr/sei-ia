@@ -85,6 +85,12 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 sudo useradd -m -s /bin/bash seiia
 ```
 
+Atualize a senha do usuario com o comando
+
+```bash
+sudo passwd seiia
+```
+
 2. **Adicionar o usuário ao grupo docker:**
    
 ```bash
