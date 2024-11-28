@@ -310,8 +310,9 @@ Após a finalização do deploy, o Airflow iniciará a indexação dos documento
 Se a instalação não for concluída com sucesso, conforme acima, **e for exclusivamente a primeira instalação**, é importante levantar informações sobre qualquer erro apresentado durante o deploy e realizar a limpeza completa do ambiente para eliminar qualquer lixo que a instalação com erro possa deixar no ambiente. Utilize o comando abaixo para a limpeza total do ambiente:
 
 ```bash
-docker ps -q --filter "name=sei_ia" | xargs -r docker stop
-docker ps -a -q --filter "name=sei_ia" | xargs -r docker rm -v
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker system prune -a --volumes
 ```
 
 13. **Ampliar permissão dentro da pasta `sei-ia-storage` depois do deploy do servidor**
