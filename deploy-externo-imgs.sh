@@ -72,7 +72,7 @@ while read -r dag; do
     if [ \"\$dag\" == \"dag_embeddings_start\" ]; then
         echo 'Pausando dag_embeddings_start...';
         airflow dags pause dag_embeddings_start || echo 'Falha ao pausar dag_embeddings_start';
-    else [ \"\$is_paused\" == \"True\" ]; then
+    else; then
         echo \"Despausando DAG: \$dag...\"
         airflow dags unpause \"\$dag\" || echo 'Falha ao despausar \$dag';
     fi
