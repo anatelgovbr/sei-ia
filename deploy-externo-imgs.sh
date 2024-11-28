@@ -37,7 +37,7 @@ cat env_files/default.env >> .env
 cat env_files/security.env >> .env
 
 echo "*** `date`: Criando pasta de storage para o SEI IA caso não exista..."
-[ -d $STORAGE_PROJ_DIR ] && chmod 777 $STORAGE_PROJ_DIR || mkdir --mode 777 $STORAGE_PROJ_DIR
+[ -d $STORAGE_PROJ_DIR ] && chmod -R 777 $STORAGE_PROJ_DIR || mkdir --mode 777 $STORAGE_PROJ_DIR
 
 echo "*** `date`: Configurando variáveis de ambiente para instalação do SEI IA..."
 export PROJECT_NAME=sei_ia
@@ -60,13 +60,38 @@ docker compose --profile externo \
   --no-build -d
 
 echo "*** `date`:Ativando as DAGs do SEI IA no Airflow..."
-docker compose -f docker-compose-prod.yaml -p $PROJECT_NAME exec airflow-webserver-pd /bin/bash -c "airflow dags list | awk '{print \$1}' | grep -v 'DAG_ID' | xargs -I {} airflow dags unpause {}; airflow dags pause dag_embeddings_start; exit 0"#adicionar registro na tabela version_register no banco sei_similaridade
+docker compose -f docker-compose-prod.yaml -p $PROJECT_NAME exec airflow-webserver-pd /bin/bash -c "
+airflow dags list | awk 'NR > 2 {print \$1}' > /tmp/dags_list.txt;
+cat /tmp/dags_list.txt || echo 'Nenhuma DAG encontrada.';
+while read -r dag; do
+    echo 'Tentando despausar DAG:' \$dag;
+
+    # Verifica se a DAG já está pausada
+    is_paused=\$(airflow dags list | grep \"^\$dag\" | awk '{print \$2}')
+    
+    if [ \"\$dag\" == \"dag_embeddings_start\" ]; then
+        echo 'Pausando dag_embeddings_start...';
+        airflow dags pause dag_embeddings_start || echo 'Falha ao pausar dag_embeddings_start';
+    elif [ \"\$is_paused\" == \"True\" ]; then
+        echo \"Despausando DAG: \$dag...\"
+        airflow dags unpause \"\$dag\" || echo 'Falha ao despausar \$dag';
+    else
+        echo \"DAG \$dag já está despausada.\"
+    fi
+done < /tmp/dags_list.txt
+"
+
+
+#adicionar registro na tabela version_register no banco sei_similaridade
 sh insert_row_version_register.sh
 
+echo "*** `date`:Rodando o healthchecker..."
 docker compose --profile externo \
   -f docker-compose-healthchecker.yaml \
   -p $PROJECT_NAME \
   up \
   --build
+
+chmod -R 777 $STORAGE_PROJ_DIR
 
 echo "*** `date`:Finalizado o Deploy do Servidor de Soluções do SEI-IA. "
