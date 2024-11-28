@@ -3,11 +3,11 @@ source ./env_files/security.env
 POSTGRES_DB="sei_similaridade"
 CONTAINER_NAME="pgvector_all"
 
-# Capturar dados do repositório local
-HASH=$(git rev-parse HEAD)
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-TAG=$(git tag --points-at HEAD)
-URL=$(git config --get remote.origin.url)
+# Capturar dados do repositório local com valores padrão
+HASH=$(git rev-parse HEAD 2>/dev/null || echo "default-hash")
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "externos")
+TAG=$(git tag --points-at HEAD 2>/dev/null || echo "1.0.1")
+URL=$(git config --get remote.origin.url 2>/dev/null || echo "EXTERNOS/jobs.git")
 CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 
 # Função para escapar aspas simples
