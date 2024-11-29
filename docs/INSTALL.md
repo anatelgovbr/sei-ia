@@ -2,8 +2,55 @@
 
 - Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 - É importante observar que este manual não tem como objetivo fornecer conhecimento sobre as tecnologias adotadas. Para isto recomendamos buscar fontes mais apropriadas.
-- **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
 - Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
+- **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
+- **ATENÇÃO:** Na seção [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente) temos um detalhamento de como usar os testes automatizados para validar a conformidade da instalação e configuração, nesta seção também orientamos como deve ser feita a leitura dos logs que indicarão eventuais erros e necessidades de ajustes para a total conformidade da instalação e configuração.
+
+---
+## SUMÁRIO
+
+- [Instalação do Servidor de Soluções de IA do módulo SEI IA](#instalação-do-servidor-de-soluções-de-ia-do-módulo-sei-ia)
+  - [SUMÁRIO](#sumário)
+  - [Pré-requisitos](#pré-requisitos)
+    - [Configurações na Rede Local do Órgão](#configurações-na-rede-local-do-órgão)
+    - [Ajustar Permissão por IP no Solr do SEI](#ajustar-permissão-por-ip-no-solr-do-sei)
+  - [Passos para Instalação](#passos-para-instalação)
+  - [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente)
+    - [Explicação dos Logs por Seção](#explicação-dos-logs-por-seção)
+      - [1. **Testes**](#1-testes)
+        - [1.1 **ENVS**](#11-envs)
+        - [1.2 **CONECTIVIDADE**](#12-conectividade)
+          - [1.2.1 **TESTE DE CONECTIVIDADE - RESUMO**](#121-teste-de-conectividade---resumo)
+          - [1.2.2 **TESTE DE SAÚDE DOS ENDPOINTS**](#122-teste-de-saúde-dos-endpoints)
+          - [1.2.3 **TESTE DE CONEXÃO COM SOLR**](#123-teste-de-conexão-com-solr)
+        - [1.3 **TESTE DE CONEXÃO COM BANCO DE DADOS**](#13-teste-de-conexão-com-banco-de-dados)
+          - [1.3.1 **EXTERNOS**](#131-externos)
+          - [1.3.2 **INTERNOS**](#132-internos)
+        - [1.4 **DOCKER**](#14-docker)
+          - [1.4.1 **DOCKER - LOGS**](#141-docker---logs)
+        - [1.5 **AIRFLOW**](#15-airflow)
+        - [1.6 **RESUMO - TESTES**](#16-resumo---testes)
+  - [Testes de Acessos](#testes-de-acessos)
+    - [Airflow](#airflow)
+      - [Principais DAGs](#principais-dags)
+      - [Monitoramento e Significado das Cores das DAGs](#monitoramento-e-significado-das-cores-das-dags)
+      - [Como Obter o Log de Execução em Caso de Falha (DAG Vermelha)](#como-obter-o-log-de-execução-em-caso-de-falha-dag-vermelha)
+    - [API de Recomendação de Processos e Documentos do SEI IA](#api-de-recomendação-de-processos-e-documentos-do-sei-ia)
+    - [API SEI IA Feedback de Processos](#api-sei-ia-feedback-de-processos)
+    - [API SEI IA Assistente](#api-sei-ia-assistente)
+    - [Bancos de Dados](#bancos-de-dados)
+      - [Solr do Servidor de Soluções de IA](#solr-do-servidor-de-soluções-de-ia)
+      - [PostgreSQL](#postgresql)
+  - [Resolução de Problemas Conhecidos](#resolução-de-problemas-conhecidos)
+  - [Pontos de Atenção para Escalabilidade](#pontos-de-atenção-para-escalabilidade)
+    - [Pontos de Montagem de Volumes](#pontos-de-montagem-de-volumes)
+    - [Ajustes Necessários](#ajustes-necessários)
+  - [Backup periódico dos dados do Servidor de Soluções de IA](#backup-periódico-dos-dados-do-servidor-de-soluções-de-ia)
+  - [ANEXOS:](#anexos)
+    - [**Instalar Git - OPCIONAL**](#instalar-git---opcional)
+    - [**Instalar Docker - CASO AINDA NÃO ESTEJA INSTALADO**](#instalar-docker---caso-ainda-não-esteja-instalado)
+  
+--- 
 
 ## Pré-requisitos
 
@@ -66,6 +113,8 @@ As configurações de rede acima são essenciais para o funcionamento correto do
 Conforme orientado no Manual de Instalação do SEI até sua versão 4.1.0, o Solr do SEI é configurado com limitação de acesso por IPs. Assim, além de rota de rede adequada do Servidor de Soluções de IA até o Solr do SEI, conforme tópico anterior, é necessário editar o arquivo `/opt/solr/server/etc/jetty.xml` no Solr do SEI **para adicionar o IP do Servidor de Soluções de IA**, tão quanto já deve constar no mencionado arquivo os IPs dos nós de aplicação do SEI do correspondente ambiente.
 
 Por mais que exista rota na rede local do órgão configurada, depois do deploy do Servidor de Soluções de IA, caso não tenha a permissão por IP liberada no Solr do SEI, algumas DAGs no AirFlow ficarão com erro por falta de permissão de acesso à aplicação em si do Solr do SEI.
+
+---
 
 ## Passos para Instalação
 
@@ -154,7 +203,7 @@ su seiia
 > - Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
 > ```bash
 > sudo mkdir /opt/sei-ia
-> sudo chmod 777 /opt/sei-ia
+> sudo chmod 770 /opt/sei-ia
 > # Coloque o arquivo da release neste diretório
 > cd /opt/sei-ia
 > unzip sei-ia-v.1.0.0.zip . # O nome do arquivo pode mudar. ATENÇÃO: para subir o arquivo zip antes no servidor.
@@ -310,9 +359,12 @@ Após a finalização do deploy, o Airflow iniciará a indexação dos documento
 Se a instalação não for concluída com sucesso, conforme acima, **e for exclusivamente a primeira instalação**, é importante levantar informações sobre qualquer erro apresentado durante o deploy e realizar a limpeza completa do ambiente para eliminar qualquer lixo que a instalação com erro possa deixar no ambiente. Utilize o comando abaixo para a limpeza total do ambiente:
 
 ```bash
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
-docker system prune -a --volumes
+sudo docker stop $(docker ps -a -q)
+sudo docker rm $(docker ps -a -q)
+sudo docker system prune -a --volumes
+# Verifique se os volumes foram deletados:
+sudo docker volumes ls 
+# caso nao tenham sido deverá ser removido com o comando docker volume rm [nome-do-volume]
 ```
 
 13. **Ampliar permissão dentro da pasta `sei-ia-storage` depois do deploy do servidor**
@@ -338,15 +390,117 @@ Se o SEI não se conectar com sucesso ao Servidor de Soluções de IA que acabou
 
 Nas seções a seguir apresentamos como testar e validar os resultados da instalação e configuração. 
 
+---
+
 ## Health Checker Geral do Ambiente
 
-Após concluir o deploy, você pode realizar testes automatizados de todo o ambiente utilizando o seguinte comando:
+Após concluir o deploy, você pode realizar testes automatizados de todo o ambiente utilizando o comando abaixo:
 
 ```bash
 docker compose -f docker-compose-healthchecker.yml up --build
 ```
 
 Aguarde a finalização dos testes. Os logs estarão disponíveis em `/opt/sei-ia-storage/logs/{DATA}`. Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
+
+Para compreensão do LOG pode-se iniciar a leitura com:
+`/opt/sei-ia-storage/logs/{DATA}/tests_{DATA}`
+
+1. **Estrutura do Log**  
+   Os logs seguem a seguinte estrutura:
+   - **Timestamp:** Data e hora do evento.
+   - **Nível de severidade:**
+     - **INFO:** Informações gerais e mensagens de sucesso.
+     - **WARNING:** Avisos de possíveis problemas ou inconsistências.
+     - **ERROR:** Erros que requerem atenção imediata.
+     - **Mensagem:** Detalhes do evento ou do problema detectado.
+
+### Explicação dos Logs por Seção
+
+#### 1. **Testes**
+
+##### 1.1 **ENVS**
+- **Descrição:** Esta seção descreve variáveis de ambiente encontradas em arquivos `.env`.
+- **Objetivo:** Verificar se todas as variáveis necessárias estão presentes e com valores corretos.
+- **Tipos de Mensagens Comuns:**
+  - **Variáveis Sobrando:** Variáveis que estão definidas mas não são utilizadas pelo sistema.
+  - **Variáveis Duplicadas:** Variáveis que aparecem mais de uma vez, podendo causar conflitos.
+  - **Variáveis Vazias ou Inválidas:** Variáveis sem valor ou com valores incorretos.
+
+##### 1.2 **CONECTIVIDADE**
+
+###### 1.2.1 **TESTE DE CONECTIVIDADE - RESUMO**
+- **Descrição:** Verifica a disponibilidade e acessibilidade de endpoints ou serviços externos.
+- **Objetivo:** Confirmar se os sistemas externos estão acessíveis.
+- **Mensagens Comuns:**
+  - **Falha de Conexão:** O sistema não conseguiu acessar o serviço especificado.
+  - **Tempo de Resposta Alto:** O serviço respondeu lentamente, sugerindo um possível problema de desempenho.
+
+###### 1.2.2 **TESTE DE SAÚDE DOS ENDPOINTS**
+- **Descrição:** Realiza uma verificação do status (saúde) de endpoints críticos da aplicação.
+- **Objetivo:** Confirmar que os endpoints principais estão funcionando corretamente.
+- **Mensagens Comuns:**
+  - **Serviço Indisponível:** O endpoint não respondeu conforme esperado.
+  - **Falha ao Testar:** Testes não puderam ser realizados devido a erro de configuração ou conectividade.
+
+###### 1.2.3 **TESTE DE CONEXÃO COM SOLR**
+- **Descrição:** Verifica a conectividade com o servidor SOLR, utilizado para busca e indexação de dados.
+- **Objetivo:** Garantir que a aplicação consiga se comunicar corretamente com o servidor SOLR.
+- **Mensagens Comuns:**
+  - **Falha de Conexão:** Erro ao tentar conectar ao SOLR.
+  - **Configuração de Endpoint Inválida:** A URL ou as credenciais de conexão podem estar incorretas.
+
+##### 1.3 **TESTE DE CONEXÃO COM BANCO DE DADOS**
+
+###### 1.3.1 **EXTERNOS**
+
+**1.3.1.1 TABELAS DO SEI**
+- **Descrição:** Verifica a conexão com bancos de dados externos, como os usados pelo SEI (Sistema Eletrônico de Informações).
+- **Objetivo:** Confirmar se a aplicação tem acesso correto a essas tabelas.
+- **Mensagens Comuns:**
+  - **Erro de Autenticação:** Falha ao validar o usuário e senha no banco de dados.
+  - **Erro de Conexão:** Problemas de rede ou configuração ao tentar conectar ao banco.
+
+###### 1.3.2 **INTERNOS**
+
+**1.3.2.1 TABELAS DO ASSISTENTE**
+- **Descrição:** Verifica a conexão e o estado das tabelas do banco de dados utilizadas pelo Assistente Virtual.
+- **Objetivo:** Garantir que o sistema do Assistente Virtual tenha acesso adequado ao banco de dados interno.
+- **Mensagens Comuns:**
+  - **Tabela Inexistente:** Falta de tabelas necessárias para o funcionamento do Assistente.
+  - **Erro de Consulta:** Falhas em queries ou na execução de operações SQL.
+
+**1.3.2.2 TABELAS DE SIMILARIDADE**
+- **Descrição:** Verifica a integridade e acessibilidade das tabelas usadas para comparação de dados (por exemplo, comparação de documentos ou consultas de similaridade).
+- **Objetivo:** Assegurar que as operações de comparação de dados funcionem corretamente.
+- **Mensagens Comuns:**
+  - **Falha ao Buscar Dados:** Erros ao tentar recuperar dados das tabelas de similaridade.
+  - **Desempenho Baixo:** Consultas muito lentas ou com alta latência.
+
+##### 1.4 **DOCKER**
+
+###### 1.4.1 **DOCKER - LOGS**
+- **Descrição:** Relata o estado dos containers Docker executando a aplicação.
+- **Objetivo:** Verificar se todos os containers estão em funcionamento e sem problemas de saúde.
+- **Mensagens Comuns:**
+  - **Containers Parados:** Containers não estão em execução ou foram reiniciados inesperadamente.
+  - **Falha de Saúde:** Containers com status `unhealthy` que indicam falhas internas.
+  - **Reinicializações Frequentes:** Containers que estão reiniciando constantemente devido a falhas.
+
+##### 1.5 **AIRFLOW**
+- **Descrição:** Registra as execuções dos DAGs (Direcionadores de Fluxos de Trabalho) do Airflow, incluindo falhas de execução ou dependências não atendidas.
+- **Objetivo:** Garantir que as tarefas programadas no Airflow sejam executadas corretamente.
+- **Mensagens Comuns:**
+  - **Falhas de Tarefa:** Tarefas que não foram executadas ou falharam durante a execução.
+  - **Dependências Não Satisfeitas:** Problemas ao tentar executar tarefas devido a dependências não resolvidas.
+
+##### 1.6 **RESUMO - TESTES**
+- **Descrição:** Apresenta um resumo geral de todos os testes realizados, destacando falhas críticas e informações importantes.
+- **Objetivo:** Facilitar a visão geral dos resultados dos testes, indicando onde ações corretivas são necessárias.
+- **Mensagens Comuns:**
+  - **Falhas Identificadas:** Relatórios com falhas graves, como falta de conectividade ou erros de autenticação.
+  - **Testes Bem-Sucedidos:** Indicação de que todas as verificações foram realizadas com sucesso, e o sistema está em bom estado.
+
+---
 
 ## Testes de Acessos
 
@@ -542,6 +696,7 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
 - **URL**: [Servidor_Solucoes_IA]:5432
 - **Descrição**: Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.
 
+---
 
 ## Resolução de Problemas Conhecidos
 
@@ -662,6 +817,7 @@ Ao escalar a solução, considere os seguintes pontos:
    | `PGVECTOR_MEM_LIMIT=8g`     | Define o limite de memória para Pgvector como 8 GB.           |
    | `PGVECTOR_CPU_LIMIT='2'`    | Define o limite de CPU para Pgvector como 2 unidades de CPU.  |
 
+---
 
 ## Backup periódico dos dados do Servidor de Soluções de IA
 
@@ -670,6 +826,8 @@ Um ponto importante em relação ao Servidor de Soluções de IA é a realizaç�
 ```bash
 docker volume ls | grep "^sei_ia-"
 ```
+
+---
 
 ## ANEXOS:
 

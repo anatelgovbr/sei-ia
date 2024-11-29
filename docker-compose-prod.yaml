@@ -710,7 +710,7 @@ services:
       SEI_IAWS_URL : ${SEI_IAWS_URL}
       SEI_IAWS_KEY : ${SEI_IAWS_KEY}
       ORACLE_HOME: /opt/oracle
-      ORACLE_VERSION: 19.25
+      ORACLE_VERSION: 19.25 # versao do banco do SEI fixa, e a versao do driver seguir o mesmo padrão.
       LD_LIBRARY_PATH: /opt/oracle
 
     # ports:
