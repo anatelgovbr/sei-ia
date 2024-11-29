@@ -37,7 +37,7 @@ cat env_files/default.env >> .env
 cat env_files/security.env >> .env
 
 echo "*** `date`: Criando pasta de storage para o SEI IA caso não exista..."
-[ -d $STORAGE_PROJ_DIR ] && chmod -R 777 $STORAGE_PROJ_DIR || mkdir --mode 777 $STORAGE_PROJ_DIR
+[ -d $STORAGE_PROJ_DIR ] && chmod -R 770 $STORAGE_PROJ_DIR || mkdir --mode 770 $STORAGE_PROJ_DIR
 
 echo "*** `date`: Configurando variáveis de ambiente para instalação do SEI IA..."
 export PROJECT_NAME=sei_ia
@@ -90,6 +90,6 @@ docker compose --profile externo \
   up \
   --build
 
-chmod -R 777 $STORAGE_PROJ_DIR
+chmod -R 770 $STORAGE_PROJ_DIR
 
 echo "*** `date`:Finalizado o Deploy do Servidor de Soluções do SEI-IA. "
