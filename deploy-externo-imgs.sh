@@ -87,6 +87,6 @@ docker compose --profile externo \
   up \
   --build
 
-chmod -R 770 $STORAGE_PROJ_DIR
+chmod -R 777 $STORAGE_PROJ_DIR
 
 echo "*** `date`:Finalizado o Deploy do Servidor de Soluções do SEI-IA. "
