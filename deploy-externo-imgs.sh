@@ -36,9 +36,6 @@ cat env_files/prod.env > .env
 cat env_files/default.env >> .env
 cat env_files/security.env >> .env
 
-echo "*** `date`: Criando pasta de storage para o SEI IA caso não exista..."
-[ -d $STORAGE_PROJ_DIR ] && chmod -R 770 $STORAGE_PROJ_DIR || mkdir --mode 770 $STORAGE_PROJ_DIR
-
 echo "*** `date`: Configurando variáveis de ambiente para instalação do SEI IA..."
 export PROJECT_NAME=sei_ia
 
@@ -85,7 +82,7 @@ sh insert_row_version_register.sh
 
 echo "*** `date`:Rodando o healthchecker..."
 docker compose --profile externo \
-  -f docker-compose-healthchecker.yaml \
+  -f docker-compose-healthchecker.yml \
   -p $PROJECT_NAME \
   up \
   --build
