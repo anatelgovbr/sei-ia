@@ -144,8 +144,8 @@ sudo mkdir -p /opt/sei-ia-storage
 ```bash
 sudo chown -R seiia:docker /opt/seiia
 sudo chown -R seiia:docker /opt/sei-ia-storage
-sudo chmod -R 770 /opt/seiia
-sudo chmod -R 770 /opt/sei-ia-storage
+sudo chmod -R 777 /opt/seiia
+sudo chmod -R 777 /opt/sei-ia-storage
 ```
 
 6. **Acessar o usuario:**
@@ -342,7 +342,7 @@ docker volumes ls
 Depois que o deploy do Servidor de Soluções de IA é concluído com sucesso, em alguns casos, é necessário ampliar as permissões dentro da pasta `sei-ia-storage` criada no passo 4 da instalação, mais acima. Execute o comando abaixo:
 
 ```bash
-sudo chmod 770 -R /opt/sei-ia-storage/*
+sudo chmod 777 -R /opt/sei-ia-storage/*
 ```
 
 14. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
