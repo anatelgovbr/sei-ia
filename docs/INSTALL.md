@@ -7,48 +7,18 @@
 - **ATENÇÃO:** Na seção [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente) temos um detalhamento de como usar os testes automatizados para validar a conformidade da instalação e configuração, nesta seção também orientamos como deve ser feita a leitura dos logs que indicarão eventuais erros e necessidades de ajustes para a total conformidade da instalação e configuração.
 
 ---
-## SUMÁRIO
+## Sumário
 
 - [Instalação do Servidor de Soluções de IA do módulo SEI IA](#instalação-do-servidor-de-soluções-de-ia-do-módulo-sei-ia)
-  - [SUMÁRIO](#sumário)
+  - [Sumário](#sumário)
   - [Pré-requisitos](#pré-requisitos)
-    - [Configurações na Rede Local do Órgão](#configurações-na-rede-local-do-órgão)
-    - [Ajustar Permissão por IP no Solr do SEI](#ajustar-permissão-por-ip-no-solr-do-sei)
   - [Passos para Instalação](#passos-para-instalação)
   - [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente)
-    - [Explicação dos Logs por Seção](#explicação-dos-logs-por-seção)
-      - [1. **Testes**](#1-testes)
-        - [1.1 **ENVS**](#11-envs)
-        - [1.2 **CONECTIVIDADE**](#12-conectividade)
-          - [1.2.1 **TESTE DE CONECTIVIDADE - RESUMO**](#121-teste-de-conectividade---resumo)
-          - [1.2.2 **TESTE DE SAÚDE DOS ENDPOINTS**](#122-teste-de-saúde-dos-endpoints)
-          - [1.2.3 **TESTE DE CONEXÃO COM SOLR**](#123-teste-de-conexão-com-solr)
-        - [1.3 **TESTE DE CONEXÃO COM BANCO DE DADOS**](#13-teste-de-conexão-com-banco-de-dados)
-          - [1.3.1 **EXTERNOS**](#131-externos)
-          - [1.3.2 **INTERNOS**](#132-internos)
-        - [1.4 **DOCKER**](#14-docker)
-          - [1.4.1 **DOCKER - LOGS**](#141-docker---logs)
-        - [1.5 **AIRFLOW**](#15-airflow)
-        - [1.6 **RESUMO - TESTES**](#16-resumo---testes)
-  - [Testes de Acessos](#testes-de-acessos)
-    - [Airflow](#airflow)
-      - [Principais DAGs](#principais-dags)
-      - [Monitoramento e Significado das Cores das DAGs](#monitoramento-e-significado-das-cores-das-dags)
-      - [Como Obter o Log de Execução em Caso de Falha (DAG Vermelha)](#como-obter-o-log-de-execução-em-caso-de-falha-dag-vermelha)
-    - [API de Recomendação de Processos e Documentos do SEI IA](#api-de-recomendação-de-processos-e-documentos-do-sei-ia)
-    - [API SEI IA Feedback de Processos](#api-sei-ia-feedback-de-processos)
-    - [API SEI IA Assistente](#api-sei-ia-assistente)
-    - [Bancos de Dados](#bancos-de-dados)
-      - [Solr do Servidor de Soluções de IA](#solr-do-servidor-de-soluções-de-ia)
-      - [PostgreSQL](#postgresql)
+  - [Testes de Acessos](#testes-de-acessos)    
   - [Resolução de Problemas Conhecidos](#resolução-de-problemas-conhecidos)
   - [Pontos de Atenção para Escalabilidade](#pontos-de-atenção-para-escalabilidade)
-    - [Pontos de Montagem de Volumes](#pontos-de-montagem-de-volumes)
-    - [Ajustes Necessários](#ajustes-necessários)
   - [Backup periódico dos dados do Servidor de Soluções de IA](#backup-periódico-dos-dados-do-servidor-de-soluções-de-ia)
-  - [ANEXOS:](#anexos)
-    - [**Instalar Git - OPCIONAL**](#instalar-git---opcional)
-    - [**Instalar Docker - CASO AINDA NÃO ESTEJA INSTALADO**](#instalar-docker---caso-ainda-não-esteja-instalado)
+  - [Anexos:](#anexos)
   
 --- 
 
@@ -104,9 +74,9 @@ Para garantir a comunicação entre os serviços do *Servidor de Soluções de I
       - **API SEI IA Feedback**: Porta 8086
       - **API SEI IA Assistente**: Porta 8088
 
-As configurações de rede acima são essenciais para o funcionamento correto dos sub-módulos de recomendação e de processamento de documentos do SEI IA, além do Assistente.
+As configurações de rede acima são mandatórias para o funcionamento correto dos sub-módulos de recomendação de processos/documentos e do Assistente.
 
-**ATENÇÃO**: Se as configurações de conexões na rede local do órgão não forem efetivadas, conforme acima, antes dos "Passos para Instalação", abaixo, e não for garantido que estão funcionando adequadamente, poderá ter problemas no meio do deploy do servidor ou durante o funcionamento de algumas das aplicações. Assim, criadas as conexões indicadas, é importante testá-las a partir do servidor correspondente, antes de seguir para os "Passos para Instalação". Seguir para a instalação somente depois que confirmar que as conexões nos sentidos corretos estão efetivamente funcionando.
+**ATENÇÃO**: Se as configurações de conexões na rede local do órgão não forem efetivadas, conforme acima, antes dos "Passos para Instalação", abaixo, e não for garantido que estão funcionando adequadamente, poderá ter problemas no meio do deploy do servidor ou durante o funcionamento de algumas das aplicações. Assim que criadas as conexões indicadas, é importante testá-las a partir do servidor correspondente, antes de seguir para os "Passos para Instalação". Seguir para a instalação somente depois que confirmar que as conexões em ambos os sentidos estiverem efetivamente funcionando.
 
 ### Ajustar Permissão por IP no Solr do SEI
 
@@ -123,7 +93,7 @@ Antes de começar a instalação, certifique-se de que os seguintes pacotes este
 - Docker Compose (versão >= 2.29).
 
 Caso não estejam instalados, consulte o pequeno tutorial de instalação do Docker na seção de Anexos deste Manual.
-- Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões homologadas.
+- Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões docker e docker composes homologadas para o SEI IA.
 
 > **Observação**:
 > - Todos os comandos ilustrados neste Manual são exemplos de comandos executados via terminal/console/CLI.
@@ -195,38 +165,7 @@ su seiia
    docker --version # deve aparecer algo como Docker version 27.2.0, build 3ab4256
    ```
 
-8. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
-
-  > **Observação**:
-  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. Trocar no comando de exemplo abaixo do `git clone` o trecho `[identificacao_release_estavel]` pela identificação correta da Release estável de interesse, constante na [página de Releases do projeto](https://github.com/anatelgovbr/sei-ia/releases), por exemplo, `v1.0.0`, `v1.0.1`, `v1.2.0` etc.
-> - Contudo, caso o órgão possua procedimentos e ferramentas de deploy próprias para seu ambiente computacional, como GitLab e Jenkins, deve adaptar esse passo aos seus próprios procedimentos.
-> - Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
-> ```bash
-> sudo mkdir /opt/sei-ia
-> sudo chmod 770 /opt/sei-ia
-> # Coloque o arquivo da release neste diretório
-> cd /opt/sei-ia
-> unzip sei-ia-v.1.0.0.zip . # O nome do arquivo pode mudar. ATENÇÃO: para subir o arquivo zip antes no servidor.
-> ```
->   - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
->   - Enquanto o projeto estiver privado, para realizar o clone é necessário utilizar as credenciais do usuário do GitHub que possua acesso autorizado no repositório.
-
-   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de [Anexos deste Manual](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALL.md#anexos) que orienta a instalar o Git no Servidor.
-   
-   ```bash
-   git clone --branch [identificacao_release_estavel] --single-branch git@github.com:anatelgovbr/sei-ia.git
-   cd sei-ia
-   ```
-
-> **Observação**
-> Para clonar o repositório com um usuário específico, enquanto o repositório está privado no GitHub, substitua `USERNAME` pelo usuário autorizado:
-> ```bash
-> git clone --branch [identificacao_release_estavel] --single-branch git@USERNAME@github.com:anatelgovbr/sei-ia.git
-> cd sei-ia
-> ```
-> - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
-
-9. **Criar a rede Docker**
+8. **Criar a rede Docker**
 
    O Docker utiliza como default a faixa de IP `172.17.*.*`, que pode ser utilizada internamente por uma organização e causar conflitos. Desta forma, se faz necessária a utilização de uma faixa de IPs dedicadas para os containers Docker rodando no Servidor, com objetivo de evitar erros de roteamento causados pela sobreposição de endereços IP.
 
@@ -235,13 +174,13 @@ su seiia
    Para os seguintes procedimentos, é necessário assegurar que o Docker está instalado e parado.
 
    ```bash
-   systemctl stop docker
+   sudo systemctl stop docker
    ```
 
    A remoção da default bridge é feita através de uma configuração do daemon.json, através de:
 
    ```bash
-   vim /etc/docker/daemon.json
+   sudo vim /etc/docker/daemon.json
    ```
 
    Deve ser configurado o daemon.json com o seguinte conteúdo:
@@ -274,6 +213,35 @@ su seiia
    ```
 
    É mandatório que os valores de *--subnet*, *--iprange* e *--gateway* sejam adequadamente definidos pelo órgão, podendo adotar os valores do exemplo acima apenas se houver certeza de inexistência de conflito de endereços.
+
+9. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
+
+  > **Observação**:
+  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. Trocar no comando de exemplo abaixo do `git clone` o trecho `[identificacao_release_estavel]` pela identificação correta da Release estável de interesse, constante na [página de Releases do projeto](https://github.com/anatelgovbr/sei-ia/releases), por exemplo, `v1.0.0`, `v1.0.1`, `v1.2.0` etc.
+> - Contudo, caso o órgão possua procedimentos e ferramentas de deploy próprias para seu ambiente computacional, como GitLab e Jenkins, deve adaptar esse passo aos seus próprios procedimentos.
+> - Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
+> ```bash
+> # Coloque o arquivo da release no diretório /opt/sei-ia
+> cd /opt/sei-ia
+> unzip sei-ia-v.1.0.0.zip . # O nome do arquivo pode mudar. ATENÇÃO: para subir o arquivo zip antes no servidor.
+> ```
+>   - **Atenção:** mantenha a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
+>   - Enquanto o projeto estiver privado no github, para realizar o clone é necessário utilizar as credenciais do usuário do GitHub que possua acesso autorizado no repositório.
+
+   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de [Anexos deste Manual](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALL.md#anexos) que orienta a instalar o Git no Servidor.
+   
+   ```bash
+   git clone --branch [identificacao_release_estavel] --single-branch git@github.com:anatelgovbr/sei-ia.git
+   cd sei-ia
+   ```
+
+> **Observação**
+> Para clonar o repositório com um usuário específico, enquanto o repositório está privado no GitHub, substitua `USERNAME` pelo usuário autorizado:
+> ```bash
+> git clone --branch [identificacao_release_estavel] --single-branch git@USERNAME@github.com:anatelgovbr/sei-ia.git
+> cd sei-ia
+> ```
+> - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
 
 10. **Configurar o arquivo `env_files/security.env` do ambiente**
    
@@ -331,7 +299,7 @@ Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARI
 
    Execute o script de deploy:
    ```bash
-   sudo bash deploy-externo-imgs.sh 
+   bash deploy-externo-imgs.sh 
    ```
 
    Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr). Logo, se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
@@ -352,18 +320,20 @@ O comando acima deverá retornar algo semelhante à imagem abaixo:
 
 * **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de "healthy".** Então, espere esse tempo e confira novamente.
 
-Caso um longo tempo tenha se passado e ainda não tenha obtido o status **healthy**, favor rever os passos anteriores e reportar eventuais problemas que permaneçam.
+Caso um longo tempo tenha se passado e ainda não tenha obtido o status **healthy**, favor seguir as orientações do [Health Checker](#health-checker-geral-do-ambiente) e rever os passos anteriores deste manual, até que não haja mais ERROR no log do Health Checker. Caso os erros persistam, deve ser repostado o problema para a Anatel, juntamente com o arquivo gerado pelo Health Checker.
 
-Após a finalização do deploy, o Airflow iniciará a indexação dos documentos já existentes no SEI do ambinete correspondente. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade do servidor.
+Após a finalização do deploy, o Airflow iniciará a indexação dos documentos já existentes no SEI do ambinete correspondente. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade computacional alocada para o servidor.
 
-Se a instalação não for concluída com sucesso, conforme acima, **e for exclusivamente a primeira instalação**, é importante levantar informações sobre qualquer erro apresentado durante o deploy e realizar a limpeza completa do ambiente para eliminar qualquer lixo que a instalação com erro possa deixar no ambiente. Utilize o comando abaixo para a limpeza total do ambiente:
+Se a instalação não for concluída com sucesso **e for exclusivamente a primeira instalação**, antes de realizar uma nova instalação é necessário realizar a limpeza completa do ambiente, para eliminar qualquer lixo que a instalação com erro possa deixar no ambiente. 
+
+Utilize os comando abaixo para a limpeza total do ambiente:
 
 ```bash
-sudo docker stop $(docker ps -a -q)
-sudo docker rm $(docker ps -a -q)
-sudo docker system prune -a --volumes
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+docker system prune -a --volumes
 # Verifique se os volumes foram deletados:
-sudo docker volumes ls 
+docker volumes ls 
 # caso nao tenham sido deverá ser removido com o comando docker volume rm [nome-do-volume]
 ```
 
@@ -394,7 +364,7 @@ Nas seções a seguir apresentamos como testar e validar os resultados da instal
 
 ## Health Checker Geral do Ambiente
 
-Após concluir o deploy, você pode realizar testes automatizados de todo o ambiente utilizando o comando abaixo:
+Após concluir o deploy, você **deve** realizar testes automatizados de todo o ambiente utilizando o comando abaixo:
 
 ```bash
 docker compose -f docker-compose-healthchecker.yml up --build
@@ -402,8 +372,7 @@ docker compose -f docker-compose-healthchecker.yml up --build
 
 Aguarde a finalização dos testes. Os logs estarão disponíveis em `/opt/sei-ia-storage/logs/{DATA}`. Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
 
-Para compreensão do LOG pode-se iniciar a leitura com:
-`/opt/sei-ia-storage/logs/{DATA}/tests_{DATA}`
+A compreensão do LOG deve iniciar pela criteriosa análise de `/opt/sei-ia-storage/logs/{DATA}/tests_{DATA}.log`, que tem a sua estrutura descrita a seguir.
 
 1. **Estrutura do Log**  
    Os logs seguem a seguinte estrutura:
@@ -829,7 +798,7 @@ docker volume ls | grep "^sei_ia-"
 
 ---
 
-## ANEXOS:
+## Anexos:
 
 ### **Instalar Git - OPCIONAL**
    
