@@ -26,7 +26,7 @@ import logging
 
 env_vars = {
     "security": {
-        "geral": ["ENVIRONMENT", "LOG_LEVEL", "GID_DOCKER"],
+        "geral": ["ENVIRONMENT", "LOG_LEVEL", "LOGLEVEL", "GID_DOCKER"],
         "DB_SEI": [
             "DB_SEI_USER", "DB_SEI_PWD", "DB_SEI_HOST", "DB_SEI_DATABASE", 
             "DB_SEI_PORT", "DB_SEI_SCHEMA", "DATABASE_TYPE"
@@ -37,7 +37,7 @@ env_vars = {
             "SEI_IAWS_URL", "SEI_IAWS_SISTEMA", "SEI_IAWS_KEY"
         ],
         "ASSISTENTE": [
-            "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_ENDPOINT_GPT4o", "AZURE_OPENAI_KEY_GPT4o", "GPT_MODEL_4o_128k",
+            "AZURE_OPENAI_ENDPOINT_GPT4o", "AZURE_OPENAI_KEY_GPT4o", "GPT_MODEL_4o_128k",
             "AZURE_OPENAI_ENDPOINT_GPT4o_mini", "AZURE_OPENAI_KEY_GPT4o_mini", "GPT_MODEL_4o_mini_128k",
             "OPENAI_API_VERSION", "ASSISTENTE_PGVECTOR_USER", "ASSISTENTE_PGVECTOR_PWD"
         ]
@@ -77,6 +77,7 @@ env_vars = {
             "PROJECT_NAME", "STORAGE_PROJ_DIR", "USE_LANGFUSE", "EMBEDDER_PROJ_URL", "AIRFLOW_PROJ_DIR"
         ],
         "OpenTelemetry": [
+            "ENABLE_OTEL_METRICS",
             "OTEL_SERVICE_NAME", "OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_PROTOCOL", "OTEL_EXPORTER_OTLP_INSECURE",
             "OTEL_METRICS_EXPORTER", "OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", "OTEL_TRACES_EXPORTER",
             "OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", "OTEL_PYTHON_REQUESTS_EXCLUDED_URLS", "OTEL_PYTHON_FASTAPI_EXCLUDED_URLS"
@@ -230,7 +231,6 @@ def validate_specific_variables(comparison_df: pd.DataFrame) -> pd.DataFrame:
 
     validations = {
         'SEI_SOLR_ADDRESS': validate_sei_solr_address,
-        'AZURE_OPENAI_ENDPOINT': validate_azure_endpoint,
         'AZURE_OPENAI_ENDPOINT_GPT4o': validate_azure_endpoint,
         'AZURE_OPENAI_ENDPOINT_GPT4o_mini': validate_azure_endpoint,
         'ENVIRONMENT': validate_environment,
@@ -275,6 +275,17 @@ def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame) -> t
     """
     comparison_df = variables_df.merge(env_df, how="outer", indicator=True)
     comparison_df = validate_specific_variables(comparison_df)
+
+    enable_otel_metrics = comparison_df[comparison_df['variavel'] == 'ENABLE_OTEL_METRICS']['value'].values
+    if enable_otel_metrics.size >= 0 and enable_otel_metrics[0].lower() in ['false', '0', 'no']:
+        otel_variables = [
+            "OTEL_SERVICE_NAME", "OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_PROTOCOL",
+            "OTEL_EXPORTER_OTLP_INSECURE", "OTEL_METRICS_EXPORTER", "OTEL_EXPORTER_OTLP_METRICS_PROTOCOL",
+            "OTEL_TRACES_EXPORTER", "OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", 
+            "OTEL_PYTHON_REQUESTS_EXCLUDED_URLS", "OTEL_PYTHON_FASTAPI_EXCLUDED_URLS"
+        ]        
+        comparison_df = comparison_df[~comparison_df['variavel'].isin(otel_variables)]
+
 
     missing_vars = comparison_df[comparison_df['_merge'] == 'left_only']
     extra_vars = comparison_df[comparison_df['_merge'] == 'right_only']
@@ -335,7 +346,7 @@ def report_env_issues(results:dict) -> int:
     return error
 
 anon_variables = ["GIT_TOKEN", "ASSISTENTE_PGVECTOR_PWD", "POSTGRES_PASSWORD",
-                  "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_ENDPOINT_GPT4o",
+                  "AZURE_OPENAI_ENDPOINT_GPT4o",
                   "AZURE_OPENAI_ENDPOINT_GPT4o_mini", "AZURE_OPENAI_KEY_GPT4o",
                   "AZURE_OPENAI_KEY_GPT4o_mini", "DB_SEI_PWD", "DB_SEI_USER",
                   "SEI_IAWS_KEY"]

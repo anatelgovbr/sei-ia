@@ -1,19 +1,4 @@
-x-common: 
-  environment: &otel-common-env                                                                                                                                                         
-     OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}                                                                                                              
-     OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL}                                                                                                              
-     OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME}                                                                                                                                  
-     OTEL_EXPORTER_OTLP_INSECURE: ${OTEL_EXPORTER_OTLP_INSECURE}                                                                                                              
-     OTEL_METRICS_EXPORTER: ${OTEL_METRICS_EXPORTER}                                                                                                                          
-     OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: ${OTEL_EXPORTER_OTLP_METRICS_PROTOCOL}                                                                                              
-     OTEL_TRACES_EXPORTER: ${OTEL_TRACES_EXPORTER}                                                                                                                            
-     OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: ${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL}
-
 x-airflow-common: &airflow-common
-  # In order to add custom dependencies or upgrade provider packages you can use your extended image.
-  # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
-  # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  #image: apache/airflow:2.6.3
   # build: .
   image: ${DOCKER_REGISTRY:-}airflow-webserver-pd:${AIRFLOW_IMAGE_NAME}
   build:
@@ -61,7 +46,6 @@ x-airflow-common: &airflow-common
     AIRFLOW__LOGGING__LOGGING_LEVEL: ${LOG_LEVEL}
     AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: ${AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG}
     AIRFLOW_API_BASE_URL: "http://airflow-webserver-pd:8080/api/v1"
-    #configuração do ETL da nossa aplicação
     SOLR_MLT_PROCESS_CORE: ${SOLR_MLT_PROCESS_CORE}
     SOLR_MLT_JURISPRUDENCE_CORE: ${SOLR_MLT_JURISPRUDENCE_CORE}
     MLT_PROCESS_CONFIGSET: "/var/solr/configsets/process"
@@ -70,13 +54,10 @@ x-airflow-common: &airflow-common
     ENVIRONMENT: ${ENVIRONMENT}
 
     AIRFLOW_HOME: /opt/airflow
-    # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
-    # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6 #bug airflow /usr/lib/x86_64-linux-gnu/libstdc++.so.6: cannot allocate memory in static TLS block
     PIP_CACHE_DIR: ${STORAGE_PROJ_DIR}/pip_cache
 
-    # Stack sei-similaridade
     AIRFLOW_DB_EXTERNAL_CONNECTION: true
     API_VERSION: ${API_SEI_IMAGE}
     APP_VERSION: ${APP_API}
@@ -141,7 +122,6 @@ services:
       POSTGRES_DB: airflow
       PGPORT: 5433
       TZ: America/Sao_Paulo
-    #command: postgres -c config_file=/etc/postgresql/postgresql.conf
     volumes:
       - airflow-postgres-db-volume:/var/lib/postgresql/data
 
@@ -259,8 +239,6 @@ services:
       start_period: 30s
     environment:
       <<: *airflow-common-env
-      # Required to handle warm shutdown of the celery workers properly
-      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
     restart: always
     depends_on:
@@ -307,7 +285,6 @@ services:
       - all
       - airflow
       - externo
-    # yamllint disable rule:line-length
     command:
       - -c
       - |
@@ -356,7 +333,6 @@ services:
         mkdir -p /sources/logs /sources/dags /sources/plugins
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
         exec /entrypoint airflow version
-    # yamllint enable rule:line-length
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: "true"
@@ -373,34 +349,10 @@ services:
     environment:
       <<: *airflow-common-env
       CONNECTION_CHECK_MAX_COUNT: "0"
-    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
     command:
       - bash
       - -c
       - airflow
-
-  # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
-  # or by explicitly targeted on the command line e.g. docker-compose up flower.
-  # See: https://docs.docker.com/compose/profiles/
-  flower:
-    <<: *airflow-common
-    command: celery flower
-    profiles:
-      - flower
-    ports:
-      - "5555:5555"
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init-pd:
-        condition: service_completed_successfully
-    volumes: *airflow-common-volumes
 
   api_sei:
     profiles:
@@ -416,14 +368,14 @@ services:
         NB_UID: ${NB_UID}
         NB_GID: ${NB_GID}
 
-    command: opentelemetry-instrument gunicorn -k uvicorn.workers.UvicornH11Worker --reload --bind=0.0.0.0:8082 api_sei.main:app
+    command: gunicorn -k uvicorn.workers.UvicornH11Worker --reload --bind=0.0.0.0:8082 api_sei.main:app
     environment:
       <<: 
         - *airflow-common-env
-        - *otel-common-env
       TZ: America/Sao_Paulo
       LD_PRELOAD: ''
       LOG_LEVEL: ${LOG_LEVEL}
+      ENABLE_OTEL_METRICS: false
     ports:
       - "8082:8082"
     networks:
@@ -537,23 +489,10 @@ services:
       - ./healthcheck/scripts:/healthcheck
       - /var/sei_similaridade/backup/solr/:/backup
       - ./backup/volumes/solr.sh:/opt/solr-9.0.0/backup.sh
-    user: root # run as root to change the permissions of the solr folder
-    # Change permissions of the solr folder, create a default core and start solr as solr user
+    user: root
     networks:
       - network1
     command: bash -c " chown -R 8983:8983 /var/solr && runuser -u solr -- solr-precreate default-core"
-    #command: bash -c "chown -R 8983:8983 /var/solr; ( ([ -d /var/solr/data/$SOLR_MLT_PROCESS_CORE ] && echo Core $SOLR_MLT_PROCESS_CORE already exists || (wait-for-solr.sh && runuser -u solr -- solr create_core -c $SOLR_MLT_PROCESS_CORE -d /var/solr/configsets/process)) &); runuser -u solr -- solr-precreate $SOLR_MLT_JURISPRUDENCE_CORE /var/solr/configsets/jurisprudence"
-    # command: bash -c "\
-    #   echo 'America/Sao_Paulo' > /etc/timezone; \
-    #   ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime; \
-    #   dpkg-reconfigure -f noninteractive tzdata; \
-    #   chmod +x /opt/solr-9.0.0/backup.sh; \
-    #   echo '55 23 * * * /opt/solr-9.0.0/backup.sh' | crontab -; \
-    #   touch /var/log/cron.log; \
-    #   service cron start; \
-    #   chown -R 8983:8983 /var/solr; \
-    #   ( ([ -d /var/solr/data/$SOLR_MLT_PROCESS_CORE ] && echo Core $SOLR_MLT_PROCESS_CORE already exists || (wait-for-solr.sh && runuser -u solr -- solr create_core -c $SOLR_MLT_PROCESS_CORE -d /var/solr/configsets/process)) &); \
-    #   runuser -u solr -- solr-precreate $SOLR_MLT_JURISPRUDENCE_CORE /var/solr/configsets/jurisprudence"
 
     restart: always
     deploy:
@@ -568,105 +507,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
-
-  # pgvector_pd:
-  #   profiles:
-  #     - all
-  #     # - externo
-  #   image: pgvector/pgvector:0.7.0-pg15
-  #   environment:
-  #     TZ: America/Sao_Paulo
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_DB: sei_similaridade
-  #   volumes:
-  #     - pgvector-db-volume:/var/lib/postgresql/data
-  #     - ./database_init/:/docker-entrypoint-initdb.d/
-  #     - ./database_init/conf/postgresql.conf:/etc/postgresql/postgresql.conf
-  #     - /opt/sei_similaridade:/opt/sei_similaridade/host/
-  #     - /var/sei_similaridade/backup/postgresql/:/backup
-
-  # #   command: postgres -c config_file=/etc/postgresql/postgresql.conf
-
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD",
-  #         "pg_isready",
-  #         "-U",
-  #         "${POSTGRES_USER}",
-  #         "-d",
-  #         "sei_similaridade",
-  #       ]
-  #     interval: 30s
-  #     retries: 5
-  #     start_period: 5s
-  #   restart: always
-  #   networks:
-  #     - network1
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: ${PGVECTOR_MEM_LIMIT}
-  #         cpus: ${PGVECTOR_CPU_LIMIT}
-
-  exporter_agent_monitor:
-    profiles:
-      - all
-    image: node-exporter:v1.7.0
-    build:
-      context: .
-      dockerfile: node-exporter/node-exporter.dockerfile
-      network: host
-    ports:
-      - 50053:9100
-      - 50054:9104
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    restart: unless-stopped
-    networks:
-      - network1
-    environment:
-      - DB_SEI_USER=${DB_SEI_USER}
-      - DB_SEI_HOST=${DB_SEI_HOST}
-      - DB_SEI_PORT=${DB_SEI_PORT}
-      - SEIWS_HOST=${SEIWS_HOST}
-      - SEIWS_PORT=${SEIWS_PORT}
-      - SEI_SOLR_ADDRESS=${SEI_SOLR_ADDRESS}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - MYSQLD_EXPORTER_PASSWORD=${DB_SEI_PWD}
-      - SOLR_ADDRESS=${SOLR_ADDRESS}
-      - SOLR_MLT_PROCESS_CORE=${SOLR_MLT_PROCESS_CORE}
-      - SOLR_MLT_JURISPRUDENCE_CORE=${SOLR_MLT_JURISPRUDENCE_CORE} 
-    deploy:
-      resources:
-        limits:
-          memory: 50mb
-          cpus: "1"
-
-  cadvisor_agent_monitor:
-    profiles:
-      - all
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
-    privileged: true
-    ports:
-      - 50055:8080
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro
-    restart: unless-stopped
-    networks:
-      - network1
-    deploy:
-      resources:
-        limits:
-          memory: 300mb
-          cpus: "1"
 
   api_assistente:
     image: ${DOCKER_REGISTRY:-}api_assistente:${API_ASSISTENTE_VERSION}
@@ -687,18 +527,12 @@ services:
     environment:
       <<: *airflow-common-env
       POSTGRES_DB_ASSISTENTE_SCHEMA: ${POSTGRES_DB_ASSISTENTE_SCHEMA}
-      ASSISTENTE_LANGFUSE_URL: ${ASSISTENTE_LANGFUSE_URL}
-      ASSISTENTE_LANGFUSE_PUBLIC_KEY: ${ASSISTENTE_LANGFUSE_PUBLIC_KEY}
-      ASSISTENTE_LANGFUSE_SECRET_KEY: ${ASSISTENTE_LANGFUSE_SECRET_KEY}
-      ASSISTENTE_LANGFUSE_SECRET_NEXTAUTH_SECRET: ${ASSISTENTE_LANGFUSE_SECRET_NEXTAUTH_SECRET}
-      ASSISTENTE_LANGFUSE_SECRET_SALT: ${ASSISTENTE_LANGFUSE_SECRET_SALT}
       TIMEOUT_API: 600
       LOG_LEVEL: ${LOG_LEVEL}
       LOGLEVEL : ${LOGLEVEL}
       USE_LANGFUSE: ${USE_LANGFUSE}
       TZ: "America/Sao_Paulo"
       OPENAI_API_VERSION: ${OPENAI_API_VERSION}
-      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
       MAX_RETRIE: ${MAX_RETRIES}
       AZURE_OPENAI_ENDPOINT_GPT4o: ${AZURE_OPENAI_ENDPOINT_GPT4o}
       AZURE_OPENAI_KEY_GPT4o: ${AZURE_OPENAI_KEY_GPT4o}
@@ -713,8 +547,6 @@ services:
       ORACLE_VERSION: 19.25 # versao do banco do SEI fixa, e a versao do driver seguir o mesmo padrão.
       LD_LIBRARY_PATH: /opt/oracle
 
-    # ports:
-    #   - "8088:8088"
     command: "gunicorn main:app -c /app/core/gunicorn_conf.py"
     networks:
       - network1
@@ -726,7 +558,6 @@ services:
     volumes:
       - ${STORAGE_PROJ_DIR}:${STORAGE_PROJ_DIR}
 
-
   pgvector_all:
     profiles:
       - all
@@ -734,12 +565,6 @@ services:
     image: ${DOCKER_REGISTRY:-}pgvector_all:${POSTGRES_IMAGE}
     build:
       dockerfile: pgvector_all.dockerfile
-#      # Variáveis não são mais usadas em tempo de build - Taiga 896
-#      args:
-#        POSTGRES_USER: ${ASSISTENTE_PGVECTOR_USER}
-#        POSTGRES_DB: ${ASSISTENTE_PGVECTOR_DB}
-#        POSTGRES_DB_SIMILARIDADE: ${POSTGRES_DATABASE}
-
       network: host
     restart: always
     environment:
@@ -777,7 +602,6 @@ services:
           memory: ${PGVECTOR_MEM_LIMIT}
           cpus: ${PGVECTOR_CPU_LIMIT}
 
-
   nginx_assistente:
     profiles:
       - all
@@ -798,37 +622,11 @@ services:
           memory: ${ASSISTENTE_NGINX_MEM_LIMIT}
           cpus: ${ASSISTENTE_NGINX_CPU_LIMIT}
 
-  langfuse_assistente:
-    profiles:
-      - all
-    image: langfuse/langfuse:2.57.0
-    ports:
-      - "3005:3005"
-    environment:
-      - DATABASE_URL=postgresql://${ASSISTENTE_PGVECTOR_USER}:${ASSISTENTE_PGVECTOR_PWD}@${ASSISTENTE_PGVECTOR_HOST}:${ASSISTENTE_PGVECTOR_PORT}/langfuse
-      - NEXTAUTH_SECRET=${ASSISTENTE_LANGFUSE_SECRET_NEXTAUTH_SECRET}
-      - SALT=${ASSISTENTE_LANGFUSE_SECRET_SALT}
-      - NEXTAUTH_URL=${ASSISTENTE_LANGFUSE_URL}
-      - PORT=3005
-    depends_on:
-      pgvector_all:
-        condition: service_healthy
-    networks:
-      - network1
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: ${ASSISTENTE_LANGFUSE_MEM_LIMIT}
-          cpus: ${ASSISTENTE_LANGFUSE_CPU_LIMIT}
-
 volumes:
   airflow-jobs:
   airflow-postgres-db-volume:
   solr-db-volume:
   airflow-logs-volume:
-  pgvector-db-volume:
-  pgvector-db-volume-assistente:
   pgvector-db-volume-all:
 
 networks:
