@@ -39,13 +39,13 @@ cat env_files/security.env >> .env
 echo "*** `date`: Configurando variáveis de ambiente para instalação do SEI IA..."
 export PROJECT_NAME=sei_ia
 
-export API_SEI_IMAGE="1.0.2-RC"
-export API_ASSISTENTE_VERSION="1.0.2-RC"
-export NGINX_ASSISTENTE_VERSION="1.0.2-RC"
-export AIRFLOW_IMAGE_NAME="1.0.2-RC"
-export APP_API="1.0.2-RC"
-export SOLR_CONTAINER="1.0.2-RC"
-export POSTGRES_IMAGE="1.0.2-RC"
+export API_SEI_IMAGE="1.0.2"
+export API_ASSISTENTE_VERSION="1.0.2"
+export NGINX_ASSISTENTE_VERSION="1.0.2"
+export AIRFLOW_IMAGE_NAME="1.0.2"
+export APP_API="1.0.2"
+export SOLR_CONTAINER="1.0.2"
+export POSTGRES_IMAGE="1.0.2"
 
 export DOCKER_REGISTRY="anatelgovbr/"
 
