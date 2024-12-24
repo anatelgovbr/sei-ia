@@ -277,7 +277,7 @@ def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame) -> t
     comparison_df = validate_specific_variables(comparison_df)
 
     enable_otel_metrics = comparison_df[comparison_df['variavel'] == 'ENABLE_OTEL_METRICS']['value'].values
-    if enable_otel_metrics.size >= 0 and enable_otel_metrics[0].lower() in ['false', '0', 'no']:
+    if enable_otel_metrics.size >= 0 and not str(enable_otel_metrics[0]).lower() in ['true', '1', 'yes']:
         otel_variables = [
             "OTEL_SERVICE_NAME", "OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_PROTOCOL",
             "OTEL_EXPORTER_OTLP_INSECURE", "OTEL_METRICS_EXPORTER", "OTEL_EXPORTER_OTLP_METRICS_PROTOCOL",
