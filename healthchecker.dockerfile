@@ -1,4 +1,4 @@
-FROM anatelgovbr/api_assistente:0.3.1-RC
+FROM anatelgovbr/api_assistente:1.0.2
 
 WORKDIR /opt/healthchecker
 
