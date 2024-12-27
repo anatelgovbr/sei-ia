@@ -43,6 +43,7 @@ x-airflow-common: &airflow-common
     LOG_LEVEL: ${LOG_LEVEL}
 
     TZ: America/Sao_Paulo
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: False
     AIRFLOW__LOGGING__LOGGING_LEVEL: ${LOG_LEVEL}
     AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: ${AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG}
     AIRFLOW_API_BASE_URL: "http://airflow-webserver-pd:8080/api/v1"
@@ -73,7 +74,7 @@ x-airflow-common: &airflow-common
     DB_SEI_SCHEMA: ${DB_SEI_SCHEMA}
     DATABASE_TYPE: ${DATABASE_TYPE}
 
-    AIRFLOW_CONN_DB_SEI_ORACLE: "oracle://${DB_SEI_USER}:${DB_SEI_PWD}@${DB_SEI_HOST}:${DB_SEI_PORT}/?sid=xe&mode=SYSDBA"
+    AIRFLOW_CONN_DB_SEI_ORACLE: "oracle://${DB_SEI_USER}:${DB_SEI_PWD}@${DB_SEI_HOST}:${DB_SEI_PORT}/?sid=xe"
     AIRFLOW_CONN_DB_SEI_MSSQL: "mssql+pymssql://${DB_SEI_USER}:${DB_SEI_PWD}@${DB_SEI_HOST}:${DB_SEI_PORT}/${DB_SEI_DATABASE}"
     AIRFLOW_CONN_DB_SEI_MYSQL: "mysql://${DB_SEI_USER}:${DB_SEI_PWD}@${DB_SEI_HOST}:${DB_SEI_PORT}/${DB_SEI_DATABASE}"
 
