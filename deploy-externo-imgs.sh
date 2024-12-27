@@ -39,25 +39,28 @@ cat env_files/security.env >> .env
 echo "*** `date`: Configurando variáveis de ambiente para instalação do SEI IA..."
 export PROJECT_NAME=sei_ia
 
-export API_SEI_IMAGE="0.3-RC"
-export API_ASSISTENTE_VERSION="0.3.1-RC"
-export NGINX_ASSISTENTE_VERSION="0.3.1-RC"
-export AIRFLOW_IMAGE_NAME="0.3.2-RC"
-export APP_API="0.3-RC"
-export SOLR_CONTAINER="0.3-RC"
-export POSTGRES_IMAGE="0.3.2-RC"
+export API_SEI_IMAGE="1.0.2"
+export API_ASSISTENTE_VERSION="1.0.2"
+export NGINX_ASSISTENTE_VERSION="1.0.2"
+export AIRFLOW_IMAGE_NAME="1.0.2"
+export APP_API="1.0.2"
+export SOLR_CONTAINER="1.0.2"
+export POSTGRES_IMAGE="1.0.2"
 
 export DOCKER_REGISTRY="anatelgovbr/"
 
 echo "*** `date`: Deploy do SEI IA em andamento..."
 docker compose --profile externo \
-  -f docker-compose-prod.yaml \
+  -f docker-compose-ext.yaml \
   -p $PROJECT_NAME \
   up \
   --no-build -d
 
+echo "*** `date`: Aguardando estabilizacao do Servidor de Solucoes de IA"
+sleep 15
+
 echo "*** `date`:Ativando as DAGs do SEI IA no Airflow..."
-docker compose -f docker-compose-prod.yaml -p $PROJECT_NAME exec airflow-webserver-pd /bin/bash -c "
+docker compose -f docker-compose-ext.yaml -p $PROJECT_NAME exec airflow-webserver-pd /bin/bash -c "
 airflow dags list | awk 'NR > 2 {print \$1}' > /tmp/dags_list.txt;
 cat /tmp/dags_list.txt || echo 'Nenhuma DAG encontrada.';
 while read -r dag; do
@@ -81,12 +84,7 @@ done < /tmp/dags_list.txt
 sh insert_row_version_register.sh
 
 echo "*** `date`:Rodando o healthchecker..."
-docker compose --profile externo \
-  -f docker-compose-healthchecker.yml \
-  -p $PROJECT_NAME \
-  up \
-  --build
-
-chmod -R 777 $STORAGE_PROJ_DIR
+docker compose -f docker-compose-healthchecker.yml \
+  -p $PROJECT_NAME up --build
 
 echo "*** `date`:Finalizado o Deploy do Servidor de Soluções do SEI-IA. "

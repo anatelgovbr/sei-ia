@@ -13,13 +13,14 @@
   - [Sumário](#sumário)
   - [Pré-requisitos](#pré-requisitos)
   - [Passos para Instalação](#passos-para-instalação)
+  - [Update](#update)
   - [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente)
-  - [Testes de Acessos](#testes-de-acessos)    
+  - [Testes de Acessos](#testes-de-acessos)
   - [Resolução de Problemas Conhecidos](#resolução-de-problemas-conhecidos)
   - [Pontos de Atenção para Escalabilidade](#pontos-de-atenção-para-escalabilidade)
   - [Backup periódico dos dados do Servidor de Soluções de IA](#backup-periódico-dos-dados-do-servidor-de-soluções-de-ia)
-  - [Anexos:](#anexos)
-  
+  - [Anexos](#anexos)
+    
 --- 
 
 ## Pré-requisitos
@@ -143,10 +144,19 @@ sudo mkdir -p /opt/sei-ia-storage
 
 ```bash
 sudo chown -R seiia:docker /opt/seiia
-sudo chown -R seiia:docker /opt/sei-ia-storage
-sudo chmod -R 777 /opt/seiia
-sudo chmod -R 777 /opt/sei-ia-storage
+sudo chown -R 5000:5000 /opt/sei-ia-storage
+sudo chmod -R 774 /opt/seiia
+sudo chmod -R 764 /opt/sei-ia-storage
 ```
+
+> **Observação:**
+> - Durante a primeira inicialização, antes de o Airflow ter sido carregado corretamente, 
+> é possível que a `jobs-api` fique reiniciando, pois as pastas necessárias dentro do 
+> `/opt/sei-ia-storage` de configuração são criadas por uma **DAG**. Sem a permissão 
+> `777`, isso pode causar esse erro.
+> - Se preferir, você pode criar a pasta com as permissões `777` e, ao final do deploy, 
+> corrigir as permissões.
+
 
 6. **Acessar o usuario:**
 
@@ -174,7 +184,7 @@ su seiia
    Para os seguintes procedimentos, é necessário assegurar que o Docker está instalado e parado.
 
    ```bash
-   sudo systemctl stop docker
+   sudo service docker stop
    ```
 
    A remoção da default bridge é feita através de uma configuração do daemon.json, através de:
@@ -194,7 +204,7 @@ su seiia
    Após a configuração é necessário Inicializar o Docker e verificar o resultado obtido:
 
    ```bash
-   sudo systemctl start docker
+   sudo service docker start
    docker network ls
    ```
 
@@ -251,19 +261,20 @@ su seiia
 
    **Importante**: As variáveis da seção `# ESSENCIAIS NO MOMENTO DA INSTALACAO:` no arquivo `env_files/security.env` são obrigatórias durante a instalação inicial.
 
-   **Recomendação**: Os arquivos `env_files/*.env` são de configurações de ambiente. Deve adicionar `env_files/*.env` ao `.gitignore` local para não serem substituídos acidentalmente no ambiente correspondente nos próximos deploys de código.
+   **Recomendação**: O arquivo `env_files/security.env` armazena configurações de ambiente e possui users, senhas e chaves que o acesso deve ser restrito. Assim, deve adicionar o arquivo `env_files/security.env` ao `.gitignore` local para não ser substituído acidentalmente no ambiente correspondente nas atualizações de update ou de upgrade de versão do Servidor de Soluçõea de IA.
 
 | Variável                   | Descrição                                                                                                        | Exemplo                             |
 |----------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------|
 | ENVIRONMENT                | Define o tipo do ambiente da instalação. Opções disponíveis: `dev`, `homol`, `prod`.                             | `prod`                              |
-| LOG_LEVEL                  | Define o nível do ambiente da instalação. Opções disponíveis: `INFO`, `DEBUG`, `WARNING`, `ERROR`.               | `INFO`                              |
+| LOGLEVEL                  | Define o nível de log do autodeployer. Opções disponíveis: `INFO`, `DEBUG`, `WARNING`, `ERROR`.               | `INFO`. Em produçao recomendamos o uso de `ERROR`                              |
+| LOG_LEVEL                  | Define o nível do ambiente da instalação. Opções disponíveis: `INFO`, `DEBUG`, `WARNING`, `ERROR`.               | `INFO`. Em produçao recomendamos o uso de `ERROR`                              |
 | GID_DOCKER                 | O GID (Group ID) do grupo Docker no host do ambiente de instalação.                                              | `1001`                              |
 | DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.              | `sei_user`                          |
 | DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                          | `senha_sei`                         |
 | DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                                       | `192.168.0.10`                      |
 | DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_db`                            |
 | DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.           | `3306`                              |
-| DB_SEI_SCHEMA              | Nome do Schema do banco de dados do SEI. Se for MySQL, repetir o nome do banco de dados do SEI.                     | `sei_schema`                        |
+| DB_SEI_SCHEMA              | Nome do Schema do banco de dados do SEI. Se for MySQL, repetir o nome do banco de dados do SEI.                  | `sei_schema`                        |
 | DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções disponíveis: `mysql`, `mssql` e `oracle`.                                  | `mysql`                             |
 | SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `https://IP_OU_HOSTNAME:8983`.                                      | `https://192.168.0.10:8983`         |
 | POSTGRES_USER              | Nome de usuário já existente de acesso ao banco de dados PostgreSQL interno do Servidor de IA. Não alterar.   | `sei_llm`                           |
@@ -281,8 +292,7 @@ su seiia
 | SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  | `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  |
 | SEI_IAWS_SISTEMA                  | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA. Não alterar.                     | `Usuario_IA` |
 | SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
-| AZURE_OPENAI_ENDPOINT             | Endpoint do Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.                             | `https://meuendpoint.openai.azure.com`  |
-| AZURE_OPENAI_ENDPOINT_GPT4o       | Endpoint específico para GPT-4o no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.      | `https://meuendpointgpt4.openai.azure.com`  |
+| AZURE_OPENAI_ENDPOINT_GPT4o       | Endpoint específico para GPT-4o no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.   | `https://meuendpointgpt4.openai.azure.com`  |
 | AZURE_OPENAI_KEY_GPT4o            | Chave de acesso para GPT-4o no Azure OpenAI Service.                                                    | `minha_chave_gpt4o`                      |
 | GPT_MODEL_4o_128k                 | Nome do modelo GPT-4o com 128k tokens.                                                                  | `gpt-4o-128k`                            |
 | AZURE_OPENAI_ENDPOINT_GPT4o_mini  | Endpoint específico para GPT-4o-mini no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint. | `https://meuendpointgpt4mini.openai.azure.com`  |
@@ -342,7 +352,8 @@ docker volumes ls
 Depois que o deploy do Servidor de Soluções de IA é concluído com sucesso, em alguns casos, é necessário ampliar as permissões dentro da pasta `sei-ia-storage` criada no passo 4 da instalação, mais acima. Execute o comando abaixo:
 
 ```bash
-sudo chmod 777 -R /opt/sei-ia-storage/*
+sudo chown -R 5000:5000 /opt/sei-ia-storage
+sudo chmod 764 -R /opt/sei-ia-storage/*
 ```
 
 14. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
@@ -362,17 +373,114 @@ Nas seções a seguir apresentamos como testar e validar os resultados da instal
 
 ---
 
+## Update
+Esta seção descreve os procedimentos para atualizar a versão do Servidor de Soluções de IA quando envolve simples Update, relativo ao ao terceiro dígito no controle de versões (v1.0.**x**). Por exemplo: da v1.0.**0** para v1.0.**1**; da v1.0.**1** para v1.0.**2**; da v1.2.**3** para v1.2.**4**.
+
+### Passos para o Update
+1. Pare os containers:
+
+```bash
+docker stop $(docker ps -a -q)
+```
+
+2. Remova os containers:
+   **ATENÇÃO**: Não remova os volumes!
+
+```bash
+docker rm $(docker ps -a -q)
+```
+Caso seja necessário, para reduzir espaço no disco, pode remover as imagens antigas constantes no ambiente de instalações anteriores.
+
+3. Certifique-se de copiar os dados do `security.env` do ambiente antes de prosseguir, podendo fazer uma cópia antes.
+   Exemplo:
+```bash
+cd /opt/seiia/sei-ia #ou diretorio onde está instalado o sei-ia
+cp envs_files/security.env .
+```
+Lembrando da recomendação de que o arquivo `env_files/security.env` armazena configurações de ambiente e possui users, senhas e chaves que o acesso deve ser restrito, motivo pelo qual já deve constar no `.gitignore` local para não ser substituído acidentalmente no ambiente correspondente nas atualizações de update ou de upgrade de versão do Servidor de Soluçõea de IA.
+
+4. Clone a nova versão
+   Clone o repositório da nova versão do Servidor de Soluções de IA, como realizado na secao `9. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***`.
+   Exemplo:
+```bash
+git fetch origin
+git branch -r
+git checkout -b [identificacao_novo_release_estavel] origin/[identificacao_novo_release_estavel]
+```
+
+5. Realizar os ajustes manuais indicados nos Releases Notes da versão nova específica da atualização, disponível na página de [Releases do projeto](https://github.com/anatelgovbr/sei-ia/releases).
+
+6. Realize o redeploy
+   Reinicie o sistema com a nova configuração.
+```bash
+bash deploy-externo-imgs.sh 
+```
+
+### Atualização da v1.0.0 ou v1.0.1 para v1.0.2
+
+1. Editar o arquivo `security.env` do ambiente, conforme abaixo:
+
+   * Abaixo da variável `LOGLEVEL`, adicionar:
+```bash
+export LOGLEVEL=INFO      # Define o nível de log do autodeployer como 'INFO'; opções disponíveis: INFO | DEBUG | WARNING | ERROR. Recomendamos deixar em `ERROR` em produção.
+```
+
+   * Remover a linha abaixo:
+```bash
+export AZURE_OPENAI_ENDPOINT=****             # Endpoint do Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint. Exemplo: https://meuendpoint.openai.azure.com
+```
+
+2. Ajuste as permissões:
+   Execute os comandos abaixo para garantir as permissões corretas no diretório de armazenamento:
+
+```bash
+sudo chmod 774 -R /opt/sei-ia-storage
+sudo chown 5000:5000 /opt/sei-ia-storage
+```
+
+---
+
 ## Health Checker Geral do Ambiente
 
 Após concluir o deploy, você **deve** realizar testes automatizados de todo o ambiente utilizando o comando abaixo:
 
 ```bash
-docker compose -f docker-compose-healthchecker.yml up --build
+docker compose -f docker-compose-healthchecker.yml -p sei_ia up --build
 ```
 
-Aguarde a finalização dos testes. Os logs estarão disponíveis em `/opt/sei-ia-storage/logs/{DATA}`. Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
+Aguarde a finalização dos testes. Os logs estarão disponíveis, por padrão, em:  
+`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/opt/sei-ia-storage/logs/{DATA}`.  
 
-A compreensão do LOG deve iniciar pela criteriosa análise de `/opt/sei-ia-storage/logs/{DATA}/tests_{DATA}.log`, que tem a sua estrutura descrita a seguir.
+Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
+
+A compreensão do LOG deve iniciar pela criteriosa análise de:  
+`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/opt/sei-ia-storage/logs/{DATA}/tests_{DATA}.log`,  
+que tem sua estrutura descrita a seguir.
+
+> **Observação:**
+> 1. Por questões de segurança, essa pasta, por padrão, não é acessível. É necessário entrar como `root` para ter acesso a esses arquivos.
+> 2. Caso os arquivos não estejam nesse local, oriente-se pelo local de montagem dos seus volumes Docker com o comando:
+>    ```bash
+>    docker volume inspect sei_ia_health_checker_logs
+>    ```
+>    A saída deve ser algo como:
+>    ```bash
+>    [
+>        {
+>            "CreatedAt": "2024-12-05T00:20:58Z",
+>            "Driver": "local",
+>            "Labels": {
+>                "com.docker.compose.project": "sei_ia",
+>                "com.docker.compose.version": "2.29.2",
+>                "com.docker.compose.volume": "health_checker_logs"
+>            },
+>            "Mountpoint": "/var/lib/docker/volumes/sei_ia_health_checker_logs/_data", <- LOCAL DO ARQUIVO
+>            "Name": "sei_ia_health_checker_logs",
+>            "Options": null,
+>            "Scope": "local"
+>        }
+>    ]
+>    ```
 
 1. **Estrutura do Log**  
    Os logs seguem a seguinte estrutura:
@@ -497,7 +605,7 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 > ```bash
 > [...]
 > docker compose --profile externo \
->   -f docker-compose-prod.yaml \
+>   -f docker-compose-ext.yaml \
 >   -p $PROJECT_NAME \
 >   up \
 >   --no-build -d
@@ -507,7 +615,7 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 > ```bash
 > [...]
 > docker compose --profile externo \
->   -f docker-compose-prod.yaml \
+>   -f docker-compose-ext.yaml \
 >   -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura do acesso externo à rede Docker.
 >   -p $PROJECT_NAME \
 >   up \
@@ -518,7 +626,7 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 > Em seguida faça o redeploy do servidor de solução de IA, conforme abaixo:
 > 
 > ```bash
-> sudo bash deploy-externo-imgs.sh 
+> bash deploy-externo-imgs.sh 
 > ```
 > 
 > Aguarde o `FIM` do deploy e em seguida prossiga com os testes.
@@ -530,12 +638,8 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 **Recomendamos bloquear o acesso de rede, exceto para o administrador do ambiente computacional. O Airflow necessita de acessos ao banco de dados do SEI e ao Solr do SEI.**
 
 #### Principais DAGs
-- **dag_embeddings_start**: Cria a fila para gerar os embeddings para RAG.
 - **document_create_index_v1**: Processa os documentos para serem indexados no Solr para recomendação.
-- **indexing_embedding_document**: Processa a fila de embeddings, gerando os embeddings para RAG.
-- **process_count_tokens_v1**: Gera a contagem de tokens para os documentos internos do SEI.
 - **process_create_index_v1**: Processa os processos para serem indexados no Solr para recomendação.
-- **process_external_docs_count_token_v1**: Gera a contagem de tokens para os documentos externos do SEI.
 - **process_update_index_v1**: Cria a fila para indexar os processos e documentos no Solr.
 - **system_clean_airflow_logs_v1**: Realiza a limpeza de logs do Airflow.
 - **system_create_mlt_weights_config_v1**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI IA.
@@ -717,7 +821,7 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
   Solução: Por padrão, ao rodar novamente o comando de inicialização, volta a funcionar. Se persistir, deve-se verificar a quantidade de memória disponível no sistema.
 
   ```bash
-  sudo bash deploy-externo-imgs.sh 
+  bash deploy-externo-imgs.sh 
   ```
 
 ## Pontos de Atenção para Escalabilidade
@@ -737,7 +841,7 @@ Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/
   - Deve parar o Docker para evitar problemas durante a movimentação dos dados:
 
    ```bash
-   sudo systemctl stop docker
+   sudo service docker stop
    ```
 
   - Mova a pasta de volumes para o novo caminho:
@@ -757,7 +861,7 @@ Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/
   - Reinicie o Docker:
 
   ```bash
-  sudo systemctl start docker
+  sudo service docker start
   ```
 
 ### Ajustes Necessários
