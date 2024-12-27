@@ -184,7 +184,7 @@ su seiia
    Para os seguintes procedimentos, é necessário assegurar que o Docker está instalado e parado.
 
    ```bash
-   sudo systemctl stop docker
+   sudo service docker stop
    ```
 
    A remoção da default bridge é feita através de uma configuração do daemon.json, através de:
@@ -204,7 +204,7 @@ su seiia
    Após a configuração é necessário Inicializar o Docker e verificar o resultado obtido:
 
    ```bash
-   sudo systemctl start docker
+   sudo service docker start
    docker network ls
    ```
 
@@ -841,7 +841,7 @@ Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/
   - Deve parar o Docker para evitar problemas durante a movimentação dos dados:
 
    ```bash
-   sudo systemctl stop docker
+   sudo service docker stop
    ```
 
   - Mova a pasta de volumes para o novo caminho:
@@ -861,7 +861,7 @@ Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/
   - Reinicie o Docker:
 
   ```bash
-  sudo systemctl start docker
+  sudo service docker start
   ```
 
 ### Ajustes Necessários
