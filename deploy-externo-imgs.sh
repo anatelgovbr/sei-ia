@@ -56,6 +56,9 @@ docker compose --profile externo \
   up \
   --no-build -d
 
+echo "*** `date`: Aguardando estabilizacao do Servidor de Solucoes de IA"
+sleep 15
+
 echo "*** `date`:Ativando as DAGs do SEI IA no Airflow..."
 docker compose -f docker-compose-ext.yaml -p $PROJECT_NAME exec airflow-webserver-pd /bin/bash -c "
 airflow dags list | awk 'NR > 2 {print \$1}' > /tmp/dags_list.txt;
