@@ -19,7 +19,10 @@
   - [Resolução de Problemas Conhecidos](#resolução-de-problemas-conhecidos)
   - [Pontos de Atenção para Escalabilidade](#pontos-de-atenção-para-escalabilidade)
   - [Backup periódico dos dados do Servidor de Soluções de IA](#backup-periódico-dos-dados-do-servidor-de-soluções-de-ia)
-  - [Anexos](#anexos)
+  - [Anexos:](#anexos)
+    - [**Instalar Git - OPCIONAL**](#instalar-git---opcional)
+    - [**Instalar Docker - CASO AINDA NÃO ESTEJA INSTALADO**](#instalar-docker---caso-ainda-não-esteja-instalado)
+  - [Consumo de Recursos da Aplicação](#consumo-de-recursos-da-aplicação)
     
 --- 
 
@@ -29,15 +32,10 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
 
 - **CPU**:
   - Provisionado: 16 Cores com 2.10GHz
-  - Consumo na ANATEL (Produção):
-    - médio: 60%
-    - máximo: 100%
 
 - **Memória**:
   - Provisionado: 128GB
-  - Consumo na ANATEL (Produção):
-    - mínimo: 64GB
-    - máximo: 115GB
+
   
 - **Espaço em Disco**:
   - Provisionado: 600GB.
@@ -54,6 +52,7 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
   - **Quantidade de Documentos Gerados** (Editor do SEI - salvos no banco): 4.2 milhões
   - **Quantidade de Documentos Externos** (Filesystem do SEI): 8 milhões
   - **Usuários Internos**: cerca de 1.800, dentre servidores públicos e colaboradores em geral
+  - **Para informações históricas do uso na ANATEL**: [Consumo de Recursos da Aplicação](#consumo-de-recursos-da-aplicação)
 > **Realidade de Cada Órgão**:
 >  - A partir dos dados acima, cada órgão deve avaliar o ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL, pois essas duas aplicações na arquitetura apresentam crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
 > - Ao final deste Manual são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
@@ -956,3 +955,124 @@ docker volume ls | grep "^sei_ia-"
    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
    sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
    ```
+
+
+## Consumo de Recursos da Aplicação
+
+Esta seção apresenta as métricas de consumo de recursos para os containers da stack *SEI IA*. Os dados foram coletados entre 24/12/2024 até 08/01/2024, considerando o ambiente de produção da Anatel. As informações foram organizadas para facilitar a análise do uso de memória (RSS e física total) e o limite de memória máxima alocado para cada container. Para facilitar a interpretação, os gráficos foram agrupados por tipo de serviço.
+
+*É importante notar que as medições abaixo foram feitas em um momento que o SEI IA está estável na Anatel, sob rotinas de indexação de novos dados. Ao instalar a solução e executar as indexações iniciais, a média e picos de consumo de recursos são maiores e proporcionais ao volume de dados que serão indexados inicialmente.*
+
+*Memória RSS*: Resident Set Size, que representa a quantidade de memória física utilizada por um processo sem considerar o uso de memória compartilhada.
+
+*Memória Física Total*: Quantidade total de memória física utilizada por um processo, incluindo memória compartilhada.
+
+### Consumo de Memória RSS
+
+#### Tabela Geral - Memória RSS
+
+| # | Container                                      | Média (MB) | Pico (MB) |
+|----|-----------------------------------------------|------------|-----------|
+| 1  | sei_ia-solr_pd-1                             | 4637.0     | 4692      |
+| 2  | sei_ia-airflow-worker-1                      | 3204.0     | 7656      |
+| 3  | sei_ia-airflow-worker-2                      | 2867.0     | 6261      |
+| 4  | sei_ia-airflow-worker-3                      | 2865.0     | 5187      |
+| 5  | sei_ia-airflow-webserver-pd-1                | 789.0      | 1868      |
+| 6  | sei_ia-api_assistente-1                      | 738.0      | 1423      |
+| 7  | sei_ia-airflow-triggerer-pd-1                | 390.0      | 505       |
+| 8  | sei_ia-airflow-scheduler-pd-1                | 367.0      | 491       |
+| 9  | sei_ia-api_sei-1                             | 360.0      | 441       |
+| 10 | sei_ia-jobs_api-1                            | 126.0      | 238       |
+| 11 | sei_ia-rabbitmq-pd-1                         | 114.0      | 195       |
+| 12 | sei_ia-app-api-feedback-1                    | 94.0       | 97        |
+| 13 | sei_ia-pgvector_all-1                        | 25.0       | 118       |
+| 14 | sei_ia-airflow_postgres-pd-1                 | 22.0       | 26        |
+| 15 | sei_ia-nginx_assistente-1                    | 11.0       | 12        |
+| **-** | **Soma Total**                              | **15188.0**| **27292** |
+
+### Gráficos Histórico de Consumo de Memória RSS
+
+##### Airflow
+
+- <img src="../docs/image/consumo_containers/Airflow/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - Airflow" width="" height="400">
+
+##### Api Similaridade
+
+- <img src="../docs/image/consumo_containers/ApiSimilaridade/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - ApiSimilaridade" width="" height="400">
+
+##### Assistente
+- <img src="../docs/image/consumo_containers/Assistente/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - Assistente" width="" height="200">
+
+##### Banco de Dados
+- <img src="../docs/image/consumo_containers/BancoDeDados/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - BancoDeDados" width="" height="400">
+
+### Consumo de Memória Física Total
+
+#### Tabela Geral - Memória Física Total
+
+| #  | Container                                      | Média (MB) | Pico (MB) |
+|----|-----------------------------------------------|------------|-----------|
+| 1  | sei_ia-solr_pd-1                             | 9496.0     | 14336     |
+| 2  | sei_ia-pgvector_all-1                        | 5644.0     | 8192      |
+| 3  | sei_ia-airflow-worker-1                      | 3420.0     | 8119      |
+| 4  | sei_ia-airflow-worker-3                      | 3124.0     | 6371      |
+| 5  | sei_ia-airflow-worker-2                      | 3100.0     | 6393      |
+| 6  | sei_ia-airflow-webserver-pd-1                | 919.0      | 1929      |
+| 7  | sei_ia-airflow-triggerer-pd-1                | 752.0      | 998       |
+| 8  | sei_ia-api_assistente-1                      | 792.0      | 1659      |
+| 9  | sei_ia-airflow-scheduler-pd-1                | 492.0      | 605       |
+| 10 | sei_ia-api_sei-1                             | 387.0      | 469       |
+| 11 | sei_ia-rabbitmq-pd-1                         | 179.0      | 244       |
+| 12 | sei_ia-jobs_api-1                            | 151.0      | 189       |
+| 13 | sei_ia-airflow_postgres-pd-1                 | 132.0      | 144       |
+| 14 | sei_ia-app-api-feedback-1                    | 111.0      | 126       |
+| 15 | sei_ia-nginx_assistente-1                    | 17.0       | 20        |
+| **-** | **Soma Total**                              | **23204.0**| **39278** |
+
+### Gráficos Histórico de Consumo de Memória Física Total
+
+##### Airflow
+- <img src="../docs/image/consumo_containers/Airflow/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - Airflow" width="" height="400">
+
+##### Api Similaridade
+- <img src="../docs/image/consumo_containers/ApiSimilaridade/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - ApiSimilaridade" width="" height="400">
+
+##### Assistente
+- <img src="../docs/image/consumo_containers/Assistente/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - Assistente" width="" height="200">
+
+##### Banco de Dados
+- <img src="../docs/image/consumo_containers/BancoDeDados/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - BancoDeDados" width="" height="400">
+
+### Limite Máximo de Memória
+
+#### Tabela Geral - Limite Máximo de Memória por Container
+
+#### Tabela Geral - Limite Máximo de Memória por Container
+
+| #  | Container                                      | Limite (MB) |
+|----|-----------------------------------------------|-------------|
+| 1  | sei_ia-airflow-worker-3                       | 35840.0     |
+| 2  | sei_ia-airflow-worker-1                       | 35840.0     |
+| 3  | sei_ia-airflow-worker-2                       | 35840.0     |
+| 4  | sei_ia-solr_pd-1                              | 14336.0     |
+| 5  | sei_ia-pgvector_all-1                         | 8192.0      |
+| 6  | sei_ia-airflow_postgres-pd-1                  | 6144.0      |
+| 7  | sei_ia-nginx_assistente-1                     | 4096.0      |
+| 8  | sei_ia-airflow-scheduler-pd-1                 | 4096.0      |
+| 9  | sei_ia-api_sei-1                              | 4096.0      |
+| 10 | sei_ia-jobs_api-1                             | 4096.0      |
+| 11 | sei_ia-airflow-webserver-pd-1                 | 2048.0      |
+| 12 | sei_ia-api_assistente-1                       | 2048.0      |
+| 13 | sei_ia-rabbitmq-pd-1                          | 2048.0      |
+| 14 | sei_ia-airflow-triggerer-pd-1                 | 1024.0      |
+| 15 | sei_ia-app-api-feedback-1                     | 512.0       |
+| **-** | **Soma Total**                               | **102720.0**|
+
+
+### Resumo do consumo
+
+•	O container com maior consumo de memória RSS sei_similaridade_deploy-solr_pd-1, com uma média de 4637 MB, e de memória física total, esse mesmo container registrou um pico de 14336 MB.
+
+•	Os containers dos workers do Airflow demonstraram grande variação no consumo de memória, com picos de até 8119 MB, sugerindo alta carga de processamento durante um período específico.
+
+•	Outros containers, como o sei_ia-api_assistente-1 e o sei_similaridade_deploy-api_sei-1, apresentaram consumo moderado de memória.
