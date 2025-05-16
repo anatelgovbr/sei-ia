@@ -1,0 +1,287 @@
+############## imagem api_sei, 1.0.2:
+
+-> Correção das strings de conexão e parametrização via env var.
+
+/home/user_deploy/app/api_sei/db_models/db_instances.py
+linha 11:
+
++                       DB_SEI_ORACLE_SID,
+
+linha 42:
+
+-    conn_str = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/?sid=xe"
++    conn_str = f"oracle+cx_oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/{DB_SEI_ORACLE_SID}"
+
+-> Correção para casos em que  id_doc_dict.get("id_document") é uma lista e não um valor:
+/home/user_deploy/app/api_sei/db_models/jurisprudence.py
+linha 53:
+
+-        id_doc_found = set([int(id_doc_dict.get("id_document")) for id_doc_dict in data])
++        id_doc_found = set([int(id_doc_dict.get("id_document")[0] if isinstance(id_doc_dict.get("id_document"), list) else id_doc_dict.get("id_document")) for id_doc_dict in data])
+
+
+############## imagem airflow, 1.0.2:
+
+-> Os seguintes erros foram identificados ao verificar a execução dos jobs do airflow. No arquivo internal_docs_jurisprudence.py, em algumas linhas o schema do BD não parametrizado do SEI apresentava erro ao consultar:
+
+/home/airflow/app/jobs/dags/database/sql_templates/internal_docs_jurisprudence.py
+linhas 42,44,45,47,50,53:
+
+-    sei.protocolo p
++    {db_sei_schema}.protocolo p
+
+-> A consulta do arquivo related_processes.py gerava erro de ';' ao executar, por isso removemos o ';' da linha 33.
+
+/home/airflow/app/jobs/dags/database/sql_templates/related_processes.py
+linha 33:
+
+-;
++
+
+
+/home/airflow/app/jobs/dags/preprocessing/process_from_sei.py
+
+-> Outro erro identificado foi que, em alguns casos a query executada pelos métodos "get_info_related_processes" e "get_docs_from_process" apresentou erro limite de 1000 itens no "IN ()" excedido ao consultar no banco Oracle. Como forma de contornar, dividimos a consulta com blocos de até 100 itens e concatenamos os resultados em um DataFrame ao final:
+
+o método (linha 172) muda de:
+
+@staticmethod
+    def get_info_related_processes(related_processes_str, external):
+        id_docs_str = ProcessFromSEI.get_id_documents_allowed(related_processes_str, external=False)
+
+        if external:
+            externos_id_docs_str = ProcessFromSEI.get_id_documents_allowed(related_processes_str, external=True)
+            if externos_id_docs_str != '':
+                if id_docs_str != '':
+                    id_docs_str = id_docs_str + "," + externos_id_docs_str
+                else:
+                    id_docs_str = externos_id_docs_str
+
+        if ((related_processes_str.strip()) and (id_docs_str != '')):
+            sql = RELATED_PROCESSES_TEMPLATE.format(
+                processes_str=related_processes_str,id_docs_str=id_docs_str)
+            info_related_processes = ProcessFromSEI.agg_related_process_query(sql)
+        else:
+            info_related_processes = pd.DataFrame(columns=["id_protocolo",
+                "protocolo_formatado","processo_especificacao","interessado",
+                "name_interested","id_type_process","id_unit_process_generator",
+                "name_id_unit_process_generator","name_id_type_process",
+                "documento_especificacao","name_id_type_doc"])
+        return info_related_processes
+
+para:
+
+
+
+@staticmethod
+    def get_info_related_processes(related_processes_str, external):
+        id_docs_str = ProcessFromSEI.get_id_documents_allowed(related_processes_str, external=False)
+
+        # modificação para corrigir: ORA-01795: maximum number of expressions in a list is 1000
+        id_docs_list = id_docs_str.split(',')
+        batch_size = 100
+        n_batchs = len(id_docs_list)//batch_size
+        if len(id_docs_list)%batch_size > 0:
+            n_batchs+=1
+        agg_info_related_processes = []
+
+        if external:
+            externos_id_docs_str = ProcessFromSEI.get_id_documents_allowed(related_processes_str, external=True)
+            if externos_id_docs_str != '':
+                if id_docs_str != '':
+                    id_docs_str = id_docs_str + "," + externos_id_docs_str
+                else:
+                    id_docs_str = externos_id_docs_str
+
+        if ((related_processes_str.strip()) and (id_docs_str != '')):
+            ##
+            for i in range(n_batchs):
+              if i == n_batchs-1:
+                _id_docs_str = ','.join(id_docs_list[i*batch_size:])
+              else:
+                _id_docs_str = ','.join(id_docs_list[i*batch_size:(i+1)*batch_size])
+
+              sql = RELATED_PROCESSES_TEMPLATE.format(
+                    processes_str=related_processes_str,id_docs_str=_id_docs_str)
+              info_related_processes = ProcessFromSEI.agg_related_process_query(sql)
+              agg_info_related_processes.append(info_related_processes)
+            info_related_processes = pd.concat(agg_info_related_processes)
+        else:
+            info_related_processes = pd.DataFrame(columns=["id_protocolo",
+                "protocolo_formatado","processo_especificacao","interessado",
+                "name_interested","id_type_process","id_unit_process_generator",
+                "name_id_unit_process_generator","name_id_type_process",
+                "documento_especificacao","name_id_type_doc"])
+        return info_related_processes
+
+-> Correção de limite de 1000 itens no in () INTERNAL_DOCS_FROM_PROCESS_TEMPLATE
+
+
+o método (linha 213) muda de:
+@staticmethod
+    def get_docs_from_process(id_protocolo, external):
+        """
+        Retorna os documentos de um processo
+        """
+
+        docs_process = pd.DataFrame()
+        id_protocolo = str(id_protocolo)
+
+        interno_id_docs_str = ProcessFromSEI.get_id_documents_allowed(id_protocolo, external=False)
+        if interno_id_docs_str != '':
+
+            internal_docs_where = f"AND da.id_documento IN ({interno_id_docs_str})"
+
+            sql = INTERNAL_DOCS_FROM_PROCESS_TEMPLATE.format(where_clause=internal_docs_where)
+
+            docs_process = sei_db.select(sql)
+
+
+
+        if external:
+            externo_id_docs_str = ProcessFromSEI.get_id_documents_allowed(id_protocolo, external=True)
+            if externo_id_docs_str != '':
+                external_docs_process = ProcessFromSEI.get_external_docs_from_process(ids_str = externo_id_docs_str)
+
+                if not docs_process.empty:
+                    docs_process = pd.concat([docs_process,external_docs_process],axis=0)
+                else:
+                    docs_process = external_docs_process
+
+
+        return docs_process.drop_duplicates(subset=["id_protocolo_documento"])
+para:
+
+
+
+@staticmethod
+    def get_docs_from_process(id_protocolo, external):
+        """
+        Retorna os documentos de um processo
+        """
+
+        docs_process = pd.DataFrame()
+        id_protocolo = str(id_protocolo)
+
+        interno_id_docs_str = ProcessFromSEI.get_id_documents_allowed(id_protocolo, external=False)
+
+        # modificação para corrigir: ORA-01795: maximum number of expressions in a list is 1000
+        id_docs_list = interno_id_docs_str.split(',')
+        batch_size = 100
+        n_batchs = len(id_docs_list)//batch_size
+        if len(id_docs_list)%batch_size > 0:
+            n_batchs+=1
+        agg_docs_process = []
+
+        if interno_id_docs_str != '':
+            ##
+
+            ##
+            for i in range(n_batchs):
+              if i == n_batchs-1:
+                _id_docs_str = ','.join(id_docs_list[i*batch_size:])
+              else:
+                _id_docs_str = ','.join(id_docs_list[i*batch_size:(i+1)*batch_size])
+
+              internal_docs_where = f"AND da.id_documento IN ({_id_docs_str})"
+              sql = INTERNAL_DOCS_FROM_PROCESS_TEMPLATE.format(where_clause=internal_docs_where)
+              _docs_process = sei_db.select(sql)
+
+              agg_docs_process.append(_docs_process)
+            docs_process = pd.concat(agg_docs_process)
+
+            ##
+            #internal_docs_where = f"AND da.id_documento IN ({interno_id_docs_str})"
+            #sql = INTERNAL_DOCS_FROM_PROCESS_TEMPLATE.format(where_clause=internal_docs_where)
+            #docs_process = sei_db.select(sql)
+
+        if external:
+            externo_id_docs_str = ProcessFromSEI.get_id_documents_allowed(id_protocolo, external=True)
+            if externo_id_docs_str != '':
+                external_docs_process = ProcessFromSEI.get_external_docs_from_process(ids_str = externo_id_docs_str)
+
+                if not docs_process.empty:
+                    docs_process = pd.concat([docs_process,external_docs_process],axis=0)
+                else:
+                    docs_process = external_docs_process
+
+
+        return docs_process.drop_duplicates(subset=["id_protocolo_documento"])
+
+
+
+
+-> Correção da string de conexão, com parametrização do SID:
+
+/home/airflow/app/jobs/db_models/repository.py
+linha 12:
+
++    DB_SEI_ORACLE_SID,
+
+linha 69:
+-        conn_str = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/?sid=xe"
++        conn_str = f"oracle+cx_oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/{DB_SEI_ORACLE_SID}"
+
+linha 78:
+-        conn_str = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/?sid=xe"
++        conn_str = f"oracle+cx_oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/{DB_SEI_ORACLE_SID}"
+
+
+############## api_assistente, 1.0.2:
+
+-> Correção da string de conexão, com parametrização do SID e parametrização do schema:
+
+/app/envs.py
+linha 20:
+
++DB_SEI_ORACLE_SID = os.getenv("DB_SEI_ORACLE_SID")
+
+/app/repository/db_instances.py
+linha 17:
+
++    DB_SEI_ORACLE_SID,
+
+linha 37:
+-    CONN_SEI_STRING = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/?sid=xe"
+-    sql="SELECT * FROM SEI.ASSUNTO"
++    CONN_SEI_STRING = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/{DB_SEI_ORACLE_SID}"
++    sql="SELECT * FROM {DB_SEI_SCHEMA}.ASSUNTO"
+
+
+
+-> Resolução erro de limite de identificador de 30 caracteres para Oracle. O SQLAlchemy estava gerando
+identificadores nas queries com mais de 30 caracteres, consequentemente gerando erros nas consultas:
+
+/app/repository/db_connect.py
+linha 70:
+
++                max_identifier_length=30,
+
+
+
+############## jobs_api, 1.0.2:
+
+-> Correção de ';' terminando query incorretamente e correção da string de conexão:
+
+/home/user_deploy/app/jobs/dags/database/sql_templates/related_processes.py
+linha 33:
+
+-;
+
+
+-> Parametrização do SID da string de conexão com o DB:
+
+/home/user_deploy/app/jobs/db_models/repository.py
+linha 16:
+
++    DB_SEI_ORACLE_SID,
+
+linha 69:
+
+-        conn_str = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/?sid=xe"
++        conn_str = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/{DB_SEI_ORACLE_SID}"
+
+linha 79:
+
+-        conn_str = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/?sid=xe"
++        conn_str = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/{DB_SEI_ORACLE_SID}"
