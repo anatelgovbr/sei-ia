@@ -81,16 +81,19 @@ import pandas as pd
 import requests
 import logging
 from tests.db_connect import DBConnector
+from requests.auth import HTTPBasicAuth
+import urllib3
+import warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+warnings.simplefilter("ignore", category=urllib3.exceptions.InsecureRequestWarning)
 
 assistente_tables = [
-    'embeddings_400_50', 'feedback', 'ip_message', 
-    'messages', 'requests', 'models'
+    'feedback', 'ip_message', 
+    'messages', 'models'
     ]
 
 similaridade_tables = [
     'document_mlt_recommendation', 'log_consume', 'log_update_mlt',
-    'mlt_allowed_jurisprudence_snapshot', 'mlt_allowed_process_snapshot',
-    'mlt_indexed_jurisprudence_snapshot', 'mlt_indexed_process_snapshot',
     'process_weighted_mlt_recommendation', 'queue_update_mlt',
     'version_register'
     ]
@@ -105,64 +108,6 @@ sei_externo_tables = [
     'md_ia_classificacao_ods', 'md_ia_hist_class', 'md_ia_interacao_chat',
     ]
 
-def create_external_sei_config(comparison_df: pd.DataFrame) -> tuple[str, DBConnector]:
-    """
-    Configura e conecta-se ao banco de dados externo do SEI com base nas variáveis de ambiente.
-
-    Args:
-        comparison_df (pd.DataFrame): DataFrame contendo variáveis de ambiente.
-
-    Returns:
-        tuple:
-            - str: Nome do schema do banco de dados SEI, ou None em caso de erro.
-            - DBConnector: Instância de conexão com o banco de dados SEI, ou None em caso de erro.
-    """
-    try:
-        DATABASE_TYPE = comparison_df[comparison_df['variavel'] == 'DATABASE_TYPE']['value'].values[0]
-        DB_SEI_USER = comparison_df[comparison_df['variavel'] == 'DB_SEI_USER']['value'].values[0]
-        DB_SEI_PWD = comparison_df[comparison_df['variavel'] == 'DB_SEI_PWD']['value'].values[0]
-        DB_SEI_HOST = comparison_df[comparison_df['variavel'] == 'DB_SEI_HOST']['value'].values[0]
-        DB_SEI_PORT = comparison_df[comparison_df['variavel'] == 'DB_SEI_PORT']['value'].values[0]
-        DB_SEI_DATABASE = comparison_df[comparison_df['variavel'] == 'DB_SEI_DATABASE']['value'].values[0]
-        DB_SEI_SCHEMA = comparison_df[comparison_df['variavel'] == 'DB_SEI_SCHEMA']['value'].values[0]
-    except IndexError:
-        logging.error("Impossível continuar com os testes para o Banco de dados SEI: variáveis faltantes nos arquivos .env")
-        return None, None
-    try:
-        if DATABASE_TYPE == "mysql":
-            CONN_SEI_STRING = (
-                f"mysql+pymysql://{DB_SEI_USER}:{DB_SEI_PWD}@"
-                f"{DB_SEI_HOST}:{DB_SEI_PORT}/{DB_SEI_DATABASE}"
-            )
-            sei_db_instance = DBConnector(CONN_SEI_STRING, schema=DB_SEI_SCHEMA)
-
-        elif DATABASE_TYPE == "oracle":
-            import sys
-            import oracledb
-            oracledb.version = "8.3.0"
-            oracledb.init_oracle_client()
-            sys.modules["cx_Oracle"] = oracledb
-            CONN_SEI_STRING = f"oracle://{DB_SEI_USER}:{DB_SEI_PWD}@{DB_SEI_HOST}:{DB_SEI_PORT}/?sid=xe"
-            sei_db_instance = DBConnector(CONN_SEI_STRING, schema=DB_SEI_SCHEMA)
-
-        elif DATABASE_TYPE == "mssql":
-            import sqlalchemy as sa
-            connection_string = (
-                f"UID={DB_SEI_USER};PWD={DB_SEI_PWD};SERVER={DB_SEI_HOST},{DB_SEI_PORT};"
-                f"DATABASE={DB_SEI_DATABASE};DRIVER=ODBC+Driver+18+for+SQL+Server;TrustServerCertificate=yes"
-            )
-            conn_str = sa.engine.URL.create("mssql+pyodbc", query={"odbc_connect": connection_string})
-            sei_db_instance = DBConnector(connection_string=conn_str, schema=DB_SEI_SCHEMA)
-
-        else:
-            logging.error("Tipo de banco de dados não suportado:", DATABASE_TYPE)
-            return None, None, None
-
-        return DB_SEI_SCHEMA,DATABASE_TYPE, sei_db_instance
-
-    except Exception as e:
-        logging.error("Erro ao conectar ao banco de dados SEI:", e)
-        return None, None, None
 
 def create_postgres_config(comparison_df: pd.DataFrame) -> tuple[dict, DBConnector, DBConnector]:
     """
@@ -178,18 +123,18 @@ def create_postgres_config(comparison_df: pd.DataFrame) -> tuple[dict, DBConnect
             - DBConnector: Instância de conexão com o banco de dados similaridade.
     """
     try:
-        POSTGRES_USER = comparison_df[comparison_df['variavel'] == 'POSTGRES_USER']['value'].values[0]
-        POSTGRES_PASSWORD = comparison_df[comparison_df['variavel'] == 'POSTGRES_PASSWORD']['value'].values[0]
-        ASSISTENTE_PGVECTOR_HOST = comparison_df[comparison_df['variavel'] == 'ASSISTENTE_PGVECTOR_HOST']['value'].values[0]
-        ASSISTENTE_PGVECTOR_PORT = comparison_df[comparison_df['variavel'] == 'ASSISTENTE_PGVECTOR_PORT']['value'].values[0]
-        ASSISTENTE_PGVECTOR_DB = comparison_df[comparison_df['variavel'] == 'ASSISTENTE_PGVECTOR_DB']['value'].values[0]
-        POSTGRES_DATABASE = comparison_df[comparison_df['variavel'] == 'POSTGRES_DATABASE']['value'].values[0]
+        POSTGRES_USER = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_USER']['value'].values[0]
+        POSTGRES_PASSWORD = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_PWD']['value'].values[0]
+        ASSISTENTE_PGVECTOR_HOST = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_HOST']['value'].values[0]
+        ASSISTENTE_PGVECTOR_PORT = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_PORT']['value'].values[0]
+        ASSISTENTE_PGVECTOR_DB = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_ASSISTENTE']['value'].values[0]
+        POSTGRES_DATABASE = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_SIMILARIDADE']['value'].values[0]
     except IndexError:
         logging.error("Variáveis faltantes para configuração do Banco de dados INTERNO.")
         return {}, None, None
 
-    assistente_conn_string = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{ASSISTENTE_PGVECTOR_HOST}:{ASSISTENTE_PGVECTOR_PORT}/{ASSISTENTE_PGVECTOR_DB}"
-    similaridade_conn_string = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{ASSISTENTE_PGVECTOR_HOST}:{ASSISTENTE_PGVECTOR_PORT}/{POSTGRES_DATABASE}"
+    assistente_conn_string = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{ASSISTENTE_PGVECTOR_HOST}:{ASSISTENTE_PGVECTOR_PORT}/{ASSISTENTE_PGVECTOR_DB}"
+    similaridade_conn_string = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{ASSISTENTE_PGVECTOR_HOST}:{ASSISTENTE_PGVECTOR_PORT}/{POSTGRES_DATABASE}"
 
     try:
         assistente_db_instance = DBConnector(assistente_conn_string, schema="")
@@ -268,24 +213,21 @@ def create_solr_config(comparison_df: pd.DataFrame) -> dict:
         dict: Dicionário com a configuração dos serviços Solr.
     """
     return {
-        "Solr_SEI": {
-            "host": comparison_df[comparison_df['variavel'] == 'SEI_SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
-            "port": int(comparison_df[comparison_df['variavel'] == 'SEI_SOLR_ADDRESS']['value'].values[0].split(":")[2]),
-            "core": comparison_df[comparison_df['variavel'] == 'SEI_SOLR_CORE']['value'].values[0]
-        },
         "Solr_Interno_documento": {
             "host": comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
             "port": int(comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[2]),
-            "core": comparison_df[comparison_df['variavel'] == 'SOLR_MLT_JURISPRUDENCE_CORE']['value'].values[0]
+            "core": comparison_df[comparison_df['variavel'] == 'SOLR_MLT_JURISPRUDENCE_CORE']['value'].values[0],
+            "interno": True
         },
         "Solr_Interno_processo": {
             "host": comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
             "port": int(comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[2]),
-            "core": comparison_df[comparison_df['variavel'] == 'SOLR_MLT_PROCESS_CORE']['value'].values[0]
+            "core": comparison_df[comparison_df['variavel'] == 'SOLR_MLT_PROCESS_CORE']['value'].values[0],
+            "interno": True
         }
     }
 
-def verificar_status_solr(host:str, port:int, core:str, verbose:bool = False) -> dict:
+def verificar_status_solr(host:str, port:int, core:str, interno:bool, verbose:bool = False) -> dict:
     """
     Verifica o status de um core específico no Solr.
 
@@ -298,15 +240,17 @@ def verificar_status_solr(host:str, port:int, core:str, verbose:bool = False) ->
     Returns:
     - dict: Dicionário com o resultado da conexão e detalhes.
     """
-    url = f"http://{host}:{port}/solr/admin/cores?action=STATUS&core={core}"
-    
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Levanta um erro para status HTTP diferentes de 200
-        status_info = response.json()
         
-        core_status = status_info.get("status", {}).get(core, {})
-        if core_status:
+    try:
+        if interno:
+            url = f"https://{host}:{port}/solr/{core}/admin/ping"
+            response = requests.get(url, verify=False, auth=HTTPBasicAuth(os.getenv("SOLR_USER"), os.getenv("SOLR_PASSWORD")))
+        else:
+            url = f"http://{host}:{port}/solr/{core}/admin/ping"
+            response = requests.get(url)
+        response.raise_for_status()
+        
+        if response.status_code == 200:
             if verbose:
                 logging.debug(f"Conexão ao core '{core}' bem-sucedida.")
             return {"Reacheble": True, "Host": host, "Port": port, "Core": core}
@@ -333,7 +277,7 @@ def test_connectivity_all_solr(solr_config:dict, verbose:bool = True) -> dict:
     """
     results = {}
     for service_name, config in solr_config.items():
-        result = verificar_status_solr(config["host"], config["port"], config["core"], verbose)
+        result = verificar_status_solr(config["host"], config["port"], config["core"],config["interno"], verbose)
         results[service_name] = result
     return results
 
@@ -344,7 +288,8 @@ def connectivity_report(results:dict , return_df:bool=False, path:str = None)->t
     Parameters:
     - results (dict): Dicionário contendo o resultado de conectividade para cada serviço.
     - return_df (bool): Se True, retorna o DataFrame dos resultados junto com o número de falhas.
-
+    - path (str) : caminho para salvar o report
+    
     Returns:
     - int: Número de serviços que falharam na conexão.
     - pd.DataFrame (opcional): DataFrame contendo os resultados detalhados se return_df for True.
@@ -361,6 +306,7 @@ def connectivity_report(results:dict , return_df:bool=False, path:str = None)->t
         logging.error(results_df[results_df["Reacheble"] == False].to_markdown())
     else:
         logging.info("\nTodos os testes passaram.\n")
+
     if path:
         results_df.to_csv(path,index=False)
     if return_df:
@@ -379,17 +325,9 @@ def create_connectivity_config(comparison_df: pd.DataFrame) -> dict:
     - dict: Dicionário com a configuração de conectividade, contendo hosts e portas dos serviços.
     """
     return {
-        "DB_SEI": {
-            "host": comparison_df[comparison_df['variavel'] == 'DB_SEI_HOST']['value'].values[0],
-            "port": int(comparison_df[comparison_df['variavel'] == 'DB_SEI_PORT']['value'].values[0])
-        },
         "DB_INTERNO": {
-            "host": comparison_df[comparison_df['variavel'] == 'ASSISTENTE_PGVECTOR_HOST']['value'].values[0],
-            "port": int(comparison_df[comparison_df['variavel'] == 'ASSISTENTE_PGVECTOR_PORT']['value'].values[0])
-        },
-        "Solr_SEI": {
-            "host": comparison_df[comparison_df['variavel'] == 'SEI_SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
-            "port": int(comparison_df[comparison_df['variavel'] == 'SEI_SOLR_ADDRESS']['value'].values[0].split(":")[2].replace("//", ""))  
+            "host": comparison_df[comparison_df['variavel'] == 'DB_SEIIA_HOST']['value'].values[0],
+            "port": int(comparison_df[comparison_df['variavel'] == 'DB_SEIIA_PORT']['value'].values[0])
         },
         "Solr_Interno": {
             "host": comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
@@ -464,13 +402,13 @@ def test_connectivity_all(config: dict, verbose: bool = False) -> dict:
 
 
 health_testes_urls = {
-    "api_recomendacao": {"http://api_sei:8082":[
+    "api_recomendacao": {"https://api_sei:8082":[
         "/health",
         "/health/database",
         # "/health/process-recommendation",
         # "/health/document-recommendation"
     ]},
-    "api_feedback": {"http://app-api-feedback:8086":["/health"]},
+    "api_feedback": {"https://app-api-feedback:8086":["/health"]},
     "api_assistente": {"http://api_assistente:8088":["/health"]}
 }
 
@@ -490,7 +428,7 @@ def test_api_connectivity_and_response(api_url: str, expected_status: int = 200)
         - Em caso de falha na conexão ou qualquer erro de requisição, a função registra o erro no log e retorna `False`.
     """
     try:
-        response = requests.get(api_url, headers={'accept': 'application/json'})
+        response = requests.get(api_url, headers={'accept': 'application/json'}, verify=False)
         if response.status_code == expected_status:
             logging.debug(f"API {api_url} respondeu com o status esperado: {expected_status}")
             return True

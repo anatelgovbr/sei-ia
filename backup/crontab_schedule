@@ -1,5 +1,0 @@
-SHELL=/bin/bash
-45 23 * * * /mnt/sei_similaridade/sei_similaridade_deploy/backup/logs_manager/backup_logs.sh /mnt/backup/sei_similaridade
-55 23 * * * /mnt/sei_similaridade/sei_similaridade_deploy/backup/shutdown.sh
-00 02 * * * /mnt/sei_similaridade/sei_similaridade_deploy/backup/start.sh
-0 6-22 * * * /mnt/sei_similaridade/sei_similaridade_deploy/backup/logs_manager/script.sh

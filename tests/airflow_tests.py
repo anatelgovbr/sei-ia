@@ -192,6 +192,7 @@ def compare_dag_runs(runs_df: pd.DataFrame, path: str = None) -> dict:
 
     Parameters:
     - runs_df (pd.DataFrame): DataFrame com informações sobre as execuções de DAGs.
+    - path (str): caminho onde sera salvo o arquivo.
 
     Returns:
     - dict: Dicionário contendo DataFrames para execuções faltantes, sobrantes, status inesperados,

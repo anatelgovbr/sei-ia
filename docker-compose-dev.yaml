@@ -1,9 +1,0 @@
-services:
-  solr_pd:
-    ports:
-      - "8084:8983"
-
-  pgvector_all:
-    ports:
-      - "5432:5432"
-      - "8089:5432"

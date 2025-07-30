@@ -6,7 +6,8 @@ os bancos de dados, o Docker e o Airflow estão funcionando corretamente. Cada c
 com o auxílio de funções específicas de teste, e os resultados são registrados em um arquivo de log com a 
 data e hora atual.
 
-Além disso, ao final dos testes, é gerado um resumo com a quantidade de erros encontrados em cada categoria.
+Além disso, ao final dos testes, é gerado um resumo com a quantidade de erros encontrados em cada categoria,
+e salvo em um arquivo zip em /opt/sei-ia-storage/logs/{data}.zip.
 
 """
 
@@ -38,7 +39,7 @@ Returns:
     None: A função não retorna nada, mas gera um arquivo de log com o resumo dos testes.
     """
     print("LOGS")
-    storage_proj_dir_base = os.getenv('STORAGE_PROJ_DIR', '/opt/sei-ia-storage').strip() 
+    storage_proj_dir_base = "/opt/sei-ia-storage"
     now = datetime.now().strftime('%Y%m%d')
     storage_proj_dir = os.path.join(storage_proj_dir_base, 'logs', datetime.now().strftime('%Y%m%d'))
     os.makedirs(storage_proj_dir, exist_ok=True)
@@ -57,8 +58,8 @@ Returns:
         # print(msg)
         logging.info(msg)
 
-    log_print("==================== TESTES ==================")
-    log_print("==================== ENVS ====================")
+    log_print("\n==================== TESTES ==================\n")
+    log_print("\n==================== ENVS ====================\n")
     
     import tests.env_tests as test_env
     import tests.connectivity_tests as test_conn
@@ -78,6 +79,7 @@ Returns:
     errors_docker = 0
     errors_log_docker = 0
     error_airflow_docker = 0
+    comparison_df = None  # Initialize comparison_df to prevent NameError
 
     try:
         variables_df = test_env.create_env_vars_df(test_env.env_vars)
@@ -89,18 +91,22 @@ Returns:
         errors_envs = 1
         log_print(f"Erro nos testes de variáveis de ambiente: {e}")
 
-    log_print("============== CONECTIVIDADE =================")
+    log_print("\n============== CONECTIVIDADE =================\n")
     
     try:
-        config = test_conn.create_connectivity_config(comparison_df)  # VEM DO TESTE DE ENV
-        results_conn = test_conn.test_connectivity_all(config)
-        log_print("====== TESTE DE CONECTIVIDADE - RESUMO =======")
-        errors_conn, _ = test_conn.connectivity_report(results_conn, path = f"{storage_proj_dir}/conn_df.csv")
+        if comparison_df is not None:
+            config = test_conn.create_connectivity_config(comparison_df)  # VEM DO TESTE DE ENV
+            results_conn = test_conn.test_connectivity_all(config)
+            log_print("\n====== TESTE DE CONECTIVIDADE - RESUMO =======\n")
+            errors_conn, _ = test_conn.connectivity_report(results_conn, path = f"{storage_proj_dir}/conn_df.csv")
+        else:
+            errors_conn = 1
+            log_print("Erro nos testes de conectividade: comparison_df não foi inicializado devido a falha nos testes de ambiente")
     except Exception as e:
         errors_conn = 1
         log_print(f"Erro nos testes de conectividade: {e}")
     
-    log_print("====== TESTE DE SAUDE DOS ENDPOINTS ==========")
+    log_print("\n====== TESTE DE SAUDE DOS ENDPOINTS ==========\n")
     try: 
         health_results = test_conn.test_api_connectivity_and_response_all(test_conn.health_testes_urls)
         health_erros, _ = test_conn.connectivity_report(health_results, path = f"{storage_proj_dir}/health_df.csv")
@@ -109,74 +115,71 @@ Returns:
         log_print(f"Erro nos testes de conectividade: {e}")
 
 
-    log_print("========= TESTE DE CONEXÃO COM SOLR ==========")
+    log_print("\n========= TESTE DE CONEXÃO COM SOLR ==========\n")
     
     try:
-        solr_config = test_conn.create_solr_config(comparison_df)
-        solr_results = test_conn.test_connectivity_all_solr(solr_config)
-        solr_erros, _ = test_conn.connectivity_report(solr_results, path = f"{storage_proj_dir}/solr_df.csv")
+        if comparison_df is not None:
+            solr_config = test_conn.create_solr_config(comparison_df)
+            solr_results = test_conn.test_connectivity_all_solr(solr_config)
+            solr_erros, _ = test_conn.connectivity_report(solr_results, path = f"{storage_proj_dir}/solr_df.csv")
+        else:
+            solr_erros = 1
+            log_print("Erro nos testes de conexão com o SOLR: comparison_df não foi inicializado devido a falha nos testes de ambiente")
     except Exception as e:
         solr_erros = 1
         log_print(f"Erro nos testes de conexão com o SOLR: {e}")
     
-    log_print("===== TESTE DE CONEXÃO COM BANCO DE DADOS ====")
-    log_print("================== EXTERNOS ==================")
+    log_print("\n===== TESTE DE CONEXÃO COM BANCO DE DADOS ====\n")
+    # log_print("\n================== EXTERNOS ==================\n")
+    
+    # Teste de conexão com banco do SEI removido - não utilizado mais
+    db_sei_erros = 0
+    # log_print("Teste de conexão com banco do SEI desabilitado - não utilizado mais")
+    
+    log_print("\n================== INTERNOS ==================\n")
     
     try:
-        DB_SEI_SCHEMA, DATABASE_TYPE, db_instance = test_conn.create_external_sei_config(comparison_df)
-        if db_instance:
-            log_print("Sem erros de conexao com o BD do SEI")
-        else:
-            log_print("Não foi possível conectar com o BD do SEI")
-        
-        if db_instance:
-            log_print("============== TABELAS DO SEI ================")
-            log_print("Verificando a existencia das tabelas do sei:")
-            db_sei_results = test_conn.verify_all_tables(db_instance, test_conn.sei_externo_tables, DB_SEI_SCHEMA, DATABASE_TYPE, verbose=False)
-            db_sei_erros, _ = test_conn.connectivity_report(db_sei_results, path = f"{storage_proj_dir}/table_sei_df.csv")
-    except Exception as e:
-        db_sei_erros = 1
-        log_print(f"Erro nos testes de conexão com o banco de dados SEI: {e}")
-    
-    log_print("================== INTERNOS ==================")
-    
-    try:
-        postgres_config, assistente_db_instance, similaridade_db_instance = test_conn.create_postgres_config(comparison_df)
-        if assistente_db_instance:
-            log_print("Sem erros de conexao com o BD do Assistente")
-        else:
-            log_print("Não foi possível conectar com o BD do Assistente")
-        
-        if similaridade_db_instance:
-            log_print("Sem erros de conexao com o BD do Sei-similaridade")
-        else:
-            log_print("Não foi possível conectar com o BD do Sei-similaridade")
-        
-        if assistente_db_instance:
-            log_print("============= TABELAS DO ASSISTENTE ==========")
-            log_print("Verificando a existencia das tabelas do assistente:")
+        if comparison_df is not None:
+            _, assistente_db_instance, similaridade_db_instance = test_conn.create_postgres_config(comparison_df)
+            if assistente_db_instance:
+                log_print("Sem erros de conexao com o BD do Assistente")
+            else:
+                log_print("Não foi possível conectar com o BD do Assistente")
+            
+            if similaridade_db_instance:
+                log_print("Sem erros de conexao com o BD do Sei-similaridade")
+            else:
+                log_print("Não foi possível conectar com o BD do Sei-similaridade")
+            
+            if assistente_db_instance:
+                log_print("\n============= TABELAS DO ASSISTENTE ==========\n")
+                log_print("\nVerificando a existencia das tabelas do assistente:\n")
 
-            assistente_results = test_conn.verify_all_tables(assistente_db_instance, test_conn.assistente_tables, 'sei_llm','mysql' ,verbose=False)
-            assistente_erros, _ = test_conn.connectivity_report(assistente_results, path = f"{storage_proj_dir}/table_assistente_df.csv")
-        
-        if similaridade_db_instance:
-            log_print("============= TABELAS DE SIMILARIDADE =========")
-            log_print("Verificando a existencia das tabelas de similaridade:")
+                assistente_results = test_conn.verify_all_tables(assistente_db_instance, test_conn.assistente_tables,None,'postgres' ,verbose=False)
+                assistente_erros, _ = test_conn.connectivity_report(assistente_results, path = f"{storage_proj_dir}/table_assistente_df.csv")
+            
+            if similaridade_db_instance:
+                log_print("\n============= TABELAS DE SIMILARIDADE =========\n")
+                log_print("\nVerificando a existencia das tabelas de similaridade:\n")
 
-            similaridade_results = test_conn.verify_all_tables(similaridade_db_instance, test_conn.similaridade_tables,None, 'mysql' ,verbose=False)
-            similaridade_erros, _ = test_conn.connectivity_report(similaridade_results, path = f"{storage_proj_dir}/table_seisimilaridade_df.csv")
+                similaridade_results = test_conn.verify_all_tables(similaridade_db_instance, test_conn.similaridade_tables,None, 'postgres' ,verbose=False)
+                similaridade_erros, _ = test_conn.connectivity_report(similaridade_results, path = f"{storage_proj_dir}/table_seisimilaridade_df.csv")
+        else:
+            assistente_erros = 1
+            similaridade_erros = 1
+            log_print("Erro nos testes de bancos internos (Assistente e Similaridade): comparison_df não foi inicializado devido a falha nos testes de ambiente")
     except Exception as e:
         assistente_erros = 1
         similaridade_erros = 1
         log_print(f"Erro nos testes de bancos internos (Assistente e Similaridade): {e}")
     
-    log_print("=================== DOCKER ====================")
+    log_print("\n=================== DOCKER ====================\n")
     
     try:
         container_status = test_docker.get_docker_containers(verbose=False)
         container_status_df = test_docker.verify_status_docker(container_status, test_docker.containers_names, verbose=False)
         errors_docker, categorized_dfs = test_docker.report_container_status(container_status_df, return_dfs=True, verbose=True, path = f"{storage_proj_dir}/containers_status_df.csv")
-        log_print("================ DOCKER - LOGS ================")
+        log_print("\n================ DOCKER - LOGS ================\n")
         logs_lines = test_docker.get_all_docker_logs(container_status, 1000, False)
         test_docker.save_logs_into_file(logs_lines,storage_proj_dir)
         errors_log_docker = test_docker.report_docker_logs(logs_lines, False)
@@ -185,7 +188,7 @@ Returns:
         errors_log_docker = 1
         log_print(f"Erro nos testes de Docker: {e}")
     
-    log_print("=================== AIRFLOW ===================")
+    log_print("\n=================== AIRFLOW ===================\n")
     
     try:
         client = docker.from_env()
@@ -201,13 +204,46 @@ Returns:
         # airflow_results = test_airflow.compare_dag_runs(runs_df, storage_proj_dir)
         # airflow_errors = test_airflow.report_dag_run_issues(airflow_results, runs_df)
         
-        # log_print("========== AIRFLOW - RESUMO DAG RUNS ==========")
+        # log_print("\n========== AIRFLOW - RESUMO DAG RUNS ==========\n")
         # log_print(runs_df.to_markdown(index=False))
     except Exception as e:
         error_airflow_docker = 1
         log_print(f"Erro no teste do Airflow: {e}")
     
-    log_print("============== RESUMO - TESTES ================")
+    log_print("\n================ SEI API ======================\n")
+    
+    try:
+        client = docker.from_env()
+        jobs_api_containers = [c for c in client.containers.list() if 'jobs_api' in c.name]
+        if jobs_api_containers:
+            jobs_api_container = jobs_api_containers[0]
+            log_print(f"Executando teste da SEI API no container: {jobs_api_container.name}")
+            
+            # Executa o teste da SEI API
+            result = jobs_api_container.exec_run(
+                "python -m tests.test_sei_db_handlers",
+                workdir="/home/seiia/app"
+            )
+            
+            output = result.output.decode('utf-8')
+            exit_code = result.exit_code
+            
+            log_print(f"Saída do teste da SEI API:\n{output}")
+            
+            if exit_code == 0:
+                log_print("✅ Teste da SEI API passou com sucesso!")
+                error_sei_api = 0
+            else:
+                log_print(f"❌ Teste da SEI API falhou com código de saída: {exit_code}")
+                error_sei_api = 1
+        else:
+            log_print("❌ Container jobs_api não encontrado")
+            error_sei_api = 1
+    except Exception as e:
+        error_sei_api = 1
+        log_print(f"Erro no teste da SEI API: {e}")
+    
+    log_print("\n============== RESUMO - TESTES ================\n")
     
     data = {
         "Categoria": [
@@ -219,8 +255,8 @@ Returns:
             "Banco de Dados Interno (Assistente)", 
             "Banco de Dados Interno (Similaridade)", 
             "Docker - Status", 
-            "Docker - Logs", 
-            "Airflow"
+            "Airflow",
+            "SEI API"
         ],
         "Quantidade de Erros": [
             errors_envs, 
@@ -231,8 +267,8 @@ Returns:
             assistente_erros, 
             similaridade_erros, 
             errors_docker, 
-            errors_log_docker, 
-            error_airflow_docker
+            error_airflow_docker,
+            error_sei_api
         ]
     }
     try:
@@ -241,11 +277,10 @@ Returns:
         log_print(df_errors.to_markdown(index=False))
     except:
         log_print(data)
-    log_print("=============== GERANDO O ZIP =================")
+    log_print("\n=============== GERANDO O ZIP =================\n")
     try:
         zipfile = f"{storage_proj_dir_base}/logs/{now}"
         shutil.make_archive(zipfile, 'zip', storage_proj_dir)
         log_print(f"O arquivo {zipfile}.zip, foi gerado com sucesso")
     except Exception as e:
-        logging.error(f"Não foi possivel gerar o zip.")
-        logging.error(f"{e!s}")
+        logging.error(f"Não foi possivel gerar o zip.\n {e!s}")

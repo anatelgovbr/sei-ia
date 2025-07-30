@@ -1,0 +1,15 @@
+services:
+  api_sei:
+    volumes:
+      - ${VOL_SEIIA_DIR}/certificado/seiia.cert.pem:/home/${NB_USER}/certificado/seiia.cert.pem:ro
+      - ${VOL_SEIIA_DIR}/certificado/seiia.cert.key:/home/${NB_USER}/certificado/seiia.cert.key:ro
+
+  nginx_assistente:
+    volumes:
+      - ${VOL_SEIIA_DIR}/certificado/seiia.cert.pem:/etc/ssl/certs/seiia.cert.pem:ro
+      - ${VOL_SEIIA_DIR}/certificado/seiia.cert.key:/etc/ssl/private/seiia.cert.key:ro
+
+  app-api-feedback:
+    volumes:
+      - ${VOL_SEIIA_DIR}/certificado/seiia.cert.pem:/home/${NB_USER}/certificado/seiia.cert.pem:ro
+      - ${VOL_SEIIA_DIR}/certificado/seiia.cert.key:/home/${NB_USER}/certificado/seiia.cert.key:ro

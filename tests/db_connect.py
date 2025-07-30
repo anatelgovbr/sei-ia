@@ -10,6 +10,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.pool import QueuePool
 
+#from embedder.http_exceptions import HTTPException503
+
+# logger = logging.get# logger(__name__)
+
 
 class DBConnector:
     """Classe para conexão com os bancos de dados.

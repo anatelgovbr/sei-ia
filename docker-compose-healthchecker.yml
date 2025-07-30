@@ -9,10 +9,11 @@ services:
       - env_files/prod.env
       - env_files/security.env
     environment:
-      STORAGE_PROJ_DIR: /opt/sei-ia-storage
       LD_LIBRARY_PATH: /opt/oracle
       ORACLE_HOME: /opt/oracle
       ORACLE_VERSION: 19.25
+      SOLR_ADDRESS: ${SOLR_ADDRESS}
+      SOLR_HOST: ${SOLR_HOST}
     command: ["python", "teste.py"]
     networks:
       - network1

@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  airflow_postgres-pd:
+    volumes:
+      - airflow-postgres-db-volume:/var/lib/postgresql/data
+
+  rabbitmq-pd:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+  airflow-webserver-pd:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+  airflow-scheduler-pd:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+  airflow-worker:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+  airflow-triggerer-pd:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+  airflow-init-pd:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+  airflow-cli:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+
+  jobs_api:
+    volumes:
+      - airflow-jobs:/home/airflow/app/jobs
+      - airflow-logs-volume:/opt/airflow/logs
+
+
+  solr_pd:
+    volumes:
+      - solr-db-volume:/var/solr
+      - backup_seiia_vol:/backup
+  pgvector_all:
+    volumes:
+      - pgvector-db-volume-all:/var/lib/postgresql/data
+      - backup_seiia_vol:/backup
+  
+  solr_config_copier:
+    image: alpine
+    volumes:
+      - ./migracao/1.0_1.1/solr_core_configs/configsets:/source
+      - solr-db-volume:/var/solr
+    command: sh -c "cp -r /source/* /var/solr/configsets/ && echo 'Config copied'"
+    depends_on:
+      - solr_pd
+    restart: "no"
+
+volumes:
+  airflow-jobs:
+  airflow-logs-volume:
+  airflow-postgres-db-volume:
+  solr-db-volume:
+  pgvector-db-volume-all:
+  backup_seiia_vol:

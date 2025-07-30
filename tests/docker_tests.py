@@ -33,6 +33,7 @@ from datetime import datetime
 import pandas as pd
 import logging
 import os
+
 containers_names = [
     'airflow-worker', 'airflow-scheduler', 'airflow-webserver', 'airflow-triggerer', 
     'nginx_assistente', 'solr_pd', 'pgvector_all', 'app-api-feedback', 'api_sei', 
@@ -122,8 +123,8 @@ def report_docker_logs(logs_lines: dict, show_logs: bool = False) -> int:
     if len(containserror) > 0 :
         errors += len(containserror)
 
-        logging.info("\nexistem containers que podem possuir erros\n")
-        logging.info(containserror[['Linhas', 'contem_erro']].to_markdown())
+        # logging.info("\nexistem containers que podem possuir erros\n")
+        # Tabela de erros de logs removida - informação não necessária para o usuário
         if show_logs:
             for row, line in containserror.iterrows():
                 logging.info(f"\n##### LOG do container {row} ####\n")
@@ -242,6 +243,7 @@ def report_container_status(container_status_df: pd.DataFrame, return_dfs: bool 
         container_status_df (pd.DataFrame): DataFrame com o status de cada container, conforme retornado por `verify_status_docker`.
         return_dfs (bool, opcional): Se True, retorna um dicionário com DataFrames categorizados por status dos containers. Padrão é False.
         verbose (bool, opcional): Se True, imprime informações adicionais para containers saudáveis.
+        path (str,opcional): caminho para salvar os reports
 
     Returns:
         tuple: Uma tupla contendo:
