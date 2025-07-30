@@ -1,0 +1,841 @@
+x-common: 
+  environment: &otel-common-env                                                                                                                                                         
+     OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}                                                                                                              
+     OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL}                                                                                                              
+     OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME}                                                                                                                                  
+     OTEL_EXPORTER_OTLP_INSECURE: ${OTEL_EXPORTER_OTLP_INSECURE}                                                                                                              
+     OTEL_METRICS_EXPORTER: ${OTEL_METRICS_EXPORTER}                                                                                                                          
+     OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: ${OTEL_EXPORTER_OTLP_METRICS_PROTOCOL}                                                                                              
+     OTEL_TRACES_EXPORTER: ${OTEL_TRACES_EXPORTER}                                                                                                                            
+     OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: ${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL}
+
+x-airflow-common: &airflow-common
+  # In order to add custom dependencies or upgrade provider packages you can use your extended image.
+  # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
+  # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
+  #image: apache/airflow:2.6.3
+  # build: .
+  image: ${DOCKER_REGISTRY:-}airflow-webserver-pd:${AIRFLOW_IMAGE_NAME}
+  build:
+    context: .
+    dockerfile: ./airflow.dockerfile
+    network: host
+    args:
+      AIRFLOW_UID: ${AIRFLOW_UID:-50000}
+      NB_USER: ${NB_USER}
+      NB_UID: ${NB_UID}
+      NB_GID: ${NB_GID}
+      GIT_TOKEN: ${GIT_TOKEN:-}
+      DB_SEIIA_HOST : ${DB_SEIIA_HOST}
+      DB_SEIIA_USER : ${DB_SEIIA_USER}
+      DB_SEIIA_PWD : ${DB_SEIIA_PWD}
+      DB_SEIIA_ASSISTENTE : ${DB_SEIIA_ASSISTENTE}
+      LIB_CONNECTION : ${LIB_CONNECTION}
+  networks:
+    - network1
+  env_file:
+    - ./airflow.env
+  environment: &airflow-common-env
+    GIT_TOKEN: ${GIT_TOKEN:-}
+    DB_SEIIA_ASSISTENTE_SCHEMA : ${DB_SEIIA_ASSISTENTE_SCHEMA}
+    DB_SEIIA_HOST : ${DB_SEIIA_HOST}
+    DB_SEIIA_USER : ${DB_SEIIA_USER}
+    DB_SEIIA_PWD : ${DB_SEIIA_PWD}
+    DB_SEIIA_ASSISTENTE : ${DB_SEIIA_ASSISTENTE}
+    LOG_LEVEL: ${LOG_LEVEL}
+    AIRFLOW__CORE__XCOM_BACKEND: airflow.models.xcom.BaseXCom
+    TZ: America/Sao_Paulo
+    AIRFLOW__LOGGING__LOGGING_LEVEL: ${LOG_LEVEL}
+    AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: ${AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG}
+    AIRFLOW_API_BASE_URL: "http://airflow-webserver-pd:8080/api/v1"
+    #configuração do ETL da nossa aplicação
+    SOLR_MLT_PROCESS_CORE: ${SOLR_MLT_PROCESS_CORE}
+    SOLR_MLT_JURISPRUDENCE_CORE: ${SOLR_MLT_JURISPRUDENCE_CORE}
+    MLT_PROCESS_CONFIGSET: "/var/solr/configsets/process"
+    MLT_JURISPRUDENCE_CONFIGSET: "/var/solr/configsets/jurisprudence"
+
+    ENVIRONMENT: ${ENVIRONMENT}
+
+    AIRFLOW_HOME: /opt/airflow
+    # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
+    # for other purpose (development, test and especially production usage) build/extend Airflow image.
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6 #bug airflow /usr/lib/x86_64-linux-gnu/libstdc++.so.6: cannot allocate memory in static TLS block
+
+    # Stack sei-similaridade
+    AIRFLOW_DB_EXTERNAL_CONNECTION: true
+    API_VERSION: ${API_SEI_IMAGE}
+    APP_VERSION: ${APP_API}
+    SOLR_ADDRESS: ${SOLR_ADDRESS}
+    CONN_STRING_APP_DB: "postgresql+psycopg2://${DB_SEIIA_USER}:${DB_SEIIA_PWD}@${DB_SEIIA_HOST}/${DB_SEIIA_SIMILARIDADE}"
+    CONN_LOG_DB_STRING: "postgresql+psycopg2://${DB_SEIIA_USER}:${DB_SEIIA_PWD}@${DB_SEIIA_HOST}/${DB_SEIIA_SIMILARIDADE}"
+
+    _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME}
+    _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@airflow_postgres-pd:5433/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@airflow_postgres-pd:5433/airflow
+    AIRFLOW__CELERY__BROKER_URL: amqp://${AIRFLOW_AMQP_USER}:${AIRFLOW_AMQP_PASSWORD}@rabbitmq-pd:5672
+    AIRFLOW__CELERY__OPERATION_TIMEOUT: 7200
+    AIRFLOW__CELERY__WORKER_TASK_LOG_READ_TIMEOUT: 86400
+    AIRFLOW__CELERY__BROKER_CONNECTION_TIMEOUT: 120
+
+    SOLR_USER: ${SOLR_USER}
+    SOLR_PASSWORD: ${SOLR_PASSWORD}
+    APP_API_RECOMMENDER_URL: "http://api_sei:8082/process-recommenders/weighted-mlt-recommender/recommendations-by-id-protocolo/{}?rows=5&debug=false"
+
+    SEI_API_DB_ADDRESS: "${SEI_ADDRESS}/sei/controlador_ws.php"
+    SEI_API_DB_IDENTIFIER_SERVICE: ${SEI_API_DB_IDENTIFIER_SERVICE}
+    SEI_API_DB_TIMEOUT: ${SEI_API_DB_TIMEOUT}
+    SEI_API_DB_USER: ${SEI_API_DB_USER}
+
+  volumes: &airflow-common-volumes
+    - airflow_jobs_vol:/home/airflow/app/jobs
+    - airflow_logs_vol:/opt/airflow/logs
+
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on: &airflow-common-depends-on
+    rabbitmq-pd:
+      condition: service_healthy
+    airflow_postgres-pd:
+      condition: service_healthy
+
+services:
+  airflow_postgres-pd:
+    profiles:
+      - all
+      - airflow
+      - externo
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${AIRFLOW_POSTGRES_USER:-airflow}
+      POSTGRES_PASSWORD: ${AIRFLOW_POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: airflow
+      PGPORT: 5433
+      TZ: America/Sao_Paulo
+    #command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    volumes:
+      - airflow_postgres_vol:/var/lib/postgresql/data
+    ports:
+      - "5433:5433"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 10
+      start_period: 5s
+      timeout: 5s
+    restart: always
+    networks:
+      - network1
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_POSTGRES_MEM_LIMIT}
+          cpus: ${AIRFLOW_POSTGRES_CPU_LIMIT}
+
+  rabbitmq-pd:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    profiles:
+      - all
+      - airflow
+      - externo
+    environment:
+      RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+      RABBITMQ_DEFAULT_USER: ${AIRFLOW_AMQP_USER}
+      RABBITMQ_DEFAULT_PASS: ${AIRFLOW_AMQP_PASSWORD}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: >
+        -rabbit consumer_timeout 3600000
+        -rabbit heartbeat 600
+      TZ: America/Sao_Paulo
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes: *airflow-common-volumes
+
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    restart: always
+    networks:
+      - network1
+    deploy:
+      resources:
+        limits:
+          memory: ${RABBITMQ_MEM_LIMIT}
+          cpus: ${RABBITMQ_CPU_LIMIT}
+
+  airflow-webserver-pd:
+    <<: *airflow-common
+    command: webserver
+    profiles:
+      - all
+      - airflow
+      - externo
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_webserver.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init-pd:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_WEBSERVER_MEM_LIMIT}
+          cpus: ${AIRFLOW_WEBSERVER_CPU_LIMIT}
+    volumes: *airflow-common-volumes
+
+  airflow-scheduler-pd:
+    <<: *airflow-common
+    cpu_shares: ${AIRFLOW_SCHEDULER_CPU_SHARES}
+    command: scheduler
+    profiles:
+      - all
+      - airflow
+      - externo
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_scheduler.sh"]
+      interval: 600s
+      timeout: 60s
+      retries: 10
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init-pd:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_SCHEDULER_MEM_LIMIT}
+          cpus: ${AIRFLOW_SCHEDULER_CPU_LIMIT}
+      replicas: 1
+    volumes: *airflow-common-volumes
+
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    profiles:
+      - all
+      - airflow
+      - externo
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_worker.sh"]
+      interval: 600s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    environment:
+      <<: *airflow-common-env
+      # Required to handle warm shutdown of the celery workers properly
+      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+      DUMB_INIT_SETSID: "0"
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init-pd:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_WORKER_MEM_LIMIT}
+          cpus: ${AIRFLOW_WORKER_CPU_LIMIT}
+      replicas: ${AIRFLOW_WORKERS_REPLICAS}
+    volumes: *airflow-common-volumes
+
+  airflow-triggerer-pd:
+    <<: *airflow-common
+    profiles:
+      - all
+      - airflow
+      - externo
+    command: triggerer
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_triggerer.sh"]
+      interval: 600s
+      timeout: 60s
+      retries: 10
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init-pd:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_TRIGGERER_MEM_LIMIT}
+          cpus: ${AIRFLOW_TRIGGERER_CPU_LIMIT}
+    volumes: *airflow-common-volumes
+
+  airflow-init-pd:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    profiles:
+      - all
+      - airflow
+      - externo
+    # yamllint disable rule:line-length
+    command:
+      - -c
+      - |
+        if [[ -z "${AIRFLOW_UID}" ]]; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: AIRFLOW_UID not set!\e[0m"
+          echo "If you are on Linux, you SHOULD follow the instructions below to set "
+          echo "AIRFLOW_UID environment variable, otherwise files will be owned by root."
+          echo "For other operating systems you can get rid of the warning with manually created .env file:"
+          echo "    See: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#setting-the-right-airflow-user"
+          echo
+        fi
+        one_meg=1048576
+        mem_available=$$(($$(getconf _PHYS_PAGES) * $$(getconf PAGE_SIZE) / one_meg))
+        cpus_available=$$(grep -cE 'cpu[0-9]+' /proc/stat)
+        disk_available=$$(df / | tail -1 | awk '{print $$4}')
+        warning_resources="false"
+        if (( mem_available < 4000 )) ; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough memory available for Docker.\e[0m"
+          echo "At least 4GB of memory required. You have $$(numfmt --to iec $$((mem_available * one_meg)))"
+          echo
+          warning_resources="true"
+        fi
+        if (( cpus_available < 2 )); then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough CPUS available for Docker.\e[0m"
+          echo "At least 2 CPUs recommended. You have $${cpus_available}"
+          echo
+          warning_resources="true"
+        fi
+        if (( disk_available < one_meg * 10 )); then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough Disk space available for Docker.\e[0m"
+          echo "At least 10 GBs recommended. You have $$(numfmt --to iec $$((disk_available * 1024 )))"
+          echo
+          warning_resources="true"
+        fi
+        if [[ $${warning_resources} == "true" ]]; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: You have not enough resources to run Airflow (see above)!\e[0m"
+          echo "Please follow the instructions to increase amount of resources available:"
+          echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
+          echo
+        fi
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow version
+    # yamllint enable rule:line-length
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+    user: "0:0"
+
+  airflow-cli:
+    <<: *airflow-common
+    profiles:
+      - debug
+    environment:
+      <<: *airflow-common-env
+      CONNECTION_CHECK_MAX_COUNT: "0"
+    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+    command:
+      - bash
+      - -c
+      - airflow
+
+  api_sei:
+    profiles:
+      - all
+      - externo
+      - certificado
+    image: ${DOCKER_REGISTRY:-}api_sei:${API_SEI_IMAGE}
+    build:
+      context: .
+      dockerfile: ./api_sei.dockerfile
+      network: host
+      args:
+        NB_USER: ${NB_USER}
+        NB_UID: ${NB_UID}
+        NB_GID: ${NB_GID}
+        LIB_CONNECTION : ${LIB_CONNECTION}
+        GIT_TOKEN: ${GIT_TOKEN:-}
+    command: opentelemetry-instrument gunicorn -k uvicorn.workers.UvicornH11Worker --reload --timeout 60 --keyfile /home/${NB_USER}/certificado/seiia.cert.key --certfile /home/${NB_USER}/certificado/seiia.cert.pem --bind=0.0.0.0:8082 api_sei.main:app
+    environment:
+      <<: 
+        - *airflow-common-env
+        - *otel-common-env
+      TZ: America/Sao_Paulo
+      LD_PRELOAD: ''
+      LOG_LEVEL: ${LOG_LEVEL}
+      ENABLE_OTEL_METRICS: true
+    ports:
+      - "8082:8082"
+    networks:
+      - network1
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${API_SEI_MEM_LIMIT}
+          cpus: ${API_SEI_CPU_LIMIT}
+    healthcheck:
+      test: ["CMD", "sh", "healthcheck.sh"]
+      start_period: 20s
+      interval: 600s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      pgvector_all:
+        condition: service_healthy
+
+  jobs_api:
+    profiles:
+      - all
+      - airflow
+      - externo
+    image: ${DOCKER_REGISTRY:-}jobs_api:${AIRFLOW_IMAGE_NAME}
+    build:
+      context: .
+      dockerfile: ./jobs_api.dockerfile
+      network: host
+      args:
+        NB_USER: ${NB_USER}
+        NB_UID: ${NB_UID}
+        NB_GID: ${NB_GID}
+        LIB_CONNECTION : ${LIB_CONNECTION}
+        GIT_TOKEN: ${GIT_TOKEN:-}
+
+    command: gunicorn -k uvicorn.workers.UvicornH11Worker --reload --bind=0.0.0.0:8642 jobs.api:app
+    environment:
+      <<: *airflow-common-env
+      TZ: America/Sao_Paulo
+      AIRFLOW_DB_EXTERNAL_CONNECTION: 'false'
+      LD_PRELOAD: ''
+      LOG_LEVEL: ${LOG_LEVEL}
+    networks:
+      - network1
+    ports:
+      - "8090:8642"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${API_SEI_MEM_LIMIT}
+          cpus: ${API_SEI_CPU_LIMIT}
+    volumes: *airflow-common-volumes
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8642/"]
+      start_period: 30s
+      interval: 600s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      pgvector_all:
+        condition: service_healthy
+      airflow-webserver-pd:
+        condition: service_healthy
+
+  app-api-feedback:
+    profiles:
+      - all
+      - externo
+      - certificado
+    image: ${DOCKER_REGISTRY:-}app-api-feedback:${APP_API}
+    build:
+      context: .
+      dockerfile: ./app-api-feedback.dockerfile
+      network: host
+      args:
+        NB_USER: ${NB_USER}
+        NB_UID: ${NB_UID}
+        NB_GID: ${NB_GID}
+        LIB_CONNECTION : ${LIB_CONNECTION}
+        GIT_TOKEN: ${GIT_TOKEN:-}
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8086 --ssl-keyfile /home/${NB_USER}/certificado/seiia.cert.key --ssl-certfile /home/${NB_USER}/certificado/seiia.cert.pem
+    environment:
+      <<: *airflow-common-env
+      TZ: America/Sao_Paulo
+      LD_PRELOAD: ""
+      LOG_LEVEL: ${LOG_LEVEL}
+    ports:
+      - "8086:8086"
+    networks:
+      - network1
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${APP_API_MEM_LIMIT}
+          cpus: ${APP_API_CPU_LIMIT}
+    healthcheck:
+      test: ["CMD", "sh", "healthcheck.sh"]
+      start_period: 20s
+      interval: 600s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      pgvector_all:
+        condition: service_healthy
+  
+  solr_pd:
+    profiles:
+      - all
+      - externo
+    image: ${DOCKER_REGISTRY:-}solr_pd:${SOLR_CONTAINER}
+    build:
+      context: .
+      dockerfile: ./solr.dockerfile
+      network: host
+      args:
+        SOLR_USER: ${SOLR_USER}
+        SOLR_PASSWORD: ${SOLR_PASSWORD}
+    environment:
+      SOLR_HOST: ${SOLR_HOST}
+      TZ: America/Sao_Paulo
+      #### SOLR AUTH #####
+      SOLR_AUTH_TYPE: 'basic'
+      SOLR_AUTHENTICATION_OPTS: "-Dsolr.preemptiveAuth=true -Dbasicauth=${SOLR_USER}:${SOLR_PASSWORD} -Dsolr.authentication.realm=SolrSeiIARealm"
+      SOLR_USER: ${SOLR_USER}
+      SOLR_PASSWORD: ${SOLR_PASSWORD}
+      #################
+      SOLR_JAVA_MEM: ${SOLR_JAVA_MEM}
+      SOLR_MLT_PROCESS_CORE: ${SOLR_MLT_PROCESS_CORE}
+      SOLR_MLT_JURISPRUDENCE_CORE: ${SOLR_MLT_JURISPRUDENCE_CORE}
+      SOLR_OPTS: "-Dsolr.jetty.request.header.size=65535 -Dlog4j.configurationFile=/opt/solr/server/resources/log4j2.xml"
+      LOG_LEVEL: ${LOG_LEVEL}
+    volumes:
+      - solr_pd_vol:/var/solr
+      - backup_seiia_vol:/backup
+    user: root
+    networks:
+      # - network1
+      network1:
+        aliases:
+          - ${SOLR_HOST}
+    #command: bash -c "cp /tmp/security.json /var/solr/data/security.json && chown -R 8983:8983 /var/solr && runuser -u solr -- solr-precreate default-core"
+    #command: bash -c "chown -R 8983:8983 /var/solr; ( ([ -d /var/solr/data/$SOLR_MLT_PROCESS_CORE ] && echo Core $SOLR_MLT_PROCESS_CORE already exists || (wait-for-solr.sh && runuser -u solr -- solr create_core -c $SOLR_MLT_PROCESS_CORE -d /var/solr/configsets/process)) &); runuser -u solr -- solr-precreate $SOLR_MLT_JURISPRUDENCE_CORE /var/solr/configsets/jurisprudence"
+    # command: bash -c "\
+    #   echo 'America/Sao_Paulo' > /etc/timezone; \
+    #   ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime; \
+    #   dpkg-reconfigure -f noninteractive tzdata; \
+    #   chmod +x /opt/solr-9.0.0/backup.sh; \
+    #   echo '55 23 * * * /opt/solr-9.0.0/backup.sh' | crontab -; \
+    #   touch /var/log/cron.log; \
+    #   service cron start; \
+    #   chown -R 8983:8983 /var/solr; \
+    #   ( ([ -d /var/solr/data/$SOLR_MLT_PROCESS_CORE ] && echo Core $SOLR_MLT_PROCESS_CORE already exists || (wait-for-solr.sh && runuser -u solr -- solr create_core -c $SOLR_MLT_PROCESS_CORE -d /var/solr/configsets/process)) &); \
+    #   runuser -u solr -- solr-precreate $SOLR_MLT_JURISPRUDENCE_CORE /var/solr/configsets/jurisprudence"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${SOLR_MEM_LIMIT}
+          cpus: ${SOLR_CPU_LIMIT}
+    healthcheck:
+      test: ["CMD", "sh", "/healthcheck/solr.sh"]
+      start_period: 30s
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+
+  exporter_agent_monitor:
+    profiles:
+      - all
+    image: node-exporter:v1.7.0
+    build:
+      context: .
+      dockerfile: node-exporter/node-exporter.dockerfile
+      network: host
+    ports:
+      - 50053:9100
+      - 50054:9104
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    restart: always
+    networks:
+      - network1
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - SOLR_ADDRESS=${SOLR_ADDRESS}
+      - SOLR_MLT_PROCESS_CORE=${SOLR_MLT_PROCESS_CORE}
+      - SOLR_MLT_JURISPRUDENCE_CORE=${SOLR_MLT_JURISPRUDENCE_CORE}
+    deploy:
+      resources:
+        limits:
+          memory: ${NODE_EXPORTER_MEM_LIMIT}
+          cpus: ${NODE_EXPORTER_CPU_LIMIT}
+
+  cadvisor_agent_monitor:
+    profiles:
+      - all
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    privileged: true
+    ports:
+      - 50055:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /cgroup:/cgroup:ro
+    restart: unless-stopped
+    networks:
+      - network1
+    deploy:
+      resources:
+        limits:
+          memory: ${CADVISOR_MEM_LIMIT}
+          cpus: ${CADVISOR_CPU_LIMIT}
+
+  api_assistente:
+    image: ${DOCKER_REGISTRY:-}api_assistente:${API_ASSISTENTE_VERSION}
+    profiles:
+      - all
+      - externo
+      - certificado
+    build:
+      dockerfile: assistente.dockerfile
+      network: host
+      args:
+        GIT_TOKEN: ${GIT_TOKEN:-}
+        LIB_CONNECTION : ${LIB_CONNECTION}
+    restart: always
+    env_file:
+      - env_files/default.env
+      - env_files/${ENVIRONMENT}.env
+      - env_files/security.env
+    environment:
+      <<: 
+        - *airflow-common-env
+        - *otel-common-env
+      ASSISTENTE_CHUNK_OVERLAP: ${ASSISTENTE_CHUNK_OVERLAP}
+      ASSISTENTE_CONTEXT_MAX_TOKENS: ${ASSISTENTE_CONTEXT_MAX_TOKENS}
+      ASSISTENTE_EMBEDDING_API_KEY: ${ASSISTENTE_EMBEDDING_API_KEY}
+      ASSISTENTE_EMBEDDING_ENDPOINT: ${ASSISTENTE_EMBEDDING_ENDPOINT}
+      ASSISTENTE_EMBEDDING_MODEL: ${ASSISTENTE_EMBEDDING_MODEL}
+      ASSISTENTE_EMBEDDING_PROVIDER: ${ASSISTENTE_EMBEDDING_PROVIDER}
+      ASSISTENTE_USE_LANGFUSE: ${ASSISTENTE_USE_LANGFUSE}
+      ASSISTENTE_MAX_RETRIES: ${ASSISTENTE_MAX_RETRIES}
+      ASSISTENTE_MAX_LENGTH_CHUNK_SIZE: ${ASSISTENTE_MAX_LENGTH_CHUNK_SIZE}
+      ASSISTENTE_TESTS_ID_DOC_EXT: ${ASSISTENTE_TESTS_ID_DOC_EXT}
+      ASSISTENTE_TESTS_ID_DOC_INT: ${ASSISTENTE_TESTS_ID_DOC_INT}
+      ASSISTENTE_TIMEOUT_API: ${ASSISTENTE_TIMEOUT_API}
+      DB_SEIIA_ASSISTENTE_SCHEMA: ${DB_SEIIA_ASSISTENTE_SCHEMA}
+      LANGFUSE_URL: ${LANGFUSE_URL:-""}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-""}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-""}
+      LANGFUSE_NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-""}
+      LANGFUSE_SECRET_SALT: ${LANGFUSE_SECRET_SALT:-""}
+      LD_LIBRARY_PATH: /opt/oracle
+      LOG_LEVEL: ${LOG_LEVEL}
+      OPENAI_API_VERSION: ${OPENAI_API_VERSION}
+      SEI_API_DB_TIMEOUT: ${SEI_API_DB_TIMEOUT}
+      SEI_API_DB_USER: ${SEI_API_DB_USER}
+      ORACLE_HOME: /opt/oracle
+      ORACLE_VERSION: 19.25
+      ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL: ${ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL}
+      ASSISTENTE_ENDPOINT_STANDARD_MODEL: ${ASSISTENTE_ENDPOINT_STANDARD_MODEL}
+      ASSISTENTE_API_KEY_STANDARD_MODEL: ${ASSISTENTE_API_KEY_STANDARD_MODEL}
+      PROJECT_ENDPOINT: ${PROJECT_ENDPOINT:-}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-""}
+      AZURE_SUBSCRIPTION_ID: ${AZURE_SUBSCRIPTION_ID:-""}
+      AGENT_ID: ${AGENT_ID:-""}
+      AZURE_WEB_AGENT_ID: ${AZURE_WEB_AGENT_ID:-""}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-""}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-""}
+      ASSISTENTE_NAME_STANDARD_MODEL: ${ASSISTENTE_NAME_STANDARD_MODEL}
+      ASSISTENTE_ENDPOINT_MINI_MODEL: ${ASSISTENTE_ENDPOINT_MINI_MODEL}
+      ASSISTENTE_API_KEY_MINI_MODEL: ${ASSISTENTE_API_KEY_MINI_MODEL}
+      ASSISTENTE_NAME_MINI_MODEL: ${ASSISTENTE_NAME_MINI_MODEL}
+      ASSISTENTE_SUMMARIZE_MODEL: ${ASSISTENTE_SUMMARIZE_MODEL}
+      ASSISTENTE_SUMMARIZE_CHUNK_SIZE: ${ASSISTENTE_SUMMARIZE_CHUNK_SIZE}
+      ASSISTENTE_SUMMARIZE_CHUNK_MAX_OUTPUT: ${ASSISTENTE_SUMMARIZE_CHUNK_MAX_OUTPUT}
+      ASSISTENTE_DEFAULT_RESPONSE_MODEL: ${ASSISTENTE_DEFAULT_RESPONSE_MODEL}
+      ASSISTENTE_API_KEY_THINK_MODEL : ${ASSISTENTE_API_KEY_THINK_MODEL}
+      ASSISTENTE_NAME_THINK_MODEL: ${ASSISTENTE_NAME_THINK_MODEL}
+      ASSISTENTE_ENDPOINT_THINK_MODEL: ${ASSISTENTE_ENDPOINT_THINK_MODEL}
+ 
+      TZ: "America/Sao_Paulo"
+    command: "uv run opentelemetry-instrument gunicorn sei_ia.main:app -c /app/sei_ia/configs/gunicorn_conf.py"
+    networks:
+      - network1
+    deploy:
+      resources:
+        limits:
+          memory: ${ASSISTENTE_MEM_LIMIT}
+          cpus: ${ASSISTENTE_CPU_LIMIT}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/"]
+      start_period: 30s
+      interval: 600s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      pgvector_all:
+        condition: service_healthy
+
+  pgvector_all:
+    profiles:
+      - all
+      - airflow
+      - externo
+      - certificado
+    image: ${DOCKER_REGISTRY:-}pgvector_all:${POSTGRES_IMAGE}
+    build:
+      dockerfile: pgvector_all.dockerfile
+      network: host
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_SEIIA_ASSISTENTE}
+      POSTGRES_USER: ${DB_SEIIA_USER}
+      POSTGRES_PASSWORD: ${DB_SEIIA_PWD}
+      POSTGRES_MAX_CONNECTIONS: 100
+      POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT: 360000
+      DB_SEIIA_USER: ${DB_SEIIA_USER}
+      DB_SEIIA_PWD: ${DB_SEIIA_PWD}
+      DB_SEIIA_SIMILARIDADE: ${DB_SEIIA_SIMILARIDADE}
+      DB_SEIIA_ASSISTENTE: ${DB_SEIIA_ASSISTENTE}
+      DB_SEIIA_ASSISTENTE_SCHEMA: ${DB_SEIIA_ASSISTENTE_SCHEMA}
+      ORACLE_HOME: /opt/oracle
+      ORACLE_VERSION: 19.25 # versao do banco do SEI fixa, e a versao do driver seguir o mesmo padrão.
+      LD_LIBRARY_PATH: /opt/oracle
+      TZ: "America/Sao_Paulo"
+    entrypoint: >
+      /bin/bash -c "
+      echo 'export POSTGRES_USER=${DB_SEIIA_USER}' > /etc/custom_env_vars_assistente.sh &&
+      echo 'export POSTGRES_PASSWORD=${DB_SEIIA_PWD}' >> /etc/custom_env_vars_assistente.sh &&
+      echo 'export POSTGRES_DB=${DB_SEIIA_ASSISTENTE}' >> /etc/custom_env_vars_assistente.sh &&
+      echo 'export PGDATA=/var/lib/postgresql/data' >> /etc/custom_env_vars_assistente.sh &&
+      echo 'export TZ=America/Sao_Paulo' >> /etc/custom_env_vars_assistente.sh &&
+      chmod +x /etc/custom_env_vars_assistente.sh &&
+      echo 'export POSTGRES_USER=${DB_SEIIA_USER}' > /etc/custom_env_vars_similaridade.sh &&
+      echo 'export POSTGRES_PASSWORD=${DB_SEIIA_PWD}' >> /etc/custom_env_vars_similaridade.sh &&
+      echo 'export POSTGRES_DB=${DB_SEIIA_SIMILARIDADE}' >> /etc/custom_env_vars_similaridade.sh &&
+      echo 'export PGDATA=/var/lib/postgresql/data' >> /etc/custom_env_vars_similaridade.sh &&
+      echo 'export TZ=America/Sao_Paulo' >> /etc/custom_env_vars_similaridade.sh &&
+      chmod +x /etc/custom_env_vars_similaridade.sh &&
+      /usr/local/bin/sei_ia-entrypoint.sh"
+    volumes:
+      - pgvector_all_vol:/var/lib/postgresql/data
+      - backup_seiia_vol:/backup
+    networks:
+      - network1
+    deploy:
+      resources:
+        limits:
+          memory: ${PGVECTOR_MEM_LIMIT}
+          cpus: ${PGVECTOR_CPU_LIMIT}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_SEIIA_USER} -d ${DB_SEIIA_ASSISTENTE} -h localhost"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+
+  nginx_assistente:
+    profiles:
+      - all
+      - externo
+      - certificado
+    image: ${DOCKER_REGISTRY:-}nginx_assistente:${NGINX_ASSISTENTE_VERSION}
+    build:
+      dockerfile: nginx.dockerfile
+      network: host
+    ports:
+      - "8088:443"
+    depends_on:
+      - api_assistente
+    networks:
+      - network1
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${ASSISTENTE_NGINX_MEM_LIMIT}
+          cpus: ${ASSISTENTE_NGINX_CPU_LIMIT}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      start_period: 30s
+      interval: 600s
+      timeout: 10s
+      retries: 5
+
+  langfuse_assistente:
+    profiles:
+      - all
+    image: langfuse/langfuse:2.57.0
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+      - DATABASE_URL=postgresql://${DB_SEIIA_USER}:${DB_SEIIA_PWD}@${DB_SEIIA_HOST}:${DB_SEIIA_PORT}/langfuse
+      - SALT=${LANGFUSE_SECRET_SALT}
+      - NEXTAUTH_SECRET=${LANGFUSE_NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${LANGFUSE_URL}
+    depends_on:
+      pgvector_all:
+        condition: service_healthy
+    networks:
+      - network1
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${LANGFUSE_MEM_LIMIT}
+          cpus: ${LANGFUSE_CPU_LIMIT}
+
+volumes:
+  airflow_jobs_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOL_SEIIA_DIR}/airflow_jobs_vol
+  airflow_logs_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOL_SEIIA_DIR}/airflow_logs_vol
+  airflow_postgres_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOL_SEIIA_DIR}/airflow_postgres_vol
+  solr_pd_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOL_SEIIA_DIR}/solr_pd_vol
+  pgvector_all_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOL_SEIIA_DIR}/pgvector_all_vol
+  backup_seiia_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOL_SEIIA_DIR}/backup_seiia_vol
+networks:
+  network1:
+    name: docker-host-bridge
+    external: true

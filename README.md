@@ -31,7 +31,7 @@ O *Docker Host* deve atender aos requisitos mínimos descritos abaixo:
   - **RAM**: 128 GB.
 
  **Requisito Mínimo do SEI**: 
-  - Versões v4.0.12 ou v4.1.4
+  - Versão v4.1.5
   - Não é compatível com versões anteriores do SEI.
   - Para utilizar versões mais recentes do SEI, é necessário conferir previamente a compatibilidade.
   - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**

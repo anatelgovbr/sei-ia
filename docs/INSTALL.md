@@ -13,18 +13,15 @@
   - [Sumário](#sumário)
   - [Pré-requisitos](#pré-requisitos)
   - [Passos para Instalação](#passos-para-instalação)
-  - [Update](#update)
   - [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente)
   - [Testes de Acessos](#testes-de-acessos)
   - [Resolução de Problemas Conhecidos](#resolução-de-problemas-conhecidos)
   - [Pontos de Atenção para Escalabilidade](#pontos-de-atenção-para-escalabilidade)
   - [Backup periódico dos dados do Servidor de Soluções de IA](#backup-periódico-dos-dados-do-servidor-de-soluções-de-ia)
-  - [Anexos:](#anexos)
-    - [**Instalar Git - OPCIONAL**](#instalar-git---opcional)
-    - [**Instalar Docker - CASO AINDA NÃO ESTEJA INSTALADO**](#instalar-docker---caso-ainda-não-esteja-instalado)
-  - [Consumo de Recursos da Aplicação](#consumo-de-recursos-da-aplicação)
-    
---- 
+  - [Anexos](#anexos)
+- [Guia de utilização de certificado SSL proprietário](#guia-de-utilização-de-certificado-ssl-proprietário)
+- [Guia de atualizações SEI IA](#guia-de-atualizações-sei-ia)
+
 
 ## Pré-requisitos
 
@@ -32,19 +29,23 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
 
 - **CPU**:
   - Provisionado: 16 Cores com 2.10GHz
+  - Consumo na ANATEL (Produção):
+    - médio: 60%
+    - máximo: 100%
 
 - **Memória**:
   - Provisionado: 128GB
-
+  - Consumo na ANATEL (Produção):
+    - mínimo: 64GB
+    - máximo: 115GB
   
 - **Espaço em Disco**:
-  - Provisionado: 600GB.
+  - Provisionado: 450GB.
   - Consumo na ANATEL (Produção):
       | Aplicação  | Caminho                                          | Tamanho em disco |
       |------------|--------------------------------------------------|------------------|
       | Solr       | /var/lib/docker/volumes/sei_ia_solr-db-volume    | 100 GB           |
       | PostgreSQL | /var/lib/docker/volumes/sei_ia_pgvector-db-volume-all | 300 GB      |
-      | Filesystem | /opt/sei-ia-storage/                             | 40 GB            |
       | Docker     | /var/lib/docker/                                 | 50 GB            |
 
 - **ATENÇÃO**: As informações acima sobre **"Consumo na ANATEL (Produção)"**, em 04/11/2024, possuem como contexto os números abaixo do SEI de Produção na Agência:
@@ -52,7 +53,6 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
   - **Quantidade de Documentos Gerados** (Editor do SEI - salvos no banco): 4.2 milhões
   - **Quantidade de Documentos Externos** (Filesystem do SEI): 8 milhões
   - **Usuários Internos**: cerca de 1.800, dentre servidores públicos e colaboradores em geral
-  - **Para informações históricas do uso na ANATEL**: [Consumo de Recursos da Aplicação](#consumo-de-recursos-da-aplicação)
 > **Realidade de Cada Órgão**:
 >  - A partir dos dados acima, cada órgão deve avaliar o ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL, pois essas duas aplicações na arquitetura apresentam crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
 > - Ao final deste Manual são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
@@ -62,8 +62,6 @@ Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, consi
 Para garantir a comunicação entre os serviços do *Servidor de Soluções de IA* e o SEI, são necessárias as seguintes permissões de conexões de rede:
 
 1. **Do Servidor de Soluções de IA para o SEI**:
-   - **Banco de Dados do SEI**: Permissão de acesso ao host e porta configurada do banco de dados do SEI (p. ex. 192.168.2.17:3306 para MySQL, sendo 192.168.2.17: um exemplo fictício).
-   - **Solr do SEI**: Permissão de acesso ao host e porta do Solr do SEI (p. ex., 192.168.2.17:8983).
    - **HTTP do SEI**: Permissão de acesso ao host e porta do SEI, para permitir acesso ao Webservice do Módulo SEI IA (p. ex., 192.168.2.17:8000).
 
 2. **Do servidor do SEI para o Servidor de Soluções de IA**:
@@ -78,14 +76,6 @@ As configurações de rede acima são mandatórias para o funcionamento correto 
 
 **ATENÇÃO**: Se as configurações de conexões na rede local do órgão não forem efetivadas, conforme acima, antes dos "Passos para Instalação", abaixo, e não for garantido que estão funcionando adequadamente, poderá ter problemas no meio do deploy do servidor ou durante o funcionamento de algumas das aplicações. Assim que criadas as conexões indicadas, é importante testá-las a partir do servidor correspondente, antes de seguir para os "Passos para Instalação". Seguir para a instalação somente depois que confirmar que as conexões em ambos os sentidos estiverem efetivamente funcionando.
 
-### Ajustar Permissão por IP no Solr do SEI
-
-Conforme orientado no Manual de Instalação do SEI até sua versão 4.1.0, o Solr do SEI é configurado com limitação de acesso por IPs. Assim, além de rota de rede adequada do Servidor de Soluções de IA até o Solr do SEI, conforme tópico anterior, é necessário editar o arquivo `/opt/solr/server/etc/jetty.xml` no Solr do SEI **para adicionar o IP do Servidor de Soluções de IA**, tão quanto já deve constar no mencionado arquivo os IPs dos nós de aplicação do SEI do correspondente ambiente.
-
-Por mais que exista rota na rede local do órgão configurada, depois do deploy do Servidor de Soluções de IA, caso não tenha a permissão por IP liberada no Solr do SEI, algumas DAGs no AirFlow ficarão com erro por falta de permissão de acesso à aplicação em si do Solr do SEI.
-
----
-
 ## Passos para Instalação
 
 Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no Linux do servidor:
@@ -93,7 +83,7 @@ Antes de começar a instalação, certifique-se de que os seguintes pacotes este
 - Docker Compose (versão >= 2.29).
 
 Caso não estejam instalados, consulte o pequeno tutorial de instalação do Docker na seção de Anexos deste Manual.
-- Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões docker e docker composes homologadas para o SEI IA.
+- Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões docker e docker compose homologadas para o SEI IA.
 
 > **Observação**:
 > - Todos os comandos ilustrados neste Manual são exemplos de comandos executados via terminal/console/CLI.
@@ -101,7 +91,7 @@ Caso não estejam instalados, consulte o pequeno tutorial de instalação do Doc
 1. **Criar o usuário:**
    
 ```bash
-sudo useradd -m -s /bin/bash seiia
+sudo useradd -m -s /bin/bash -u 4000 seiia
 ```
 
 Atualize a senha do usuario com o comando
@@ -135,27 +125,14 @@ sudo usermod -aG wheel seiia
 4. **Criar as pastas necessárias:**
 
 ```bash
-sudo mkdir -p /opt/seiia
-sudo mkdir -p /opt/sei-ia-storage
+sudo mkdir -p /opt/seiia/volumes
 ```
 
 5. **Corrigir as permissoes de pastas:**
 
 ```bash
-sudo chown -R seiia:docker /opt/seiia
-sudo chown -R 5000:5000 /opt/sei-ia-storage
-sudo chmod -R 774 /opt/seiia
-sudo chmod -R 764 /opt/sei-ia-storage
+sudo chown -R seiia:docker /opt/seiia/volumes
 ```
-
-> **Observação:**
-> - Durante a primeira inicialização, antes de o Airflow ter sido carregado corretamente, 
-> é possível que a `jobs-api` fique reiniciando, pois as pastas necessárias dentro do 
-> `/opt/sei-ia-storage` de configuração são criadas por uma **DAG**. Sem a permissão 
-> `777`, isso pode causar esse erro.
-> - Se preferir, você pode criar a pasta com as permissões `777` e, ao final do deploy, 
-> corrigir as permissões.
-
 
 6. **Acessar o usuario:**
 
@@ -170,7 +147,7 @@ su seiia
    Inicie o serviço do Docker.
 
    ```bash
-   sudo service docker start
+   sudo systemctl start docker
    docker --version # deve aparecer algo como Docker version 27.2.0, build 3ab4256
    ```
 
@@ -183,7 +160,7 @@ su seiia
    Para os seguintes procedimentos, é necessário assegurar que o Docker está instalado e parado.
 
    ```bash
-   sudo service docker stop
+   sudo systemctl stop docker
    ```
 
    A remoção da default bridge é feita através de uma configuração do daemon.json, através de:
@@ -200,10 +177,10 @@ su seiia
    }
    ``` 
 
-   Após a configuração é necessário Inicializar o Docker e verificar o resultado obtido:
+   Após a configuração é necessário inicializar o Docker e verificar o resultado obtido:
 
    ```bash
-   sudo service docker start
+   sudo systemctl start docker
    docker network ls
    ```
 
@@ -252,64 +229,113 @@ su seiia
 > ```
 > - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
 
-10. **Configurar o arquivo `env_files/security.env` do ambiente**
-   
-   Certifique-se de conhecer o tipo de banco de dados utilizado pelo SEI do órgão.
 
-   Preencha os campos no arquivo `env_files/security.env` conforme descrito nos comentários sobre cada variável.
+10. **Configuração do Arquivo env_files/security.env**
 
-   **Importante**: As variáveis da seção `# ESSENCIAIS NO MOMENTO DA INSTALACAO:` no arquivo `env_files/security.env` são obrigatórias durante a instalação inicial.
+O arquivo `env_files/security.env` contém as variáveis de configuração necessárias para o ambiente do Servidor de Soluções de IA do módulo SEI IA. As tabelas abaixo foram organizadas com base no novo arquivo `security.env`.   
 
-   **Recomendação**: O arquivo `env_files/security.env` armazena configurações de ambiente e possui users, senhas e chaves que o acesso deve ser restrito. Assim, deve adicionar o arquivo `env_files/security.env` ao `.gitignore` local para não ser substituído acidentalmente no ambiente correspondente nas atualizações de update ou de upgrade de versão do Servidor de Soluçõea de IA.
+**Importante:**  
 
-| Variável                   | Descrição                                                                                                        | Exemplo                             |
-|----------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------|
-| ENVIRONMENT                | Define o tipo do ambiente da instalação. Opções disponíveis: `dev`, `homol`, `prod`.                             | `prod`                              |
-| LOGLEVEL                  | Define o nível de log do autodeployer. Opções disponíveis: `INFO`, `DEBUG`, `WARNING`, `ERROR`.               | `INFO`. Em produçao recomendamos o uso de `ERROR`                              |
-| LOG_LEVEL                  | Define o nível do ambiente da instalação. Opções disponíveis: `INFO`, `DEBUG`, `WARNING`, `ERROR`.               | `INFO`. Em produçao recomendamos o uso de `ERROR`                              |
-| GID_DOCKER                 | O GID (Group ID) do grupo Docker no host do ambiente de instalação.                                              | `1001`                              |
-| DB_SEI_USER                | Usuário de aplicação com permissão de SOMENTE LEITURA que deve ser criado no banco de dados do SEI.              | `sei_user`                          |
-| DB_SEI_PWD                 | Senha do usuário de aplicação criado no banco de dados do SEI, conforme variável acima.                          | `senha_sei`                         |
-| DB_SEI_HOST                | Endereço do host do banco de dados do SEI.                                                                       | `192.168.0.10`                      |
-| DB_SEI_DATABASE            | Nome do banco de dados do SEI, conforme consta no ConfiguracaoSEI.php do ambiente do SEI.                        | `sei_db`                            |
-| DB_SEI_PORT                | Porta de conexão do banco de dados do SEI , conforme consta no ConfiguracaoSEI.php do ambiente do SEI.           | `3306`                              |
-| DB_SEI_SCHEMA              | Nome do Schema do banco de dados do SEI. Se for MySQL, repetir o nome do banco de dados do SEI.                  | `sei_schema`                        |
-| DATABASE_TYPE              | Tipo de banco de dados do SEI. Opções disponíveis: `mysql`, `mssql` e `oracle`.                                  | `mysql`                             |
-| SEI_SOLR_ADDRESS           | Endereço do Solr do SEI. Deve ser no formato `https://IP_OU_HOSTNAME:8983`.                                      | `https://192.168.0.10:8983`         |
-| POSTGRES_USER              | Nome de usuário já existente de acesso ao banco de dados PostgreSQL interno do Servidor de IA. Não alterar.   | `sei_llm`                           |
-| POSTGRES_PASSWORD          | Informe a senha que deseja usar para o usuário de banco a ser criado, conforme a variável acima. **Não deve conter**: "`'`" (aspas simples), "`"`" (aspas duplas), "`\`", "` `" (espaço), "`$`", "`(`", "`)`", "`:`", "`@`", "`;`", "`` ` ``" (crase), "`&`", "`*`", "`+`" (mais), "`-`" (menos), "`=`", "`/`", "`?`", "`!`", "`[`", "`]`", "`{`", "`}`", "`<`", "`>`", "`\|`", "`%`", "`^`", "`~`".                   | `iJI_YTuygb`                 |
+O arquivo `security.env` contém informações sensíveis (usuários, senhas e chaves). Recomenda-se adicionar esse arquivo ao `.gitignore` para evitar substituições acidentais durante atualizações.  
 
-> **Observação**:
-> - Sobre a variável `GID_DOCKER`, Group ID do ambiente de instalação correspondente deve ser obtido executando o comando: `cat /etc/group | grep ^docker: | cut -d: -f3`.
+### Ambiente  
 
-11. **Configurações adicionais**
+| Variável              | Descrição | Exemplo |
+|-----------------------|-----------|---------|
+| `GID_DOCKER`         | O GID (Group ID) do grupo Docker no host do ambiente de instalação. | <code>cat /etc/group &#124; grep ^docker: &#124; cut -d: -f3</code> | 983 |
+| `ENVIRONMENT`        | Indicativo do tipo de ambiente de instalação. Para usuários externos, manter sempre como "prod". Opções disponíveis: dev, homol, prod. | `prod` |
 
-   No arquivo `env_files/security.env`, preencha as variáveis da seção `# NAO ESSENCIAIS NO MOMENTO DA INSTALACAO:`. Essas variáveis não são essenciais durante a instalação inicial do Servidor de Soluções de IA do módulo SEI IA, mas serão necessárias para o uso do **ASSISTENTE**.
 
-| Variável                          | Descrição                                                                                                        | Exemplo                                  |
-|-----------------------------------|------------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| SEI_IAWS_URL                      | URL do Webservice do Módulo SEI IA. Deve ser no formato `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  | `https://[dominio_servidor]/sei/modulos/ia/ws/IaWS.php`  |
-| SEI_IAWS_SISTEMA                  | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA. Não alterar.                     | `Usuario_IA` |
-| SEI_IAWS_KEY                      | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".   | `minha_chave_de_acesso`  |
-| AZURE_OPENAI_ENDPOINT_GPT4o       | Endpoint específico para GPT-4o no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint.   | `https://meuendpointgpt4.openai.azure.com`  |
-| AZURE_OPENAI_KEY_GPT4o            | Chave de acesso para GPT-4o no Azure OpenAI Service.                                                    | `minha_chave_gpt4o`                      |
-| GPT_MODEL_4o_128k                 | Nome do modelo GPT-4o com 128k tokens.                                                                  | `gpt-4o-128k`                            |
-| AZURE_OPENAI_ENDPOINT_GPT4o_mini  | Endpoint específico para GPT-4o-mini no Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint. | `https://meuendpointgpt4mini.openai.azure.com`  |
-| AZURE_OPENAI_KEY_GPT4o_mini       | Chave de acesso para GPT-4o-mini no Azure OpenAI Service.                                               | `minha_chave_gpt4o_mini`                 |
-| GPT_MODEL_4o_mini_128k            | Nome do modelo GPT-4o-mini com 128k tokens.                                                             | `gpt-4o-mini-128k`                       |
-| OPENAI_API_VERSION                | Versão da API da OpenAI no Azure OpenAI Service. Não alterar                                            | `2024-10-21`                            |
 
-Note que existem algumas variáveis que estão abaixo de `# NÃO ALTERAR AS VARIAVEIS ABAIXO` que não podem ser alteradas.
+### Banco de Dados da Aplicação SEI IA  
 
-12. **Executar o deploy**
+| Variável        | Descrição | Exemplo |
+|----------------|-----------|---------|
+| `DB_SEIIA_USER` | Usuário de acesso ao banco de dados PostgreSQL interno do Servidor de IA. | `seiia_user` |
+| `DB_SEIIA_PWD`  | Senha do usuário de banco a ser criado. **Não deve conter**: "`'`" (aspas simples), "`"`" (aspas duplas), "`\`", "` `" (espaço), "`$`", "`(`", "`)`", "`:`", "`@`", "`;`", "`` ` ``" (crase), "`&`", "`*`", "`+`" (mais), "`-`" (menos), "`=`", "`/`", "`?`", "`!`", "`[`", "`]`", "`{`", "`}`", "`<`", "`>`", "`\|`", "`%`", "`^`", "`~`".                   | `iJI_YTuygb`                 |
+
+
+### Solr da Aplicação SEI IA  
+
+| Variável       | Descrição | Exemplo |
+|---------------|-----------|---------|
+| `SOLR_USER`   | Usuário de acesso ao Solr SEI IA. | `seiia` |
+| `SOLR_PASSWORD` | Senha do usuário de acesso ao Solr SEI IA. | `solr_password` |
+
+
+### Airflow  
+
+| Variável                     | Descrição | Exemplo |
+|------------------------------|-----------|---------|
+| `_AIRFLOW_WWW_USER_USERNAME` | Usuário para acesso à UI do Airflow. | `seiia` |
+| `_AIRFLOW_WWW_USER_PASSWORD` | Senha para acesso à UI do Airflow. | `seiia` |
+| `AIRFLOW_POSTGRES_USER` | Usuário de acesso ao PostgreSQL do Airflow. | `seiia` |
+| `AIRFLOW_POSTGRES_PASSWORD` | Senha para acesso ao PostgreSQL do Airflow. | `seiia` |
+| `AIRFLOW_AMQP_USER` | Usuário para acesso ao RabbitMQ do Airflow. | `seiia` |
+| `AIRFLOW_AMQP_PASSWORD` | Senha para acesso ao RabbitMQ do Airflow. | `seiia` |
+
+
+#### API do SEI
+
+| Variável             | Descrição                                                                              | Exemplo |
+|----------------------|----------------------------------------------------------------------------------------|---------|
+| `SEI_ADDRESS`       | Endereço do SEI.                                                                       | http://www.sei.gov.br |
+| `SEI_API_DB_IDENTIFIER_SERVICE`       | Chave de acesso para o serviço da API do SEI.                                         |         |
+| `SEI_API_DB_TIMEOUT` | Timeout da api que abstrai o banco de dados.  | 120     |
+| `SEI_API_DB_USER` | Usuário de acesso à api que abstrai o banco de dados.  | `Usuario_IA` |
+
+#### Securities OpenAI
+
+| Variável                          | Descrição                                               | Exemplo |
+|-----------------------------------|---------------------------------------------------------|---------|
+| `OPENAI_API_VERSION`              | Versão da API da OpenAI no Azure OpenAI Service.        | `2024-10-21`            |
+| `ASSISTENTE_EMBEDDING_MODEL`      | Modelo de embeddings para o RAG do Assistente.          | `text-embedding-3-small`      |
+| `ASSISTENTE_EMBEDDING_API_KEY`    | Chave de API para o assistente de embedding no Azure OpenAI Service           |         |
+| `ASSISTENTE_EMBEDDING_ENDPOINT`   | Endpoint para o assistente de embedding no Azure OpenAI Service           |         |
+| `ASSISTENTE_DEFAULT_RESPONSE_MODEL` | Modelo padrão de resposta do assistente.                | `standard` |
+| `ASSISTENTE_API_KEY_STANDARD_MODEL` | Chave de API para o modelo standard |         |
+| `ASSISTENTE_ENDPOINT_STANDARD_MODEL` | URL do endpoint para o modelo standard |         |
+| `ASSISTENTE_NAME_STANDARD_MODEL` | Nome do modelo standard.                                | `gpt-4.1` |
+| `ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL` | Número máximo de tokens de saída para o modelo standard.| `32768` |
+| `ASSISTENTE_CTX_LEN_STANDARD_MODEL` | Tamanho do contexto para o modelo standard.             | `1000000` |
+| `ASSISTENTE_API_KEY_MINI_MODEL` | Chave de API para o modelo mini |         |
+| `ASSISTENTE_ENDPOINT_MINI_MODEL` | URL do endpoint para o modelo mini |         |
+| `ASSISTENTE_NAME_MINI_MODEL` | Nome do modelo mini.                                    | `gpt-4.1-mini` |
+| `ASSISTENTE_OUTPUT_TOKENS_MINI_MODEL` | Número máximo de tokens de saída para o modelo mini.    | `32768` |
+| `ASSISTENTE_CTX_LEN_MINI_MODEL` | Tamanho do contexto para o modelo mini.                 | `1000000` |
+| `ASSISTENTE_API_KEY_THINK_MODEL` | Chave de API para o modelo think |         |
+| `ASSISTENTE_ENDPOINT_THINK_MODEL` | URL do endpoint para o modelo think |         |
+| `ASSISTENTE_NAME_THINK_MODEL` | Nome do modelo think.                                   | `o4-mini` |
+| `ASSISTENTE_OUTPUT_TOKENS_THINK_MODEL` | Número máximo de tokens de saída para o modelo think.   | `100000` |
+| `ASSISTENTE_CTX_LEN_THINK_MODEL` | Tamanho do contexto para o modelo think.                | `200000` |
+| `ASSISTENTE_SUMMARIZE_MODEL` | Categoria do modelo que irá resumir cada segmento.      | `mini` |
+| `ASSISTENTE_SUMMARIZE_CHUNK_SIZE` | Tamanho de entrada de cada segmento de documento a ser resumido. | `16000` |
+| `ASSISTENTE_SUMMARIZE_CHUNK_MAX_OUTPUT` | Tamanho máximo da saída de cada segmento resumido.      | `4000` |
+
+
+
+## Observações  
+
+- `GID_DOCKER`: Execute `cat /etc/group | grep ^docker: | cut -d: -f3` no host da instalação.  
+
+
+11. **Executar o deploy**
  > **ATENÇÃO**:
  > - Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
  > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 
-   Execute o script de deploy:
-   ```bash
-   bash deploy-externo-imgs.sh 
-   ```
+  Vamos criar os diretório que serão utilizados como `volume bind` 
+  ***IMPORTANTE*** : o usuário deve ter permissão sudo para criar os volumer no /var
+  ```
+  source env_files/default.env
+  sudo mkdir --parents --mode=750 $VOL_SEIIA_DIR && sudo chown seiia:docker $VOL_SEIIA_DIR
+  ```
+  
+  Executar o script de deploy com o usuário seiia.
+  ```
+  su seiia
+  bash deploy-externo.sh
+  ```
 
    Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr). Logo, se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
 
@@ -346,16 +372,8 @@ docker volumes ls
 # caso nao tenham sido deverá ser removido com o comando docker volume rm [nome-do-volume]
 ```
 
-13. **Ampliar permissão dentro da pasta `sei-ia-storage` depois do deploy do servidor**
 
-Depois que o deploy do Servidor de Soluções de IA é concluído com sucesso, em alguns casos, é necessário ampliar as permissões dentro da pasta `sei-ia-storage` criada no passo 4 da instalação, mais acima. Execute o comando abaixo:
-
-```bash
-sudo chown -R 5000:5000 /opt/sei-ia-storage
-sudo chmod 764 -R /opt/sei-ia-storage/*
-```
-
-14. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
+12. **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
 
 Conforme consta orientado no [README do Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia?tab=readme-ov-file#orienta%C3%A7%C3%B5es-negociais), somente com tudo configurado na Administração do módulo no SEI do ambiente correspondente será possível o uso adequado de toda a solução.
  
@@ -372,89 +390,27 @@ Nas seções a seguir apresentamos como testar e validar os resultados da instal
 
 ---
 
-## Update
-Esta seção descreve os procedimentos para atualizar a versão do Servidor de Soluções de IA quando envolve simples Update, relativo ao ao terceiro dígito no controle de versões (v1.0.**x**). Por exemplo: da v1.0.**0** para v1.0.**1**; da v1.0.**1** para v1.0.**2**; da v1.2.**3** para v1.2.**4**.
-
-### Passos para o Update
-1. Pare os containers:
-
-```bash
-docker stop $(docker ps -a -q)
-```
-
-2. Remova os containers:
-   **ATENÇÃO**: Não remova os volumes!
-
-```bash
-docker rm $(docker ps -a -q)
-```
-Caso seja necessário, para reduzir espaço no disco, pode remover as imagens antigas constantes no ambiente de instalações anteriores.
-
-3. Certifique-se de copiar os dados do `security.env` do ambiente antes de prosseguir, podendo fazer uma cópia antes.
-   Exemplo:
-```bash
-cd /opt/seiia/sei-ia #ou diretorio onde está instalado o sei-ia
-cp envs_files/security.env .
-```
-Lembrando da recomendação de que o arquivo `env_files/security.env` armazena configurações de ambiente e possui users, senhas e chaves que o acesso deve ser restrito, motivo pelo qual já deve constar no `.gitignore` local para não ser substituído acidentalmente no ambiente correspondente nas atualizações de update ou de upgrade de versão do Servidor de Soluçõea de IA.
-
-4. Clone a nova versão
-   Clone o repositório da nova versão do Servidor de Soluções de IA, como realizado na secao `9. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***`.
-   Exemplo:
-```bash
-git fetch origin
-git branch -r
-git checkout -b [identificacao_novo_release_estavel] origin/[identificacao_novo_release_estavel]
-```
-
-5. Realizar os ajustes manuais indicados nos Releases Notes da versão nova específica da atualização, disponível na página de [Releases do projeto](https://github.com/anatelgovbr/sei-ia/releases).
-
-6. Realize o redeploy
-   Reinicie o sistema com a nova configuração.
-```bash
-bash deploy-externo-imgs.sh 
-```
-
-### Atualização da v1.0.0 ou v1.0.1 para v1.0.2
-
-1. Editar o arquivo `security.env` do ambiente, conforme abaixo:
-
-   * Abaixo da variável `LOGLEVEL`, adicionar:
-```bash
-export LOGLEVEL=INFO      # Define o nível de log do autodeployer como 'INFO'; opções disponíveis: INFO | DEBUG | WARNING | ERROR. Recomendamos deixar em `ERROR` em produção.
-```
-
-   * Remover a linha abaixo:
-```bash
-export AZURE_OPENAI_ENDPOINT=****             # Endpoint do Azure OpenAI Service. Note que não deve ser posta `/` ao final do endpoint. Exemplo: https://meuendpoint.openai.azure.com
-```
-
-2. Ajuste as permissões:
-   Execute os comandos abaixo para garantir as permissões corretas no diretório de armazenamento:
-
-```bash
-sudo chmod 774 -R /opt/sei-ia-storage
-sudo chown 5000:5000 /opt/sei-ia-storage
-```
-
----
-
 ## Health Checker Geral do Ambiente
 
-Após concluir o deploy, você **deve** realizar testes automatizados de todo o ambiente utilizando o comando abaixo:
+O Health Checker é executado como último comando do script `deploy-externo.sh`. Ele faz uma checagem geral de conexões , mapeamento e problemas comuns.
 
+
+Caso deseje executar o Health Checker manualmente  execute o comando:
 ```bash
-docker compose -f docker-compose-healthchecker.yml -p sei_ia up --build
+source env_files/default.env
+docker compose -f docker-compose-healthchecker.yml -p $PROJECT_NAME --build
 ```
 
-Aguarde a finalização dos testes. Os logs estarão disponíveis, por padrão, em:  
-`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/opt/sei-ia-storage/logs/{DATA}`.  
+Aguarde a finalização dos testes. Os logs estarão disponíveis, por padrão, em:
+`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/logs/{DATA}`
 
 Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
 
 A compreensão do LOG deve iniciar pela criteriosa análise de:  
-`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/opt/sei-ia-storage/logs/{DATA}/tests_{DATA}.log`,  
+`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/logs/{DATA}/tests_{DATA}.log`,  
 que tem sua estrutura descrita a seguir.
+
+**Dica:** Os containers do Airflow podem emitir alguns erros e avisos devido a pequenas falhas momentâneas de comunicação entre eles, que podem ser ignorados.
 
 > **Observação:**
 > 1. Por questões de segurança, essa pasta, por padrão, não é acessível. É necessário entrar como `root` para ter acesso a esses arquivos.
@@ -518,8 +474,8 @@ que tem sua estrutura descrita a seguir.
   - **Serviço Indisponível:** O endpoint não respondeu conforme esperado.
   - **Falha ao Testar:** Testes não puderam ser realizados devido a erro de configuração ou conectividade.
 
-###### 1.2.3 **TESTE DE CONEXÃO COM SOLR**
-- **Descrição:** Verifica a conectividade com o servidor SOLR, utilizado para busca e indexação de dados.
+###### 1.2.3 **TESTE DE CONEXÃO COM SOLR do SEI IA**
+- **Descrição:** Verifica a conectividade com o servidor SOLR IA, utilizado para busca e indexação de dados.
 - **Objetivo:** Garantir que a aplicação consiga se comunicar corretamente com o servidor SOLR.
 - **Mensagens Comuns:**
   - **Falha de Conexão:** Erro ao tentar conectar ao SOLR.
@@ -527,14 +483,6 @@ que tem sua estrutura descrita a seguir.
 
 ##### 1.3 **TESTE DE CONEXÃO COM BANCO DE DADOS**
 
-###### 1.3.1 **EXTERNOS**
-
-**1.3.1.1 TABELAS DO SEI**
-- **Descrição:** Verifica a conexão com bancos de dados externos, como os usados pelo SEI (Sistema Eletrônico de Informações).
-- **Objetivo:** Confirmar se a aplicação tem acesso correto a essas tabelas.
-- **Mensagens Comuns:**
-  - **Erro de Autenticação:** Falha ao validar o usuário e senha no banco de dados.
-  - **Erro de Conexão:** Problemas de rede ou configuração ao tentar conectar ao banco.
 
 ###### 1.3.2 **INTERNOS**
 
@@ -585,20 +533,18 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 | Solução                                     | URL de Acesso                          | Descrição                                                                                   | Recomendações                                                                       |
 |---------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
 | Airflow                                     | http://[Servidor_Solucoes_IA]:8081    | Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings. | - Alterar a senha do Airflow                                                   |
-|                                             |                                        |                                                                                               | - Preferencialmente, bloquear o acesso de rede, exceto para o administrador do SEI. |
-|                                             |                                        |                                                                                                | - Necessita comunicação com banco de dados e Solr do SEI.                          |
-| API SEI IA                                  | http://[Servidor_Solucoes_IA]:8082    | API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI. | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI IA Feedback                         | http://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI IA Assistente                       | http://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                     | - Necessita comunicação com banco de dados e Solr do SEI.                              |
-|                                             |                                        |                                                                                                | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA  | http://[Servidor_Solucoes_IA]:8084    | Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.                                    | - Por padrão, já vem bloqueado.                                                 |
+| API SEI IA                                  | https://[Servidor_Solucoes_IA]:8082    | API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI. | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
+| API SEI IA Feedback                         | https://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
+| API SEI IA Assistente                       | https://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                      |  - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente.
+|                                             |                                        |                                                                                          - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
+| Solr do Servidor de Soluções de IA  | https://[Servidor_Solucoes_IA]:8084    | Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.                                    | - Por padrão, já vem bloqueado.                                                 |
 | Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.                   | - Por padrão, já vem bloqueado.                                                 |
 
 > **Observações:**
 > * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação **às aplicações Solr e PostgreSQL** não possuem direcionamento para ambiente externo. E não deve ter esse redirecionamento! Essas duas aplicações **são totalmente internas** e armazenam dados indexados dos documentos do SEI. Ou seja, são os bancos de dados das soluções de IA rodando no servidor e o acesso a eles deve ter alta restrição, sendo recomendável manter acessível apenas internamente no servidor.
 > * Seria uma falha de segurança abrir um acesso externo a essas duas aplicações sem controle, sem restringir o acesso em nível de rede local do órgão para apenas quem pode acessar.
 > * Consideramos que o Administrador do ambiente computacional do SEI, caso precise conferir algo no Solr e PostgreSQL interno do Servidor de Soluções de IA, pode acessar diretamente a partir do acesso dele ao próprio servidor.
-> * Exepcionalmente, em ambiente que não seja de Produção e devendo restringir acesso em nível de rede local do órgão, é possível permitir o acesso externo à rede Docker. Para isso é necessário adicionar a linha afeta ao `docker-compose-dev.yaml` no script de deploy, localizado no arquivo: `deploy-externo-imgs.sh`:
+> * Exepcionalmente, em ambiente que não seja de Produção e devendo restringir acesso em nível de rede local do órgão, é possível permitir o acesso externo à rede Docker. Para isso é necessário adicionar a linha afeta ao `docker-compose-dev.yaml` no script de deploy, localizado no arquivo: `deploy-externo.sh`:
 >
 > DE:
 > ```bash
@@ -625,7 +571,7 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 > Em seguida faça o redeploy do servidor de solução de IA, conforme abaixo:
 > 
 > ```bash
-> bash deploy-externo-imgs.sh 
+> bash deploy-externo.sh 
 > ```
 > 
 > Aguarde o `FIM` do deploy e em seguida prossiga com os testes.
@@ -634,19 +580,20 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 - **URL**: http://[Servidor_Solucoes_IA]:8081
 - **Descrição**: Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings.
 
-**Recomendamos bloquear o acesso de rede, exceto para o administrador do ambiente computacional. O Airflow necessita de acessos ao banco de dados do SEI e ao Solr do SEI.**
+**Recomendamos bloquear o acesso de rede, exceto para o administrador do ambiente computacional. 
 
 #### Principais DAGs
-- **document_create_index_v1**: Processa os documentos para serem indexados no Solr para recomendação.
-- **process_create_index_v1**: Processa os processos para serem indexados no Solr para recomendação.
-- **process_update_index_v1**: Cria a fila para indexar os processos e documentos no Solr.
-- **system_clean_airflow_logs_v1**: Realiza a limpeza de logs do Airflow.
-- **system_create_mlt_weights_config_v1**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI IA.
+- **documents_indexing**: Processa os documentos para serem indexados no Solr do SEI IA para recomendação.
+- **documents_update_index**: Atualiza o índice de documentos no Solr do SEI IA.
+- **process_indexing**: Processa os processos para serem indexados no Solr do SEI IA para recomendação.
+- **process_update_index**: Cria a fila para indexar os processos e documentos no Solr do SEI IA.
+- **system_clean_airflow_logs**: Realiza a limpeza de logs do Airflow.
+- **system_create_mlt_weights_config**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI IA.
 
 Ao acessar o Airflow, será apresentada a tela:
 ![Airflow Interface](image/airflow_interface.png)
 
-No primeiro acesso, o usuário é `airflow` e a senha é `airflow`.
+No primeiro acesso, o usuário padrão é `seiia` (variável _AIRFLOW_WWW_USER_USERNAME no security.env) e a senha padrão é `seiia` (variável _AIRFLOW_WWW_USER_PASSWORD no security.env).
 
 A senha padrão acima **deve ser alterada**! Seguir os passos abaixo para alterar a senha padrão do Airflow.
   - Inicialmente, você deve acessar `Your Profile`
@@ -820,7 +767,7 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
   Solução: Por padrão, ao rodar novamente o comando de inicialização, volta a funcionar. Se persistir, deve-se verificar a quantidade de memória disponível no sistema.
 
   ```bash
-  bash deploy-externo-imgs.sh 
+  bash deploy-externo.sh 
   ```
 
 ## Pontos de Atenção para Escalabilidade
@@ -840,7 +787,7 @@ Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/
   - Deve parar o Docker para evitar problemas durante a movimentação dos dados:
 
    ```bash
-   sudo service docker stop
+   sudo systemctl stop docker
    ```
 
   - Mova a pasta de volumes para o novo caminho:
@@ -860,7 +807,7 @@ Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/
   - Reinicie o Docker:
 
   ```bash
-  sudo service docker start
+  sudo systemctl start docker
   ```
 
 ### Ajustes Necessários
@@ -873,9 +820,9 @@ Ao escalar a solução, considere os seguintes pontos:
 
    | Variável                        | Descrição                                                                                  |
    |---------------------------------|--------------------------------------------------------------------------------------------|
-   | `SOLR_JAVA_MEM="-Xms2g -Xmx8g"` | Define as opções de memória Java para Solr, com um mínimo de 2 GB e um máximo de 8 GB.     |
-   | `SOLR_MEM_LIMIT=10g`            | Define o limite de memória para Solr como 10 GB.                                           |
-   | `SOLR_CPU_LIMIT='2'`            | Define o limite de CPU para Solr como 2 unidades de CPU.                                   |
+   | `SOLR_JAVA_MEM="-Xms8g -Xmx24g"` | Define as opções de memória Java para Solr, com um mínimo de 8 GB e um máximo de 24 GB.     |
+   | `SOLR_MEM_LIMIT=28g`            | Define o limite de memória para Solr como 8 GB.                                           |
+   | `SOLR_CPU_LIMIT='8'`            | Define o limite de CPU para Solr como 8 unidades de CPU.                                   |
 
 - **Airflow**:
   - O Airflow pode ser escalado horizontalmente adicionando mais workers. Para mais informações, consulte a [documentação do Airflow](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/overview.html).
@@ -886,8 +833,8 @@ Ao escalar a solução, considere os seguintes pontos:
 
    | Variável                    | Descrição                                                     |
    |-----------------------------|---------------------------------------------------------------|
-   | `PGVECTOR_MEM_LIMIT=8g`     | Define o limite de memória para Pgvector como 8 GB.           |
-   | `PGVECTOR_CPU_LIMIT='2'`    | Define o limite de CPU para Pgvector como 2 unidades de CPU.  |
+   | `PGVECTOR_MEM_LIMIT=16g`     | Define o limite de memória para Pgvector como 16 GB.           |
+   | `PGVECTOR_CPU_LIMIT='4'`    | Define o limite de CPU para Pgvector como 4 unidades de CPU.  |
 
 ---
 
@@ -956,123 +903,115 @@ docker volume ls | grep "^sei_ia-"
    sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
    ```
 
-
-## Consumo de Recursos da Aplicação
-
-Esta seção apresenta as métricas de consumo de recursos para os containers da stack *SEI IA*. Os dados foram coletados entre 24/12/2024 até 08/01/2024, considerando o ambiente de produção da Anatel. As informações foram organizadas para facilitar a análise do uso de memória (RSS e física total) e o limite de memória máxima alocado para cada container. Para facilitar a interpretação, os gráficos foram agrupados por tipo de serviço.
-
-*É importante notar que as medições abaixo foram feitas em um momento que o SEI IA está estável na Anatel, sob rotinas de indexação de novos dados. Ao instalar a solução e executar as indexações iniciais, a média e picos de consumo de recursos são maiores e proporcionais ao volume de dados que serão indexados inicialmente.*
-
-*Memória RSS*: Resident Set Size, que representa a quantidade de memória física utilizada por um processo sem considerar o uso de memória compartilhada.
-
-*Memória Física Total*: Quantidade total de memória física utilizada por um processo, incluindo memória compartilhada.
-
-### Consumo de Memória RSS
-
-#### Tabela Geral - Memória RSS
-
-| # | Container                                      | Média (MB) | Pico (MB) |
-|----|-----------------------------------------------|------------|-----------|
-| 1  | sei_ia-solr_pd-1                             | 4637.0     | 4692      |
-| 2  | sei_ia-airflow-worker-1                      | 3204.0     | 7656      |
-| 3  | sei_ia-airflow-worker-2                      | 2867.0     | 6261      |
-| 4  | sei_ia-airflow-worker-3                      | 2865.0     | 5187      |
-| 5  | sei_ia-airflow-webserver-pd-1                | 789.0      | 1868      |
-| 6  | sei_ia-api_assistente-1                      | 738.0      | 1423      |
-| 7  | sei_ia-airflow-triggerer-pd-1                | 390.0      | 505       |
-| 8  | sei_ia-airflow-scheduler-pd-1                | 367.0      | 491       |
-| 9  | sei_ia-api_sei-1                             | 360.0      | 441       |
-| 10 | sei_ia-jobs_api-1                            | 126.0      | 238       |
-| 11 | sei_ia-rabbitmq-pd-1                         | 114.0      | 195       |
-| 12 | sei_ia-app-api-feedback-1                    | 94.0       | 97        |
-| 13 | sei_ia-pgvector_all-1                        | 25.0       | 118       |
-| 14 | sei_ia-airflow_postgres-pd-1                 | 22.0       | 26        |
-| 15 | sei_ia-nginx_assistente-1                    | 11.0       | 12        |
-| **-** | **Soma Total**                              | **15188.0**| **27292** |
-
-### Gráficos Histórico de Consumo de Memória RSS
-
-##### Airflow
-
-- <img src="../docs/image/consumo_containers/Airflow/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - Airflow" width="" height="400">
-
-##### Api Similaridade
-
-- <img src="../docs/image/consumo_containers/ApiSimilaridade/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - ApiSimilaridade" width="" height="400">
-
-##### Assistente
-- <img src="../docs/image/consumo_containers/Assistente/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - Assistente" width="" height="200">
-
-##### Banco de Dados
-- <img src="../docs/image/consumo_containers/BancoDeDados/grafico_Memória_RSS.png" alt="Gráfico - Memória RSS - BancoDeDados" width="" height="400">
-
-### Consumo de Memória Física Total
-
-#### Tabela Geral - Memória Física Total
-
-| #  | Container                                      | Média (MB) | Pico (MB) |
-|----|-----------------------------------------------|------------|-----------|
-| 1  | sei_ia-solr_pd-1                             | 9496.0     | 14336     |
-| 2  | sei_ia-pgvector_all-1                        | 5644.0     | 8192      |
-| 3  | sei_ia-airflow-worker-1                      | 3420.0     | 8119      |
-| 4  | sei_ia-airflow-worker-3                      | 3124.0     | 6371      |
-| 5  | sei_ia-airflow-worker-2                      | 3100.0     | 6393      |
-| 6  | sei_ia-airflow-webserver-pd-1                | 919.0      | 1929      |
-| 7  | sei_ia-airflow-triggerer-pd-1                | 752.0      | 998       |
-| 8  | sei_ia-api_assistente-1                      | 792.0      | 1659      |
-| 9  | sei_ia-airflow-scheduler-pd-1                | 492.0      | 605       |
-| 10 | sei_ia-api_sei-1                             | 387.0      | 469       |
-| 11 | sei_ia-rabbitmq-pd-1                         | 179.0      | 244       |
-| 12 | sei_ia-jobs_api-1                            | 151.0      | 189       |
-| 13 | sei_ia-airflow_postgres-pd-1                 | 132.0      | 144       |
-| 14 | sei_ia-app-api-feedback-1                    | 111.0      | 126       |
-| 15 | sei_ia-nginx_assistente-1                    | 17.0       | 20        |
-| **-** | **Soma Total**                              | **23204.0**| **39278** |
-
-### Gráficos Histórico de Consumo de Memória Física Total
-
-##### Airflow
-- <img src="../docs/image/consumo_containers/Airflow/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - Airflow" width="" height="400">
-
-##### Api Similaridade
-- <img src="../docs/image/consumo_containers/ApiSimilaridade/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - ApiSimilaridade" width="" height="400">
-
-##### Assistente
-- <img src="../docs/image/consumo_containers/Assistente/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - Assistente" width="" height="200">
-
-##### Banco de Dados
-- <img src="../docs/image/consumo_containers/BancoDeDados/grafico_Memória_física_total.png" alt="Gráfico - Memória Física Total - BancoDeDados" width="" height="400">
-
-### Limite Máximo de Memória
-
-#### Tabela Geral - Limite Máximo de Memória por Container
-
-#### Tabela Geral - Limite Máximo de Memória por Container
-
-| #  | Container                                      | Limite (MB) |
-|----|-----------------------------------------------|-------------|
-| 1  | sei_ia-airflow-worker-3                       | 35840.0     |
-| 2  | sei_ia-airflow-worker-1                       | 35840.0     |
-| 3  | sei_ia-airflow-worker-2                       | 35840.0     |
-| 4  | sei_ia-solr_pd-1                              | 14336.0     |
-| 5  | sei_ia-pgvector_all-1                         | 8192.0      |
-| 6  | sei_ia-airflow_postgres-pd-1                  | 6144.0      |
-| 7  | sei_ia-nginx_assistente-1                     | 4096.0      |
-| 8  | sei_ia-airflow-scheduler-pd-1                 | 4096.0      |
-| 9  | sei_ia-api_sei-1                              | 4096.0      |
-| 10 | sei_ia-jobs_api-1                             | 4096.0      |
-| 11 | sei_ia-airflow-webserver-pd-1                 | 2048.0      |
-| 12 | sei_ia-api_assistente-1                       | 2048.0      |
-| 13 | sei_ia-rabbitmq-pd-1                          | 2048.0      |
-| 14 | sei_ia-airflow-triggerer-pd-1                 | 1024.0      |
-| 15 | sei_ia-app-api-feedback-1                     | 512.0       |
-| **-** | **Soma Total**                               | **102720.0**|
+# Guia de atualizações SEI IA
+Esta seção descreve os procedimentos para atualizar a versão do Servidor de Soluções de IA quando envolve simples Update, relativo ao segundo dígito no controle de versões (v1.**x**.0). Por exemplo: da v1.0.**0** para v1.1.**0**; da v1.1.**0** para v1.2.**0**; da v1.2.**0** para v1.3.**0**.
 
 
-### Resumo do consumo
+### Atualização da v1.0.x para v1.1.x
 
-•	O container com maior consumo de memória RSS sei_similaridade_deploy-solr_pd-1, com uma média de 4637 MB, e de memória física total, esse mesmo container registrou um pico de 14336 MB.
+- **Atenção**: Os volumes referentes ao airflow serão excluídos durante o processo.
 
-•	Os containers dos workers do Airflow demonstraram grande variação no consumo de memória, com picos de até 8119 MB, sugerindo alta carga de processamento durante um período específico.
+Va para a pasta onde foi realizado o último deploy e seguida os passos para o Update:
 
-•	Outros containers, como o sei_ia-api_assistente-1 e o sei_similaridade_deploy-api_sei-1, apresentaram consumo moderado de memória.
+1. Pare os containers:
+
+```bash
+cd [diretorio do deploy antigo]
+docker stop $(docker ps -a -q)
+```
+
+2. Remova os containers:
+   **ATENÇÃO**: Não remova os volumes!
+
+```bash
+docker rm $(docker ps -a -q)
+```
+
+3. Copiar os arquivos env_files antigo para um diretório temporário
+```bash
+mv env_files /tmp/env_files_old
+```
+
+4. Git fetch e trocar o repositório git para a branch 1.1.x
+```bash
+git fetch origin
+git pull
+git reset --hard
+git checkout -b 1.1.x
+```
+
+```
+5. Executar o script de migração das variáveis de ambiente. É necessário preencher o caminho da pasta em que a pasta env_files_old foi salva.
+```bash
+python migracao/1.0_1.1/migracao_1.0_1.1.py
+```
+
+
+6. Preencher as novas variáveis de ambiente no arquivo `env_files/security.env`:
+
+
+| Variável                       | Descrição                                                                 | Exemplo                                      |
+|--------------------------------|--------------------------------------------------------------------------|----------------------------------------------|
+| `SOLR_USER`                    | Usuário de acesso ao Dashboard do Solr.                                  | `seiia` |
+| `SOLR_PASSWORD`                | Senha do usuário de acesso ao Dashboard do Solr.                         | `solr_password` |
+| `ASSISTENTE_EMBEDDING_API_KEY` | Chave de API para o assistente de embedding no Azure OpenAI Service.     | `minha_chave_embedding`                     |
+| `ASSISTENTE_EMBEDDING_ENDPOINT`| Endpoint para o assistente de embedding no Azure OpenAI Service.        | `https://meuendpointembedding.openai.azure.com` |
+| `ASSISTENTE_EMBEDDING_MODEL`      | Modelo de embeddings para o RAG do Assistente.          | `text-embedding-3-small`      |
+| `ASSISTENTE_API_KEY_STANDARD_MODEL` | Chave de API para o modelo standard  | `sua_chave_standard` |
+| `ASSISTENTE_ENDPOINT_STANDARD_MODEL` | URL do endpoint para o modelo standard  | `https://endpoint-standard.openai.azure.com` |
+| `ASSISTENTE_NAME_STANDARD_MODEL` | Nome do modelo standard. | `gpt-4.1`   |
+| `ASSISTENTE_API_KEY_MINI_MODEL` | Chave de API para o modelo mini  | `sua_chave_mini` |
+| `ASSISTENTE_ENDPOINT_MINI_MODEL` | URL do endpoint para o modelo mini  | `https://endpoint-mini.openai.azure.com` |
+| `ASSISTENTE_NAME_MINI_MODEL` | Nome do modelo mini.  | `gpt-4.1-mini` |
+| `ASSISTENTE_API_KEY_THINK_MODEL` | Chave de API para o modelo think | `sua_chave_think` |
+| `ASSISTENTE_ENDPOINT_THINK_MODEL` | URL do endpoint para o modelo think | `https://endpoint-think.openai.azure.com` |
+| `ASSISTENTE_NAME_THINK_MODEL` | Nome do modelo think.  | `o4-mini` |
+
+**Nota:** As variáveis DB_SEI_ do env antigo foram substituídas por variáveis SEI_API_DB_ no novo security.env, que abstraem o acesso ao banco de dados do SEI via API. Preencha essas com base nas configurações do seu ambiente SEI, conforme descrito na seção geral de configuração do security.env.
+
+7. Executar o script de deploy apropriado para a migração
+
+  Vamos criar os diretório que serão utilizados como `volume bind` 
+  ***IMPORTANTE*** : o usuário deve ter permissão sudo para criar os volumer no /var
+  ```
+  source env_files/default.env
+  sudo mkdir --parents --mode=750 $VOL_SEIIA_DIR && sudo chown seiia:docker $VOL_SEIIA_DIR
+  ```
+
+  ```bash
+  bash migracao/1.0_1.1/deploy-externo-1.0-1.1.sh
+  ```
+
+# Guia de utilização de certificado SSL proprietário
+
+Este guia tem como objetivo auxiliar na configuração de um certificado SSL proprietário para as aplicações de backend do SEI IA. 
+
+### Passos para a configuração do certificado SSL proprietário
+
+**IMPORTANTE:** O usuário que vai executar o script deve ter permissão sudo.
+
+1. **Criar a pasta certificado na raiz do projeto:**
+
+```bash
+sudo mkdir certificado
+```
+
+2. **Configuração do certificado:**
+
+   **Opção A - Se você já possui um certificado SSL:**
+   
+   Copie os arquivos .key e .pem para a pasta certificado:
+   ```bash
+   cp [caminho do arquivo .key] certificado/seiia.key
+   cp [caminho do arquivo .pem] certificado/seiia.pem
+   ```
+
+   **Opção B - Se você NÃO possui um certificado SSL:**
+   
+   O certificado será criado automaticamente durante a execução do script.
+
+3. **Executar o script de ativação:**
+
+```bash
+sudo bash certificado_ssl_proprietario/script_ativar_ssl_proprietario.sh
+```
