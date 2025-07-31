@@ -242,7 +242,7 @@ O arquivo `security.env` contém informações sensíveis (usuários, senhas e c
 
 | Variável              | Descrição | Exemplo |
 |-----------------------|-----------|---------|
-| `GID_DOCKER`         | O GID (Group ID) do grupo Docker no host do ambiente de instalação. | <code>cat /etc/group &#124; grep ^docker: &#124; cut -d: -f3</code> | 983 |
+| `GID_DOCKER`          | O GID (Group ID) do grupo Docker no host do ambiente de instalação. Deve ser obtido executando o comando: <code>cat /etc/group &#124; grep ^docker: &#124; cut -d: -f3</code> | `983` |
 | `ENVIRONMENT`        | Indicativo do tipo de ambiente de instalação. Para usuários externos, manter sempre como "prod". Opções disponíveis: dev, homol, prod. | `prod` |
 
 
