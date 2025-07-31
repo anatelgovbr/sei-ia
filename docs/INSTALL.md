@@ -242,10 +242,8 @@ O arquivo `security.env` contém informações sensíveis (usuários, senhas e c
 
 | Variável              | Descrição | Exemplo |
 |-----------------------|-----------|---------|
-| `GID_DOCKER`          | O GID (Group ID) do grupo Docker no host do ambiente de instalação. Deve ser obtido executando o comando: <code>cat /etc/group &#124; grep ^docker: &#124; cut -d: -f3</code> | `983` |
+| `GID_DOCKER`         | O GID (Group ID) do grupo Docker no host do ambiente de instalação. Deve ser obtido executando o comando: <code>cat /etc/group &#124; grep ^docker: &#124; cut -d: -f3</code> | 983 |
 | `ENVIRONMENT`        | Indicativo do tipo de ambiente de instalação. Para usuários externos, manter sempre como "prod". Opções disponíveis: dev, homol, prod. | `prod` |
-
-
 
 ### Banco de Dados da Aplicação SEI IA  
 
@@ -254,7 +252,6 @@ O arquivo `security.env` contém informações sensíveis (usuários, senhas e c
 | `DB_SEIIA_USER` | Usuário de acesso ao banco de dados PostgreSQL interno do Servidor de IA. | `seiia_user` |
 | `DB_SEIIA_PWD`  | Senha do usuário de banco a ser criado. **Não deve conter**: "`'`" (aspas simples), "`"`" (aspas duplas), "`\`", "` `" (espaço), "`$`", "`(`", "`)`", "`:`", "`@`", "`;`", "`` ` ``" (crase), "`&`", "`*`", "`+`" (mais), "`-`" (menos), "`=`", "`/`", "`?`", "`!`", "`[`", "`]`", "`{`", "`}`", "`<`", "`>`", "`\|`", "`%`", "`^`", "`~`".                   | `iJI_YTuygb`                 |
 
-
 ### Solr da Aplicação SEI IA  
 
 | Variável       | Descrição | Exemplo |
@@ -262,56 +259,53 @@ O arquivo `security.env` contém informações sensíveis (usuários, senhas e c
 | `SOLR_USER`   | Usuário de acesso ao Solr SEI IA. | `seiia` |
 | `SOLR_PASSWORD` | Senha do usuário de acesso ao Solr SEI IA. | `solr_password` |
 
-
 ### Airflow  
 
 | Variável                     | Descrição | Exemplo |
 |------------------------------|-----------|---------|
-| `_AIRFLOW_WWW_USER_USERNAME` | Usuário para acesso à UI do Airflow. | `seiia` |
-| `_AIRFLOW_WWW_USER_PASSWORD` | Senha para acesso à UI do Airflow. | `seiia` |
-| `AIRFLOW_POSTGRES_USER` | Usuário de acesso ao PostgreSQL do Airflow. | `seiia` |
-| `AIRFLOW_POSTGRES_PASSWORD` | Senha para acesso ao PostgreSQL do Airflow. | `seiia` |
-| `AIRFLOW_AMQP_USER` | Usuário para acesso ao RabbitMQ do Airflow. | `seiia` |
-| `AIRFLOW_AMQP_PASSWORD` | Senha para acesso ao RabbitMQ do Airflow. | `seiia` |
-
-
-#### API do SEI
-
-| Variável             | Descrição                                                                              | Exemplo |
-|----------------------|----------------------------------------------------------------------------------------|---------|
-| `SEI_ADDRESS`       | Endereço do SEI.                                                                       | http://www.sei.gov.br |
-| `SEI_API_DB_IDENTIFIER_SERVICE`       | Chave de acesso para o serviço da API do SEI.                                         |         |
-| `SEI_API_DB_TIMEOUT` | Timeout da api que abstrai o banco de dados.  | 120     |
-| `SEI_API_DB_USER` | Usuário de acesso à api que abstrai o banco de dados.  | `Usuario_IA` |
+| `_AIRFLOW_WWW_USER_USERNAME` | Usuário para acesso à UI do Airflow. Não alterar. | `seiia` |
+| `_AIRFLOW_WWW_USER_PASSWORD` | Senha para acesso à UI do Airflow. Não alterar. | `seiia` |
+| `AIRFLOW_POSTGRES_USER` | Usuário de acesso ao PostgreSQL do Airflow. Não alterar. | `seiia` |
+| `AIRFLOW_POSTGRES_PASSWORD` | Senha para acesso ao PostgreSQL do Airflow. Não alterar. | `seiia` |
+| `AIRFLOW_AMQP_USER` | Usuário para acesso ao RabbitMQ do Airflow. Não alterar. | `seiia` |
+| `AIRFLOW_AMQP_PASSWORD` | Senha para acesso ao RabbitMQ do Airflow. Não alterar. | `seiia` |
 
 #### Securities OpenAI
 
 | Variável                          | Descrição                                               | Exemplo |
 |-----------------------------------|---------------------------------------------------------|---------|
-| `OPENAI_API_VERSION`              | Versão da API da OpenAI no Azure OpenAI Service.        | `2024-10-21`            |
-| `ASSISTENTE_EMBEDDING_MODEL`      | Modelo de embeddings para o RAG do Assistente.          | `text-embedding-3-small`      |
-| `ASSISTENTE_EMBEDDING_API_KEY`    | Chave de API para o assistente de embedding no Azure OpenAI Service           |         |
-| `ASSISTENTE_EMBEDDING_ENDPOINT`   | Endpoint para o assistente de embedding no Azure OpenAI Service           |         |
-| `ASSISTENTE_DEFAULT_RESPONSE_MODEL` | Modelo padrão de resposta do assistente.                | `standard` |
+| `OPENAI_API_VERSION`              | Versão da API da OpenAI no Azure OpenAI Service. Não alterar.        | `2024-10-21`            |
+| `ASSISTENTE_DEFAULT_RESPONSE_MODEL` | Modelo padrão de resposta do assistente                | `standard` |
+| `ASSISTENTE_EMBEDDING_MODEL`      | Modelo de embeddings para o RAG do Assistente. Não alterar.          | `text-embedding-3-small`      |
+| `ASSISTENTE_EMBEDDING_API_KEY`    | Chave de API para o assistente de embedding no Azure OpenAI Service.           |         |
+| `ASSISTENTE_EMBEDDING_ENDPOINT`   | Endpoint para o assistente de embedding no Azure OpenAI Service.           | https://meuendpointembedding.openai.azure.com |
 | `ASSISTENTE_API_KEY_STANDARD_MODEL` | Chave de API para o modelo standard |         |
 | `ASSISTENTE_ENDPOINT_STANDARD_MODEL` | URL do endpoint para o modelo standard |         |
-| `ASSISTENTE_NAME_STANDARD_MODEL` | Nome do modelo standard.                                | `gpt-4.1` |
-| `ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL` | Número máximo de tokens de saída para o modelo standard.| `32768` |
-| `ASSISTENTE_CTX_LEN_STANDARD_MODEL` | Tamanho do contexto para o modelo standard.             | `1000000` |
+| `ASSISTENTE_NAME_STANDARD_MODEL` | Nome do modelo standard. Não alterar.                       | `gpt-4.1` |
+| `ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL` | Número máximo de tokens de saída para o modelo standard. Não alterar. | `32768` |
+| `ASSISTENTE_CTX_LEN_STANDARD_MODEL` | Tamanho do contexto para o modelo standard. Não alterar. | `1000000` |
 | `ASSISTENTE_API_KEY_MINI_MODEL` | Chave de API para o modelo mini |         |
 | `ASSISTENTE_ENDPOINT_MINI_MODEL` | URL do endpoint para o modelo mini |         |
-| `ASSISTENTE_NAME_MINI_MODEL` | Nome do modelo mini.                                    | `gpt-4.1-mini` |
-| `ASSISTENTE_OUTPUT_TOKENS_MINI_MODEL` | Número máximo de tokens de saída para o modelo mini.    | `32768` |
-| `ASSISTENTE_CTX_LEN_MINI_MODEL` | Tamanho do contexto para o modelo mini.                 | `1000000` |
+| `ASSISTENTE_NAME_MINI_MODEL` | Nome do modelo mini. Não alterar.                              | `gpt-4.1-mini` |
+| `ASSISTENTE_OUTPUT_TOKENS_MINI_MODEL` | Número máximo de tokens de saída para o modelo mini. Não alterar.    | `32768` |
+| `ASSISTENTE_CTX_LEN_MINI_MODEL` | Tamanho do contexto para o modelo mini. Não alterar.        | `1000000` |
 | `ASSISTENTE_API_KEY_THINK_MODEL` | Chave de API para o modelo think |         |
 | `ASSISTENTE_ENDPOINT_THINK_MODEL` | URL do endpoint para o modelo think |         |
-| `ASSISTENTE_NAME_THINK_MODEL` | Nome do modelo think.                                   | `o4-mini` |
-| `ASSISTENTE_OUTPUT_TOKENS_THINK_MODEL` | Número máximo de tokens de saída para o modelo think.   | `100000` |
-| `ASSISTENTE_CTX_LEN_THINK_MODEL` | Tamanho do contexto para o modelo think.                | `200000` |
-| `ASSISTENTE_SUMMARIZE_MODEL` | Categoria do modelo que irá resumir cada segmento.      | `mini` |
-| `ASSISTENTE_SUMMARIZE_CHUNK_SIZE` | Tamanho de entrada de cada segmento de documento a ser resumido. | `16000` |
-| `ASSISTENTE_SUMMARIZE_CHUNK_MAX_OUTPUT` | Tamanho máximo da saída de cada segmento resumido.      | `4000` |
+| `ASSISTENTE_NAME_THINK_MODEL` | Nome do modelo think. Não alterar.                            | `o4-mini` |
+| `ASSISTENTE_OUTPUT_TOKENS_THINK_MODEL` | Número máximo de tokens de saída para o modelo think. Não alterar.   | `100000` |
+| `ASSISTENTE_CTX_LEN_THINK_MODEL` | Tamanho do contexto para o modelo think. Não alterar.      | `200000` |
+| `ASSISTENTE_SUMMARIZE_MODEL` | Catégoria do modelo que irá resumir cada segmento. Não alterar.  | `mini` |
+| `ASSISTENTE_SUMMARIZE_CHUNK_SIZE` | Tamanho de entrada de cada segmento de documento a ser resumido. Não alterar. | `16000` |
+| `ASSISTENTE_SUMMARIZE_CHUNK_MAX_OUTPUT` | Tamanho máximo da saída de cada segmento resumido. Não alterar.  | `4000` |
 
+#### WsIa (API REST CENTRAL DE INTEGRAÇÃO COM OS DADOS DO SEI)
+
+| Variável             | Descrição                                                                              | Exemplo |
+|----------------------|----------------------------------------------------------------------------------------|---------|
+| `SEI_ADDRESS`        | Endereço raiz do SEI.                                                                   | http://www.sei.gov.br |
+| `SEI_API_DB_IDENTIFIER_SERVICE`   | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".                |         |
+| `SEI_API_DB_TIMEOUT` | Timeout padrão da conexão da aplicação SEI IA junto à API do SEI de integração dos dados do SEI.  | 120     |
+| `SEI_API_DB_USER` | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA. Não alterar.  | `Usuario_IA` |
 
 
 ## Observações  
