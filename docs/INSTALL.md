@@ -901,7 +901,7 @@ docker volume ls | grep "^sei_ia-"
 Esta seção descreve os procedimentos para atualizar a versão do Servidor de Soluções de IA quando envolve simples Update, relativo ao segundo dígito no controle de versões (v1.**x**.0). Por exemplo: da v1.0.**0** para v1.1.**0**; da v1.1.**0** para v1.2.**0**; da v1.2.**0** para v1.3.**0**.
 
 
-### Atualização da v1.0.x para v1.1.x
+### Atualização da v1.0.x para v1.1.x OU da v1.1.x para v1.1.2
 
 - **Atenção**: Os volumes referentes ao airflow serão excluídos durante o processo.
 
