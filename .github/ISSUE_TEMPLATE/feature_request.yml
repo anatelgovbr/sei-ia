@@ -1,0 +1,63 @@
+name: ✨ Solicitação de Nova Funcionalidade
+description: Propor uma nova funcionalidade ou recurso para o sistema
+title: "[FEATURE]: "
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Obrigado por sugerir uma nova funcionalidade!
+        Por favor, preencha as informações abaixo.
+
+  - type: input
+    id: nome
+    attributes:
+      label: Nome Completo
+      description: Seu nome completo
+      placeholder: "Ex: João da Silva Santos"
+    validations:
+      required: true
+
+  - type: input
+    id: orgao
+    attributes:
+      label: Órgão
+      description: Nome do órgão onde você está lotado
+      placeholder: "Ex: Tribunal Regional Federal da 1ª Região"
+    validations:
+      required: true
+
+  - type: input
+    id: email
+    attributes:
+      label: Email de Contato
+      description: Email para contato
+      placeholder: "exemplo@orgao.gov.br"
+    validations:
+      required: true
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição da Funcionalidade
+      description: Descreva a funcionalidade que você gostaria de ver implementada no sistema.
+      placeholder: |
+        Descreva a funcionalidade aqui...
+
+        Exemplo:
+        - Qual funcionalidade você gostaria de ter?
+        - Qual problema ela resolveria?
+        - Como ela funcionaria?
+        - Quem seria beneficiado?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Verifiquei que não existe uma solicitação similar já aberta
+          required: true
