@@ -193,11 +193,34 @@ allowed_empty_vars = [
     "LANGFUSE_PUBLIC_KEY",
     "LANGFUSE_SECRET_KEY",
     "LANGFUSE_SECRET_SALT",
-    "LANGFUSE_URL"
+    "LANGFUSE_URL",
+    # OpenTelemetry - relevante apenas para deploy interno (podem ficar vazias em deploy externo)
+    "OTEL_SERVICE_NAME",
+    "OTEL_EXPORTER_OTLP_ENDPOINT",
+    "OTEL_EXPORTER_OTLP_PROTOCOL",
+    "OTEL_EXPORTER_OTLP_INSECURE",
+    "OTEL_METRICS_EXPORTER",
+    "OTEL_EXPORTER_OTLP_METRICS_PROTOCOL",
+    "OTEL_TRACES_EXPORTER",
+    "OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"
 ]
 
 # Lista de variáveis que podem estar presentes nos arquivos .env sem serem consideradas erros
-allowed_extra_vars = ["AZURE_OPENAI_ENDPOINT_GPT4o"]
+allowed_extra_vars = [
+    "AZURE_OPENAI_ENDPOINT_GPT4o",
+    # Variáveis do Azure AI Foundry presentes em security.env
+    "AGENT_ID",
+    "AZURE_CLIENT_ID",
+    "AZURE_CLIENT_SECRET",
+    "AZURE_SUBSCRIPTION_ID",
+    "AZURE_TENANT_ID",
+    "AZURE_WEB_AGENT_ID",
+    "BING_CONNECTION_NAME",
+    "MODEL_DEPLOYMENT_NAME",
+    "PROJECT_ENDPOINT",
+    # Outras variáveis de configuração
+    "EMBEDDING_MAX_ACTIVE_RUNS"
+]
 
 def create_env_vars_df(env_vars: dict) -> pd.DataFrame:
     dfs = []
