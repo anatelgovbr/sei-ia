@@ -2,6 +2,6 @@
   api_sei:
     command: gunicorn -k uvicorn.workers.UvicornH11Worker --reload --timeout 60 --keyfile /home/${NB_USER}/certificado/seiia.cert.key --certfile /home/${NB_USER}/certificado/seiia.cert.pem --bind=0.0.0.0:8082 api_sei.main:app
   api_assistente:
-    command: "uv run gunicorn sei_ia.main:app -c /app/sei_ia/configs/gunicorn_conf.py"
+    command: "/bin/bash -c 'source /app/.venv/bin/activate && gunicorn sei_ia.main:app -c /app/sei_ia/configs/gunicorn_conf.py'"
     environment:
       ENABLE_OTEL_METRICS: false

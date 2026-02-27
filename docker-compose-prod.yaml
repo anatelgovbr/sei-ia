@@ -1,12 +1,12 @@
-x-common: 
-  environment: &otel-common-env                                                                                                                                                         
-     OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}                                                                                                              
-     OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL}                                                                                                              
-     OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME}                                                                                                                                  
-     OTEL_EXPORTER_OTLP_INSECURE: ${OTEL_EXPORTER_OTLP_INSECURE}                                                                                                              
-     OTEL_METRICS_EXPORTER: ${OTEL_METRICS_EXPORTER}                                                                                                                          
-     OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: ${OTEL_EXPORTER_OTLP_METRICS_PROTOCOL}                                                                                              
-     OTEL_TRACES_EXPORTER: ${OTEL_TRACES_EXPORTER}                                                                                                                            
+x-common:
+  environment: &otel-common-env
+     OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+     OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL}
+     OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME}
+     OTEL_EXPORTER_OTLP_INSECURE: ${OTEL_EXPORTER_OTLP_INSECURE}
+     OTEL_METRICS_EXPORTER: ${OTEL_METRICS_EXPORTER}
+     OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: ${OTEL_EXPORTER_OTLP_METRICS_PROTOCOL}
+     OTEL_TRACES_EXPORTER: ${OTEL_TRACES_EXPORTER}
      OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: ${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL}
 
 x-airflow-common: &airflow-common
@@ -21,6 +21,7 @@ x-airflow-common: &airflow-common
     dockerfile: ./airflow.dockerfile
     network: host
     args:
+      DOCKER_BUILDKIT: 1
       AIRFLOW_UID: ${AIRFLOW_UID:-50000}
       NB_USER: ${NB_USER}
       NB_UID: ${NB_UID}
@@ -30,11 +31,11 @@ x-airflow-common: &airflow-common
       DB_SEIIA_USER : ${DB_SEIIA_USER}
       DB_SEIIA_PWD : ${DB_SEIIA_PWD}
       DB_SEIIA_ASSISTENTE : ${DB_SEIIA_ASSISTENTE}
-      LIB_CONNECTION : ${LIB_CONNECTION}
   networks:
     - network1
   env_file:
     - ./airflow.env
+    - ./.env
   environment: &airflow-common-env
     GIT_TOKEN: ${GIT_TOKEN:-}
     DB_SEIIA_ASSISTENTE_SCHEMA : ${DB_SEIIA_ASSISTENTE_SCHEMA}
@@ -47,6 +48,7 @@ x-airflow-common: &airflow-common
     TZ: America/Sao_Paulo
     AIRFLOW__LOGGING__LOGGING_LEVEL: ${LOG_LEVEL}
     AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: ${AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG}
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-}
     AIRFLOW_API_BASE_URL: "http://airflow-webserver-pd:8080/api/v1"
     #configuração do ETL da nossa aplicação
     SOLR_MLT_PROCESS_CORE: ${SOLR_MLT_PROCESS_CORE}
@@ -55,6 +57,9 @@ x-airflow-common: &airflow-common
     MLT_JURISPRUDENCE_CONFIGSET: "/var/solr/configsets/jurisprudence"
 
     ENVIRONMENT: ${ENVIRONMENT}
+
+    JOBS_REDIS_URI: ${JOBS_REDIS_URI:-redis://redis_cache:6379/0}
+    JOBS_CACHE_ENABLED: ${JOBS_CACHE_ENABLED:-true}
 
     AIRFLOW_HOME: /opt/airflow
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
@@ -83,13 +88,24 @@ x-airflow-common: &airflow-common
     SOLR_PASSWORD: ${SOLR_PASSWORD}
     APP_API_RECOMMENDER_URL: "http://api_sei:8082/process-recommenders/weighted-mlt-recommender/recommendations-by-id-protocolo/{}?rows=5&debug=false"
 
+    EMBEDDING_PROVIDER: ${ASSISTENTE_EMBEDDING_PROVIDER}
+    EMBEDDING_MODEL: ${ASSISTENTE_EMBEDDING_MODEL:-embedding}
+    MAX_LENGTH_CHUNK_SIZE: ${ASSISTENTE_MAX_LENGTH_CHUNK_SIZE}
+    CHUNK_OVERLAP: ${ASSISTENTE_CHUNK_OVERLAP}
+    EMBEDDING_MAX_ACTIVE_RUNS: ${EMBEDDING_MAX_ACTIVE_RUNS}
+    LITELLM_PROXY_URL: ${ASSISTENTE_LITELLM_PROXY_URL}
+    LITELLM_MODEL_NAME: ${ASSISTENTE_EMBEDDING_MODEL:-embedding}
+    EMBEDDING_ENDPOINT: ${ASSISTENTE_LITELLM_PROXY_URL}
+    EMBEDDING_API_KEY: ${ASSISTENTE_LITELLM_PROXY_API_KEY:-dummy}
+
     SEI_API_DB_ADDRESS: "${SEI_ADDRESS}/sei/controlador_ws.php"
     SEI_API_DB_IDENTIFIER_SERVICE: ${SEI_API_DB_IDENTIFIER_SERVICE}
     SEI_API_DB_TIMEOUT: ${SEI_API_DB_TIMEOUT}
     SEI_API_DB_USER: ${SEI_API_DB_USER}
 
+
+
   volumes: &airflow-common-volumes
-    - airflow_jobs_vol:/home/airflow/app/jobs
     - airflow_logs_vol:/opt/airflow/logs
 
   user: "${AIRFLOW_UID:-50000}:0"
@@ -118,7 +134,7 @@ services:
     ports:
       - "5433:5433"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 10s
       retries: 10
       start_period: 5s
@@ -153,11 +169,11 @@ services:
     volumes: *airflow-common-volumes
 
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 15s
-      timeout: 10s
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 15s
       retries: 10
-      start_period: 10s
+      start_period: 90s
     restart: always
     networks:
       - network1
@@ -367,11 +383,10 @@ services:
         NB_USER: ${NB_USER}
         NB_UID: ${NB_UID}
         NB_GID: ${NB_GID}
-        LIB_CONNECTION : ${LIB_CONNECTION}
         GIT_TOKEN: ${GIT_TOKEN:-}
     command: opentelemetry-instrument gunicorn -k uvicorn.workers.UvicornH11Worker --reload --timeout 60 --keyfile /home/${NB_USER}/certificado/seiia.cert.key --certfile /home/${NB_USER}/certificado/seiia.cert.pem --bind=0.0.0.0:8082 api_sei.main:app
     environment:
-      <<: 
+      <<:
         - *airflow-common-env
         - *otel-common-env
       TZ: America/Sao_Paulo
@@ -412,10 +427,11 @@ services:
         NB_USER: ${NB_USER}
         NB_UID: ${NB_UID}
         NB_GID: ${NB_GID}
-        LIB_CONNECTION : ${LIB_CONNECTION}
         GIT_TOKEN: ${GIT_TOKEN:-}
 
     command: gunicorn -k uvicorn.workers.UvicornH11Worker --reload --bind=0.0.0.0:8642 jobs.api:app
+    env_file:
+      - ./.env
     environment:
       <<: *airflow-common-env
       TZ: America/Sao_Paulo
@@ -459,7 +475,6 @@ services:
         NB_USER: ${NB_USER}
         NB_UID: ${NB_UID}
         NB_GID: ${NB_GID}
-        LIB_CONNECTION : ${LIB_CONNECTION}
         GIT_TOKEN: ${GIT_TOKEN:-}
     command: uvicorn main:app --reload --host 0.0.0.0 --port 8086 --ssl-keyfile /home/${NB_USER}/certificado/seiia.cert.key --ssl-certfile /home/${NB_USER}/certificado/seiia.cert.pem
     environment:
@@ -486,7 +501,7 @@ services:
     depends_on:
       pgvector_all:
         condition: service_healthy
-  
+
   solr_pd:
     profiles:
       - all
@@ -611,22 +626,20 @@ services:
       network: host
       args:
         GIT_TOKEN: ${GIT_TOKEN:-}
-        LIB_CONNECTION : ${LIB_CONNECTION}
     restart: always
     env_file:
       - env_files/default.env
       - env_files/${ENVIRONMENT}.env
       - env_files/security.env
     environment:
-      <<: 
-        - *airflow-common-env
-        - *otel-common-env
+      <<: *airflow-common-env
       ASSISTENTE_CHUNK_OVERLAP: ${ASSISTENTE_CHUNK_OVERLAP}
       ASSISTENTE_CONTEXT_MAX_TOKENS: ${ASSISTENTE_CONTEXT_MAX_TOKENS}
-      ASSISTENTE_EMBEDDING_API_KEY: ${ASSISTENTE_EMBEDDING_API_KEY}
-      ASSISTENTE_EMBEDDING_ENDPOINT: ${ASSISTENTE_EMBEDDING_ENDPOINT}
-      ASSISTENTE_EMBEDDING_MODEL: ${ASSISTENTE_EMBEDDING_MODEL}
+      ASSISTENTE_EMBEDDING_MODEL: ${ASSISTENTE_EMBEDDING_MODEL:-embedding}
       ASSISTENTE_EMBEDDING_PROVIDER: ${ASSISTENTE_EMBEDDING_PROVIDER}
+      ASSISTENTE_LITELLM_PROXY_URL: ${ASSISTENTE_LITELLM_PROXY_URL}
+      ASSISTENTE_LITELLM_PROXY_API_KEY: ${ASSISTENTE_LITELLM_PROXY_API_KEY}
+      ASSISTENTE_EMBEDDING_ENCODING_NAME: ${ASSISTENTE_EMBEDDING_ENCODING_NAME}
       ASSISTENTE_USE_LANGFUSE: ${ASSISTENTE_USE_LANGFUSE}
       ASSISTENTE_MAX_RETRIES: ${ASSISTENTE_MAX_RETRIES}
       ASSISTENTE_MAX_LENGTH_CHUNK_SIZE: ${ASSISTENTE_MAX_LENGTH_CHUNK_SIZE}
@@ -635,20 +648,19 @@ services:
       ASSISTENTE_TIMEOUT_API: ${ASSISTENTE_TIMEOUT_API}
       DB_SEIIA_ASSISTENTE_SCHEMA: ${DB_SEIIA_ASSISTENTE_SCHEMA}
       LANGFUSE_URL: ${LANGFUSE_URL:-""}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-""}
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-""}
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-""}
       LANGFUSE_NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-""}
       LANGFUSE_SECRET_SALT: ${LANGFUSE_SECRET_SALT:-""}
       LD_LIBRARY_PATH: /opt/oracle
       LOG_LEVEL: ${LOG_LEVEL}
-      OPENAI_API_VERSION: ${OPENAI_API_VERSION}
       SEI_API_DB_TIMEOUT: ${SEI_API_DB_TIMEOUT}
       SEI_API_DB_USER: ${SEI_API_DB_USER}
       ORACLE_HOME: /opt/oracle
       ORACLE_VERSION: 19.25
+      ASSISTENTE_OUTPUT_TOKENS_THINK_MODEL: ${ASSISTENTE_OUTPUT_TOKENS_THINK_MODEL}
       ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL: ${ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL}
-      ASSISTENTE_ENDPOINT_STANDARD_MODEL: ${ASSISTENTE_ENDPOINT_STANDARD_MODEL}
-      ASSISTENTE_API_KEY_STANDARD_MODEL: ${ASSISTENTE_API_KEY_STANDARD_MODEL}
       PROJECT_ENDPOINT: ${PROJECT_ENDPOINT:-}
       AZURE_TENANT_ID: ${AZURE_TENANT_ID:-""}
       AZURE_SUBSCRIPTION_ID: ${AZURE_SUBSCRIPTION_ID:-""}
@@ -656,20 +668,16 @@ services:
       AZURE_WEB_AGENT_ID: ${AZURE_WEB_AGENT_ID:-""}
       AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-""}
       AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-""}
-      ASSISTENTE_NAME_STANDARD_MODEL: ${ASSISTENTE_NAME_STANDARD_MODEL}
-      ASSISTENTE_ENDPOINT_MINI_MODEL: ${ASSISTENTE_ENDPOINT_MINI_MODEL}
-      ASSISTENTE_API_KEY_MINI_MODEL: ${ASSISTENTE_API_KEY_MINI_MODEL}
-      ASSISTENTE_NAME_MINI_MODEL: ${ASSISTENTE_NAME_MINI_MODEL}
+      BING_CONNECTION_NAME: ${BING_CONNECTION_NAME:-""}
       ASSISTENTE_SUMMARIZE_MODEL: ${ASSISTENTE_SUMMARIZE_MODEL}
       ASSISTENTE_SUMMARIZE_CHUNK_SIZE: ${ASSISTENTE_SUMMARIZE_CHUNK_SIZE}
       ASSISTENTE_SUMMARIZE_CHUNK_MAX_OUTPUT: ${ASSISTENTE_SUMMARIZE_CHUNK_MAX_OUTPUT}
       ASSISTENTE_DEFAULT_RESPONSE_MODEL: ${ASSISTENTE_DEFAULT_RESPONSE_MODEL}
-      ASSISTENTE_API_KEY_THINK_MODEL : ${ASSISTENTE_API_KEY_THINK_MODEL}
-      ASSISTENTE_NAME_THINK_MODEL: ${ASSISTENTE_NAME_THINK_MODEL}
-      ASSISTENTE_ENDPOINT_THINK_MODEL: ${ASSISTENTE_ENDPOINT_THINK_MODEL}
- 
+      MODEL_DEPLOYMENT_NAME: ${MODEL_DEPLOYMENT_NAME:-"gpt-4.1"}
+      ASSISTENTE_REDIS_URI: ${JOBS_REDIS_URI:-redis://redis_cache:6379/0}
+      ASSISTENTE_CACHE_ENABLED: ${JOBS_CACHE_ENABLED:-true}
       TZ: "America/Sao_Paulo"
-    command: "uv run opentelemetry-instrument gunicorn sei_ia.main:app -c /app/sei_ia/configs/gunicorn_conf.py"
+    command: "uv run gunicorn sei_ia.main:app -c /app/sei_ia/configs/gunicorn_conf.py"
     networks:
       - network1
     deploy:
@@ -678,7 +686,7 @@ services:
           memory: ${ASSISTENTE_MEM_LIMIT}
           cpus: ${ASSISTENTE_CPU_LIMIT}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8088/"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8088/')"]
       start_period: 30s
       interval: 600s
       timeout: 10s
@@ -774,6 +782,40 @@ services:
       timeout: 10s
       retries: 5
 
+  redis_cache:
+    profiles:
+      - all
+      - externo
+    image: redis:7.2-alpine
+    expose:
+      - "6379"  # Expõe apenas internamente na rede, não externamente
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_MAXMEMORY=${REDIS_MAXMEMORY:-512mb}
+      - REDIS_MAXMEMORY_POLICY=${REDIS_MAXMEMORY_POLICY:-allkeys-lru}
+    command: >
+      sh -c "
+      if [ -n \"${REDIS_PASSWORD:-}\" ]; then
+        redis-server --requirepass ${REDIS_PASSWORD:-} --maxmemory ${REDIS_MAXMEMORY:-512mb} --maxmemory-policy ${REDIS_MAXMEMORY_POLICY:-allkeys-lru} --save 60 1000 --appendonly yes
+      else
+        redis-server --maxmemory ${REDIS_MAXMEMORY:-512mb} --maxmemory-policy ${REDIS_MAXMEMORY_POLICY:-allkeys-lru} --save 60 1000 --appendonly yes
+      fi
+      "
+    networks:
+      - network1
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: ${REDIS_MEM_LIMIT:-1g}
+          cpus: ${REDIS_CPU_LIMIT:-0.5}
+    healthcheck:
+      test: ["CMD-SHELL", "if [ -n \"$REDIS_PASSWORD\" ]; then redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG; else redis-cli ping | grep PONG; fi"]
+      start_period: 10s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   langfuse_assistente:
     profiles:
       - all
@@ -797,6 +839,41 @@ services:
         limits:
           memory: ${LANGFUSE_MEM_LIMIT}
           cpus: ${LANGFUSE_CPU_LIMIT}
+
+  litellm:
+    profiles:
+      - all
+      - externo
+    image: docker.litellm.ai/berriai/litellm:main-latest
+    command: --config /app/config.yaml --port ${LITELLM_PORT:-4000} --host 0.0.0.0
+    volumes:
+      - ./llm_config/litellm_config.yaml:/app/config.yaml
+    ports:
+      - "${LITELLM_PORT:-4000}:${LITELLM_PORT:-4000}"
+    expose:
+      - "${LITELLM_PORT:-4000}"
+    networks:
+      - network1
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      PORT: ${LITELLM_PORT:-4000}
+      LOG_LEVEL: ${LITELLM_LOG_LEVEL:-WARNING}
+      LITELLM_LOG_LEVEL: ${LITELLM_LOG_LEVEL:-WARNING}
+      UVICORN_LOG_LEVEL: "warning"  # Controla o nivel de log do Uvicorn (critical | error | warning | info | debug | trace)
+      LITELLM_REQUEST_TIMEOUT: "1800"  # 30 minutos para prompts grandes
+      UVICORN_TIMEOUT_KEEP_ALIVE: "1800"  # Keep-alive timeout
+    deploy:
+      resources:
+        limits:
+          memory: ${LITELLM_MEM_LIMIT:-2g}
+          cpus: ${LITELLM_CPU_LIMIT:-1}
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health').read()"]
+      start_period: 30s
+      interval: 60s
+      timeout: 10s
+      retries: 3
 
 volumes:
   airflow_jobs_vol:
