@@ -71,11 +71,11 @@ Returns:
     
     errors_envs = 0
     errors_conn = 0
-    health_erros = 0
-    solr_erros = 0
-    db_sei_erros = 0
-    assistente_erros = 0
-    similaridade_erros = 0
+    health_errors = 0
+    solr_errors = 0
+    db_sei_errors = 0
+    errors_assistente = 0
+    similaridade_errors = 0
     errors_docker = 0
     error_airflow_docker = 0
     error_litellm = 0
@@ -91,7 +91,7 @@ Returns:
             allowed_extra_vars=test_env.allowed_extra_vars
         )
         errors_envs = test_env.report_env_issues(results_envs)
-        test_env.anonymize_and_save(comparison_df,storage_proj_dir,test_env.anon_variables)
+        test_env.anonymize_and_save(comparison_df,storage_proj_dir,test_env.anonymize_variables)
     except Exception as e:
         errors_envs = 1
         log_print(f"Erro nos testes de variáveis de ambiente: {e}")
@@ -114,9 +114,9 @@ Returns:
     log_print("\n====== TESTE DE SAUDE DOS ENDPOINTS ==========\n")
     try:
         health_results = test_conn.test_api_connectivity_and_response_all(test_conn.health_testes_urls)
-        health_erros, _ = test_conn.connectivity_report(health_results, path = f"{storage_proj_dir}/health_df.csv")
+        health_errors, _ = test_conn.connectivity_report(health_results, path = f"{storage_proj_dir}/health_df.csv")
     except Exception as e:
-        health_erros = 1
+        health_errors = 1
         log_print(f"Erro nos testes de conectividade: {e}")
 
     log_print("\n====== TESTE DO LITELLM PROXY ================\n")
@@ -134,19 +134,19 @@ Returns:
         if comparison_df is not None:
             solr_config = test_conn.create_solr_config(comparison_df)
             solr_results = test_conn.test_connectivity_all_solr(solr_config)
-            solr_erros, _ = test_conn.connectivity_report(solr_results, path = f"{storage_proj_dir}/solr_df.csv")
+            solr_errors, _ = test_conn.connectivity_report(solr_results, path = f"{storage_proj_dir}/solr_df.csv")
         else:
-            solr_erros = 1
+            solr_errors = 1
             log_print("Erro nos testes de conexão com o SOLR: comparison_df não foi inicializado devido a falha nos testes de ambiente")
     except Exception as e:
-        solr_erros = 1
+        solr_errors = 1
         log_print(f"Erro nos testes de conexão com o SOLR: {e}")
     
     log_print("\n===== TESTE DE CONEXÃO COM BANCO DE DADOS ====\n")
     # log_print("\n================== EXTERNOS ==================\n")
     
     # Teste de conexão com banco do SEI removido - não utilizado mais
-    db_sei_erros = 0
+    db_sei_errors = 0
     # log_print("Teste de conexão com banco do SEI desabilitado - não utilizado mais")
     
     log_print("\n================== INTERNOS ==================\n")
@@ -169,21 +169,21 @@ Returns:
                 log_print("\nVerificando a existencia das tabelas do assistente:\n")
 
                 assistente_results = test_conn.verify_all_tables(assistente_db_instance, test_conn.assistente_tables,None,'postgres' ,verbose=False)
-                assistente_erros, _ = test_conn.connectivity_report(assistente_results, path = f"{storage_proj_dir}/table_assistente_df.csv")
-            
+                errors_assistente, _ = test_conn.connectivity_report(assistente_results, path = f"{storage_proj_dir}/table_assistente_df.csv")
+
             if similaridade_db_instance:
                 log_print("\n============= TABELAS DE SIMILARIDADE =========\n")
                 log_print("\nVerificando a existencia das tabelas de similaridade:\n")
 
                 similaridade_results = test_conn.verify_all_tables(similaridade_db_instance, test_conn.similaridade_tables,None, 'postgres' ,verbose=False)
-                similaridade_erros, _ = test_conn.connectivity_report(similaridade_results, path = f"{storage_proj_dir}/table_seisimilaridade_df.csv")
+                similaridade_errors, _ = test_conn.connectivity_report(similaridade_results, path = f"{storage_proj_dir}/table_seisimilaridade_df.csv")
         else:
-            assistente_erros = 1
-            similaridade_erros = 1
+            errors_assistente = 1
+            similaridade_errors = 1
             log_print("Erro nos testes de bancos internos (Assistente e Similaridade): comparison_df não foi inicializado devido a falha nos testes de ambiente")
     except Exception as e:
-        assistente_erros = 1
-        similaridade_erros = 1
+        errors_assistente = 1
+        similaridade_errors = 1
         log_print(f"Erro nos testes de bancos internos (Assistente e Similaridade): {e}")
     
     log_print("\n=================== DOCKER ====================\n")
@@ -274,12 +274,12 @@ Returns:
         "Quantidade de Erros": [
             errors_envs,
             errors_conn,
-            health_erros,
+            health_errors,
             error_litellm,
-            solr_erros,
-            db_sei_erros,
-            assistente_erros,
-            similaridade_erros,
+            solr_errors,
+            db_sei_errors,
+            errors_assistente,
+            similaridade_errors,
             errors_docker,
             error_airflow_docker,
             error_sei_api
