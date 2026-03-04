@@ -8,7 +8,7 @@ O *Servidor de Soluções de IA* contém as ferramentas necessárias para o func
 
 A instalação do *Servidor de Soluções de IA* foi projetada para ser simples, automatizando todos os procedimentos possíveis. No entanto, há alguns procedimentos que, por questões de segurança ou por estarem relacionados ao ambiente onde a instalação é realizada, precisam ser realizados manualmente pelo administrador do ambiente computacional. 
 
-Para melhor entendimento do manual, é **mandatório** que seja feita uma leitura integral deste README e do **[Manual de Instalação](docs/INSTALL.md)** antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
+Para melhor entendimento do manual, é **mandatório** que seja feita uma leitura integral deste README e do **[Manual de Instalação](docs/INSTALACAO.md)** antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
 
 - **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
 
@@ -44,7 +44,7 @@ O download do pacote de instalação do *Servidor de Soluções de IA* deve ser 
 
 ## Instalação
 
-As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[Manual de Instalação](docs/INSTALL.md)**.
+As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[Manual de Instalação](docs/INSTALACAO.md)**.
 
 ## Documentação
 
