@@ -71,7 +71,7 @@ Returns:
     
     errors_envs = 0
     errors_conn = 0
-    health_erros = 0
+    health_errors = 0
     solr_erros = 0
     db_sei_errors = 0
     assistente_erros = 0
