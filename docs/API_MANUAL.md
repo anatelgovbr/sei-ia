@@ -12,7 +12,7 @@ Aqui você pode encontrar uma breve descrição dos endpoints das APIs do servid
 
 ### Endpoints
 
-#### 1. Testes
+<!-- #### 1. Testes
 
 ##### `GET /tests`
 
@@ -27,9 +27,9 @@ Executa uma bateria de testes.
 - **200**: Resposta bem-sucedida.
 - **422**: Erro de validação.
 
----
+--- -->
 
-#### 2. Testes de Timeout
+#### 1. Testes de Timeout
 
 ##### `POST /tests/timeout/{timeout}`
 
@@ -46,7 +46,7 @@ Modelo de testes de timeout.
 
 ---
 
-#### 3. Verificação de Saúde
+#### 2. Verificação de Saúde
 
 ##### `GET /health`
 
@@ -58,7 +58,7 @@ Realiza uma verificação de saúde da API.
 
 ---
 
-#### 4. Retorno de Documento
+#### 3. Retorno de Documento
 
 ##### `GET /document/id_documento/{id_documento}`
 
@@ -75,7 +75,7 @@ Retorna o documento.
 
 ---
 
-#### 5. Retorno de Documento Externo
+#### 4. Retorno de Documento Externo
 
 ##### `GET /document/external/id_documento/{id_documento}`
 
@@ -92,7 +92,7 @@ Retorna o documento externo.
 
 ---
 
-#### 6. Retorno de Documento Interno
+#### 5. Retorno de Documento Interno
 
 ##### `GET /document/internal/id_documento/{id_documento}`
 
@@ -109,7 +109,7 @@ Retorna o documento interno.
 
 ---
 
-#### 7. Resposta do GPT-4 (128k)
+#### 6. Resposta do GPT-4 (128k)
 
 ##### `POST /llm_lang/chat_gpt_4o_128k`
 
@@ -132,7 +132,7 @@ Modelo de resposta do GPT-4.
 
 ---
 
-#### 8. Resposta do GPT-4 (128k)
+#### 7. Resposta do GPT-4 (128k)
 
 ##### `POST /llm_lang/chat_gpt_4_128k`
 
@@ -155,7 +155,7 @@ Modelo de resposta do GPT-4.
 
 ---
 
-#### 9. Resposta do GPT-4 Mini (128k)
+#### 8. Resposta do GPT-4 Mini (128k)
 
 ##### `POST /llm_lang/chat_gpt_4o_mini_128k`
 
@@ -178,7 +178,7 @@ Modelo de resposta do GPT-4 Mini.
 
 ---
 
-#### 10. Feedback
+#### 9. Feedback
 
 ##### `POST /feedback/feedback`
 

@@ -1,0 +1,76 @@
+model_list:
+  - model_name: standard
+    litellm_params:
+      model: azure/gpt-4.1 # Nome do modelo implantado
+      api_base: https://your-endpoint.openai.azure.com
+      api_key: your-api-key-here
+      api_version: "2025-03-01-preview"
+      max_completion_tokens: 32768
+    model_info:
+      base_model: gpt-4.1 # Nome do modelo original
+
+  - model_name: mini
+    litellm_params:
+      model: azure/gpt-4.1-mini # Nome do modelo implantado
+      api_base: https://your-endpoint.openai.azure.com
+      api_key: your-api-key-here
+      api_version: "2025-03-01-preview"
+      max_completion_tokens: 32768
+    model_info:
+      base_model: gpt-4.1-mini # Nome do modelo original
+
+  - model_name: think
+    litellm_params:
+      model: azure/gpt-5.2 # Nome do modelo implantado
+      api_base: https://your-endpoint.openai.azure.com
+      api_key: your-api-key-here
+      api_version: "2025-03-01-preview"
+      max_completion_tokens: 102400
+      reasoning_effort: "medium"
+      stream_timeout: 1800  # 30 minutos para streaming de reasoning models
+      timeout: 1800  # 30 minutos para prompts grandes
+    model_info:
+      base_model: gpt-5.2 # Nome do modelo original
+
+  - model_name: embedding
+    litellm_params:
+      model: azure/text-embedding-3-small # Nome do modelo implantado
+      api_base: https://your-endpoint.openai.azure.com
+      api_key: your-api-key-here
+      api_version: "2025-03-01-preview"
+    model_info:
+      base_model: text-embedding-3-small # Nome do modelo original
+
+# ============================================================================
+# Configuracoes de Retry e Reliability
+# ============================================================================
+
+# Configuracoes gerais do LiteLLM
+litellm_settings:
+  num_retries: 3  # Numero de tentativas de retry em cada modelo
+  request_timeout: 1800  # Timeout em segundos (30 minutos para reasoning models)
+  streaming_timeout: 1800  # Timeout para streaming (30 minutos)
+  drop_params: true  # Remove parametros nao suportados automaticamente
+  modify_params: true  # Permite modificacao de parametros para reasoning
+
+# Configuracoes do Router (load balancing e fallbacks)
+router_settings:
+  routing_strategy: simple-shuffle  # Estrategia de roteamento entre modelos
+  num_retries: 3  # Retries no nivel do router
+  timeout: 1800  # Timeout para operacoes do router em segundos (30 minutos)
+
+  # Politica de retry por tipo de erro
+  retry_policy:
+    AuthenticationErrorRetries: 0
+    TimeoutErrorRetries: 3
+    RateLimitErrorRetries: 3
+    ContentPolicyViolationErrorRetries: 0
+    InternalServerErrorRetries: 4
+    BadRequestErrorRetries: 0
+
+# Configuracoes gerais do proxy
+general_settings:
+  # master_key: os.environ/LITELLM_MASTER_KEY
+
+settings:
+  model_list: model_list

@@ -40,24 +40,16 @@ env_vars = {
             "SEI_API_DB_USER"
         ],
         "ASSISTENTE": [
-            "OPENAI_API_VERSION",
             "ASSISTENTE_EMBEDDING_MODEL",
-            "ASSISTENTE_EMBEDDING_API_KEY",
-            "ASSISTENTE_EMBEDDING_ENDPOINT",
+            "ASSISTENTE_EMBEDDING_ENCODING_NAME",
             "ASSISTENTE_DEFAULT_RESPONSE_MODEL",
-            "ASSISTENTE_API_KEY_STANDARD_MODEL",
-            "ASSISTENTE_ENDPOINT_STANDARD_MODEL",
-            "ASSISTENTE_NAME_STANDARD_MODEL",
+            "LITELLM_PORT",
+            "ASSISTENTE_LITELLM_PROXY_URL",
+            "ASSISTENTE_LITELLM_PROXY_API_KEY",
             "ASSISTENTE_OUTPUT_TOKENS_STANDARD_MODEL",
             "ASSISTENTE_CTX_LEN_STANDARD_MODEL",
-            "ASSISTENTE_API_KEY_MINI_MODEL",
-            "ASSISTENTE_ENDPOINT_MINI_MODEL",
-            "ASSISTENTE_NAME_MINI_MODEL",
             "ASSISTENTE_OUTPUT_TOKENS_MINI_MODEL",
             "ASSISTENTE_CTX_LEN_MINI_MODEL",
-            "ASSISTENTE_API_KEY_THINK_MODEL",
-            "ASSISTENTE_ENDPOINT_THINK_MODEL",
-            "ASSISTENTE_NAME_THINK_MODEL",
             "ASSISTENTE_OUTPUT_TOKENS_THINK_MODEL",
             "ASSISTENTE_CTX_LEN_THINK_MODEL",
             "ASSISTENTE_SUMMARIZE_MODEL",
@@ -67,6 +59,17 @@ env_vars = {
         "Solr_interno": [
             "SOLR_USER",
             "SOLR_PASSWORD"
+        ],
+        "AZURE_AI": [
+            "AGENT_ID",
+            "AZURE_CLIENT_ID",
+            "AZURE_CLIENT_SECRET",
+            "AZURE_SUBSCRIPTION_ID",
+            "AZURE_TENANT_ID",
+            "AZURE_WEB_AGENT_ID",
+            "BING_CONNECTION_NAME",
+            "MODEL_DEPLOYMENT_NAME",
+            "PROJECT_ENDPOINT"
         ]
     },
     "prod": {
@@ -93,7 +96,8 @@ env_vars = {
             "AIRFLOW_SCHEDULER_CPU_LIMIT",
             "AIRFLOW_SCHEDULER_CPU_SHARES",
             "AIRFLOW_TRIGGERER_MEM_LIMIT",
-            "AIRFLOW_TRIGGERER_CPU_LIMIT"
+            "AIRFLOW_TRIGGERER_CPU_LIMIT",
+            "EMBEDDING_MAX_ACTIVE_RUNS"
         ],
         "Api_sei": [
             "API_SEI_MEM_LIMIT",
@@ -118,12 +122,16 @@ env_vars = {
             "ASSISTENTE_NGINX_MEM_LIMIT",
             "ASSISTENTE_NGINX_CPU_LIMIT",
             "ASSISTENTE_CONTEXT_MAX_TOKENS",
-            "ASSISTENTE_FATOR_LIMITAR_RAG",
-            "ASSISTENTE_FATOR_LIMITAR_RAG_FALSO"
+            "ASSISTENTE_FATOR_LIMITAR_RAG"
         ],
         "LANGFUSE": [
             "LANGFUSE_MEM_LIMIT",
             "LANGFUSE_CPU_LIMIT"
+        ],
+        "LiteLLM": [
+            "LITELLM_CPU_LIMIT",
+            "LITELLM_MEM_LIMIT",
+            "LITELLM_LOG_LEVEL"
         ]
     },
     "default": {
@@ -180,7 +188,6 @@ env_vars = {
             "DB_SEIIA_HOST",
             "DB_SEIIA_PORT",
             "DB_SEIIA_ASSISTENTE_SCHEMA",
-            "LIB_CONNECTION",
             "DB_SEIIA_SIMILARIDADE",
             "DB_SEIIA_ASSISTENTE"
         ]
@@ -193,7 +200,8 @@ allowed_empty_vars = [
     "LANGFUSE_PUBLIC_KEY",
     "LANGFUSE_SECRET_KEY",
     "LANGFUSE_SECRET_SALT",
-    "LANGFUSE_URL"
+    "LANGFUSE_URL",
+    "ASSISTENTE_LITELLM_PROXY_API_KEY"
 ]
 
 # Lista de variáveis que podem estar presentes nos arquivos .env sem serem consideradas erros
@@ -222,7 +230,7 @@ def load_env_file(file_path: str) -> pd.DataFrame:
             # Ensure line contains an equals sign
             if '=' in line:
                 processed_lines.append(line)
-    
+
     # Parse the lines and handle potential issues
     parsed_lines = []
     for line in processed_lines:
@@ -233,11 +241,11 @@ def load_env_file(file_path: str) -> pd.DataFrame:
             # Ensure both parts are non-empty strings
             if var_name and isinstance(var_name, str):
                 parsed_lines.append([var_name, var_value])
-    
+
     return pd.DataFrame(parsed_lines, columns=['variavel', 'value'])
 
 def validate_specific_variables(comparison_df: pd.DataFrame) -> pd.DataFrame:
-   
+
     def validate_azure_endpoint(value) -> bool:
         try:
             if pd.isna(value) or not isinstance(value, str):
@@ -259,11 +267,11 @@ def validate_specific_variables(comparison_df: pd.DataFrame) -> pd.DataFrame:
         'AZURE_OPENAI_ENDPOINT_GPT4o_mini': validate_azure_endpoint,
         'ENVIRONMENT': validate_environment,
     }
-    
+
     # Initialize 'valid' column if it doesn't exist
     if 'valid' not in comparison_df.columns:
         comparison_df['valid'] = True
-    
+
     for var, validation_func in validations.items():
         mask = comparison_df['variavel'] == var
         if mask.any():
@@ -284,17 +292,17 @@ def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame, allo
 
     missing_vars = comparison_df[comparison_df['_merge'] == 'left_only']
     extra_vars = comparison_df[
-        (comparison_df['_merge'] == 'right_only') & 
+        (comparison_df['_merge'] == 'right_only') &
         (~comparison_df['variavel'].isin(allowed_extra_vars))
     ]
     empty_vars = comparison_df[
-        ((comparison_df['value'].isna()) | 
-         (comparison_df['value'].isin(["*****", "<VALOR>"]))) & 
+        ((comparison_df['value'].isna()) |
+         (comparison_df['value'].isin(["*****", "<VALOR>"]))) &
         (~comparison_df['variavel'].isin(allowed_empty_vars))
     ]
     duplicated_vars = env_df[env_df.duplicated(subset=['variavel'], keep=False)]
     invalid_vars = comparison_df[comparison_df['valid'] == False]
-    
+
     results = {
         'missing': missing_vars[['file', 'categoria', 'variavel', 'value']],
         'extra': extra_vars[['file', 'categoria', 'variavel', 'value']],

@@ -79,6 +79,7 @@ Returns:
     errors_docker = 0
     errors_log_docker = 0
     error_airflow_docker = 0
+    error_litellm = 0
     comparison_df = None  # Initialize comparison_df to prevent NameError
 
     try:
@@ -107,12 +108,20 @@ Returns:
         log_print(f"Erro nos testes de conectividade: {e}")
     
     log_print("\n====== TESTE DE SAUDE DOS ENDPOINTS ==========\n")
-    try: 
+    try:
         health_results = test_conn.test_api_connectivity_and_response_all(test_conn.health_testes_urls)
         health_erros, _ = test_conn.connectivity_report(health_results, path = f"{storage_proj_dir}/health_df.csv")
     except Exception as e:
         errors_health = 1
         log_print(f"Erro nos testes de conectividade: {e}")
+
+    log_print("\n====== TESTE DO LITELLM PROXY ================\n")
+    try:
+        litellm_result = test_conn.test_litellm_proxy_models()
+        error_litellm = test_conn.report_litellm_proxy_status(litellm_result)
+    except Exception as e:
+        error_litellm = 1
+        log_print(f"Erro no teste do LiteLLM Proxy: {e}")
 
 
     log_print("\n========= TESTE DE CONEXÃO COM SOLR ==========\n")
@@ -247,26 +256,28 @@ Returns:
     
     data = {
         "Categoria": [
-            "Env Variables", 
-            "Conectividade", 
+            "Env Variables",
+            "Conectividade",
             "Health",
-            "Conexão com SOLR", 
-            "Banco de Dados Externo (SEI)", 
-            "Banco de Dados Interno (Assistente)", 
-            "Banco de Dados Interno (Similaridade)", 
-            "Docker - Status", 
+            "LiteLLM Proxy",
+            "Conexão com SOLR",
+            "Banco de Dados Externo (SEI)",
+            "Banco de Dados Interno (Assistente)",
+            "Banco de Dados Interno (Similaridade)",
+            "Docker - Status",
             "Airflow",
             "SEI API"
         ],
         "Quantidade de Erros": [
-            errors_envs, 
-            errors_conn, 
+            errors_envs,
+            errors_conn,
             health_erros,
-            solr_erros, 
-            db_sei_erros, 
-            assistente_erros, 
-            similaridade_erros, 
-            errors_docker, 
+            error_litellm,
+            solr_erros,
+            db_sei_erros,
+            assistente_erros,
+            similaridade_erros,
+            errors_docker,
             error_airflow_docker,
             error_sei_api
         ]

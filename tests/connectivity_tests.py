@@ -318,12 +318,29 @@ def create_connectivity_config(comparison_df: pd.DataFrame) -> dict:
     Cria uma configuração de conectividade a partir de um DataFrame de variáveis de ambiente.
 
     Parameters:
-    - comparison_df (pd.DataFrame): DataFrame contendo variáveis de ambiente com colunas 
+    - comparison_df (pd.DataFrame): DataFrame contendo variáveis de ambiente com colunas
       'variavel' e 'value', onde 'variavel' identifica o serviço e 'value' armazena o valor.
 
     Returns:
     - dict: Dicionário com a configuração de conectividade, contendo hosts e portas dos serviços.
     """
+    # Extrair URL do LiteLLM Proxy da variável de ambiente
+    litellm_proxy_url = os.getenv("ASSISTENTE_LITELLM_PROXY_URL", "http://litellm:4000")
+
+    # Parse da URL do LiteLLM para extrair host e porta
+    try:
+        # Remove protocolo (http:// ou https://)
+        litellm_url_parts = litellm_proxy_url.replace("http://", "").replace("https://", "")
+        if ":" in litellm_url_parts:
+            litellm_host, litellm_port = litellm_url_parts.split(":")
+            litellm_port = int(litellm_port)
+        else:
+            litellm_host = litellm_url_parts
+            litellm_port = 80  # porta padrão se não especificada
+    except:
+        litellm_host = "litellm"
+        litellm_port = 4000
+
     return {
         "DB_INTERNO": {
             "host": comparison_df[comparison_df['variavel'] == 'DB_SEIIA_HOST']['value'].values[0],
@@ -331,7 +348,7 @@ def create_connectivity_config(comparison_df: pd.DataFrame) -> dict:
         },
         "Solr_Interno": {
             "host": comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
-            "port": int(comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[2].replace("//", ""))  
+            "port": int(comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[2].replace("//", ""))
         },
         "API_SEI": {
             "host": "api_sei",
@@ -352,6 +369,10 @@ def create_connectivity_config(comparison_df: pd.DataFrame) -> dict:
         "AIRFLOW": {
             "host": "airflow-webserver-pd",
             "port": 8080
+        },
+        "LITELLM_PROXY": {
+            "host": litellm_host,
+            "port": litellm_port
         }
     }
 
@@ -401,16 +422,29 @@ def test_connectivity_all(config: dict, verbose: bool = False) -> dict:
     return results
 
 
-health_testes_urls = {
-    "api_recomendacao": {"https://api_sei:8082":[
-        "/health",
-        "/health/database",
-        # "/health/process-recommendation",
-        # "/health/document-recommendation"
-    ]},
-    "api_feedback": {"https://app-api-feedback:8086":["/health"]},
-    "api_assistente": {"http://api_assistente:8088":["/health"]}
-}
+def get_health_testes_urls() -> dict:
+    """
+    Retorna o dicionário de URLs de testes de health, usando variáveis de ambiente quando disponíveis.
+
+    Returns:
+        dict: Dicionário com URLs e endpoints para testes de health
+    """
+    litellm_proxy_url = os.getenv("ASSISTENTE_LITELLM_PROXY_URL", "http://litellm:4000")
+
+    return {
+        "api_recomendacao": {"https://api_sei:8082":[
+            "/health",
+            "/health/database",
+            # "/health/process-recommendation",
+            # "/health/document-recommendation"
+        ]},
+        "api_feedback": {"https://app-api-feedback:8086":["/health"]},
+        "api_assistente": {"http://api_assistente:8088":["/health"]},
+        "litellm_proxy": {litellm_proxy_url:["/health"]}
+    }
+
+# Compatibilidade: manter health_testes_urls como variável global
+health_testes_urls = get_health_testes_urls()
 
 
 def test_api_connectivity_and_response(api_url: str, expected_status: int = 200) -> bool:
@@ -449,7 +483,7 @@ def test_api_connectivity_and_response_all(health_tests_urls: dict, expected_sta
         expected_status (int, opcional): Código de status HTTP esperado para cada resposta (padrão é 200).
 
     Retorna:
-        list: Uma lista de dicionários contendo o relatório de cada teste, incluindo serviço, status de conectividade, 
+        list: Uma lista de dicionários contendo o relatório de cada teste, incluindo serviço, status de conectividade,
               host, porta e endpoint.
     """
     report = []
@@ -464,3 +498,159 @@ def test_api_connectivity_and_response_all(health_tests_urls: dict, expected_sta
                     "Endpoint": check
                 })
     return report
+
+
+def test_litellm_proxy_models(proxy_url: str = None) -> dict:
+    """
+    Testa se o LiteLLM Proxy está rodando e se os modelos esperados (standard, mini, think, embedding) estão disponíveis.
+
+    Parâmetros:
+        proxy_url (str): URL base do LiteLLM Proxy. Se None, usa a variável de ambiente ASSISTENTE_LITELLM_PROXY_URL
+                        (padrão: http://litellm:4000)
+
+    Retorna:
+        dict: Dicionário com o status de cada modelo e informações de erro, se houver.
+              Estrutura: {
+                  "proxy_health": bool,
+                  "models": {
+                      "standard": {"available": bool, "details": dict},
+                      "mini": {"available": bool, "details": dict},
+                      "think": {"available": bool, "details": dict},
+                      "embedding": {"available": bool, "details": dict}
+                  },
+                  "error": str (se houver)
+              }
+    """
+    # Se proxy_url não foi fornecido, usa a variável de ambiente
+    if proxy_url is None:
+        proxy_url = os.getenv("ASSISTENTE_LITELLM_PROXY_URL", "http://litellm:4000")
+
+    logging.info(f"Testando LiteLLM Proxy em: {proxy_url}")
+
+    result = {
+        "proxy_health": False,
+        "proxy_url": proxy_url,
+        "models": {
+            "standard": {"available": False, "details": {}},
+            "mini": {"available": False, "details": {}},
+            "think": {"available": False, "details": {}},
+            "embedding": {"available": False, "details": {}}
+        },
+        "error": None
+    }
+
+    required_models = ["standard", "mini", "think", "embedding"]
+
+    try:
+        # Testar health do proxy
+        health_response = requests.get(f"{proxy_url}/health", timeout=10)
+        if health_response.status_code == 200:
+            result["proxy_health"] = True
+            logging.info("LiteLLM Proxy está rodando e respondendo ao /health")
+        else:
+            result["error"] = f"LiteLLM Proxy /health retornou status {health_response.status_code}"
+            logging.error(result["error"])
+            return result
+
+        # Listar modelos disponíveis
+        models_response = requests.get(f"{proxy_url}/v1/models", timeout=10)
+
+        if models_response.status_code == 200:
+            models_data = models_response.json()
+            available_models = []
+
+            # Extrair nomes dos modelos disponíveis
+            if "data" in models_data:
+                available_models = [model.get("id") for model in models_data["data"]]
+                logging.debug(f"Modelos disponíveis no LiteLLM: {available_models}")
+
+            # Verificar cada modelo requerido
+            for model_name in required_models:
+                if model_name in available_models:
+                    result["models"][model_name]["available"] = True
+                    result["models"][model_name]["details"] = {
+                        "status": "OK",
+                        "message": f"Modelo '{model_name}' está disponível"
+                    }
+                    logging.info(f"✅ Modelo '{model_name}' encontrado no LiteLLM Proxy")
+                else:
+                    result["models"][model_name]["available"] = False
+                    result["models"][model_name]["details"] = {
+                        "status": "MISSING",
+                        "message": f"Modelo '{model_name}' NÃO está disponível"
+                    }
+                    logging.error(f"❌ Modelo '{model_name}' NÃO encontrado no LiteLLM Proxy")
+        else:
+            result["error"] = f"Falha ao listar modelos do LiteLLM: HTTP {models_response.status_code}"
+            logging.error(result["error"])
+
+    except requests.exceptions.RequestException as e:
+        result["error"] = f"Erro ao conectar ao LiteLLM Proxy: {str(e)}"
+        logging.error(result["error"])
+    except Exception as e:
+        result["error"] = f"Erro inesperado ao testar LiteLLM Proxy: {str(e)}"
+        logging.error(result["error"])
+
+    return result
+
+
+def report_litellm_proxy_status(test_result: dict) -> int:
+    """
+    Gera um relatório do status do LiteLLM Proxy e retorna o número de erros encontrados.
+
+    Parâmetros:
+        test_result (dict): Resultado do teste de modelos do LiteLLM Proxy
+
+    Retorna:
+        int: Número de erros encontrados (proxy down + modelos faltando)
+    """
+    error_count = 0
+
+    logging.info("\n========== STATUS DO LITELLM PROXY ===========")
+    logging.info(f"URL do Proxy: {test_result.get('proxy_url', 'N/A')}")
+
+    # Verificar saúde do proxy
+    if test_result["proxy_health"]:
+        logging.info("✅ LiteLLM Proxy: OK (respondendo)")
+    else:
+        logging.error("❌ LiteLLM Proxy: FALHOU (não está respondendo)")
+        error_count += 1
+        if test_result["error"]:
+            logging.error(f"   Erro: {test_result['error']}")
+        return error_count  # Se o proxy não está rodando, retornar imediatamente
+
+    # Verificar modelos
+    logging.info("\n---------- Modelos Configurados --------------")
+    models_status = []
+    for model_name, model_info in test_result["models"].items():
+        if model_info["available"]:
+            status_icon = "✅"
+            status_text = "DISPONÍVEL"
+        else:
+            status_icon = "❌"
+            status_text = "FALTANDO"
+            error_count += 1
+
+        models_status.append({
+            "Modelo": model_name,
+            "Status": f"{status_icon} {status_text}",
+            "Mensagem": model_info["details"].get("message", "")
+        })
+
+        logging.info(f"{status_icon} {model_name}: {status_text}")
+
+    # Resumo
+    total_models = len(test_result["models"])
+    available_models = sum(1 for m in test_result["models"].values() if m["available"])
+
+    logging.info(f"\n---------- Resumo ----------------------------")
+    logging.info(f"Total de modelos esperados: {total_models}")
+    logging.info(f"Modelos disponíveis: {available_models}")
+    logging.info(f"Modelos faltando: {total_models - available_models}")
+
+    if error_count == 0:
+        logging.info("\n✅ Todos os modelos do LiteLLM Proxy estão OK!")
+    else:
+        logging.error(f"\n❌ Encontrados {error_count} erro(s) no LiteLLM Proxy")
+
+    return error_count

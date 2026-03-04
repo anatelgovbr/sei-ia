@@ -9,6 +9,15 @@ source env_files/prod.env
 source env_files/default.env
 source env_files/security.env
 
+# Gerar AIRFLOW__WEBSERVER__SECRET_KEY automaticamente se não definida
+if [ -z "$AIRFLOW__WEBSERVER__SECRET_KEY" ]; then
+    echo "*** $(date): AIRFLOW__WEBSERVER__SECRET_KEY não encontrada. Gerando nova chave automaticamente..."
+    NEW_AIRFLOW_SECRET_KEY=$(openssl rand -base64 32)
+    export AIRFLOW__WEBSERVER__SECRET_KEY="$NEW_AIRFLOW_SECRET_KEY"
+    echo "export AIRFLOW__WEBSERVER__SECRET_KEY=\"$NEW_AIRFLOW_SECRET_KEY\"" >> env_files/security.env
+    echo "*** $(date): Chave salva em env_files/security.env para reutilização futura."
+fi
+
 # Carregar variáveis de ambiente específicas de acordo com o argumento
 cat env_files/prod.env > .env
 cat env_files/default.env >> .env
@@ -26,8 +35,10 @@ echo 'export GIT_TOKEN=""
 export LANGFUSE_SECRET_SALT=""
 export LANGFUSE_NEXTAUTH_SECRET=""
 export LANGFUSE_URL=""
+export LANGFUSE_HOST=""
 export LANGFUSE_PUBLIC_KEY=""
 export LANGFUSE_SECRET_KEY=""
+export REDIS_PASSWORD=""
 ' >> .env
 
 
@@ -72,13 +83,15 @@ attempt=1
 
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' "$CONTAINER_NAME" 2>/dev/null | tr -d '"')
-  
+
   if [ "$HEALTH" == "healthy" ]; then
     echo "*** `date`: Container $CONTAINER_NAME está saudável. Prosseguindo..."
     break
   elif [ -z "$HEALTH" ]; then
-    echo "*** `date`: Container $CONTAINER_NAME não encontrado ou sem healthcheck configurado."
-    exit 1
+    echo "Container $CONTAINER_NAME ainda não iniciado (aguardando serviços dependentes)..."
+    sleep $SLEEP_INTERVAL
+    ((attempt++))
+    continue
   else
     sleep $SLEEP_INTERVAL
     ((attempt++))
