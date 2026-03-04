@@ -27,7 +27,7 @@
 
 ## Pré-requisitos
 
-Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, considerando os dados e a carga de trabalho da Anatel. Outras configurações de alocação de recursos podem ser avalidas por pessoas devidamente capacitadas.
+Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, considerando os dados e a carga de trabalho da Anatel. Outras configurações de alocação de recursos podem ser avaliadas por pessoas devidamente capacitadas.
 
 - **CPU**:
   - Provisionado: 16 Cores com 2.10GHz
