@@ -1,5 +1,5 @@
 """
-Modulo de testes de conexões.
+Módulo de testes de conexões.
 
 Este módulo permite configurar e testar a conectividade com uma lista de serviços,
 como bancos de dados, Solr, e APIs, conforme especificado nas variáveis de ambiente.
@@ -199,7 +199,7 @@ def verify_all_tables(instance: DBConnector, tables: list[str], schema: str = No
     """
     result = {}
     for table in tables:
-        result[table] = {"Reacheble": verify_table(instance, table, schema, DATABASE_TYPE, verbose)}
+        result[table] = {"Reachable": verify_table(instance, table, schema, DATABASE_TYPE, verbose)}
     return result
 
 def create_solr_config(comparison_df: pd.DataFrame) -> dict:
@@ -253,16 +253,16 @@ def verificar_status_solr(host:str, port:int, core:str, interno:bool, verbose:bo
         if response.status_code == 200:
             if verbose:
                 logging.debug(f"Conexão ao core '{core}' bem-sucedida.")
-            return {"Reacheble": True, "Host": host, "Port": port, "Core": core}
+            return {"Reachable": True, "Host": host, "Port": port, "Core": core}
         else:
             if verbose:
                 logging.error(f"Core '{core}' não encontrado ou inativo.")
-            return {"Reacheble": False, "Host": host, "Port": port, "Core": core}
+            return {"Reachable": False, "Host": host, "Port": port, "Core": core}
     
     except requests.exceptions.RequestException as e:
         if verbose:
             logging.error(f"Erro ao conectar ao Solr '{core}':", e)
-        return {"Reacheble": False, "Host": host, "Port": port, "Core": core}
+        return {"Reachable": False, "Host": host, "Port": port, "Core": core}
 
 def test_connectivity_all_solr(solr_config:dict, verbose:bool = True) -> dict:
     """
@@ -296,14 +296,14 @@ def connectivity_report(results:dict , return_df:bool=False, path:str = None)->t
     """
     try:
         results_df = pd.DataFrame.from_dict(results, orient="index")
-    except:
+    except Exception:
         results_df = pd.DataFrame.from_dict(results)
-    error_count = len(results_df[results_df["Reacheble"] == False])
+    error_count = len(results_df[results_df["Reachable"] == False])
 
     if error_count > 0:
         logging.error("\nHouve falha nos testes abaixo:\n")
-        # logging.info(results_df[results_df["Reacheble"] == False][["Host", "Port", "Core", "Reacheble"]].to_markdown())
-        logging.error(results_df[results_df["Reacheble"] == False].to_markdown())
+        # logging.info(results_df[results_df["Reachable"] == False][["Host", "Port", "Core", "Reachable"]].to_markdown())
+        logging.error(results_df[results_df["Reachable"] == False].to_markdown())
     else:
         logging.info("\nTodos os testes passaram.\n")
 
@@ -337,7 +337,7 @@ def create_connectivity_config(comparison_df: pd.DataFrame) -> dict:
         else:
             litellm_host = litellm_url_parts
             litellm_port = 80  # porta padrão se não especificada
-    except:
+    except Exception:
         litellm_host = "litellm"
         litellm_port = 4000
 
@@ -418,7 +418,7 @@ def test_connectivity_all(config: dict, verbose: bool = False) -> dict:
         host = settings["host"]
         port = settings["port"]
         result = test_connectivity(host, port, service_name, verbose)
-        results[service_name] = {"Reacheble": result, "Host": host, "Port": port}
+        results[service_name] = {"Reachable": result, "Host": host, "Port": port}
     return results
 
 
@@ -492,7 +492,7 @@ def test_api_connectivity_and_response_all(health_tests_urls: dict, expected_sta
             for check in health_tests_urls[servico][url]:
                 report.append({
                     "Servico": servico,
-                    "Reacheble": test_api_connectivity_and_response(f'{url}{check}', expected_status),
+                    "Reachable": test_api_connectivity_and_response(f'{url}{check}', expected_status),
                     "Host": url.split(":")[1].replace("//", ""),
                     "Port": url.split(":")[2],
                     "Endpoint": check

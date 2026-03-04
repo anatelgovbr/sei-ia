@@ -364,7 +364,6 @@ class DBConnector:
             if if_exists == "replace":
                 # Usa a lógica do método insert_replace
                 temp_table_name = f"temp_{table_name}"
-                temp_table = Table(temp_table_name, self.base.metadata, autoload_with=self.engine)
 
                 # Insere os dados na tabela temporária
                 df.to_sql(temp_table_name, self.engine, if_exists="replace", index=False)
