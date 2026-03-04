@@ -3,7 +3,7 @@ Módulo de Testes Automatizados para Ambiente, Conectividade, Docker, Airflow e 
 
 Este módulo executa uma série de testes automatizados para garantir que o ambiente, as conexões de rede,
 os bancos de dados, o Docker, o Airflow e o LiteLLM Proxy estão funcionando corretamente. Cada categoria de teste é realizada
-com o auxílio de funções específicas de teste, e os resultados são registrados em um arquivo de log com a 
+com o auxílio de funções específicas de teste, e os resultados são registrados em um arquivo de log com a
 data e hora atual.
 
 Além disso, ao final dos testes, é gerado um resumo com a quantidade de erros encontrados em cada categoria,
@@ -12,9 +12,9 @@ e salvo em um arquivo zip em /opt/sei-ia-storage/logs/{data}.zip.
 """
 
 import logging
-from datetime import datetime
 import os
 import shutil
+from datetime import datetime
 
 
 def test_all():
@@ -31,7 +31,7 @@ Durante a execução, os testes incluem:
     - Testes de execução de DAGs do Airflow e problemas relacionados
     - Testes do LiteLLM Proxy e de sua conectividade/funcionamento
 
-Os resultados de cada categoria de teste são armazenados em um DataFrame, e um resumo final com 
+Os resultados de cada categoria de teste são armazenados em um DataFrame, e um resumo final com
 a quantidade de erros é impresso no log.
 
 Exceções que ocorrerem durante os testes são registradas no arquivo de log.
@@ -45,29 +45,30 @@ Returns:
     storage_proj_dir = os.path.join(storage_proj_dir_base, 'logs', now)
     os.makedirs(storage_proj_dir, exist_ok=True)
     log_filename = os.path.join(storage_proj_dir, f'tests_{now}.log')
-    
+
     logging.basicConfig(
-        level=logging.INFO,  
+        level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.StreamHandler(),  
+            logging.StreamHandler(),
             logging.FileHandler(log_filename)
         ]
     )
-    
+
     def log_print(msg):
         logging.info(msg)
 
     log_print("\n==================== TESTES ==================\n")
     log_print("\n==================== ENVS ====================\n")
-    
-    import tests.env_tests as test_env
-    import tests.connectivity_tests as test_conn
-    import tests.docker_tests as test_docker
-    import tests.airflow_tests as test_airflow
+
     import docker
     import pandas as pd
-    
+
+    import tests.airflow_tests as test_airflow
+    import tests.connectivity_tests as test_conn
+    import tests.docker_tests as test_docker
+    import tests.env_tests as test_env
+
     errors_envs = 0
     errors_conn = 0
     health_errors = 0
@@ -93,7 +94,7 @@ Returns:
         log_print(f"Erro nos testes de variáveis de ambiente: {e}")
 
     log_print("\n============== CONECTIVIDADE =================\n")
-    
+
     try:
         if comparison_df is not None:
             config = test_conn.create_connectivity_config(comparison_df)  # VEM DO TESTE DE ENV
@@ -106,7 +107,7 @@ Returns:
     except Exception as e:
         errors_conn = 1
         log_print(f"Erro nos testes de conectividade: {e}")
-    
+
     log_print("\n====== TESTE DE SAUDE DOS ENDPOINTS ==========\n")
     try:
         health_results = test_conn.test_api_connectivity_and_response_all(test_conn.health_testes_urls)
@@ -125,7 +126,7 @@ Returns:
 
 
     log_print("\n========= TESTE DE CONEXÃO COM SOLR ==========\n")
-    
+
     try:
         if comparison_df is not None:
             solr_config = test_conn.create_solr_config(comparison_df)
@@ -137,16 +138,16 @@ Returns:
     except Exception as e:
         solr_errors = 1
         log_print(f"Erro nos testes de conexão com o SOLR: {e}")
-    
+
     log_print("\n===== TESTE DE CONEXÃO COM BANCO DE DADOS ====\n")
     # log_print("\n================== EXTERNOS ==================\n")
-    
+
     # Teste de conexão com banco do SEI removido - não utilizado mais
     db_sei_errors = 0
     # log_print("Teste de conexão com banco do SEI desabilitado - não utilizado mais")
-    
+
     log_print("\n================== INTERNOS ==================\n")
-    
+
     try:
         if comparison_df is not None:
             _, assistente_db_instance, similaridade_db_instance = test_conn.create_postgres_config(comparison_df)
@@ -154,12 +155,12 @@ Returns:
                 log_print("Sem erros de conexao com o BD do Assistente")
             else:
                 log_print("Não foi possível conectar com o BD do Assistente")
-            
+
             if similaridade_db_instance:
                 log_print("Sem erros de conexao com o BD do Sei-similaridade")
             else:
                 log_print("Não foi possível conectar com o BD do Sei-similaridade")
-            
+
             if assistente_db_instance:
                 log_print("\n============= TABELAS DO ASSISTENTE ==========\n")
                 log_print("\nVerificando a existencia das tabelas do assistente:\n")
@@ -181,9 +182,9 @@ Returns:
         errors_assistente = 1
         similaridade_errors = 1
         log_print(f"Erro nos testes de bancos internos (Assistente e Similaridade): {e}")
-    
+
     log_print("\n=================== DOCKER ====================\n")
-    
+
     try:
         container_status = test_docker.get_docker_containers(verbose=False)
         container_status_df = test_docker.verify_status_docker(container_status, test_docker.containers_names, verbose=False)
@@ -195,14 +196,14 @@ Returns:
     except Exception as e:
         errors_docker = 1
         log_print(f"Erro nos testes de Docker: {e}")
-    
+
     log_print("\n=================== AIRFLOW ===================\n")
-    
+
     try:
         client = docker.from_env()
         container_name = container_status_df[container_status_df['Nome'].str.contains("airflow-webserver")]['Nome'].values[0]
         container = client.containers.get(container_name)
-        
+
         output_text = test_airflow.run_command(container, "airflow dags list")
         airflow_dags_df, error_airflow_lines = test_airflow.convert_docker_airflow_output_to_df(output_text)
         airflow_dags_df.to_csv(f"{storage_proj_dir}/airflow_dags_df.csv",index=False)
@@ -211,33 +212,33 @@ Returns:
         # runs_df = test_airflow.get_dags_runs(container, airflow_dags_df, dag_filename_error)
         # airflow_results = test_airflow.compare_dag_runs(runs_df, storage_proj_dir)
         # airflow_errors = test_airflow.report_dag_run_issues(airflow_results, runs_df)
-        
+
         # log_print("\n========== AIRFLOW - RESUMO DAG RUNS ==========\n")
         # log_print(runs_df.to_markdown(index=False))
     except Exception as e:
         error_airflow_docker = 1
         log_print(f"Erro no teste do Airflow: {e}")
-    
+
     log_print("\n================ SEI API ======================\n")
-    
+
     try:
         client = docker.from_env()
         jobs_api_containers = [c for c in client.containers.list() if 'jobs_api' in c.name]
         if jobs_api_containers:
             jobs_api_container = jobs_api_containers[0]
             log_print(f"Executando teste da SEI API no container: {jobs_api_container.name}")
-            
+
             # Executa o teste da SEI API
             result = jobs_api_container.exec_run(
                 "python -m tests.test_sei_db_handlers",
                 workdir="/home/seiia/app"
             )
-            
+
             output = result.output.decode('utf-8')
             exit_code = result.exit_code
-            
+
             log_print(f"Saída do teste da SEI API:\n{output}")
-            
+
             if exit_code == 0:
                 log_print("✅ Teste da SEI API passou com sucesso!")
                 error_sei_api = 0
@@ -250,9 +251,9 @@ Returns:
     except Exception as e:
         error_sei_api = 1
         log_print(f"Erro no teste da SEI API: {e}")
-    
+
     log_print("\n============== RESUMO - TESTES ================\n")
-    
+
     data = {
         "Categoria": [
             "Env Variables",

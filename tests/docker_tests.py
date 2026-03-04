@@ -2,7 +2,7 @@
 Módulo de monitoramento de containers Docker.
 
 Este módulo permite monitorar o status dos containers Docker e seus logs, incluindo a verificação
-de execução, reinicialização, status de saúde e logs de erros. Ele facilita o diagnóstico rápido de problemas 
+de execução, reinicialização, status de saúde e logs de erros. Ele facilita o diagnóstico rápido de problemas
 em containers Docker relevantes para o sistema.
 
 Exemplo de uso:
@@ -14,8 +14,8 @@ errors_in_logs = report_docker_logs(logs, show_logs=True)
 
 Lista de containers para verificação:
 containers_names = [
-    'airflow-worker', 'airflow-scheduler', 'airflow-webserver', 'airflow-triggerer', 
-    'nginx_assistente', 'solr_pd', 'pgvector_all', 'app-api-feedback', 'api_sei', 
+    'airflow-worker', 'airflow-scheduler', 'airflow-webserver', 'airflow-triggerer',
+    'nginx_assistente', 'solr_pd', 'pgvector_all', 'app-api-feedback', 'api_sei',
     'api_assistente', 'airflow_postgres', 'jobs_api', 'rabbitmq'
 ]
 
@@ -28,15 +28,16 @@ Functions:
     - report_docker_logs: Analisa os logs de todos os containers, reportando possíveis erros e containers que não geram logs.
 """
 
-import docker
-from datetime import datetime
-import pandas as pd
 import logging
 import os
+from datetime import datetime
+
+import docker
+import pandas as pd
 
 containers_names = [
-    'airflow-worker', 'airflow-scheduler', 'airflow-webserver', 'airflow-triggerer', 
-    'nginx_assistente', 'solr_pd', 'pgvector_all', 'app-api-feedback', 'api_sei', 
+    'airflow-worker', 'airflow-scheduler', 'airflow-webserver', 'airflow-triggerer',
+    'nginx_assistente', 'solr_pd', 'pgvector_all', 'app-api-feedback', 'api_sei',
     'api_assistente', 'airflow_postgres', 'jobs_api', 'rabbitmq'
 ]
 
@@ -90,7 +91,7 @@ def get_all_docker_logs(container_status: dict, tail: int = 1000, verbose: bool 
         docker.errors.APIError: Se houver um problema ao tentar acessar a API do Docker.
     """
     logs_lines = {}
-    for container_name in container_status.keys():
+    for container_name in container_status:
         log_line = get_docker_logs(container_name,tail,verbose)
         logs_lines[container_name]={'Linhas': len(log_line), "log_text": '\n'.join(log_line)}
     return logs_lines
@@ -110,10 +111,10 @@ def report_docker_logs(logs_lines: dict, show_logs: bool = False) -> int:
         KeyError: Se o formato de `logs_lines` estiver incorreto.
     """
     results_df = pd.DataFrame.from_dict(logs_lines, orient="index")
-    results_df['contem_erro'] = results_df['log_text'].str.lower().str.count('\[error\]')
+    results_df['contem_erro'] = results_df['log_text'].str.lower().str.count(r'\[error\]')
     notcontainslog = results_df[results_df['Linhas'] < 3]
     containserror = results_df[results_df['contem_erro'] != 0]
-    errors = 0 
+    errors = 0
     if len(notcontainslog) > 0 :
         errors += len(notcontainslog)
         logging.info("\nexistem containers que nao estao gerando logs\n")
@@ -135,12 +136,12 @@ def report_docker_logs(logs_lines: dict, show_logs: bool = False) -> int:
 
 def get_docker_containers(verbose: bool = False) -> dict:
     """
-    Obtém o status e detalhes dos containers Docker que estão atualmente configurados, 
-    filtrando apenas aqueles cujo nome inicia com 'sei_ia'. Calcula o uptime dos containers 
+    Obtém o status e detalhes dos containers Docker que estão atualmente configurados,
+    filtrando apenas aqueles cujo nome inicia com 'sei_ia'. Calcula o uptime dos containers
     com base no tempo de início e, quando aplicável, no tempo de término.
 
     Args:
-        verbose (bool, opcional): Se True, imprime detalhes de cada container processado. 
+        verbose (bool, opcional): Se True, imprime detalhes de cada container processado.
             Padrão é False.
 
     Returns:
@@ -189,7 +190,7 @@ def get_docker_containers(verbose: bool = False) -> dict:
 
 def verify_status_docker(container_status: dict, containers_names: list, verbose: bool = False) -> pd.DataFrame:
     """
-    Verifica o status dos containers especificados na lista `containers_names` com base nas 
+    Verifica o status dos containers especificados na lista `containers_names` com base nas
     informações contidas em `container_status`. Retorna um DataFrame com os dados de cada container solicitado,
     indicando sua existência e status.
 
@@ -213,7 +214,7 @@ def verify_status_docker(container_status: dict, containers_names: list, verbose
                     'Status': 'Indisponível',
                     'Health': 'Indisponível',
                 }, index=[0]))
-    else:      
+    else:
         data_df['Health'] = data_df['Health'].apply(lambda x: x.get('Status') if isinstance(x, dict) else "Indisponível")
         data_df.reset_index(inplace=True)
         data_df.rename(columns={'index': 'Nome'}, inplace=True)
@@ -236,7 +237,7 @@ def verify_status_docker(container_status: dict, containers_names: list, verbose
 
 def report_container_status(container_status_df: pd.DataFrame, return_dfs: bool = False, verbose: bool = False, path:str = None) -> tuple:
     """
-    Gera um relatório sobre o status dos containers, incluindo aqueles que não estão rodando, 
+    Gera um relatório sobre o status dos containers, incluindo aqueles que não estão rodando,
     estão em reinicialização ou apresentam problemas de saúde.
 
     Args:
@@ -258,7 +259,7 @@ def report_container_status(container_status_df: pd.DataFrame, return_dfs: bool 
         container_status_df.to_csv(path,index=False)
 
     not_running = container_status_df[container_status_df['Status'] != 'running']
-    restarting = container_status_df[container_status_df['Restarting'] == True]
+    restarting = container_status_df[container_status_df['Restarting']]
     unhealth = container_status_df[container_status_df['Health'] == 'unhealthy']
     health_unavailable = container_status_df[container_status_df['Health'] == 'Indisponível']
 
@@ -323,4 +324,4 @@ def save_logs_into_file(logs_lines:dict, path:str):
                 log_file.write(log_data.get("log_text", ""))
             logging.info(f"Logs do container '{container_name}' salvos em: {log_file_path}")
         except Exception as e:
-            logging.error(f"Erro ao salvar logs do container '{container_name}': {e}")    
+            logging.error(f"Erro ao salvar logs do container '{container_name}': {e}")
