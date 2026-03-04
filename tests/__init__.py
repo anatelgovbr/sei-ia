@@ -210,7 +210,7 @@ Returns:
         output_text = test_airflow.run_command(container, "airflow dags list")
         airflow_dags_df, error_airflow_lines = test_airflow.convert_docker_airflow_output_to_df(output_text)
         airflow_dags_df.to_csv(f"{storage_proj_dir}/airflow_dags_df.csv",index=False)
-        _dag_filename_error = test_airflow.get_airflow_dag_import_error(container, error_airflow_lines)
+        test_airflow.get_airflow_dag_import_error(container, error_airflow_lines)
         # Comentado por estar levando muito tempo.
         # runs_df = test_airflow.get_dags_runs(container, airflow_dags_df, dag_filename_error)
         # airflow_results = test_airflow.compare_dag_runs(runs_df, storage_proj_dir)
