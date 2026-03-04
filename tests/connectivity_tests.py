@@ -25,7 +25,7 @@ solr_config = create_solr_config(comparison_df)
 solr_results = test_connectivity_all_solr(solr_config)
 solr_erros = connectivity_report(solr_results)
 ```
-    
+
 3. Testando a conectividade com o Solr:
 
 ```python
@@ -75,20 +75,23 @@ Funções:
     - test_api_connectivity_and_response_all: Executa testes de conectividade e resposta para múltiplas URLs de serviços, gerando um relatório detalhado com o resultado.
 """
 
-import socket
+import logging
 import os
+import socket
+import warnings
+
 import pandas as pd
 import requests
-import logging
-from tests.db_connect import DBConnector
-from requests.auth import HTTPBasicAuth
 import urllib3
-import warnings
+from requests.auth import HTTPBasicAuth
+
+from tests.db_connect import DBConnector
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.simplefilter("ignore", category=urllib3.exceptions.InsecureRequestWarning)
 
 assistente_tables = [
-    'feedback', 'ip_message', 
+    'feedback', 'ip_message',
     'messages', 'models'
     ]
 
@@ -99,7 +102,7 @@ similaridade_tables = [
     ]
 
 sei_externo_tables = [
-    'md_ia_adm_cfg_assi_ia_usu', 'md_ia_topico_chat', 
+    'md_ia_adm_cfg_assi_ia_usu', 'md_ia_topico_chat',
     'md_ia_adm_config_assist_ia', 'md_ia_adm_config_similar', 'md_ia_adm_doc_relev',
     'md_ia_adm_integ_funcion','md_ia_adm_integracao', 'md_ia_adm_meta_ods',
     'md_ia_adm_metadado', 'md_ia_adm_objetivo_ods', 'md_ia_adm_ods_onu',
@@ -163,10 +166,7 @@ def verify_table(instance: DBConnector, table: str, schema: str = None, database
     if verbose:
         logging.debug(f"Verificando se a tabela {table} existe.")
     try:
-        if schema:
-            sql = f"SELECT * FROM {schema}.{table}"
-        else:
-            sql = f"SELECT * FROM {table}"
+        sql = f"SELECT * FROM {schema}.{table}" if schema else f"SELECT * FROM {table}"
         if database_type == "mysql":
             sql += ' LIMIT 1'
         elif database_type == "oracle":
@@ -240,7 +240,7 @@ def verify_solr_status(host: str, port: int, core: str, interno: bool, verbose: 
     Returns:
     - dict: Dicionário com o resultado da conexão e detalhes.
     """
-        
+
     try:
         if interno:
             url = f"https://{host}:{port}/solr/{core}/admin/ping"
@@ -249,7 +249,7 @@ def verify_solr_status(host: str, port: int, core: str, interno: bool, verbose: 
             url = f"http://{host}:{port}/solr/{core}/admin/ping"
             response = requests.get(url)
         response.raise_for_status()
-        
+
         if response.status_code == 200:
             if verbose:
                 logging.debug(f"Conexão ao core '{core}' bem-sucedida.")
@@ -258,7 +258,7 @@ def verify_solr_status(host: str, port: int, core: str, interno: bool, verbose: 
             if verbose:
                 logging.error(f"Core '{core}' não encontrado ou inativo.")
             return {"Reachable": False, "Host": host, "Port": port, "Core": core}
-    
+
     except requests.exceptions.RequestException as e:
         if verbose:
             logging.error(f"Erro ao conectar ao Solr '{core}':", e)
@@ -289,7 +289,7 @@ def connectivity_report(results:dict , return_df:bool=False, path:str = None)->t
     - results (dict): Dicionário contendo o resultado de conectividade para cada serviço.
     - return_df (bool): Se True, retorna o DataFrame dos resultados junto com o número de falhas.
     - path (str) : caminho para salvar o report
-    
+
     Returns:
     - int: Número de serviços que falharam na conexão.
     - pd.DataFrame (opcional): DataFrame contendo os resultados detalhados se return_df for True.
@@ -298,12 +298,12 @@ def connectivity_report(results:dict , return_df:bool=False, path:str = None)->t
         results_df = pd.DataFrame.from_dict(results, orient="index")
     except Exception:
         results_df = pd.DataFrame.from_dict(results)
-    error_count = len(results_df[results_df["Reachable"] == False])
+    error_count = len(results_df[not results_df["Reachable"]])
 
     if error_count > 0:
         logging.error("\nHouve falha nos testes abaixo:\n")
         # logging.info(results_df[results_df["Reachable"] == False][["Host", "Port", "Core", "Reachable"]].to_markdown())
-        logging.error(results_df[results_df["Reachable"] == False].to_markdown())
+        logging.error(results_df[not results_df["Reachable"]].to_markdown())
     else:
         logging.info("\nTodos os testes passaram.\n")
 
@@ -396,7 +396,7 @@ def test_connectivity(host: str, port: int, service_name: str, verbose: bool = T
             if verbose:
                 logging.debug(f"Conexao {service_name} bem sucedida!")
             return True
-    except (socket.timeout, socket.error) as e:
+    except (TimeoutError, OSError) as e:
         if verbose:
             logging.error(f"Falha ao conectar ao {service_name}. Erro: {e}")
         return False
@@ -406,11 +406,11 @@ def test_connectivity_all(config: dict, verbose: bool = False) -> dict:
     Testa a conectividade com todos os serviços especificados na configuração.
 
     Parameters:
-    - config (dict): Dicionário com a configuração de conectividade contendo 
+    - config (dict): Dicionário com a configuração de conectividade contendo
       hosts e portas dos serviços a serem testados.
 
     Returns:
-    - dict: Dicionário contendo o resultado de cada teste, com True para conexões bem-sucedidas 
+    - dict: Dicionário contendo o resultado de cada teste, com True para conexões bem-sucedidas
       e False para falhas.
     """
     results = {}
@@ -487,7 +487,7 @@ def test_api_connectivity_and_response_all(health_tests_urls: dict, expected_sta
               host, porta e endpoint.
     """
     report = []
-    for servico in health_tests_urls.keys():
+    for servico in health_tests_urls:
         for url in health_tests_urls[servico]:
             for check in health_tests_urls[servico][url]:
                 report.append({
@@ -643,7 +643,7 @@ def report_litellm_proxy_status(test_result: dict) -> int:
     total_models = len(test_result["models"])
     available_models = sum(1 for m in test_result["models"].values() if m["available"])
 
-    logging.info(f"\n---------- Resumo ----------------------------")
+    logging.info("\n---------- Resumo ----------------------------")
     logging.info(f"Total de modelos esperados: {total_models}")
     logging.info(f"Modelos disponíveis: {available_models}")
     logging.info(f"Modelos faltando: {total_models - available_models}")

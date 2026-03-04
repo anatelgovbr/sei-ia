@@ -13,11 +13,11 @@ results, comparison_df = compare_env_variables(variables_df, env_df, allowed_emp
 errors = report_env_issues(results)
 """
 
-import re
-import pandas as pd
 import logging
 import sys
 from urllib.parse import urlparse
+
+import pandas as pd
 
 env_vars = {
     "security": {
@@ -259,9 +259,7 @@ def validate_specific_variables(comparison_df: pd.DataFrame) -> pd.DataFrame:
             parsed = urlparse(value)
             if parsed.scheme not in ("http", "https"):
                 return False
-            if not parsed.netloc:
-                return False
-            return True
+            return parsed.netloc
         except (TypeError, AttributeError, ValueError):
             return False
 
@@ -297,7 +295,11 @@ def consolidate_env_files(categories: list[str]) -> pd.DataFrame:
         dfs.append(temp_df)
     return pd.concat(dfs, ignore_index=True)
 
-def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame, allowed_empty_vars: list = [], allowed_extra_vars: list = []) -> tuple[dict, pd.DataFrame]:
+def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame, allowed_empty_vars: list = None, allowed_extra_vars: list = None) -> tuple[dict, pd.DataFrame]:
+    if allowed_extra_vars is None:
+        allowed_extra_vars = []
+    if allowed_empty_vars is None:
+        allowed_empty_vars = []
     comparison_df = variables_df.merge(env_df, how="outer", indicator=True)
     comparison_df = validate_specific_variables(comparison_df)
 

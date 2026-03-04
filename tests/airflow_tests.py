@@ -1,8 +1,8 @@
 """
 Modulo de gerenciamento de DAGs do Airflow em containers Docker.
 
-Este módulo permite interagir com containers Docker executando o Airflow, coletando informações sobre 
-DAGs, execuções de DAGs e estados de tarefas, além de capturar erros de importação de DAGs. Ele facilita o 
+Este módulo permite interagir com containers Docker executando o Airflow, coletando informações sobre
+DAGs, execuções de DAGs e estados de tarefas, além de capturar erros de importação de DAGs. Ele facilita o
 processo de execução de comandos no container e a conversão de saídas de texto em DataFrames para análise.
 
 Exemplo de uso:
@@ -44,10 +44,10 @@ Funções:
 
 
 
+import logging
 import os
 
 import pandas as pd
-import logging
 
 
 def run_command(container, command: str) -> str:
@@ -119,9 +119,7 @@ def get_airflow_dag_import_error(container, error_airflow_lines: list[str]) -> l
         dag_filename_error = []
 
         for line in lines:
-            if line.startswith('='):
-                continue
-            elif line.startswith('filepath'):
+            if line.startswith('=') or line.startswith('filepath'):
                 continue
             else:
                 line_splited = line.split("|")
@@ -153,7 +151,7 @@ def get_dags_runs(container, airflow_dags_df: pd.DataFrame, dag_filename_error: 
 
     for _, dag in airflow_dags_df.iterrows():
         dag_id = dag["dag_id"]
-        
+
         runs_output = run_command(container, f"airflow dags list-runs -d {dag_id}")
         runs_df, _ = convert_docker_airflow_output_to_df(runs_output)
 
@@ -164,12 +162,12 @@ def get_dags_runs(container, airflow_dags_df: pd.DataFrame, dag_filename_error: 
             tasks_output = run_command(container, f"airflow tasks states-for-dag-run {dag_id} {run_id}")
             tasks_df, _ = convert_docker_airflow_output_to_df(tasks_output)
             tasks_dfs.append(tasks_df)
-            
+
             success = (tasks_df['state'] == 'success').sum()
             failed = (tasks_df['state'] == 'failed').sum()
             running = (tasks_df['state'] == 'running').sum()
             up_for_retry = (tasks_df['state'] == 'up_for_retry').sum()
-            
+
             runs_data.append([
                 dag_id, dag['fileloc'], dag["is_paused"], state,
                 success, failed, running, up_for_retry
@@ -221,7 +219,7 @@ def report_dag_run_issues(results: dict, runs_df: pd.DataFrame) -> int:
     Gera um relatório para as execuções faltantes, sobrantes, com status inesperado e com estado diferente de "success".
 
     Parameters:
-    - results (dict): Dicionário contendo DataFrames para execuções faltantes, sobrantes, status inesperado e 
+    - results (dict): Dicionário contendo DataFrames para execuções faltantes, sobrantes, status inesperado e
                       execuções com estado diferente de "success".
 
     Returns:
@@ -237,7 +235,7 @@ def report_dag_run_issues(results: dict, runs_df: pd.DataFrame) -> int:
         logging.warning("\nExistem execuções com estado diferente de 'success' nos seguintes DAGs:\n")
         logging.warning(results['non_success_runs'].to_markdown(index=False))
         error += len(results['non_success_runs'])
-    
+
     if error == 0:
         logging.info("\nNão foram encontrados erros nas execuções dos DAGs.\n")
 
