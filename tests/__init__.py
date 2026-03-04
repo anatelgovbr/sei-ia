@@ -42,7 +42,7 @@ Returns:
     print("LOGS")
     storage_proj_dir_base = "/opt/sei-ia-storage"
     now = datetime.now().strftime('%Y%m%d')
-    storage_proj_dir = os.path.join(storage_proj_dir_base, 'logs', datetime.now().strftime('%Y%m%d'))
+    storage_proj_dir = os.path.join(storage_proj_dir_base, 'logs', now)
     os.makedirs(storage_proj_dir, exist_ok=True)
     log_filename = os.path.join(storage_proj_dir, f'tests_{now}.log')
     
@@ -56,7 +56,6 @@ Returns:
     )
     
     def log_print(msg):
-        # print(msg)
         logging.info(msg)
 
     log_print("\n==================== TESTES ==================\n")
@@ -71,9 +70,9 @@ Returns:
     
     errors_envs = 0
     errors_conn = 0
-    health_erros = 0
+    health_errors = 0
     solr_erros = 0
-    db_sei_erros = 0
+    db_sei_errors = 0
     assistente_erros = 0
     similaridade_erros = 0
     errors_docker = 0
