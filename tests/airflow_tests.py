@@ -153,15 +153,14 @@ def get_dags_runs(container, airflow_dags_df: pd.DataFrame, dag_filename_error: 
         dag_id = dag["dag_id"]
         
         runs_output = run_command(container, f"airflow dags list-runs -d {dag_id}")
-        runs_df, error = convert_docker_airflow_output_to_df(runs_output)
-        
-        for idx_runs, run_row in runs_df.iterrows():
+        runs_df, _ = convert_docker_airflow_output_to_df(runs_output)
+
+        for _, run_row in runs_df.iterrows():
             run_id = run_row['run_id']
-            execution_date = run_row['execution_date']
             state = run_row['state']
-            
+
             tasks_output = run_command(container, f"airflow tasks states-for-dag-run {dag_id} {run_id}")
-            tasks_df, errors = convert_docker_airflow_output_to_df(tasks_output)
+            tasks_df, _ = convert_docker_airflow_output_to_df(tasks_output)
             tasks_dfs.append(tasks_df)
             
             success = (tasks_df['state'] == 'success').sum()

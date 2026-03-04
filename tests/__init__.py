@@ -1,8 +1,8 @@
 """
-Módulo de Testes Automatizados para Ambiente, Conectividade e Docker
+Módulo de Testes Automatizados para Ambiente, Conectividade, Docker, Airflow e LiteLLM Proxy
 
-Este módulo executa uma série de testes automatizados para garantir que o ambiente, as conexões de rede, 
-os bancos de dados, o Docker e o Airflow estão funcionando corretamente. Cada categoria de teste é realizada 
+Este módulo executa uma série de testes automatizados para garantir que o ambiente, as conexões de rede,
+os bancos de dados, o Docker, o Airflow e o LiteLLM Proxy estão funcionando corretamente. Cada categoria de teste é realizada
 com o auxílio de funções específicas de teste, e os resultados são registrados em um arquivo de log com a 
 data e hora atual.
 
@@ -29,6 +29,7 @@ Durante a execução, os testes incluem:
     - Testes de conexão com o SOLR e bancos de dados externos e internos
     - Testes de status e logs do Docker
     - Testes de execução de DAGs do Airflow e problemas relacionados
+    - Testes do LiteLLM Proxy e de sua conectividade/funcionamento
 
 Os resultados de cada categoria de teste são armazenados em um DataFrame, e um resumo final com 
 a quantidade de erros é impresso no log.
@@ -70,14 +71,12 @@ Returns:
     
     errors_envs = 0
     errors_conn = 0
-    errors_health = 0
     health_erros = 0
     solr_erros = 0
     db_sei_erros = 0
     assistente_erros = 0
     similaridade_erros = 0
     errors_docker = 0
-    errors_log_docker = 0
     error_airflow_docker = 0
     error_litellm = 0
     comparison_df = None  # Initialize comparison_df to prevent NameError
@@ -87,7 +86,7 @@ Returns:
         env_df = test_env.consolidate_env_files(['security', 'prod', 'default'])
         results_envs, comparison_df = test_env.compare_env_variables(variables_df, env_df)
         errors_envs = test_env.report_env_issues(results_envs)
-        test_env.anom_and_save(comparison_df,storage_proj_dir,test_env.anon_variables)
+        test_env.anonymize_and_save(comparison_df,storage_proj_dir,test_env.anon_variables)
     except Exception as e:
         errors_envs = 1
         log_print(f"Erro nos testes de variáveis de ambiente: {e}")
@@ -112,7 +111,7 @@ Returns:
         health_results = test_conn.test_api_connectivity_and_response_all(test_conn.health_testes_urls)
         health_erros, _ = test_conn.connectivity_report(health_results, path = f"{storage_proj_dir}/health_df.csv")
     except Exception as e:
-        errors_health = 1
+        health_erros = 1
         log_print(f"Erro nos testes de conectividade: {e}")
 
     log_print("\n====== TESTE DO LITELLM PROXY ================\n")
@@ -187,14 +186,13 @@ Returns:
     try:
         container_status = test_docker.get_docker_containers(verbose=False)
         container_status_df = test_docker.verify_status_docker(container_status, test_docker.containers_names, verbose=False)
-        errors_docker, categorized_dfs = test_docker.report_container_status(container_status_df, return_dfs=True, verbose=True, path = f"{storage_proj_dir}/containers_status_df.csv")
+        errors_docker, _ = test_docker.report_container_status(container_status_df, return_dfs=True, verbose=True, path = f"{storage_proj_dir}/containers_status_df.csv")
         log_print("\n================ DOCKER - LOGS ================\n")
         logs_lines = test_docker.get_all_docker_logs(container_status, 1000, False)
         test_docker.save_logs_into_file(logs_lines,storage_proj_dir)
-        errors_log_docker = test_docker.report_docker_logs(logs_lines, False)
+        test_docker.report_docker_logs(logs_lines, False)
     except Exception as e:
         errors_docker = 1
-        errors_log_docker = 1
         log_print(f"Erro nos testes de Docker: {e}")
     
     log_print("\n=================== AIRFLOW ===================\n")
@@ -207,7 +205,7 @@ Returns:
         output_text = test_airflow.run_command(container, "airflow dags list")
         airflow_dags_df, error_airflow_lines = test_airflow.convert_docker_airflow_output_to_df(output_text)
         airflow_dags_df.to_csv(f"{storage_proj_dir}/airflow_dags_df.csv",index=False)
-        dag_filename_error = test_airflow.get_airflow_dag_import_error(container, error_airflow_lines)
+        _dag_filename_error = test_airflow.get_airflow_dag_import_error(container, error_airflow_lines)
         # Comentado por estar levando muito tempo.
         # runs_df = test_airflow.get_dags_runs(container, airflow_dags_df, dag_filename_error)
         # airflow_results = test_airflow.compare_dag_runs(runs_df, storage_proj_dir)
@@ -286,7 +284,7 @@ Returns:
         df_errors = pd.DataFrame(data)
         df_errors.to_csv(f"{storage_proj_dir}/resumo_df.csv",index=False)
         log_print(df_errors.to_markdown(index=False))
-    except:
+    except Exception:
         log_print(data)
     log_print("\n=============== GERANDO O ZIP =================\n")
     try:

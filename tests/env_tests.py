@@ -1,8 +1,10 @@
 """
-Modulo de testes dos arquivos .env.
+Módulo de testes dos arquivos .env.
 
 Este módulo permite validar a presença, ausência, duplicação e preenchimento de variáveis de ambiente
-em arquivos `.env` com base em uma estrutura esperada.
+em arquivos `.env` com base em uma estrutura esperada, bem como verificar formatos e valores específicos
+de determinadas variáveis (por exemplo, endpoints Azure e valores de ambiente) por meio da função
+`validate_specific_variables`.
 
 Exemplo de uso:
 variables_df = create_env_vars_df(env_vars)
@@ -340,9 +342,9 @@ def report_env_issues(results: dict) -> int:
 
 anon_variables = ["GIT_TOKEN"] # anonimizar env
 
-def anom_and_save(comparison_df: pd.DataFrame, path: str, anom_variables: list):
+def anonymize_and_save(comparison_df: pd.DataFrame, path: str, anonymize_variables: list):
     df_anonymized = comparison_df.copy()
-    df_anonymized.loc[df_anonymized['variavel'].isin(anom_variables), 'value'] = 'ANONIMIZED'
+    df_anonymized.loc[df_anonymized['variavel'].isin(anonymize_variables), 'value'] = 'ANONYMIZED'
     df_anonymized.to_csv(f"{path}/comparison_df.csv", index=False)
     logging.info(f"Arquivo comparison_df anonimizado salvo em: {path}")
 
@@ -351,4 +353,4 @@ if __name__ == "__main__":
     env_df = consolidate_env_files(['security', 'prod', 'default'])
     results, comparison_df = compare_env_variables(variables_df, env_df, allowed_empty_vars, allowed_extra_vars)
     errors = report_env_issues(results)
-    anom_and_save(comparison_df, "output", anon_variables)
+    anonymize_and_save(comparison_df, "output", anon_variables)
