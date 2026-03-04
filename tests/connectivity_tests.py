@@ -147,7 +147,7 @@ def create_postgres_config(comparison_df: pd.DataFrame) -> tuple[dict, DBConnect
         logging.error("Erro ao conectar aos bancos de dados internos:", e)
         return {}, None, None
 
-def verify_table(instance: DBConnector, table: str, schema: str = None,DATABASE_TYPE: str = None, verbose: bool = False) -> bool:
+def verify_table(instance: DBConnector, table: str, schema: str = None, database_type: str = None, verbose: bool = False) -> bool:
     """
     Verifica a existência de uma tabela em um banco de dados Postgres.
 
@@ -167,11 +167,11 @@ def verify_table(instance: DBConnector, table: str, schema: str = None,DATABASE_
             sql = f"SELECT * FROM {schema}.{table}"
         else:
             sql = f"SELECT * FROM {table}"
-        if DATABASE_TYPE == "mysql":
+        if database_type == "mysql":
             sql += ' LIMIT 1'
-        elif DATABASE_TYPE == "oracle":
+        elif database_type == "oracle":
             sql += ' WHERE ROWNUM = 1'
-        elif DATABASE_TYPE == "mssql":
+        elif database_type == "mssql":
             sql = f"SELECT TOP 1 * FROM {schema}.{table}" if schema else f"SELECT TOP 1 * FROM {table}"
         if verbose:
             logging.debug(sql)
@@ -184,7 +184,7 @@ def verify_table(instance: DBConnector, table: str, schema: str = None,DATABASE_
             logging.error(f"Tabela {table} não existe. Erro: {e}")
         return False
 
-def verify_all_tables(instance: DBConnector, tables: list[str], schema: str = None, DATABASE_TYPE: str = None, verbose: bool = True) -> dict[str, dict]:
+def verify_all_tables(instance: DBConnector, tables: list[str], schema: str = None, database_type: str = None, verbose: bool = True) -> dict[str, dict]:
     """
     Verifica a existência de várias tabelas em um banco de dados Postgres.
 
@@ -199,7 +199,7 @@ def verify_all_tables(instance: DBConnector, tables: list[str], schema: str = No
     """
     result = {}
     for table in tables:
-        result[table] = {"Reachable": verify_table(instance, table, schema, DATABASE_TYPE, verbose)}
+        result[table] = {"Reachable": verify_table(instance, table, schema, database_type, verbose)}
     return result
 
 def create_solr_config(comparison_df: pd.DataFrame) -> dict:
@@ -227,7 +227,7 @@ def create_solr_config(comparison_df: pd.DataFrame) -> dict:
         }
     }
 
-def verificar_status_solr(host:str, port:int, core:str, interno:bool, verbose:bool = False) -> dict:
+def verify_solr_status(host: str, port: int, core: str, interno: bool, verbose: bool = False) -> dict:
     """
     Verifica o status de um core específico no Solr.
 
@@ -277,7 +277,7 @@ def test_connectivity_all_solr(solr_config:dict, verbose:bool = True) -> dict:
     """
     results = {}
     for service_name, config in solr_config.items():
-        result = verificar_status_solr(config["host"], config["port"], config["core"],config["interno"], verbose)
+        result = verify_solr_status(config["host"], config["port"], config["core"], config["interno"], verbose)
         results[service_name] = result
     return results
 

@@ -84,7 +84,12 @@ Returns:
     try:
         variables_df = test_env.create_env_vars_df(test_env.env_vars)
         env_df = test_env.consolidate_env_files(['security', 'prod', 'default'])
-        results_envs, comparison_df = test_env.compare_env_variables(variables_df, env_df)
+        results_envs, comparison_df = test_env.compare_env_variables(
+            variables_df,
+            env_df,
+            allowed_empty_vars=test_env.allowed_empty_vars,
+            allowed_extra_vars=test_env.allowed_extra_vars
+        )
         errors_envs = test_env.report_env_issues(results_envs)
         test_env.anonymize_and_save(comparison_df,storage_proj_dir,test_env.anon_variables)
     except Exception as e:
