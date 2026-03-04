@@ -42,7 +42,7 @@ Returns:
     print("LOGS")
     storage_proj_dir_base = "/opt/sei-ia-storage"
     now = datetime.now().strftime('%Y%m%d')
-    storage_proj_dir = os.path.join(storage_proj_dir_base, 'logs', datetime.now().strftime('%Y%m%d'))
+    storage_proj_dir = os.path.join(storage_proj_dir_base, 'logs', now)
     os.makedirs(storage_proj_dir, exist_ok=True)
     log_filename = os.path.join(storage_proj_dir, f'tests_{now}.log')
     
