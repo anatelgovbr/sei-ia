@@ -56,7 +56,6 @@ Returns:
     )
     
     def log_print(msg):
-        # print(msg)
         logging.info(msg)
 
     log_print("\n==================== TESTES ==================\n")
