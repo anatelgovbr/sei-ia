@@ -16,6 +16,7 @@ errors = report_env_issues(results)
 import re
 import pandas as pd
 import logging
+import sys
 
 env_vars = {
     "security": {
@@ -354,3 +355,4 @@ if __name__ == "__main__":
     results, comparison_df = compare_env_variables(variables_df, env_df, allowed_empty_vars, allowed_extra_vars)
     errors = report_env_issues(results)
     anonymize_and_save(comparison_df, "output", anon_variables)
+    sys.exit(errors)
