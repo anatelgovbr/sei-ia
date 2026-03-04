@@ -252,7 +252,7 @@ def validate_specific_variables(comparison_df: pd.DataFrame) -> pd.DataFrame:
         try:
             if pd.isna(value) or not isinstance(value, str):
                 return False
-            return bool(re.match(r'^(http|https)://\S+$', value)) and not value.endswith('/')
+            return bool(re.match(r'^(http|https)://\S+$', value))
         except (TypeError, AttributeError):
             return False
 

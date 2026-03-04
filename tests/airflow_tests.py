@@ -44,6 +44,8 @@ Funções:
 
 
 
+import os
+
 import pandas as pd
 import logging
 
@@ -207,8 +209,8 @@ def compare_dag_runs(runs_df: pd.DataFrame, path: str = None) -> dict:
         'non_success_runs': non_success_runs[['dag_id', 'file_loc', 'status']]
     }
     if path:
-        unexpected_status.to_csv(os.path.join(path,f"airflow_unexpected_status.csv", index = False))
-        non_success_runs.to_csv(os.path.join(path,f"airflow_non_success_runs.csv", index = False)) 
+        unexpected_status.to_csv(os.path.join(path, "airflow_unexpected_status.csv"), index=False)
+        non_success_runs.to_csv(os.path.join(path, "airflow_non_success_runs.csv"), index=False)
 
 
     return results
