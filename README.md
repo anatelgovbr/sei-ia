@@ -46,6 +46,10 @@ O download do pacote de instalação do *Servidor de Soluções de IA* deve ser 
 
 As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[Manual de Instalação](docs/INSTALACAO.md)**.
 
+## Atualização
+
+As instruções de atualização de versão podem ser encontradas na pasta `docs/` ou diretamente em **[Guia de Atualização do Servidor de Soluções de IA do módulo SEI IA](docs/UPGRADE.md)**.
+
 ## Documentação
 
 Uma documentaçao simplificada das APIs pode ser encontrada na pasta `docs/` ou diretamente em **[Documentação Simplificada das APIs](docs/API_MANUAL.md)**.
