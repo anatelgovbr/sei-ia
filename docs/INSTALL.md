@@ -3,6 +3,7 @@
 - Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
 - É importante observar que este manual não tem como objetivo fornecer conhecimento sobre as tecnologias adotadas. Para isto recomendamos buscar fontes mais apropriadas.
 - Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
+- **Para atualização de versão**, seguir o [Guia de Atualização do Servidor de Soluções de IA do mópdulo SEI IA](https://github.com/anatelgovbr/sei-ia/blob/main/docs/UPGRADE.md).
 - **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
 - **ATENÇÃO:** Na seção [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente) temos um detalhamento de como usar os testes automatizados para validar a conformidade da instalação e configuração, nesta seção também orientamos como deve ser feita a leitura dos logs que indicarão eventuais erros e necessidades de ajustes para a total conformidade da instalação e configuração.
 
@@ -20,10 +21,6 @@
   - [Backup periódico dos dados do Servidor de Soluções de IA](#backup-periódico-dos-dados-do-servidor-de-soluções-de-ia)
   - [Guia de utilização de certificado SSL proprietário](#guia-de-utilização-de-certificado-ssl-proprietário)
   - [Anexos](#anexos)
-- [Guia de atualizações SEI IA](#guia-de-atualizações-sei-ia)
-  - [Atualização da v1.1.x para v1.2.x](#atualização-da-v11x-para-v12x)
-  - [Atualização da v1.0.x para v1.1.x](#atualização-da-v10x-para-v11x)
-
 
 ## Pré-requisitos
 
