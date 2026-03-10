@@ -1,4 +1,4 @@
-# Guia de Atualizações do Servidor de Soluções de IA do SEI IA
+# Guia de Atualização do Servidor de Soluções de IA do módulo SEI IA
 
 Esta seção descreve os procedimentos para atualizar a versão do Servidor de Soluções de IA quando envolve simples Update, relativo ao segundo dígito no controle de versões (v1.**x**.0). Por exemplo: da v1.0.**0** para v1.1.**0**; da v1.1.**0** para v1.2.**0**; da v1.2.**0** para v1.3.**0**.
 
