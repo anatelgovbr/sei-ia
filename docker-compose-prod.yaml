@@ -80,9 +80,13 @@ x-airflow-common: &airflow-common
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@airflow_postgres-pd:5433/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@airflow_postgres-pd:5433/airflow
     AIRFLOW__CELERY__BROKER_URL: amqp://${AIRFLOW_AMQP_USER}:${AIRFLOW_AMQP_PASSWORD}@rabbitmq-pd:5672
+    AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: 300
+    AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT: 600
     AIRFLOW__CELERY__OPERATION_TIMEOUT: 7200
     AIRFLOW__CELERY__WORKER_TASK_LOG_READ_TIMEOUT: 86400
-    AIRFLOW__CELERY__BROKER_CONNECTION_TIMEOUT: 120
+    AIRFLOW__CELERY__BROKER_CONNECTION_TIMEOUT: 300
+    AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: 600
+    AIRFLOW__WEBSERVER__WORKERS: 2
 
     SOLR_USER: ${SOLR_USER}
     SOLR_PASSWORD: ${SOLR_PASSWORD}
@@ -101,6 +105,7 @@ x-airflow-common: &airflow-common
     SEI_API_DB_ADDRESS: "${SEI_ADDRESS}/sei/controlador_ws.php"
     SEI_API_DB_IDENTIFIER_SERVICE: ${SEI_API_DB_IDENTIFIER_SERVICE}
     SEI_API_DB_TIMEOUT: ${SEI_API_DB_TIMEOUT}
+    SEI_API_DB_CHUNK_SIZE: ${SEI_API_DB_CHUNK_SIZE:-100}
     SEI_API_DB_USER: ${SEI_API_DB_USER}
 
 
@@ -239,7 +244,11 @@ services:
 
   airflow-worker:
     <<: *airflow-common
-    command: celery worker
+    command:
+      - celery
+      - worker
+      - -H
+      - airflow-worker@%h
     profiles:
       - all
       - airflow
@@ -384,6 +393,7 @@ services:
         NB_UID: ${NB_UID}
         NB_GID: ${NB_GID}
         GIT_TOKEN: ${GIT_TOKEN:-}
+        LIB_CONNECTION: ${LIB_CONNECTION:-}
     command: opentelemetry-instrument gunicorn -k uvicorn.workers.UvicornH11Worker --reload --timeout 60 --keyfile /home/${NB_USER}/certificado/seiia.cert.key --certfile /home/${NB_USER}/certificado/seiia.cert.pem --bind=0.0.0.0:8082 api_sei.main:app
     environment:
       <<:
@@ -476,6 +486,7 @@ services:
         NB_UID: ${NB_UID}
         NB_GID: ${NB_GID}
         GIT_TOKEN: ${GIT_TOKEN:-}
+        LIB_CONNECTION: ${LIB_CONNECTION:-}
     command: uvicorn main:app --reload --host 0.0.0.0 --port 8086 --ssl-keyfile /home/${NB_USER}/certificado/seiia.cert.key --ssl-certfile /home/${NB_USER}/certificado/seiia.cert.pem
     environment:
       <<: *airflow-common-env
@@ -550,6 +561,10 @@ services:
     #   chown -R 8983:8983 /var/solr; \
     #   ( ([ -d /var/solr/data/$SOLR_MLT_PROCESS_CORE ] && echo Core $SOLR_MLT_PROCESS_CORE already exists || (wait-for-solr.sh && runuser -u solr -- solr create_core -c $SOLR_MLT_PROCESS_CORE -d /var/solr/configsets/process)) &); \
     #   runuser -u solr -- solr-precreate $SOLR_MLT_JURISPRUDENCE_CORE /var/solr/configsets/jurisprudence"
+    ulimits:
+      nofile:
+        soft: 65000
+        hard: 65000
     restart: always
     deploy:
       resources:
@@ -656,6 +671,7 @@ services:
       LD_LIBRARY_PATH: /opt/oracle
       LOG_LEVEL: ${LOG_LEVEL}
       SEI_API_DB_TIMEOUT: ${SEI_API_DB_TIMEOUT}
+      SEI_API_DB_CHUNK_SIZE: ${SEI_API_DB_CHUNK_SIZE:-100}
       SEI_API_DB_USER: ${SEI_API_DB_USER}
       ORACLE_HOME: /opt/oracle
       ORACLE_VERSION: 19.25

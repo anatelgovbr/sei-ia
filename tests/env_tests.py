@@ -13,11 +13,10 @@ results, comparison_df = compare_env_variables(variables_df, env_df, allowed_emp
 errors = report_env_issues(results)
 """
 
+import re
+import pandas as pd
 import logging
 import sys
-from urllib.parse import urlparse
-
-import pandas as pd
 
 env_vars = {
     "security": {
@@ -35,7 +34,8 @@ env_vars = {
             "AIRFLOW_POSTGRES_USER",
             "AIRFLOW_POSTGRES_PASSWORD",
             "AIRFLOW_AMQP_USER",
-            "AIRFLOW_AMQP_PASSWORD"
+            "AIRFLOW_AMQP_PASSWORD",
+            "AIRFLOW__WEBSERVER__SECRET_KEY",
         ],
         "SEI_API_DB": [
             "SEI_ADDRESS",
@@ -126,7 +126,8 @@ env_vars = {
             "ASSISTENTE_NGINX_MEM_LIMIT",
             "ASSISTENTE_NGINX_CPU_LIMIT",
             "ASSISTENTE_CONTEXT_MAX_TOKENS",
-            "ASSISTENTE_FATOR_LIMITAR_RAG"
+            "ASSISTENTE_FATOR_LIMITAR_RAG",
+            "ASSISTENTE_OCR_MAX_CONCURRENT_PAGES"
         ],
         "LANGFUSE": [
             "LANGFUSE_MEM_LIMIT",
@@ -223,7 +224,7 @@ def create_env_vars_df(env_vars: dict) -> pd.DataFrame:
     return pd.concat(dfs, ignore_index=True)
 
 def load_env_file(file_path: str) -> pd.DataFrame:
-    with open(file_path, encoding="utf-8") as file:
+    with open(file_path) as file:
         lines = file.readlines()
     processed_lines = []
     for line in lines:
@@ -254,13 +255,8 @@ def validate_specific_variables(comparison_df: pd.DataFrame) -> pd.DataFrame:
         try:
             if pd.isna(value) or not isinstance(value, str):
                 return False
-            if any(ch.isspace() for ch in value):
-                return False
-            parsed = urlparse(value)
-            if parsed.scheme not in ("http", "https"):
-                return False
-            return parsed.netloc
-        except (TypeError, AttributeError, ValueError):
+            return bool(re.match(r'^(http|https)://\S+$', value))
+        except (TypeError, AttributeError):
             return False
 
     def validate_environment(value) -> bool:
@@ -288,18 +284,14 @@ def validate_specific_variables(comparison_df: pd.DataFrame) -> pd.DataFrame:
     return comparison_df
 
 def consolidate_env_files(categories: list[str]) -> pd.DataFrame:
-    dfs = []
+    env_df = pd.DataFrame()
     for category in categories:
         temp_df = load_env_file(f'env_files/{category}.env')
         temp_df['file'] = category
-        dfs.append(temp_df)
-    return pd.concat(dfs, ignore_index=True)
+        env_df = pd.concat([env_df, temp_df], ignore_index=True)
+    return env_df
 
-def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame, allowed_empty_vars: list = None, allowed_extra_vars: list = None) -> tuple[dict, pd.DataFrame]:
-    if allowed_extra_vars is None:
-        allowed_extra_vars = []
-    if allowed_empty_vars is None:
-        allowed_empty_vars = []
+def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame, allowed_empty_vars: list = [], allowed_extra_vars: list = []) -> tuple[dict, pd.DataFrame]:
     comparison_df = variables_df.merge(env_df, how="outer", indicator=True)
     comparison_df = validate_specific_variables(comparison_df)
 
@@ -314,7 +306,7 @@ def compare_env_variables(variables_df: pd.DataFrame, env_df: pd.DataFrame, allo
         (~comparison_df['variavel'].isin(allowed_empty_vars))
     ]
     duplicated_vars = env_df[env_df.duplicated(subset=['variavel'], keep=False)]
-    invalid_vars = comparison_df[~comparison_df['valid']]
+    invalid_vars = comparison_df[comparison_df['valid'] == False]
 
     results = {
         'missing': missing_vars[['file', 'categoria', 'variavel', 'value']],
@@ -351,7 +343,7 @@ def report_env_issues(results: dict) -> int:
         logging.info("\nNão foram encontrados erros nos arquivos .env.\n")
     return error
 
-anonymize_variables = ["GIT_TOKEN"] # anonimizar env
+anon_variables = ["GIT_TOKEN"] # anonimizar env
 
 def anonymize_and_save(comparison_df: pd.DataFrame, path: str, anonymize_variables: list):
     df_anonymized = comparison_df.copy()
@@ -364,5 +356,5 @@ if __name__ == "__main__":
     env_df = consolidate_env_files(['security', 'prod', 'default'])
     results, comparison_df = compare_env_variables(variables_df, env_df, allowed_empty_vars, allowed_extra_vars)
     errors = report_env_issues(results)
-    anonymize_and_save(comparison_df, "output", anonymize_variables)
+    anonymize_and_save(comparison_df, "output", anon_variables)
     sys.exit(errors)

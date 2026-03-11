@@ -124,6 +124,8 @@ nano env_files/security.env
 
 > **Nota**: Se não utilizar Azure Web Agent, mantenha os valores como `****`
 
+**4c. `AIRFLOW__WEBSERVER__SECRET_KEY`** — Esta variável é **gerada automaticamente pelo script de deploy** caso não esteja presente em `env_files/security.env`. Nenhuma ação necessária.
+
 #### Passo 5: Executar Migração
 
 > **Atenção**: O script de deploy verifica automaticamente se o `llm_config/litellm_config.yaml` ainda contém valores de exemplo (`your-api-key-here`). Se sim, a execução é interrompida até que as credenciais sejam preenchidas.

@@ -3,11 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from utils import (
-    ServicoNaoPermitidoError,
-    execute_service_and_print_realtime,
-    get_parameters,
-)
+from utils import ServicoNaoPermitidoError, execute_service_and_print_realtime, get_parameters
 
 
 def test_execute_service_and_print_realtime_success() -> None:

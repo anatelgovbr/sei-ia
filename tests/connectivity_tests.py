@@ -75,18 +75,15 @@ Funções:
     - test_api_connectivity_and_response_all: Executa testes de conectividade e resposta para múltiplas URLs de serviços, gerando um relatório detalhado com o resultado.
 """
 
-import logging
-import os
 import socket
-import warnings
-
+import os
 import pandas as pd
 import requests
-import urllib3
-from requests.auth import HTTPBasicAuth
-
+import logging
 from tests.db_connect import DBConnector
-
+from requests.auth import HTTPBasicAuth
+import urllib3
+import warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.simplefilter("ignore", category=urllib3.exceptions.InsecureRequestWarning)
 
@@ -150,7 +147,7 @@ def create_postgres_config(comparison_df: pd.DataFrame) -> tuple[dict, DBConnect
         logging.error("Erro ao conectar aos bancos de dados internos:", e)
         return {}, None, None
 
-def verify_table(instance: DBConnector, table: str, schema: str = None, database_type: str = None, verbose: bool = False) -> bool:
+def verify_table(instance: DBConnector, table: str, schema: str = None,database_type: str = None, verbose: bool = False) -> bool:
     """
     Verifica a existência de uma tabela em um banco de dados Postgres.
 
@@ -166,7 +163,10 @@ def verify_table(instance: DBConnector, table: str, schema: str = None, database
     if verbose:
         logging.debug(f"Verificando se a tabela {table} existe.")
     try:
-        sql = f"SELECT * FROM {schema}.{table}" if schema else f"SELECT * FROM {table}"
+        if schema:
+            sql = f"SELECT * FROM {schema}.{table}"
+        else:
+            sql = f"SELECT * FROM {table}"
         if database_type == "mysql":
             sql += ' LIMIT 1'
         elif database_type == "oracle":
@@ -298,12 +298,12 @@ def connectivity_report(results:dict , return_df:bool=False, path:str = None)->t
         results_df = pd.DataFrame.from_dict(results, orient="index")
     except Exception:
         results_df = pd.DataFrame.from_dict(results)
-    error_count = len(results_df[not results_df["Reachable"]])
+    error_count = len(results_df[results_df["Reachable"] == False])
 
     if error_count > 0:
         logging.error("\nHouve falha nos testes abaixo:\n")
         # logging.info(results_df[results_df["Reachable"] == False][["Host", "Port", "Core", "Reachable"]].to_markdown())
-        logging.error(results_df[not results_df["Reachable"]].to_markdown())
+        logging.error(results_df[results_df["Reachable"] == False].to_markdown())
     else:
         logging.info("\nTodos os testes passaram.\n")
 
@@ -396,7 +396,7 @@ def test_connectivity(host: str, port: int, service_name: str, verbose: bool = T
             if verbose:
                 logging.debug(f"Conexao {service_name} bem sucedida!")
             return True
-    except (TimeoutError, OSError) as e:
+    except (socket.timeout, socket.error) as e:
         if verbose:
             logging.error(f"Falha ao conectar ao {service_name}. Erro: {e}")
         return False
@@ -487,7 +487,7 @@ def test_api_connectivity_and_response_all(health_tests_urls: dict, expected_sta
               host, porta e endpoint.
     """
     report = []
-    for servico in health_tests_urls:
+    for servico in health_tests_urls.keys():
         for url in health_tests_urls[servico]:
             for check in health_tests_urls[servico][url]:
                 report.append({
@@ -643,7 +643,7 @@ def report_litellm_proxy_status(test_result: dict) -> int:
     total_models = len(test_result["models"])
     available_models = sum(1 for m in test_result["models"].values() if m["available"])
 
-    logging.info("\n---------- Resumo ----------------------------")
+    logging.info(f"\n---------- Resumo ----------------------------")
     logging.info(f"Total de modelos esperados: {total_models}")
     logging.info(f"Modelos disponíveis: {available_models}")
     logging.info(f"Modelos faltando: {total_models - available_models}")

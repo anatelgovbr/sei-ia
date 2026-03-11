@@ -276,6 +276,7 @@ As tabelas abaixo foram organizadas com base no novo arquivo `security.env`.
 | `AIRFLOW_POSTGRES_PASSWORD` | Senha para acesso ao PostgreSQL do Airflow. Não alterar. | `seiia` |
 | `AIRFLOW_AMQP_USER` | Usuário para acesso ao RabbitMQ do Airflow. Não alterar. | `seiia` |
 | `AIRFLOW_AMQP_PASSWORD` | Senha para acesso ao RabbitMQ do Airflow. Não alterar. | `seiia` |
+| `AIRFLOW__WEBSERVER__SECRET_KEY` | Chave secreta para assinatura de sessões do webserver do Airflow. **Gerada automaticamente pelo script de deploy** caso não esteja definida em `security.env`. | *(auto-gerada)* |
 
 #### Configuração de Modelos LLM - LiteLLM Proxy
 

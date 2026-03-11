@@ -1,4 +1,4 @@
-# Servidor de Soluções de IA do Módulo SEI IA 
+# Servidor de Soluções de IA do Módulo SEI IA
 
 O *Servidor de Soluções de IA* contém as ferramentas necessárias para o funcionamento do [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia), composto, de forma simplificada, pelos sub-módulos:
 - SEI-IA-SIMILARIDADE: Responsável pela recomendação de processos similares e de documentos similares;
@@ -6,7 +6,7 @@ O *Servidor de Soluções de IA* contém as ferramentas necessárias para o func
 
 ## Orientações Preliminares
 
-A instalação do *Servidor de Soluções de IA* foi projetada para ser simples, automatizando todos os procedimentos possíveis. No entanto, há alguns procedimentos que, por questões de segurança ou por estarem relacionados ao ambiente onde a instalação é realizada, precisam ser realizados manualmente pelo administrador do ambiente computacional. 
+A instalação do *Servidor de Soluções de IA* foi projetada para ser simples, automatizando todos os procedimentos possíveis. No entanto, há alguns procedimentos que, por questões de segurança ou por estarem relacionados ao ambiente onde a instalação é realizada, precisam ser realizados manualmente pelo administrador do ambiente computacional.
 
 Para melhor entendimento do manual, é **mandatório** que seja feita uma leitura integral deste README e do **[Manual de Instalação](docs/INSTALL.md)** antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
 
@@ -30,7 +30,7 @@ O *Docker Host* deve atender aos requisitos mínimos descritos abaixo:
   - **CPU**: 16 cores com 2.10GHz.
   - **RAM**: 128 GB.
 
- **Requisito Mínimo do SEI**: 
+ **Requisito Mínimo do SEI**:
   - Versão v4.1.5
   - Não é compatível com versões anteriores do SEI.
   - Para utilizar versões mais recentes do SEI, é necessário conferir previamente a compatibilidade.
@@ -50,10 +50,6 @@ As instruções de instalação podem ser encontradas na pasta `docs/` ou direta
 
 As instruções de atualização de versão podem ser encontradas na pasta `docs/` ou diretamente em **[Guia de Atualização do Servidor de Soluções de IA do módulo SEI IA](docs/UPGRADE.md)**.
 
-## Documentação
-
-Uma documentaçao simplificada das APIs pode ser encontrada na pasta `docs/` ou diretamente em **[Documentação Simplificada das APIs](docs/API_MANUAL.md)**.
-
 ## Suporte
 
-Em caso de dúvidas ou problemas durante o procedimento de atualização, entrar em contato via e-mail com: Nei Jobson - neijobson@anatel.gov.br
+Em caso de dúvidas ou problemas, abra uma issue em: [https://github.com/anatelgovbr/sei-ia/issues](https://github.com/anatelgovbr/sei-ia/issues)
