@@ -21,7 +21,7 @@
 1. Disponibilização de script de migração de versão do SEI IA 1.0 para versão 1.1.
 
 ## Update de versões anteriores
-1. Caso possua um ambiente previamente instalado do Servidor de Soluções de IA na v1.0.0, v1.0.1 ou v1.0.2, deve seguir os procedimentos reportados na seção [Update do Manual de Instalação](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALACAO.md#update).
+1. Caso possua um ambiente previamente instalado do Servidor de Soluções de IA na v1.0.0, v1.0.1 ou v1.0.2, deve seguir os procedimentos reportados na seção [Update do Manual de Instalação](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALL.md#update).
 
 
 <hr style="height:3px; background-color:white; border:none;">
@@ -41,7 +41,7 @@
 4. Melhorias gerais na documentação.
 
 ## Update de versões anteriores
-1. Caso possua um ambiente previamente instalado do Servidor de Soluções de IA na v1.0.0 ou v1.0.1, deve seguir os procedimentos reportados na seção [Update do Manual de Instalação](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALACAO.md#update).
+1. Caso possua um ambiente previamente instalado do Servidor de Soluções de IA na v1.0.0 ou v1.0.1, deve seguir os procedimentos reportados na seção [Update do Manual de Instalação](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALL.md#update).
 2. Nessa caso, tenha atenção para realizar os ajustes manuais orientados abaixo para Update.
 
 ### Ajustes manuais relacionados com o Update da v1.0.0 ou v1.0.1 para v1.0.2
@@ -84,7 +84,7 @@ sudo chown 5000:5000 /opt/sei-ia-storage
 6. Melhorias gerais na documentação.
 
 ## Evoluções desta Versão
-1. Disponibilizada ferramenta de "Health Checker Geral do Ambiente", conforme tópico documentado no [INSTALACAO.md](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALACAO.md#health-checker-geral-do-ambiente).
+1. Disponibilizada ferramenta de "Health Checker Geral do Ambiente", conforme tópico documentado no [INSTALL.md](https://github.com/anatelgovbr/sei-ia/blob/main/docs/INSTALL.md#health-checker-geral-do-ambiente).
 
 
 <hr style="height:3px; background-color:white; border:none;">

@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files\
+# Byte-compiled / optimized / DLL files
 deletar.sh
 env_files/assistente.env
 manager_env
@@ -135,7 +135,12 @@ autodeployer/shared
 
 # Docker files
 
+# LiteLLM config (contains credentials)
+llm_config/litellm_config.yaml
+
 *.csv
 *.zip
+volumes
+uv.lock
 
-externo/
+sei-ia-externo

@@ -79,7 +79,7 @@ class DBConnector:
             logging.debug(f"Connection string used: {masked_connection_string}")
             logging.error(e)
             raise ValueError(
-                "Banco relacional indisponível\nCONNECTION_STRING:" f" {masked_connection_string}") from e
+                "Banco relacional indisponível\nCONNECTION_STRING:" f" {masked_connection_string}")
         else:
             return engine
 

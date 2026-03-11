@@ -44,10 +44,10 @@ Funções:
 
 
 
-import logging
 import os
 
 import pandas as pd
+import logging
 
 
 def run_command(container, command: str) -> str:
@@ -119,7 +119,9 @@ def get_airflow_dag_import_error(container, error_airflow_lines: list[str]) -> l
         dag_filename_error = []
 
         for line in lines:
-            if line.startswith('=') or line.startswith('filepath'):
+            if line.startswith('='):
+                continue
+            elif line.startswith('filepath'):
                 continue
             else:
                 line_splited = line.split("|")
