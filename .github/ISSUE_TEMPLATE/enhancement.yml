@@ -1,0 +1,63 @@
+name: 🔧 Melhoria de Funcionalidade
+description: Sugerir melhorias em funcionalidades já existentes no sistema
+title: "[MELHORIA]: "
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Obrigado por sugerir uma melhoria!
+        Por favor, preencha as informações abaixo.
+
+  - type: input
+    id: nome
+    attributes:
+      label: Nome Completo
+      description: Seu nome completo
+      placeholder: "Ex: João da Silva Santos"
+    validations:
+      required: true
+
+  - type: input
+    id: orgao
+    attributes:
+      label: Órgão
+      description: Nome do órgão onde você está lotado
+      placeholder: "Ex: Tribunal Regional Federal da 1ª Região"
+    validations:
+      required: true
+
+  - type: input
+    id: email
+    attributes:
+      label: Email de Contato
+      description: Email para contato
+      placeholder: "exemplo@orgao.gov.br"
+    validations:
+      required: true
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição da Melhoria
+      description: Descreva a melhoria que você sugere para uma funcionalidade existente.
+      placeholder: |
+        Descreva a melhoria aqui...
+
+        Exemplo:
+        - Qual funcionalidade você quer melhorar?
+        - Como ela funciona hoje?
+        - Como você sugere que ela funcione?
+        - Que benefícios isso traria?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Verifiquei que não existe uma sugestão similar já aberta
+          required: true

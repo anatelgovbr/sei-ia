@@ -1,0 +1,63 @@
+name: 🐛 Relatório de Bug
+description: Reportar um problema ou comportamento inesperado no sistema
+title: "[BUG]: "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Obrigado por reportar um bug!
+        Por favor, preencha as informações abaixo.
+
+  - type: input
+    id: nome
+    attributes:
+      label: Nome Completo
+      description: Seu nome completo
+      placeholder: "Ex: João da Silva Santos"
+    validations:
+      required: true
+
+  - type: input
+    id: orgao
+    attributes:
+      label: Órgão
+      description: Nome do órgão onde você está lotado
+      placeholder: "Ex: Tribunal Regional Federal da 1ª Região"
+    validations:
+      required: true
+
+  - type: input
+    id: email
+    attributes:
+      label: Email de Contato
+      description: Email para contato
+      placeholder: "exemplo@orgao.gov.br"
+    validations:
+      required: true
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição do Bug
+      description: Descreva o problema que você encontrou. Inclua detalhes como o que você estava fazendo, o que esperava que acontecesse e o que aconteceu de errado.
+      placeholder: |
+        Descreva o problema aqui...
+
+        Exemplo:
+        - O que você estava fazendo quando o erro ocorreu?
+        - O que você esperava que acontecesse?
+        - O que aconteceu de errado?
+        - Em qual página/funcionalidade ocorreu?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Verifiquei que não existe uma issue similar já aberta
+          required: true
