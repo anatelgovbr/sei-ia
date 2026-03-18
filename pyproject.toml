@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sei-ia"
+version = "0.1.0"
+description = "SEI-IA - Inteligência Artificial para o SEI"
+authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
+requires-python = ">=3.10"
+
+dependencies = [
+    "requests>=2.32.0",
+    "sqlalchemy",
+    "psycopg2-binary>=2.9.9",
+    "python-dotenv",
+    "urllib3>=2.2.2",
+    "docker",
+    "pandas",
+    "GitPython",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "ruff==0.14.10",
+    "requests-mock",
+    "coverage",
+    "pytest-mock",
+    "pre-commit",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = ["./tests/*", "./.conda/*"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (inclui F841 - unused local variable = py/unused-local-variable)
+    "I",   # isort (imports organizados)
+    "B",   # flake8-bugbear (pega bugs comuns)
+    "UP",  # pyupgrade (mantém sintaxe moderna)
+    "SIM", # flake8-simplify (sugere simplificações)
+    "C4",  # flake8-comprehensions (otimiza loops)
+    # --- Equivalentes às queries de segurança do CodeQL ---
+    "S",   # flake8-bandit: SQL injection (S608), path injection (S603/S605/S607),
+           #   logging de dados sensíveis (S101/S506), exec/eval (S102/S307), etc.
+]
+
+ignore = [
+    "E501",   # Tamanho de linha (deixe o formatter cuidar)
+    "S101",   # assert — usado normalmente em testes
+    "S105",   # Possível senha em string literal — muitos falsos positivos em configs
+    "S106",   # Possível senha em argumento — idem
+    "S311",   # random não criptográfico — não usamos para segurança
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Testes podem usar assert e fixtures com nomes que parecem senhas
+"tests/**/*.py" = ["S", "F841"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
