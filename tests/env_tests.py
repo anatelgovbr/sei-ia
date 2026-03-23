@@ -44,6 +44,7 @@ env_vars = {
             "SEI_API_DB_USER"
         ],
         "ASSISTENTE": [
+            "SEI_API_DB_CHUNK_SIZE",
             "ASSISTENTE_EMBEDDING_MODEL",
             "ASSISTENTE_EMBEDDING_ENCODING_NAME",
             "ASSISTENTE_DEFAULT_RESPONSE_MODEL",
