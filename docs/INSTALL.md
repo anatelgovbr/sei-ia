@@ -355,10 +355,13 @@ model_list:
 ```
 
 **Observações importantes:**
-- O valor em `model:` deve ser `azure/` seguido do **nome do deployment** configurado no Azure OpenAI Studio
-- O parâmetro `reasoning_effort` é **exclusivo para modelos GPT-5** (think). Não adicione este parâmetro aos modelos gpt-4.1
-- Cada modelo pode estar em endpoints diferentes (recursos Azure distintos)
-- Use a versão de API `2025-03-01-preview` para todos os modelos (GPT-4.1, GPT-5 e embeddings)
+
+- O campo model: deve seguir o formato azure/<nome-do-deployment>, utilizando exatamente o nome configurado no Azure OpenAI Studio.
+- O parâmetro reasoning_effort é exclusivo dos modelos GPT-5 (think) e não deve ser utilizado com modelos GPT-4.1.
+- Cada modelo pode estar associado a endpoints diferentes, conforme os recursos configurados no Azure.
+- Utilize a versão de API 2025-03-01-preview para todos os modelos (GPT-4.1, GPT-5 e embeddings).
+  - Versão da API vs. modelo (Azure OpenAI): a variável api_version define o contrato da API e deve permanecer inalterada, pois não está vinculada à versão do modelo. Alterá-la pode causar incompatibilidades. Já a versão do modelo deve ser mantida sempre atualizada, preferencialmente com atualização automática habilitada.
+- Modelo Think – modelo com raciocínio avançado (GPT-5): modelos da família gpt-5.x podem não estar disponíveis por padrão no Azure OpenAI. É necessário solicitar liberação para a assinatura no portal do Azure antes de criar o endpoint correspondente.
 
 **Exemplo prático:**
 
