@@ -446,6 +446,52 @@ curl -s http://localhost:4000/health | jq '{
 | `SEI_API_DB_TIMEOUT` | Timeout padrão da conexão da aplicação SEI IA junto à API do SEI de integração dos dados do SEI.  | 120     |
 | `SEI_API_DB_USER` | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA. Não alterar.  | `Usuario_IA` |
 
+### Integração com WebSearch (Bing) - Opcional
+
+A integração com WebSearch (Bing Grounding) permite que o Assistente utilize informações externas (internet) para complementar respostas.
+
+> **ATENÇÃO**:
+> - Esta funcionalidade é **opcional**
+> - Caso não seja configurada, o sistema continuará funcionando normalmente
+> - Para desabilitar completamente, basta não configurar as variáveis abaixo e desativar a opção de WebSearch na Administração do SEI
+
+#### Variáveis de Ambiente - WebSearch
+
+| Variável | Descrição |
+|----------|----------|
+| `PROJECT_ENDPOINT` | Endpoint do projeto no Azure AI Foundry |
+| `AZURE_TENANT_ID` | Identificador do tenant no Entra ID |
+| `AZURE_SUBSCRIPTION_ID` | Identificador da assinatura Azure |
+| `AZURE_CLIENT_ID` | Client ID do App registrado no Entra ID |
+| `AZURE_CLIENT_SECRET` | Client Secret do App registrado no Entra ID |
+| `AGENT_ID` | Identificador do Agent configurado no Azure AI Foundry |
+| `AZURE_WEB_AGENT_ID` | Identificador do Agent com WebSearch habilitado |
+| `BING_CONNECTION_NAME` | Nome da conexão com o Bing Grounding |
+| `MODEL_DEPLOYMENT_NAME` | Nome do deployment do modelo no Azure |
+
+#### Configuração Básica
+
+Para utilização do WebSearch, é necessário:
+
+1. Criar um registro de aplicativo no Entra ID para autenticação
+2. Criar um projeto no Azure AI Foundry
+3. Provisionar o recurso de Bing Grounding Search
+4. Configurar um Agent no projeto
+5. Criar uma conexão com o recurso de Bing Grounding  
+   - Observação: a associação do Agent com o Bing Grounding está disponível apenas para modelos compatíveis (ex: GPT-4.1)
+6. Associar a conexão ao Agent
+7. Preencher as variáveis no arquivo `security.env`
+
+#### Observações
+
+- Caso as variáveis não sejam informadas:
+  - O Assistente continuará funcionando normalmente
+  - Apenas não realizará consultas externas, e essa funcionalidade deverá ser desabilitada na Administração do SEI
+- Recomenda-se validar:
+  - Permissões do aplicativo no Entra ID
+  - Existência da conexão com Bing Grounding
+  - Associação correta entre Agent e Connection
+- Em ambientes com restrição de acesso à internet, recomenda-se manter o WebSearch desabilitado
 
 11. **Executar o deploy**
  > **ATENÇÃO**:

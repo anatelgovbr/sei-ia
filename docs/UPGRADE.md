@@ -9,7 +9,7 @@ Esta seção descreve o processo de migração do SEI IA versão 1.1.x para 1.2.
 
 ### Resumo das Alterações em Variáveis de Ambiente
 
-#### security.env - Novas Variáveis (OBRIGATÓRIAS)
+#### security.env - Novas Variáveis (OBRIGATÓRIAS para o uso do WebSearch)
 
 | Variável | Descrição |
 |----------|-----------|
@@ -22,6 +22,35 @@ Esta seção descreve o processo de migração do SEI IA versão 1.1.x para 1.2.
 | `AZURE_CLIENT_ID` | ID do cliente do Registro de Aplicativo |
 | `BING_CONNECTION_NAME` | Nome identificador do Bing Grounding |
 | `MODEL_DEPLOYMENT_NAME` | Nome identificador do modelo configurado |
+
+A integração com WebSearch (Bing Grounding) permite que o Assistente utilize informações externas (internet) para complementar respostas.
+
+> **ATENÇÃO**:
+> - Esta funcionalidade é **opcional**
+> - Caso não seja configurada, o sistema continuará funcionando normalmente
+> - Para desabilitar completamente, basta não configurar as variáveis abaixo e desativar a opção de WebSearch na Administração do SEI
+
+Para utilização do WebSearch, é necessário:
+
+1. Criar um registro de aplicativo no Entra ID para autenticação
+2. Criar um projeto no Azure AI Foundry
+3. Provisionar o recurso de Bing Grounding Search
+4. Configurar um Agent no projeto
+5. Criar uma conexão com o recurso de Bing Grounding  
+   - Observação: a associação do Agent com o Bing Grounding está disponível apenas para modelos compatíveis (ex: GPT-4.1)
+6. Associar a conexão ao Agent
+7. Preencher as variáveis no arquivo `security.env`
+
+##### Observações
+
+- Caso as variáveis não sejam informadas:
+  - O Assistente continuará funcionando normalmente
+  - Apenas não realizará consultas externas, e essa funcionalidade deverá ser desabilitada na Administração do SEI
+- Recomenda-se validar:
+  - Permissões do aplicativo no Entra ID
+  - Existência da conexão com Bing Grounding
+  - Associação correta entre Agent e Connection
+- Em ambientes com restrição de acesso à internet, recomenda-se manter o WebSearch desabilitado
 
 #### security.env - Valores Alterados
 
