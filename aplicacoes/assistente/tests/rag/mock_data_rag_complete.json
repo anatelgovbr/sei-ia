@@ -1,0 +1,733 @@
+{
+  "mock_documents": [
+    {
+      "id_documento": "7578399",
+      "id_documento_formatado": "id_doc_formatado-7578399", 
+      "content": "CONTRATO DE PRESTAÇÃO DE SERVIÇOS Nº 53500.019339/2021-48\n\nCláusula 3ª - DA VIGÊNCIA\nO presente contrato terá vigência de 60 (sessenta) meses, contados da data de sua assinatura, podendo ser prorrogado por períodos sucessivos, limitado ao prazo máximo de 60 (sessenta) meses, conforme Art. 57, IV da Lei 8.666/93.\n\nData de início: 15/03/2021\nData de término: 15/03/2026\n\nVigência máxima: 60 meses iniciais + 60 meses de prorrogação = 120 meses total",
+      "doc_tokens": 180,
+      "metadata": "Contrato de prestação de serviços - Vigência e prazos contratuais",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "7813996",
+      "id_documento_formatado": "id_doc_formatado-7813996",
+      "content": "TERMO ADITIVO AO CONTRATO Nº 53500.019339/2021-48\n\nCláusula 1ª - DO OBJETO\nProrrogação da vigência do contrato por mais 12 (doze) meses, mantidas as demais cláusulas.\n\nNova data de término: 15/03/2027\n\nFundamentação: Art. 57, IV da Lei 8.666/93, respeitado o limite de 60 meses de prorrogação.",
+      "doc_tokens": 120,
+      "metadata": "Termo aditivo - Prorrogação contratual",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "7814683", 
+      "id_documento_formatado": "id_doc_formatado-7814683",
+      "content": "PARECER TÉCNICO SOBRE VIGÊNCIA CONTRATUAL\n\nAnálise: O contrato nº 53500.019339/2021-48 possui vigência inicial de 60 meses, com possibilidade de prorrogação por até 60 meses adicionais, totalizando 120 meses como vigência máxima permitida por lei.\n\nSituação atual: Primeiro aditivo já executado, restando ainda 48 meses de prorrogação possível.",
+      "doc_tokens": 100,
+      "metadata": "Parecer técnico - Análise de vigência",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9240275",
+      "id_documento_formatado": "id_doc_formatado-9240275", 
+      "content": "RELATÓRIO DE ACOMPANHAMENTO CONTRATUAL\n\nContrato: 53500.019339/2021-48\nStatus: Ativo\nPeríodo vigente: 15/03/2021 a 15/03/2027 (após 1º aditivo)\nTempo restante para nova prorrogação: 48 meses",
+      "doc_tokens": 80,
+      "metadata": "Relatório de acompanhamento - Status contratual",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8710347",
+      "id_documento_formatado": "id_doc_formatado-8710347",
+      "content": "LEGISLAÇÃO APLICÁVEL - LEI 8.666/93\n\nArt. 57, IV - Os contratos poderão ter a sua duração prorrogada por iguais períodos com vistas à obtenção de preços e condições mais vantajosas para a administração, limitada a sessenta meses;\n\nInterpretação: Vigência inicial + prorrogações limitadas a 60 meses cada = máximo 120 meses totais.",
+      "doc_tokens": 90,
+      "metadata": "Base legal - Lei de Licitações",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "7578403",
+      "id_documento_formatado": "id_doc_formatado-7578403",
+      "content": "DOCUMENTAÇÃO COMPLEMENTAR AO CONTRATO 53500.019339/2021-48\n\nAnexo I - Especificações técnicas dos serviços contratados\nAnexo II - Cronograma de execução\nAnexo III - Planilha de custos\n\nObservação: Vigência conforme contrato principal - 120 meses máximo total.",
+      "doc_tokens": 85,
+      "metadata": "Documentação complementar - Anexos contratuais",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9280556",
+      "id_documento_formatado": "id_doc_formatado-9280556",
+      "content": "AVALIAÇÃO DE DESEMPENHO CONTRATUAL\n\nContrato: 53500.019339/2021-48\nPeríodo avaliado: Março/2021 a Dezembro/2023\nDesempenho: Satisfatório\nRecomendação: Manutenção dos serviços dentro do prazo de vigência estabelecido (120 meses máximo).",
+      "doc_tokens": 75,
+      "metadata": "Avaliação de desempenho - Relatório trimestral",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8665099",
+      "id_documento_formatado": "id_doc_formatado-8665099",
+      "content": "NOTIFICAÇÃO SOBRE VIGÊNCIA CONTRATUAL\n\nRef: Contrato 53500.019339/2021-48\nAssunto: Comunicação sobre prazo de vigência\n\nInformamos que o contrato possui vigência máxima de 120 meses (60 iniciais + 60 de prorrogação), conforme Lei 8.666/93.",
+      "doc_tokens": 70,
+      "metadata": "Notificação oficial - Comunicação de vigência",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8665251",
+      "id_documento_formatado": "id_doc_formatado-8665251",
+      "content": "HISTÓRICO DE ALTERAÇÕES CONTRATUAIS\n\nContrato: 53500.019339/2021-48\n- 15/03/2021: Assinatura do contrato (60 meses)\n- 10/02/2026: 1º Termo Aditivo (prorrogação 12 meses)\n\nVigência atual: até 15/03/2027\nProrrogação restante possível: 48 meses",
+      "doc_tokens": 95,
+      "metadata": "Histórico de alterações - Cronologia contratual",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8679616",
+      "id_documento_formatado": "id_doc_formatado-8679616",
+      "content": "PROCESSO DE FISCALIZAÇÃO CONTRATUAL\n\nContrato fiscalizado: 53500.019339/2021-48\nFiscal designado: Maria Silva\nPeríodo: 2021-2027\n\nObservação: Vigência máxima de 120 meses conforme lei, sendo 60 meses iniciais + 60 meses de prorrogação.",
+      "doc_tokens": 78,
+      "metadata": "Processo de fiscalização - Designação de fiscal",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8679623",
+      "id_documento_formatado": "id_doc_formatado-8679623",
+      "content": "RELATÓRIO MENSAL DE EXECUÇÃO\n\nContrato: 53500.019339/2021-48\nMês/Ano: Janeiro/2024\nStatus: Em execução normal\nVigência: Dentro do prazo (120 meses máximo total)\nPróxima avaliação: Fevereiro/2024",
+      "doc_tokens": 72,
+      "metadata": "Relatório mensal - Execução contratual",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8679941",
+      "id_documento_formatado": "id_doc_formatado-8679941",
+      "content": "PARECER JURÍDICO SOBRE PRORROGAÇÃO\n\nRef: Contrato 53500.019339/2021-48\n\nParecer: É possível a prorrogação por mais 48 meses, respeitando o limite de 60 meses de prorrogação previsto no Art. 57, IV da Lei 8.666/93.\n\nVigência máxima total: 120 meses.",
+      "doc_tokens": 88,
+      "metadata": "Parecer jurídico - Análise de prorrogação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8679899",
+      "id_documento_formatado": "id_doc_formatado-8679899",
+      "content": "DOCUMENTAÇÃO TÉCNICA - ESPECIFICAÇÕES\n\nContrato: 53500.019339/2021-48\nEspecificações técnicas atualizadas\nRequisitos de desempenho\nCritérios de aceitação\n\nVigência conforme contrato principal: 120 meses máximo (60+60).",
+      "doc_tokens": 76,
+      "metadata": "Documentação técnica - Especificações atualizadas",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8679911",
+      "id_documento_formatado": "id_doc_formatado-8679911",
+      "content": "CRONOGRAMA DE ATIVIDADES CONTRATUAIS\n\nContrato: 53500.019339/2021-48\nInício: 15/03/2021\nTérmino previsto: 15/03/2031 (caso utilize toda a vigência máxima de 120 meses)\nEtapas principais definidas para todo período contratual.",
+      "doc_tokens": 79,
+      "metadata": "Cronograma - Planejamento de atividades",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8679925",
+      "id_documento_formatado": "id_doc_formatado-8679925",
+      "content": "PLANILHA DE CUSTOS E VALORES\n\nContrato: 53500.019339/2021-48\nValor mensal: R$ 150.000,00\nValor total estimado para 120 meses: R$ 18.000.000,00\nReajustes conforme índices oficiais\nPagamentos mensais mediante medição.",
+      "doc_tokens": 82,
+      "metadata": "Planilha de custos - Valores contratuais",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8687688",
+      "id_documento_formatado": "id_doc_formatado-8687688",
+      "content": "TERMO DE RECEBIMENTO PROVISÓRIO\n\nContrato: 53500.019339/2021-48\nServiços executados no período: Janeiro-Março/2024\nStatus: Recebimento provisório aprovado\nObservação: Dentro da vigência de 120 meses máximo estabelecida.",
+      "doc_tokens": 74,
+      "metadata": "Termo de recebimento - Aprovação provisória",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8687689",
+      "id_documento_formatado": "id_doc_formatado-8687689",
+      "content": "TERMO DE RECEBIMENTO DEFINITIVO\n\nContrato: 53500.019339/2021-48\nServiços executados no período: Outubro-Dezembro/2023\nStatus: Recebimento definitivo aprovado\nPrazo de garantia: 12 meses\nVigência contratual: 120 meses máximo conforme lei.",
+      "doc_tokens": 81,
+      "metadata": "Termo de recebimento - Aprovação definitiva",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8701047",
+      "id_documento_formatado": "id_doc_formatado-8701047",
+      "content": "SOLICITAÇÃO DE PRORROGAÇÃO CONTRATUAL\n\nRef: Contrato 53500.019339/2021-48\nSolicitação: Prorrogação por 24 meses adicionais\nJustificativa: Continuidade dos serviços essenciais\nLimite legal: Máximo 48 meses restantes (total 120 meses).",
+      "doc_tokens": 77,
+      "metadata": "Solicitação - Prorrogação contratual",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8645159",
+      "id_documento_formatado": "id_doc_formatado-8645159",
+      "content": "ANÁLISE DE ECONOMICIDADE\n\nContrato: 53500.019339/2021-48\nEstudo comparativo de preços\nResultado: Manutenção do contrato é mais econômica\nRecomendação: Prorrogar dentro do limite de 120 meses máximo estabelecido pela Lei 8.666/93.",
+      "doc_tokens": 73,
+      "metadata": "Análise de economicidade - Estudo comparativo",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8381443",
+      "id_documento_formatado": "id_doc_formatado-8381443",
+      "content": "MEMORIAL DESCRITIVO DOS SERVIÇOS\n\nContrato: 53500.019339/2021-48\nDescrição detalhada dos serviços contratados\nObjetivos e metas\nIndicadores de desempenho\nVigência: Conforme contrato principal (120 meses máximo).",
+      "doc_tokens": 69,
+      "metadata": "Memorial descritivo - Detalhamento de serviços",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8365618",
+      "id_documento_formatado": "id_doc_formatado-8365618",
+      "content": "ATESTADO DE CAPACIDADE TÉCNICA\n\nEmpresa: Prestadora de Serviços Ltda\nContrato de referência: 53500.019339/2021-48\nPeriodo: 15/03/2021 a 15/03/2027 (vigência atual)\nCapacidade para contratos de até 120 meses de duração.",
+      "doc_tokens": 71,
+      "metadata": "Atestado técnico - Capacidade da empresa",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8365521",
+      "id_documento_formatado": "id_doc_formatado-8365521",
+      "content": "CERTIDÕES E DOCUMENTOS HABILITATÓRIOS\n\nContrato: 53500.019339/2021-48\nCertidão Negativa de Débitos: Válida\nRegularidade Fiscal: Em dia\nCapacidade jurídica: Apta para contratos de 120 meses máximo.",
+      "doc_tokens": 68,
+      "metadata": "Documentos habilitatórios - Regularidade fiscal",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8365676",
+      "id_documento_formatado": "id_doc_formatado-8365676",
+      "content": "GARANTIA CONTRATUAL\n\nContrato: 53500.019339/2021-48\nTipo: Seguro garantia\nValor: 5% do valor total do contrato\nVigência da garantia: Durante toda execução (até 120 meses máximo)\nSeguradora: Empresa Seguradora S/A.",
+      "doc_tokens": 75,
+      "metadata": "Garantia contratual - Seguro garantia",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8701404",
+      "id_documento_formatado": "id_doc_formatado-8701404",
+      "content": "RELATÓRIO DE AUDITORIA INTERNA\n\nContrato auditado: 53500.019339/2021-48\nPeríodo: 2021-2024\nResultado: Conforme normas legais\nVigência: Respeitando limite de 120 meses da Lei 8.666/93\nRecomendações: Manter controles atuais.",
+      "doc_tokens": 72,
+      "metadata": "Relatório de auditoria - Controles internos",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "7578408",
+      "id_documento_formatado": "id_doc_formatado-7578408",
+      "content": "EDITAL DE LICITAÇÃO ORIGINAL\n\nProcesso: 53500.019339/2021-48\nModalidade: Pregão Eletrônico\nObjeto: Prestação de serviços especializados\nPrazo de execução: 60 meses, prorrogável por igual período (máximo 120 meses).\nData: 01/02/2021",
+      "doc_tokens": 83,
+      "metadata": "Edital original - Processo licitatório",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8710758",
+      "id_documento_formatado": "id_doc_formatado-8710758",
+      "content": "ATA DA SESSÃO PÚBLICA DE PREGÃO\n\nProcesso: 53500.019339/2021-48\nData: 15/02/2021\nVencedor: Prestadora de Serviços Ltda\nValor: R$ 150.000,00 mensais\nPrazo: 60 meses + 60 meses de prorrogação possível (120 meses máximo).",
+      "doc_tokens": 79,
+      "metadata": "Ata de pregão - Resultado da licitação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8711001",
+      "id_documento_formatado": "id_doc_formatado-8711001",
+      "content": "HOMOLOGAÇÃO DO PROCESSO LICITATÓRIO\n\nProcesso: 53500.019339/2021-48\nData da homologação: 28/02/2021\nAutoridade competente: Diretor-Geral\nResultado homologado: Prestadora de Serviços Ltda\nPrazo contratual: Máximo 120 meses.",
+      "doc_tokens": 76,
+      "metadata": "Homologação - Resultado final da licitação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8711007",
+      "id_documento_formatado": "id_doc_formatado-8711007",
+      "content": "ADJUDICAÇÃO DO OBJETO LICITADO\n\nProcesso: 53500.019339/2021-48\nData: 01/03/2021\nEmpresa adjudicatária: Prestadora de Serviços Ltda\nObjeto: Serviços especializados\nVigência máxima permitida: 120 meses conforme Art. 57 da Lei 8.666/93.",
+      "doc_tokens": 77,
+      "metadata": "Adjudicação - Contratação da empresa vencedora",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8711813",
+      "id_documento_formatado": "id_doc_formatado-8711813",
+      "content": "PUBLICAÇÃO NO DIÁRIO OFICIAL\n\nProcesso: 53500.019339/2021-48\nData de publicação: 05/03/2021\nResumo: Contrato de prestação de serviços\nPrazo: 60 meses iniciais, prorrogável por até 60 meses adicionais\nVigência máxima: 120 meses total.",
+      "doc_tokens": 78,
+      "metadata": "Publicação oficial - Diário Oficial da União",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8711836",
+      "id_documento_formatado": "id_doc_formatado-8711836",
+      "content": "EXTRATO DO CONTRATO PUBLICADO\n\nContrato nº 53500.019339/2021-48\nPartes: ANATEL x Prestadora de Serviços Ltda\nObjeto: Serviços especializados\nValor mensal: R$ 150.000,00\nVigência: 60 meses + possibilidade de prorrogação (máximo 120 meses).",
+      "doc_tokens": 80,
+      "metadata": "Extrato contratual - Publicação resumida",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8717792",
+      "id_documento_formatado": "id_doc_formatado-8717792",
+      "content": "ORDEM DE SERVIÇO INICIAL\n\nContrato: 53500.019339/2021-48\nData: 15/03/2021\nServiços: Início da execução contratual\nPrazo para conclusão: Conforme cronograma (120 meses máximo)\nFiscal responsável: João Santos.",
+      "doc_tokens": 73,
+      "metadata": "Ordem de serviço - Início da execução",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8717912",
+      "id_documento_formatado": "id_doc_formatado-8717912",
+      "content": "PRIMEIRA MEDIÇÃO MENSAL\n\nContrato: 53500.019339/2021-48\nPeríodo: Março/2021\nServiços executados: 100% conforme especificado\nValor: R$ 150.000,00\nObservação: Dentro da vigência de 120 meses estabelecida.",
+      "doc_tokens": 71,
+      "metadata": "Primeira medição - Execução inicial",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8717920",
+      "id_documento_formatado": "id_doc_formatado-8717920",
+      "content": "RELATÓRIO TRIMESTRAL DE ACOMPANHAMENTO\n\nContrato: 53500.019339/2021-48\nTrimestre: 1º/2021\nDesempenho: Satisfatório\nMetas atingidas: 100%\nPrazo contratual: Respeitando limite de 120 meses máximo.",
+      "doc_tokens": 69,
+      "metadata": "Relatório trimestral - Acompanhamento de metas",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "8765860",
+      "id_documento_formatado": "id_doc_formatado-8765860",
+      "content": "AVALIAÇÃO SEMESTRAL DE PERFORMANCE\n\nContrato: 53500.019339/2021-48\nPeríodo: 1º semestre/2022\nIndicadores: Todos dentro da meta\nQualidade: Excelente\nContinuidade recomendada dentro da vigência máxima de 120 meses.",
+      "doc_tokens": 70,
+      "metadata": "Avaliação semestral - Performance contratual",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9154626",
+      "id_documento_formatado": "id_doc_formatado-9154626",
+      "content": "PARECER TÉCNICO SOBRE CONTINUIDADE\n\nContrato: 53500.019339/2021-48\nAnálise: Serviços essenciais para a ANATEL\nRecomendação: Continuar execução\nPrazo restante: 84 meses (dentro do limite de 120 meses máximo)\nAprovação: Área técnica.",
+      "doc_tokens": 74,
+      "metadata": "Parecer técnico - Análise de continuidade",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9167366",
+      "id_documento_formatado": "id_doc_formatado-9167366",
+      "content": "COMUNICAÇÃO OFICIAL SOBRE VIGÊNCIA\n\nRef: Contrato 53500.019339/2021-48\nAssunto: Esclarecimentos sobre prazo contratual\nInformação: Vigência máxima é de 120 meses (60 iniciais + 60 prorrogação)\nFundamento: Art. 57, IV da Lei 8.666/93.",
+      "doc_tokens": 75,
+      "metadata": "Comunicação oficial - Esclarecimentos de vigência",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9196605",
+      "id_documento_formatado": "id_doc_formatado-9196605",
+      "content": "RELATÓRIO ANUAL DE GESTÃO CONTRATUAL\n\nContrato: 53500.019339/2021-48\nAno: 2023\nExecução: 100% satisfatória\nEconomia gerada: R$ 500.000,00\nVigência atual: Dentro do prazo máximo de 120 meses permitido.",
+      "doc_tokens": 72,
+      "metadata": "Relatório anual - Gestão contratual 2023",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9230272",
+      "id_documento_formatado": "id_doc_formatado-9230272",
+      "content": "SOLICITAÇÃO DE INFORMAÇÕES SOBRE PRAZO\n\nContrato: 53500.019339/2021-48\nSolicitante: Controlladoria Interna\nPergunta: Qual o prazo máximo de vigência?\nResposta: 120 meses conforme Lei 8.666/93, Art. 57, IV.",
+      "doc_tokens": 68,
+      "metadata": "Solicitação de informações - Esclarecimento de prazo",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9159566",
+      "id_documento_formatado": "id_doc_formatado-9159566",
+      "content": "MINUTA DE SEGUNDO TERMO ADITIVO\n\nContrato: 53500.019339/2021-48\nFinalidade: Prorrogação por mais 36 meses\nFundamentação: Art. 57, IV da Lei 8.666/93\nLimite respeitado: Sim (total não ultrapassará 120 meses)\nStatus: Em elaboração.",
+      "doc_tokens": 76,
+      "metadata": "Minuta aditiva - Segundo termo em elaboração",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9162614",
+      "id_documento_formatado": "id_doc_formatado-9162614",
+      "content": "JUSTIFICATIVA PARA PRORROGAÇÃO\n\nContrato: 53500.019339/2021-48\nRazões: Continuidade dos serviços essenciais\nVantagens: Economicidade e eficiência\nPrazo solicitado: 36 meses adicionais\nTotal final: 96 meses (dentro do limite de 120).",
+      "doc_tokens": 73,
+      "metadata": "Justificativa - Razões para prorrogação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9305793",
+      "id_documento_formatado": "id_doc_formatado-9305793",
+      "content": "ANÁLISE JURÍDICA SOBRE VIGÊNCIA MÁXIMA\n\nContrato: 53500.019339/2021-48\nQuestão: Limite de prorrogação\nParece jurídico: Máximo 60 meses de prorrogação\nTotal permitido: 120 meses (60 iniciais + 60 prorrogação)\nFundamento: Lei 8.666/93.",
+      "doc_tokens": 77,
+      "metadata": "Análise jurídica - Limites de vigência",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9313140",
+      "id_documento_formatado": "id_doc_formatado-9313140",
+      "content": "CONTROLE DE PRAZOS CONTRATUAIS\n\nContrato: 53500.019339/2021-48\nInício: 15/03/2021\nPrimeiro aditivo: 15/03/2026 (12 meses)\nSegundo aditivo previsto: 15/03/2027 (36 meses)\nTérmino máximo legal: 15/03/2031 (120 meses total).",
+      "doc_tokens": 78,
+      "metadata": "Controle de prazos - Cronologia de aditivos",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9313518",
+      "id_documento_formatado": "id_doc_formatado-9313518",
+      "content": "PARECER DA ASSESSORIA JURÍDICA\n\nRef: Contrato 53500.019339/2021-48\nConsulta: Possibilidade de nova prorrogação\nParecer: Possível por mais 12 meses, totalizando 108 meses\nLimite legal: 120 meses máximo (ainda não atingido)\nAprovação: Favorável.",
+      "doc_tokens": 79,
+      "metadata": "Parecer jurídico - Possibilidade de nova prorrogação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9313568",
+      "id_documento_formatado": "id_doc_formatado-9313568",
+      "content": "MANIFESTAÇÃO DO GESTOR DO CONTRATO\n\nContrato: 53500.019339/2021-48\nGestor: Carlos Lima\nManifestação: Favorável à prorrogação por 12 meses\nJustificativa: Qualidade dos serviços prestados\nVigência final: 108 meses (dentro do limite de 120).",
+      "doc_tokens": 74,
+      "metadata": "Manifestação do gestor - Aprovação de prorrogação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9330593",
+      "id_documento_formatado": "id_doc_formatado-9330593",
+      "content": "TERCEIRO TERMO ADITIVO ASSINADO\n\nContrato: 53500.019339/2021-48\nData: 10/03/2027\nProrrogação: 12 meses adicionais\nNovo término: 15/03/2028\nVigência total acumulada: 84 meses\nSaldo para prorrogação: 36 meses (limite 120).",
+      "doc_tokens": 81,
+      "metadata": "Terceiro aditivo - Prorrogação por 12 meses",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9380900",
+      "id_documento_formatado": "id_doc_formatado-9380900",
+      "content": "AVALIAÇÃO PARA QUARTO ADITIVO\n\nContrato: 53500.019339/2021-48\nSituação atual: 84 meses de vigência\nProposta: Prorrogação por 24 meses\nTotal resultante: 108 meses\nLimite legal: 120 meses (ainda dentro do permitido)\nAnálise: Favorável.",
+      "doc_tokens": 76,
+      "metadata": "Avaliação - Quarto termo aditivo proposto",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9401593",
+      "id_documento_formatado": "id_doc_formatado-9401593",
+      "content": "QUARTO TERMO ADITIVO\n\nContrato: 53500.019339/2021-48\nData de assinatura: 05/03/2028\nProrrogação: 24 meses\nNovo término: 15/03/2030\nVigência acumulada: 108 meses\nSaldo restante: 12 meses (para atingir o limite de 120).",
+      "doc_tokens": 78,
+      "metadata": "Quarto aditivo - Prorrogação por 24 meses",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9462263",
+      "id_documento_formatado": "id_doc_formatado-9462263",
+      "content": "ANÁLISE FINAL DE VIGÊNCIA\n\nContrato: 53500.019339/2021-48\nVigência atual: 108 meses\nProrrogação máxima restante: 12 meses\nData limite legal: 15/03/2031\nRecomendação: Último aditivo para completar os 120 meses permitidos pela lei.",
+      "doc_tokens": 75,
+      "metadata": "Análise final - Última prorrogação possível",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9516974",
+      "id_documento_formatado": "id_doc_formatado-9516974",
+      "content": "QUINTO E ÚLTIMO TERMO ADITIVO\n\nContrato: 53500.019339/2021-48\nData: 01/03/2030\nProrrogação: 12 meses (última possível)\nTérmino final: 15/03/2031\nVigência total: 120 meses (máximo legal atingido)\nObservação: Limite da Lei 8.666/93 respeitado.",
+      "doc_tokens": 82,
+      "metadata": "Quinto aditivo - Prorrogação final até limite legal",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9464057",
+      "id_documento_formatado": "id_doc_formatado-9464057",
+      "content": "COMUNICADO DE ENCERRAMENTO FUTURO\n\nContrato: 53500.019339/2021-48\nData de encerramento: 15/03/2031\nMotivo: Atingimento do prazo máximo de 120 meses\nOrientação: Iniciar procedimento para nova contratação\nTransição: Planejar substituição dos serviços.",
+      "doc_tokens": 77,
+      "metadata": "Comunicado - Orientação para nova contratação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9476565",
+      "id_documento_formatado": "id_doc_formatado-9476565",
+      "content": "RELATÓRIO DE ENCERRAMENTO DO CONTRATO\n\nContrato: 53500.019339/2021-48\nPeríodo total: 15/03/2021 a 15/03/2031\nDuração: 120 meses (máximo legal)\nDesempenho: Excelente durante toda vigência\nEconomia total: R$ 2.500.000,00\nResultado: Muito satisfatório.",
+      "doc_tokens": 80,
+      "metadata": "Relatório final - Encerramento após 120 meses",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9475179",
+      "id_documento_formatado": "id_doc_formatado-9475179",
+      "content": "HISTÓRICO COMPLETO DA VIGÊNCIA\n\nContrato: 53500.019339/2021-48\n1º período: 60 meses iniciais (15/03/2021 a 15/03/2026)\n1º aditivo: 12 meses (15/03/2026 a 15/03/2027)\n2º aditivo: 12 meses (15/03/2027 a 15/03/2028)\n3º aditivo: 24 meses (15/03/2028 a 15/03/2030)\n4º aditivo: 12 meses (15/03/2030 a 15/03/2031)\nTotal: 120 meses máximo legal",
+      "doc_tokens": 120,
+      "metadata": "Histórico completo - Toda a vigência contratual",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9515802",
+      "id_documento_formatado": "id_doc_formatado-9515802",
+      "content": "COMPROVAÇÃO DE LIMITE LEGAL RESPEITADO\n\nContrato: 53500.019339/2021-48\nLegislação: Lei 8.666/93, Art. 57, IV\nLimite: 60 meses de prorrogação máxima\nVigência inicial: 60 meses\nProrrogações: 60 meses total\nResultado: 120 meses (limite respeitado).",
+      "doc_tokens": 78,
+      "metadata": "Comprovação - Conformidade com limite legal",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9515885",
+      "id_documento_formatado": "id_doc_formatado-9515885",
+      "content": "DOCUMENTAÇÃO PARA ARQUIVO PERMANENTE\n\nContrato: 53500.019339/2021-48\nPeríodo: 15/03/2021 a 15/03/2031 (120 meses)\nStatus: Encerrado no prazo máximo legal\nDocumentos: Todos organizados para arquivo\nDestinação: Arquivo permanente da ANATEL.",
+      "doc_tokens": 73,
+      "metadata": "Documentação - Organização para arquivo",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9515993",
+      "id_documento_formatado": "id_doc_formatado-9515993",
+      "content": "LIÇÕES APRENDIDAS DO CONTRATO\n\nContrato: 53500.019339/2021-48\nDuração: 120 meses completos\nPontos positivos: Gestão eficiente, economia, qualidade\nMelhorias: Planejamento de transição\nRecomendação: Modelo a ser seguido em futuras contratações.",
+      "doc_tokens": 72,
+      "metadata": "Lições aprendidas - Experiências para futuras contratações",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9519129",
+      "id_documento_formatado": "id_doc_formatado-9519129",
+      "content": "TERMO DE ENCERRAMENTO OFICIAL\n\nContrato: 53500.019339/2021-48\nData de encerramento: 15/03/2031\nVigência total: 120 meses (10 anos)\nMotivo: Atingimento do prazo máximo legal\nPendências: Nenhuma\nSituação: Encerrado definitivamente.",
+      "doc_tokens": 74,
+      "metadata": "Termo de encerramento - Finalização oficial",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9550776",
+      "id_documento_formatado": "id_doc_formatado-9550776",
+      "content": "CERTIFICADO DE REGULARIDADE FISCAL FINAL\n\nContrato: 53500.019339/2021-48\nEmpresa: Prestadora de Serviços Ltda\nSituação: Regular durante todos os 120 meses\nVencimento: Válido até encerramento (15/03/2031)\nObservação: Mantida regularidade fiscal completa.",
+      "doc_tokens": 76,
+      "metadata": "Certificado fiscal - Regularidade durante toda vigência",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9551363",
+      "id_documento_formatado": "id_doc_formatado-9551363",
+      "content": "QUITAÇÃO FINAL DE VALORES\n\nContrato: 53500.019339/2021-48\nValor total pago: R$ 18.000.000,00\nParcelas: 120 mensais de R$ 150.000,00\nReajustes: Aplicados conforme índices oficiais\nSituação: Quitação integral realizada\nPendências financeiras: Nenhuma.",
+      "doc_tokens": 79,
+      "metadata": "Quitação final - Acerto financeiro completo",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9559044",
+      "id_documento_formatado": "id_doc_formatado-9559044",
+      "content": "RELATÓRIO CONSOLIDADO DE TODA VIGÊNCIA\n\nContrato: 53500.019339/2021-48\nPeríodo total: 120 meses (máximo legal)\nDesempenho médio: 98% de satisfação\nIncidentes: 3 menores (todos resolvidos)\nEconomia acumulada: R$ 2.500.000,00\nClassificação: Excelente.",
+      "doc_tokens": 81,
+      "metadata": "Relatório consolidado - Performance de 120 meses",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9557861",
+      "id_documento_formatado": "id_doc_formatado-9557861",
+      "content": "AVALIAÇÃO DA EMPRESA CONTRATADA\n\nContrato: 53500.019339/2021-48\nEmpresa: Prestadora de Serviços Ltda\nPeríodo avaliado: 120 meses completos\nNota final: 9,5/10\nRecomendação: Empresa apta para futuras contratações\nObservação: Cumpriu integralmente o prazo máximo.",
+      "doc_tokens": 77,
+      "metadata": "Avaliação da empresa - Performance nos 120 meses",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9562954",
+      "id_documento_formatado": "id_doc_formatado-9562954",
+      "content": "COMPARATIVO COM CONTRATOS SIMILARES\n\nContrato analisado: 53500.019339/2021-48\nVigência: 120 meses (máximo legal usado)\nOutros contratos: Média de 84 meses\nVantagem: Maior estabilidade e economia\nConclusão: Uso completo da vigência foi vantajoso.",
+      "doc_tokens": 75,
+      "metadata": "Comparativo - Análise com outros contratos",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9588220",
+      "id_documento_formatado": "id_doc_formatado-9588220",
+      "content": "ESTUDO DE CASO PARA CAPACITAÇÃO\n\nTema: Gestão de vigência contratual\nContrato exemplo: 53500.019339/2021-48\nDuração: 120 meses (limite máximo da Lei 8.666/93)\nLições: Planejamento, controle de prazos, benefícios da prorrogação\nUso: Material didático interno.",
+      "doc_tokens": 80,
+      "metadata": "Estudo de caso - Material para capacitação",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9588263",
+      "id_documento_formatado": "id_doc_formatado-9588263",
+      "content": "PARECER FINAL DA CONTROLADORIA\n\nContrato: 53500.019339/2021-48\nVigência: 120 meses (2021-2031)\nAnálise: Todas as normas legais respeitadas\nArt. 57, IV da Lei 8.666/93: Cumprido integralmente\nConclusão: Contrato modelo em gestão de vigência.",
+      "doc_tokens": 78,
+      "metadata": "Parecer da controladoria - Análise de conformidade",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9611663",
+      "id_documento_formatado": "id_doc_formatado-9611663",
+      "content": "MEMORIAL DE CÁLCULO DE VIGÊNCIA\n\nContrato: 53500.019339/2021-48\nPrazo inicial: 60 meses\nProrrogações permitidas: até 60 meses (Art. 57, IV)\nTotal máximo: 60 + 60 = 120 meses\nUtilizado: 120 meses (100% do permitido)\nStatus: Limite legal esgotado.",
+      "doc_tokens": 82,
+      "metadata": "Memorial de cálculo - Demonstração matemática da vigência",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9611652",
+      "id_documento_formatado": "id_doc_formatado-9611652",
+      "content": "ORIENTAÇÃO PARA FUTUROS CONTRATOS\n\nBase: Experiência do contrato 53500.019339/2021-48\nDuração ideal: Utilizar os 120 meses quando vantajoso\nPlanejamento: Considerar todo o ciclo desde o início\nGestão: Controlar prazos para não ultrapassar limites\nReferência: Lei 8.666/93, Art. 57, IV.",
+      "doc_tokens": 83,
+      "metadata": "Orientação - Diretrizes para contratos futuros",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9611737",
+      "id_documento_formatado": "id_doc_formatado-9611737",
+      "content": "CRONOLOGIA DETALHADA DE PRORROGAÇÕES\n\nContrato: 53500.019339/2021-48\n15/03/2021: Início (60 meses)\n15/03/2026: 1º aditivo (+12 meses) = 72 meses\n15/03/2027: 2º aditivo (+12 meses) = 84 meses\n15/03/2028: 3º aditivo (+24 meses) = 108 meses\n15/03/2030: 4º aditivo (+12 meses) = 120 meses\n15/03/2031: Encerramento (limite legal atingido)",
+      "doc_tokens": 110,
+      "metadata": "Cronologia detalhada - Todas as prorrogações",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9611850",
+      "id_documento_formatado": "id_doc_formatado-9611850",
+      "content": "FUNDAMENTAÇÃO LEGAL COMPLETA\n\nContrato: 53500.019339/2021-48\nLei 8.666/93, Art. 57: 'A duração dos contratos regidos por esta Lei ficará adstrita à vigência dos respectivos créditos orçamentários, exceto quanto aos relativos:'\nInciso IV: 'à prestação de serviços a serem executados de forma contínua, que poderão ter a sua duração prorrogada por iguais e sucessivos períodos com vistas à obtenção de preços e condições mais vantajosas para a administração, limitada a sessenta meses'\nAplicação: 60 meses iniciais + 60 meses de prorrogação = 120 meses máximo",
+      "doc_tokens": 150,
+      "metadata": "Fundamentação legal - Texto completo da lei aplicável",
+      "download_ext": false,
+      "id_anexos": null
+    },
+    {
+      "id_documento": "9620501",
+      "id_documento_formatado": "id_doc_formatado-9620501",
+      "content": "RESUMO EXECUTIVO FINAL\n\nContrato: 53500.019339/2021-48\nObjetivo: Prestação de serviços especializados\nVigência máxima legal: 120 meses (Lei 8.666/93, Art. 57, IV)\nUtilização: 100% do prazo máximo (120 meses)\nPeríodo: 15/03/2021 a 15/03/2031\nResultado: Contrato modelo em gestão de prazos\nEconomia: R$ 2.500.000,00\nSatisfação: 98% média\nConclusão: Exemplo de excelência em contratação pública",
+      "doc_tokens": 125,
+      "metadata": "Resumo executivo - Síntese completa do contrato",
+      "download_ext": false,
+      "id_anexos": null
+    }
+  ],
+  "mock_metadata": {
+    "procedimento": {
+      "id_procedimento": "7578389",
+      "metadata": "Processo de acompanhamento contratual - Contrato 53500.019339/2021-48"
+    },
+    "doc_metadata": {
+      "7578399": "Contrato original - Cláusulas de vigência e prazos",
+      "7813996": "1º Termo Aditivo - Prorrogação por 12 meses", 
+      "7814683": "Parecer jurídico sobre limites de prorrogação",
+      "9240275": "Relatório de acompanhamento do status contratual",
+      "8710347": "Fundamentação legal - Lei 8.666/93",
+      "7578403": "Documentação complementar - Anexos contratuais",
+      "9280556": "Avaliação de desempenho - Relatório trimestral",
+      "8665099": "Notificação oficial - Comunicação de vigência",
+      "8665251": "Histórico de alterações - Cronologia contratual",
+      "8679616": "Processo de fiscalização - Designação de fiscal",
+      "8679623": "Relatório mensal - Execução contratual",
+      "8679941": "Parecer jurídico - Análise de prorrogação",
+      "8679899": "Documentação técnica - Especificações atualizadas",
+      "8679911": "Cronograma - Planejamento de atividades",
+      "8679925": "Planilha de custos - Valores contratuais",
+      "8687688": "Termo de recebimento - Aprovação provisória",
+      "8687689": "Termo de recebimento - Aprovação definitiva",
+      "8701047": "Solicitação - Prorrogação contratual",
+      "8645159": "Análise de economicidade - Estudo comparativo",
+      "8381443": "Memorial descritivo - Detalhamento de serviços",
+      "8365618": "Atestado técnico - Capacidade da empresa",
+      "8365521": "Documentos habilitatórios - Regularidade fiscal",
+      "8365676": "Garantia contratual - Seguro garantia",
+      "8701404": "Relatório de auditoria - Controles internos",
+      "7578408": "Edital original - Processo licitatório",
+      "8710758": "Ata de pregão - Resultado da licitação",
+      "8711001": "Homologação - Resultado final da licitação",
+      "8711007": "Adjudicação - Contratação da empresa vencedora",
+      "8711813": "Publicação oficial - Diário Oficial da União",
+      "8711836": "Extrato contratual - Publicação resumida",
+      "8717792": "Ordem de serviço - Início da execução",
+      "8717912": "Primeira medição - Execução inicial",
+      "8717920": "Relatório trimestral - Acompanhamento de metas",
+      "8765860": "Avaliação semestral - Performance contratual",
+      "9154626": "Parecer técnico - Análise de continuidade",
+      "9167366": "Comunicação oficial - Esclarecimentos de vigência",
+      "9196605": "Relatório anual - Gestão contratual 2023",
+      "9230272": "Solicitação de informações - Esclarecimento de prazo",
+      "9159566": "Minuta aditiva - Segundo termo em elaboração",
+      "9162614": "Justificativa - Razões para prorrogação",
+      "9305793": "Análise jurídica - Limites de vigência",
+      "9313140": "Controle de prazos - Cronologia de aditivos",
+      "9313518": "Parecer jurídico - Possibilidade de nova prorrogação",
+      "9313568": "Manifestação do gestor - Aprovação de prorrogação",
+      "9330593": "Terceiro aditivo - Prorrogação por 12 meses",
+      "9380900": "Avaliação - Quarto termo aditivo proposto",
+      "9401593": "Quarto aditivo - Prorrogação por 24 meses",
+      "9462263": "Análise final - Última prorrogação possível",
+      "9516974": "Quinto aditivo - Prorrogação final até limite legal",
+      "9464057": "Comunicado - Orientação para nova contratação",
+      "9476565": "Relatório final - Encerramento após 120 meses",
+      "9475179": "Histórico completo - Toda a vigência contratual",
+      "9515802": "Comprovação - Conformidade com limite legal",
+      "9515885": "Documentação - Organização para arquivo",
+      "9515993": "Lições aprendidas - Experiências para futuras contratações",
+      "9519129": "Termo de encerramento - Finalização oficial",
+      "9550776": "Certificado fiscal - Regularidade durante toda vigência",
+      "9551363": "Quitação final - Acerto financeiro completo",
+      "9559044": "Relatório consolidado - Performance de 120 meses",
+      "9557861": "Avaliação da empresa - Performance nos 120 meses",
+      "9562954": "Comparativo - Análise com outros contratos",
+      "9588220": "Estudo de caso - Material para capacitação",
+      "9588263": "Parecer da controladoria - Análise de conformidade",
+      "9611663": "Memorial de cálculo - Demonstração matemática da vigência",
+      "9611652": "Orientação - Diretrizes para contratos futuros",
+      "9611737": "Cronologia detalhada - Todas as prorrogações",
+      "9611850": "Fundamentação legal - Texto completo da lei aplicável",
+      "9620501": "Resumo executivo - Síntese completa do contrato",
+      "9623320": "Complemento documental - Informações adicionais",
+      "9660981": "Documentação anexa - Materiais de apoio",
+      "9658285": "Registros complementares - Documentação adicional",
+      "9559341": "Arquivo suplementar - Dados complementares",
+      "9661807": "Material de referência - Documentos relacionados",
+      "9664647": "Complemento informativo - Dados adicionais",
+      "9658398": "Documentação auxiliar - Materiais de suporte",
+      "9670368": "Registros adicionais - Informações complementares",
+      "9674025": "Material complementar - Documentos anexos",
+      "9674041": "Dados suplementares - Informações adicionais",
+      "9674066": "Documentação adicional - Materiais anexos",
+      "9674081": "Registros auxiliares - Dados complementares",
+      "9697096": "Informações complementares - Documentos anexos",
+      "9658423": "Material adicional - Dados suplementares",
+      "9704947": "Documentação anexa - Informações adicionais",
+      "9707331": "Registros complementares - Materiais anexos",
+      "9462428": "Dados adicionais - Documentação complementar",
+      "9660551": "Material suplementar - Informações anexas",
+      "9746239": "Documentação adicional - Dados complementares",
+      "9748718": "Registros anexos - Informações adicionais",
+      "9758178": "Material complementar - Dados suplementares",
+      "9748031": "Documentação auxiliar - Informações complementares",
+      "9748374": "Registros adicionais - Dados anexos",
+      "9756566": "Material adicional - Documentação complementar",
+      "9766658": "Dados suplementares - Informações adicionais",
+      "9792435": "Documentação complementar - Materiais anexos",
+      "9793801": "Registros auxiliares - Dados adicionais",
+      "9793802": "Material anexo - Informações complementares",
+      "9794451": "Documentação adicional - Dados suplementares",
+      "9807436": "Registros complementares - Materiais adicionais",
+      "9809100": "Material suplementar - Dados anexos",
+      "9825748": "Documentação auxiliar - Informações adicionais",
+      "9839712": "Registros adicionais - Materiais complementares",
+      "9840953": "Material complementar - Dados adicionais",
+      "9857924": "Documentação anexa - Informações suplementares",
+      "10043298": "Registros auxiliares - Dados complementares",
+      "10043440": "Material adicional - Documentação anexa",
+      "11221890": "Dados suplementares - Informações complementares",
+      "11223009": "Documentação adicional - Materiais anexos",
+      "11223067": "Registros complementares - Dados adicionais",
+      "11222920": "Material final - Documentação de encerramento"
+    }
+  }
+}

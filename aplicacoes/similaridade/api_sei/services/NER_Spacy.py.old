@@ -1,0 +1,35 @@
+# import spacy
+# from bs4 import BeautifulSoup
+# import logging
+
+# logger = logging.getLogger(__name__)
+# class NER_Spacy_predict:
+
+#     def __init__(self,model_path):
+#         self.nlp = None
+#         try:
+#             self.nlp = spacy.load(model_path, disable=['tagger', 'parser'])
+#         except OSError as e:
+#             logger.info(f"Erro ao carregar modelo NER : {model_path}")
+#             pass
+
+#     def predict(self, text):
+#         if self.nlp is None:
+#             logger.info(f"Modelo NER não carregado")
+#             return None
+
+#         doc = self.nlp(text[0].lower())
+
+#         entities = []
+#         for ent in doc.ents:
+#             #print(ent.text, ent.label_, ent.start_char, int(text[1]))
+#             r = {}
+#             r["text"] =  BeautifulSoup(ent.text).text.replace('</p', '')
+#             r["label"] = ent.label_
+#             r["ini"] = ent.start_char + int(text[1])
+#             r["fim"] = r["ini"] + len(r["text"])
+#             entities.append(r)
+
+#         return entities
+
+

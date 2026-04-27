@@ -1,0 +1,188 @@
+ennio.sh
+deletar.py
+scripts/historia*/similarities
+tmp/
+.env
+ennio.env
+envs.sh
+config.ini
+assets/
+logs/
+storage/
+plugins/
+data/
+.vscode/
+default-core
+process_test
+#desenv.py
+*desenv.py
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+build
+dist
+*.egg-info
+# C extensions
+*.so
+conf/
+api_sei/dags/database/solr_cores_configs/*/conf/
+desenv.ipynb
+*desenv.ipynb
+.vscode
+desenv*
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+**/.ipynb_checkpoints/
+*.csv
+*.xlsx
+*.pkl
+*.exe
+*.zip
+*.rar
+*.part
+*.tar
+*.gz
+*.gzip
+logs/.keep
+*.joblib
+api_sei/dags/database/solr_cores_configs/mlt/conf/
+api_sei/dags/database/solr_cores_configs/mlt_exp/
+api_sei/dags/database/solr_cores_configs/process/conf/
+api_sei/dags/database/solr_cores_configs/process_not_multivalued/
+scripts/base_de_validacao_v20221227/
+scripts/debugs_mlt/
+scripts/mlt_process_recommender/
+scripts/validacao_carol/
+scripts/validacao_carol_ivan/
+*.png
+faiss_index
+id_rsa
+desenv_2_paraphase.py
+api_sei/dags/database/solr_cores_configs
+
+paulo.sh
+
+config_prod.ini
+tests/unit/config.cfg
+tests/unit/dataset_dev.spacy
+tests/unit/dataset_train.spacy
+tests/unit/dev.txt
+tests/unit/dev_spacy.json
+tests/unit/model-best-acc/
+tests/unit/model-best-eff/
+tests/unit/model-last/
+tests/unit/test.txt
+tests/unit/test_spacy.json
+tests/unit/train.txt
+tests/unit/train_spacy.json
+api_sei-local.dockerfile
+uv.lock

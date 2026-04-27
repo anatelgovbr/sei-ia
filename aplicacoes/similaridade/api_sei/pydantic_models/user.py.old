@@ -1,0 +1,21 @@
+# from typing import Union
+
+# from pydantic import BaseModel, validator
+
+
+# class User(BaseModel):
+#     senha: str
+#     id_usuario: str
+#     nome: str
+
+#     @validator("senha", "id_usuario", "nome", pre=True, always=True)
+#     def validate_fields_not_none(cls, value):
+#         if value is None:
+#             raise ValueError("Todos os campos sao obrigatorios")
+#         return value
+
+
+# class UserNotFoundException(Exception):
+#     def __init__(self, message="User not found"):
+#         self.message = message
+#         super().__init__(self.message)

@@ -1,0 +1,109 @@
+model_list:
+  - model_name: standard
+    litellm_params:
+      model: ${LITELLM_STANDARD_MODEL}
+      api_base: ${LITELLM_STANDARD_API_BASE}
+      api_key: ${LITELLM_STANDARD_API_KEY}
+      api_version: "${LITELLM_STANDARD_API_VERSION}"
+      max_completion_tokens: 32768
+    model_info:
+      base_model: ${LITELLM_STANDARD_MODEL}
+
+  - model_name: mini
+    litellm_params:
+      model: ${LITELLM_MINI_MODEL}
+      api_base: ${LITELLM_STANDARD_API_BASE}
+      api_key: ${LITELLM_STANDARD_API_KEY}
+      api_version: "${LITELLM_STANDARD_API_VERSION}"
+      max_completion_tokens: 32768
+    model_info:
+      base_model: ${LITELLM_MINI_MODEL}
+
+  - model_name: nano
+    litellm_params:
+      model: ${LITELLM_NANO_MODEL}
+      api_base: ${LITELLM_STANDARD_API_BASE}
+      api_key: ${LITELLM_STANDARD_API_KEY}
+      api_version: "${LITELLM_STANDARD_API_VERSION}"
+      max_completion_tokens: 32000
+    model_info:
+      base_model: ${LITELLM_NANO_MODEL}
+
+  - model_name: think
+    litellm_params:
+      model: ${LITELLM_STANDARD_MODEL}
+      api_base: ${LITELLM_STANDARD_API_BASE}
+      api_key: ${LITELLM_STANDARD_API_KEY}
+      api_version: "${LITELLM_STANDARD_API_VERSION}"
+      max_completion_tokens: ${LITELLM_THINK_MAX_TOKENS}
+      reasoning_effort: "medium"
+    model_info:
+      base_model: ${LITELLM_STANDARD_MODEL}
+
+  - model_name: think-low
+    litellm_params:
+      model: ${LITELLM_STANDARD_MODEL}
+      api_base: ${LITELLM_STANDARD_API_BASE}
+      api_key: ${LITELLM_STANDARD_API_KEY}
+      api_version: "${LITELLM_STANDARD_API_VERSION}"
+      max_completion_tokens: ${LITELLM_THINK_MAX_TOKENS}
+      reasoning_effort: "low"
+    model_info:
+      base_model: ${LITELLM_STANDARD_MODEL}
+
+  - model_name: think-none
+    litellm_params:
+      model: ${LITELLM_STANDARD_MODEL}
+      api_base: ${LITELLM_STANDARD_API_BASE}
+      api_key: ${LITELLM_STANDARD_API_KEY}
+      api_version: "${LITELLM_STANDARD_API_VERSION}"
+      max_completion_tokens: ${LITELLM_THINK_MAX_TOKENS}
+      reasoning_effort: "none"
+    model_info:
+      base_model: ${LITELLM_STANDARD_MODEL}
+
+  - model_name: embedding
+    litellm_params:
+      model: ${LITELLM_EMBEDDING_MODEL}
+      api_base: ${LITELLM_EMBEDDING_API_BASE}
+      api_key: ${LITELLM_EMBEDDING_API_KEY}
+      api_version: "${LITELLM_EMBEDDING_API_VERSION}"
+    model_info:
+      base_model: ${LITELLM_EMBEDDING_MODEL}
+
+  - model_name: speech-to-text
+    litellm_params:
+      model: ${LITELLM_STT_MODEL}
+      api_base: ${LITELLM_STT_API_BASE}
+      api_key: ${LITELLM_STT_API_KEY}
+      api_version: "${LITELLM_STT_API_VERSION}"
+    model_info:
+      base_model: ${LITELLM_STT_MODEL}
+
+# ============================================================================
+# Configuracoes de Retry e Reliability
+# ============================================================================
+
+litellm_settings:
+  num_retries: 3
+  request_timeout: 900
+  drop_params: true
+  modify_params: true
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 3
+  timeout: 900
+  retry_policy:
+    AuthenticationErrorRetries: 0
+    TimeoutErrorRetries: 3
+    RateLimitErrorRetries: 3
+    ContentPolicyViolationErrorRetries: 0
+    InternalServerErrorRetries: 4
+    BadRequestErrorRetries: 0
+
+general_settings:
+  # master_key: os.environ/LITELLM_MASTER_KEY
+
+settings:
+  model_list: model_list

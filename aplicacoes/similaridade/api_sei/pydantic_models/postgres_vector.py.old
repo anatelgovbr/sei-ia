@@ -1,0 +1,14 @@
+
+# from sqlalchemy.orm import declarative_base
+# from pgvector.sqlalchemy import Vector
+# from sqlalchemy import Column, BigInteger, Integer
+
+# Base_pg = declarative_base()
+
+# class EmbdMiniLM(Base_pg):
+#     __tablename__ = 'embd_doc_minilm_128'
+#     id_documento = Column(BigInteger, primary_key=True)
+#     id_processo = Column(BigInteger, nullable=False)
+#     embd = Column(Vector, nullable=False)
+#     tp_documento = Column(Integer, nullable=False)
+#     chunk_idx = Column(Integer, primary_key=True)

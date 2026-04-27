@@ -1,0 +1,528 @@
+name: sei-ia
+
+x-app-common: &app-common
+  restart: unless-stopped
+  networks:
+    - seiia
+  env_file:
+    - default.env
+    - security.env
+  environment:
+    SEI_API_DB_ADDRESS: ${SEI_ADDRESS}/sei/controlador_ws.php
+
+x-airflow-common: &airflow-common
+  build:
+    context: .
+    dockerfile: aplicacoes/etl-airflow/airflow.dockerfile
+    args:
+      AIRFLOW_UID: ${AIRFLOW_UID:-4000}
+  image: sei-ia/etl-airflow:local
+  restart: unless-stopped
+  networks:
+    - seiia
+  env_file:
+    - default.env
+    - security.env
+  environment:
+    AIRFLOW_API_BASE_URL: http://etl-airflow-webserver:8080/api/v1
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_POSTGRES_USER:-airflow}:${AIRFLOW_POSTGRES_PASSWORD:-airflow}@infra-postgres-airflow:5432/${AIRFLOW_POSTGRES_DB:-airflow}
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${AIRFLOW_POSTGRES_USER:-airflow}:${AIRFLOW_POSTGRES_PASSWORD:-airflow}@infra-postgres-airflow:5432/${AIRFLOW_POSTGRES_DB:-airflow}
+    AIRFLOW__CELERY__BROKER_URL: amqp://${AIRFLOW_AMQP_USER:-airflow}:${AIRFLOW_AMQP_PASSWORD:-airflow}@infra-rabbitmq:5672//
+    AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: ${AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG}
+    SEI_API_DB_ADDRESS: ${SEI_ADDRESS}/sei/controlador_ws.php
+    SOLR_MLT_PROCESS_CORE: ${SOLR_MLT_PROCESS_CORE}
+    SOLR_MLT_JURISPRUDENCE_CORE: ${SOLR_MLT_JURISPRUDENCE_CORE}
+    MLT_PROCESS_CONFIGSET: /var/solr/configsets/process
+    MLT_JURISPRUDENCE_CONFIGSET: /var/solr/configsets/jurisprudence
+    CONN_STRING_APP_DB: postgresql+psycopg2://${DB_SEIIA_USER:-postgres}:${DB_SEIIA_PWD:-postgres}@infra-postgres:5432/${DB_SEIIA_SIMILARIDADE:-sei_similaridade}
+    CONN_LOG_DB_STRING: postgresql+psycopg2://${DB_SEIIA_USER:-postgres}:${DB_SEIIA_PWD:-postgres}@infra-postgres:5432/${DB_SEIIA_SIMILARIDADE:-sei_similaridade}
+    LITELLM_PROXY_URL: http://infra-litellm:4000
+    EMBEDDING_MODEL: ${EMBEDDING_MODEL}
+  volumes:
+    - ${VOL_SEIIA_DIR}/airflow_logs_vol:/opt/airflow/logs
+  depends_on:
+    infra-postgres-airflow:
+      condition: service_healthy
+    infra-rabbitmq:
+      condition: service_healthy
+    infra-postgres:
+      condition: service_healthy
+    infra-solr:
+      condition: service_healthy
+    infra-redis:
+      condition: service_started
+
+services:
+  assistente:
+    <<: *app-common
+    networks:
+      seiia:
+        aliases:
+          - api_assistente
+    build:
+      context: .
+      dockerfile: aplicacoes/assistente/assistente.dockerfile
+    image: sei-ia/assistente:local
+    command: >
+      uv run gunicorn sei_ia.main:app -c /app/sei_ia/configs/gunicorn_conf.py
+    environment:
+      SEI_API_DB_ADDRESS: ${SEI_ADDRESS}/sei/controlador_ws.php
+      ASSISTENTE_EMBEDDING_MODEL: ${EMBEDDING_MODEL}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8088/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      infra-postgres:
+        condition: service_healthy
+      infra-redis:
+        condition: service_started
+      infra-litellm:
+        condition: service_started
+
+  assistente-nginx:
+    <<: *app-common
+    build:
+      context: .
+      dockerfile: aplicacoes/assistente/nginx.dockerfile
+    image: sei-ia/assistente-nginx:local
+    ports:
+      - "${ASSISTENTE_PORT:-8088}:443"
+    depends_on:
+      assistente:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: ${ASSISTENTE_NGINX_MEM_LIMIT}
+          cpus: ${ASSISTENTE_NGINX_CPU_LIMIT}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      start_period: 30s
+      interval: 600s
+      timeout: 10s
+      retries: 5
+
+  similaridade:
+    <<: *app-common
+    build:
+      context: .
+      dockerfile: aplicacoes/similaridade/api_sei.dockerfile
+    image: sei-ia/similaridade:local
+    command: >
+      gunicorn -k uvicorn.workers.UvicornH11Worker --workers=2
+      --keyfile=/home/seisimi/certificado/seiia.cert.key
+      --certfile=/home/seisimi/certificado/seiia.cert.pem
+      --bind=0.0.0.0:8082 api_sei.main:app
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-kfsS", "--max-time", "5", "https://127.0.0.1:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      infra-postgres:
+        condition: service_healthy
+      infra-solr:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: ${API_SEI_MEM_LIMIT}
+          cpus: ${API_SEI_CPU_LIMIT}
+
+  similaridade-feedback:
+    <<: *app-common
+    build:
+      context: .
+      dockerfile: aplicacoes/similaridade/api_sei.dockerfile
+    image: sei-ia/similaridade:local
+    command: >
+      gunicorn -k uvicorn.workers.UvicornH11Worker
+      --keyfile=/home/seisimi/certificado/seiia.cert.key
+      --certfile=/home/seisimi/certificado/seiia.cert.pem
+      --bind=0.0.0.0:8086 app_api.main:app
+    healthcheck:
+      test: ["CMD", "curl", "-kfsS", "--max-time", "5", "https://127.0.0.1:8086/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      infra-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: ${APP_API_MEM_LIMIT}
+          cpus: ${APP_API_CPU_LIMIT}
+    ports:
+      - "8086:8086"
+
+  etl-airflow-init:
+    <<: *airflow-common
+    restart: "no"
+    command: >
+      bash -lc "airflow db migrate &&
+      airflow users create
+      --role Admin
+      --username ${_AIRFLOW_WWW_USER_USERNAME:-admin}
+      --password ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
+      --firstname SEI
+      --lastname IA
+      --email sei-ia@example.local || true"
+
+  etl-airflow-webserver:
+    <<: *airflow-common
+    command: airflow webserver
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_webserver.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      etl-airflow-init:
+        condition: service_completed_successfully
+      infra-postgres-airflow:
+        condition: service_healthy
+      infra-rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_WEBSERVER_MEM_LIMIT}
+          cpus: ${AIRFLOW_WEBSERVER_CPU_LIMIT}
+
+  etl-airflow-scheduler:
+    <<: *airflow-common
+    cpu_shares: ${AIRFLOW_SCHEDULER_CPU_SHARES}
+    command: airflow scheduler
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_scheduler.sh"]
+      interval: 60s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      etl-airflow-init:
+        condition: service_completed_successfully
+      infra-postgres-airflow:
+        condition: service_healthy
+      infra-rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_SCHEDULER_MEM_LIMIT}
+          cpus: ${AIRFLOW_SCHEDULER_CPU_LIMIT}
+      replicas: 1
+
+  etl-airflow-worker:
+    <<: *airflow-common
+    command:
+      - celery
+      - worker
+      - -H
+      - airflow-worker@%h
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_worker.sh"]
+      interval: 60s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      etl-airflow-init:
+        condition: service_completed_successfully
+      infra-postgres-airflow:
+        condition: service_healthy
+      infra-rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_WORKER_MEM_LIMIT}
+          cpus: ${AIRFLOW_WORKER_CPU_LIMIT}
+      replicas: ${AIRFLOW_WORKERS_REPLICAS}
+
+  etl-airflow-triggerer:
+    <<: *airflow-common
+    command: airflow triggerer
+    healthcheck:
+      test: ["CMD", "sh", "/home/airflow/app/healthcheck/airflow_triggerer.sh"]
+      interval: 60s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      etl-airflow-init:
+        condition: service_completed_successfully
+      infra-postgres-airflow:
+        condition: service_healthy
+      infra-rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_TRIGGERER_MEM_LIMIT}
+          cpus: ${AIRFLOW_TRIGGERER_CPU_LIMIT}
+
+  etl-airflow-api:
+    <<: *app-common
+    build:
+      context: .
+      dockerfile: aplicacoes/etl-airflow/jobs_api.dockerfile
+    image: sei-ia/etl-airflow-api:local
+    command: >
+      gunicorn -k uvicorn.workers.UvicornH11Worker --bind=0.0.0.0:8642 jobs.api:app
+    ports:
+      - "8090:8642"
+    environment:
+      SEI_API_DB_ADDRESS: ${SEI_ADDRESS}/sei/controlador_ws.php
+      SOLR_MLT_PROCESS_CORE: ${SOLR_MLT_PROCESS_CORE}
+      SOLR_MLT_JURISPRUDENCE_CORE: ${SOLR_MLT_JURISPRUDENCE_CORE}
+      MLT_PROCESS_CONFIGSET: /var/solr/configsets/process
+      MLT_JURISPRUDENCE_CONFIGSET: /var/solr/configsets/jurisprudence
+      CONN_STRING_APP_DB: postgresql+psycopg2://${DB_SEIIA_USER:-postgres}:${DB_SEIIA_PWD:-postgres}@infra-postgres:5432/${DB_SEIIA_SIMILARIDADE:-sei_similaridade}
+      CONN_LOG_DB_STRING: postgresql+psycopg2://${DB_SEIIA_USER:-postgres}:${DB_SEIIA_PWD:-postgres}@infra-postgres:5432/${DB_SEIIA_SIMILARIDADE:-sei_similaridade}
+      LITELLM_PROXY_URL: http://infra-litellm:4000
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8642/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      etl-airflow-webserver:
+        condition: service_healthy
+      infra-postgres:
+        condition: service_healthy
+      infra-solr:
+        condition: service_healthy
+      infra-redis:
+        condition: service_started
+
+  infra-postgres-airflow:
+    image: postgres:13
+    restart: unless-stopped
+    networks:
+      - seiia
+    environment:
+      POSTGRES_USER: ${AIRFLOW_POSTGRES_USER:-airflow}
+      POSTGRES_PASSWORD: ${AIRFLOW_POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: ${AIRFLOW_POSTGRES_DB:-airflow}
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ${VOL_SEIIA_DIR}/airflow_postgres_vol:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: ${AIRFLOW_POSTGRES_MEM_LIMIT}
+          cpus: ${AIRFLOW_POSTGRES_CPU_LIMIT}
+
+  infra-rabbitmq:
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    networks:
+      - seiia
+    environment:
+      RABBITMQ_DEFAULT_USER: ${AIRFLOW_AMQP_USER:-airflow}
+      RABBITMQ_DEFAULT_PASS: ${AIRFLOW_AMQP_PASSWORD:-airflow}
+      TZ: ${TZ:-America/Sao_Paulo}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  infra-postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    networks:
+      - seiia
+    env_file:
+      - default.env
+      - security.env
+    environment:
+      POSTGRES_DB: ${DB_SEIIA_ASSISTENTE:-sei_ia}
+      POSTGRES_USER: ${DB_SEIIA_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_SEIIA_PWD:-postgres}
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ${VOL_SEIIA_DIR}/pgvector_all_vol:/var/lib/postgresql/data
+      - ./ops/database/ddl.sql:/docker-entrypoint-initdb.d/10-ddl.sql:ro
+      - ./ops/database/conf/init_pgvector.sql:/docker-entrypoint-initdb.d/20-init_pgvector.sql:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_SEIIA_USER:-postgres} -d ${DB_SEIIA_ASSISTENTE:-sei_ia} -h localhost",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  infra-solr:
+    build:
+      context: .
+      dockerfile: ops/solr/solr.dockerfile
+      args:
+        SOLR_USER: ${SOLR_USER:-solr}
+        SOLR_PASSWORD: ${SOLR_PASSWORD:-solr}
+    image: sei-ia/infra-solr:local
+    restart: unless-stopped
+    networks:
+      - seiia
+    env_file:
+      - default.env
+      - security.env
+    environment:
+      SOLR_ULIMIT_CHECKS: "false"
+    volumes:
+      - ${VOL_SEIIA_DIR}/solr_pd_vol:/var/solr
+    mem_limit: ${SOLR_MEM_LIMIT}
+    cpus: ${SOLR_CPU_LIMIT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -kfsS -u \"$$SOLR_USER:$$SOLR_PASSWORD\" https://localhost:8983/solr/admin/info/system >/dev/null",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    ulimits:
+      nofile:
+        soft: 65000
+        hard: 65000
+
+  infra-redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    networks:
+      - seiia
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command: >
+      sh -c "
+      if [ -n \"$$REDIS_PASSWORD\" ]; then
+        redis-server --requirepass $$REDIS_PASSWORD --appendonly yes;
+      else
+        redis-server --appendonly yes;
+      fi"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "if [ -n \"$$REDIS_PASSWORD\" ]; then redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG; else redis-cli ping | grep PONG; fi",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  infra-litellm:
+    image: docker.litellm.ai/berriai/litellm:main-latest
+    restart: unless-stopped
+    networks:
+      - seiia
+    command: --config /app/config.yaml --port ${LITELLM_PORT:-4000} --host 0.0.0.0
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml:ro
+
+  stack-config-checker:
+    build:
+      context: .
+      network: host
+      dockerfile: ops/healthchecker.dockerfile
+    profiles: ["checks"]
+    env_file:
+      - default.env
+      - security.env
+    environment:
+      LD_LIBRARY_PATH: /opt/oracle
+      ORACLE_HOME: /opt/oracle
+      ORACLE_VERSION: 19.25
+      SOLR_ADDRESS: ${SOLR_ADDRESS}
+      SOLR_HOST: ${SOLR_HOST}
+      SEI_API_DB_ADDRESS: ${SEI_ADDRESS}/sei/controlador_ws.php
+      LITELLM_PROXY_URL: ${ASSISTENTE_LITELLM_PROXY_URL}
+    command: ["python3", "teste.py"]
+    networks:
+      - seiia
+    depends_on:
+      assistente:
+        condition: service_healthy
+      assistente-nginx:
+        condition: service_healthy
+      similaridade:
+        condition: service_healthy
+      similaridade-feedback:
+        condition: service_healthy
+      etl-airflow-api:
+        condition: service_healthy
+      etl-airflow-webserver:
+        condition: service_healthy
+      infra-postgres:
+        condition: service_healthy
+      infra-postgres-airflow:
+        condition: service_healthy
+      infra-rabbitmq:
+        condition: service_healthy
+      infra-redis:
+        condition: service_healthy
+      infra-solr:
+        condition: service_healthy
+      infra-litellm:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: ${ASSISTENTE_MEM_LIMIT}
+          cpus: ${ASSISTENTE_CPU_LIMIT}
+    volumes:
+      - health_checker_logs:/opt/sei-ia-storage
+      - ./:/opt/healthchecker
+      - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    privileged: true
+
+networks:
+  seiia:
+    name: ${COMPOSE_NETWORK_NAME:-docker-host-bridge}
+    external: true
+
+volumes:
+  redis_data:
+  health_checker_logs:

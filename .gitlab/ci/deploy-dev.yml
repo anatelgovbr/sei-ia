@@ -1,0 +1,19 @@
+deploy-dev:
+  stage: deploy
+  image: docker:27-cli
+  tags:
+    - dev
+  environment:
+    name: development
+  variables:
+    GIT_STRATEGY: none
+  needs:
+    - runner-branch-check
+  before_script:
+    - apk add --no-cache bash git gettext
+    - docker compose version
+  script:
+    - 'test -n "$DEPLOY_REPO_PATH" || (echo "DEPLOY_REPO_PATH is required" && exit 1)'
+    - bash "$DEPLOY_REPO_PATH/.gitlab/scripts/deploy_changed.sh"
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /^(dev|develop|desenvolvimento)$/

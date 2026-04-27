@@ -1,0 +1,285 @@
+[
+    {
+        "test_description": "recomendação processo existente",
+        "path": "/process-recommenders/weighted-mlt-recommender/recommendations/{id_recommendation}",
+        "params": {
+            "id_recommendation": "5453141",
+            "rows": "10",
+            "debug": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação processo inexistente",
+        "path": "/process-recommenders/weighted-mlt-recommender/recommendations/{id_recommendation}",
+        "params": {
+            "id_recommendation": "1",
+            "rows": "10",
+            "debug": "false"
+        },
+        "result_expected": {
+            "status_code": 404
+        }
+    },
+    
+    {
+        "test_description": "recomendação processo existente",
+        "path": "/process-recommenders/weighted-mlt-recommender/recommendations/{id_recommendation}",
+        "params": {
+            "id_recommendation": "5453141",
+            "id_user": "1",
+            "rows": "10",
+            "debug": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação processo existente",
+        "path": "/process-recommenders/weighted-mlt-recommender/recommendations/{id_recommendation}",
+        "params": {
+            "id_recommendation": "5453141",
+            "id_user": "1",
+            "rows": "20",
+            "debug": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação processo existente com debug",
+        "path": "/process-recommenders/weighted-mlt-recommender/recommendations/{id_recommendation}",
+        "params": {
+            "id_recommendation": "5453141",
+            "id_user": "1",
+            "rows": "10",
+            "debug": "true"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação doc int existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "135629",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false",
+            "id_user": "1234"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação doc int existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "135629",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação normalizada doc int existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "135629",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "true"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação ponderada doc int existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "135629",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.2",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação doc int existente e busca de texto",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "text": "PADO",
+            "list_id_doc": "135629",
+            "list_type_id_doc": ["7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação lista com doc int inexistente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "text": "PADO",
+            "list_id_doc": ["1", "135629"],
+            "list_type_id_doc": ["7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 404
+        }
+    },
+    {
+        "test_description": "recomendação doc int existente com citação",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "text": "PADO",
+            "list_id_doc": ["135629"],
+            "list_type_id_doc": ["7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "true",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 404
+        }
+    },
+
+    {
+        "test_description": "recomendação doc ext existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "13631856",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false",
+            "id_user": "1234"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação doc ext existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "13631856",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação normalizada doc ext existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "13631856",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "true"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação ponderada doc ext existente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "list_id_doc": "13631856",
+            "list_type_id_doc": ["4", "7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.2",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação doc ext existente e busca de texto",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "text": "PADO",
+            "list_id_doc": "13631856",
+            "list_type_id_doc": ["7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 200
+        }
+    },
+    {
+        "test_description": "recomendação lista com doc ext inexistente",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "text": "PADO",
+            "list_id_doc": ["1", "13631856"],
+            "list_type_id_doc": ["7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "false",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 404
+        }
+    },
+    {
+        "test_description": "recomendação doc ext existente com citação",
+        "path": "/document-recommenders/mlt-recommender/recommendations",
+        "params": {
+            "text": "PADO",
+            "list_id_doc": ["13631856"],
+            "list_type_id_doc": ["7", "8", "19", "94"],
+            "rows": "10",
+            "include_citations": "true",
+            "text_weight": "0.5",
+            "normalized": "false"
+        },
+        "result_expected": {
+            "status_code": 404
+        }
+    }
+]

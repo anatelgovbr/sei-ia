@@ -1,0 +1,16 @@
+services:
+  infra-postgres:
+    ports:
+      - "${PGVECTOR_PORT:-5432}:5432"
+
+  infra-solr:
+    ports:
+      - "${SOLR_PORT:-8084}:8983"
+
+  infra-redis:
+    ports:
+      - "${REDIS_PORT:-8091}:6379"
+
+  infra-litellm:
+    ports:
+      - "${LITELLM_PORT:-4000}:${LITELLM_PORT:-4000}"

@@ -1,0 +1,373 @@
+.quality_job:
+  stage: quality
+  image: python:3.12-slim
+  needs:
+    - runner-branch-check
+  cache:
+    key: "pip-cache"
+    paths:
+      - .cache/pip
+  before_script:
+    - python --version
+    - python -m pip install --upgrade pip
+    - python -m pip install "ruff==0.14.10"
+
+.test_job:
+  stage: test
+  image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+  variables:
+    UV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/uv"
+    UV_COMPILE_BYTECODE: "1"
+    UV_LINK_MODE: "copy"
+  cache:
+    key: "uv-assistente-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .cache/uv
+    policy: pull-push
+  before_script:
+    - uv --version
+    - cd aplicacoes/assistente
+    - uv sync --extra dev
+
+linter:assistente:dev:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Linter Assistente (dev/hm - allow_failure) =========="
+    - cd aplicacoes/assistente
+    - ruff check --statistics .
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento|hm|homolog|homologacao)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|hm)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+
+linter:assistente:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Linter Assistente (pd/main - bloqueia merge) =========="
+    - cd aplicacoes/assistente
+    - ruff check --statistics .
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - when: never
+
+formatter:assistente:dev:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Format Assistente (dev/hm - allow_failure) =========="
+    - cd aplicacoes/assistente
+    - ruff format --check .
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento|hm|homolog|homologacao)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|hm)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+
+formatter:assistente:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Format Assistente (pd/main - bloqueia merge) =========="
+    - cd aplicacoes/assistente
+    - ruff format --check .
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - when: never
+
+linter:similaridade:dev:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Linter Similaridade (dev/hm - allow_failure) =========="
+    - cd aplicacoes/similaridade
+    - ruff check --statistics .
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento|hm|homolog|homologacao)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|hm)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+
+linter:similaridade:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Linter Similaridade (pd/main - bloqueia merge) =========="
+    - cd aplicacoes/similaridade
+    - ruff check --statistics .
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+    - when: never
+
+formatter:similaridade:dev:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Format Similaridade (dev/hm - allow_failure) =========="
+    - cd aplicacoes/similaridade
+    - ruff format --check .
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento|hm|homolog|homologacao)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|hm)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+
+formatter:similaridade:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Format Similaridade (pd/main - bloqueia merge) =========="
+    - cd aplicacoes/similaridade
+    - ruff format --check .
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/similaridade/*
+        - aplicacoes/similaridade/**/*
+    - when: never
+
+linter:etl-airflow:dev:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Linter ETL Airflow (dev/hm - allow_failure) =========="
+    - cd aplicacoes/etl-airflow
+    - ruff check --statistics .
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento|hm|homolog|homologacao)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|hm)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+
+linter:etl-airflow:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Linter ETL Airflow (pd/main - bloqueia merge) =========="
+    - cd aplicacoes/etl-airflow
+    - ruff check --statistics .
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+    - when: never
+
+formatter:etl-airflow:dev:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Format ETL Airflow (dev/hm - allow_failure) =========="
+    - cd aplicacoes/etl-airflow
+    - ruff format --check .
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento|hm|homolog|homologacao)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|hm)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+
+formatter:etl-airflow:
+  stage: quality
+  extends: .quality_job
+  script:
+    - echo "========== Ruff Format ETL Airflow (pd/main - bloqueia merge) =========="
+    - cd aplicacoes/etl-airflow
+    - ruff format --check .
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/etl-airflow/*
+        - aplicacoes/etl-airflow/**/*
+    - when: never
+
+e2e_test:assistente:dev:
+  stage: test
+  extends: .test_job
+  needs:
+    - job: linter:assistente:dev
+      optional: true
+    - job: linter:assistente
+      optional: true
+    - job: formatter:assistente:dev
+      optional: true
+    - job: formatter:assistente
+      optional: true
+  script:
+    - echo "========== Testes E2E Assistente (dev/hm - allow_failure) =========="
+    - uv run pytest tests/e2e/test_service.py -v --tb=short
+  timeout: 30m
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    paths:
+      - aplicacoes/assistente/tests/e2e/*.log
+    expire_in: 3 days
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento|hm|homolog|homologacao)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(dev|hm)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+
+e2e_test:assistente:
+  stage: test
+  extends: .test_job
+  needs:
+    - job: linter:assistente:dev
+      optional: true
+    - job: linter:assistente
+      optional: true
+    - job: formatter:assistente:dev
+      optional: true
+    - job: formatter:assistente
+      optional: true
+  script:
+    - echo "========== Testes E2E Assistente (pd/main - bloqueia merge) =========="
+    - uv run pytest tests/e2e/test_service.py -v --tb=short
+  timeout: 30m
+  allow_failure: false
+  artifacts:
+    when: on_failure
+    paths:
+      - aplicacoes/assistente/tests/e2e/*.log
+    expire_in: 3 days
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - if: $CI_COMMIT_REF_NAME =~ /^(pd|prod)\//
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+        - aplicacoes/assistente/*
+        - aplicacoes/assistente/**/*
+    - when: never

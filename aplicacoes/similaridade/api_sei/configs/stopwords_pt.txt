@@ -1,0 +1,619 @@
+ | From svn.tartarus.org/snowball/trunk/website/algorithms/portuguese/stop.txt
+ | This file is distributed under the BSD License.
+ | See http://snowball.tartarus.org/license.php
+ | Also see http://www.opensource.org/licenses/bsd-license.html
+ |  - Encoding was converted to UTF-8.
+ |  - This notice was added.
+ |
+ | NOTE: To use this file with StopFilterFactory, you must specify format="snowball"
+
+ | A Portuguese stop word list. Comments begin with vertical bar. Each stop
+ | word is at the start of a line.
+
+
+ | The following is a ranked list (commonest to rarest) of stopwords
+ | deriving from a large sample of text.
+
+ | Extra words have been added at the end.
+
+de             |  of, from
+a              |  the; to, at; her
+o              |  the; him
+que            |  who, that
+e              |  and
+do             |  de + o
+da             |  de + a
+em             |  in
+um             |  a
+para           |  for
+  | é          from SER
+com            |  with
+não            |  not, no
+uma            |  a
+os             |  the; them
+no             |  em + o
+se             |  himself etc
+na             |  em + a
+por            |  for
+mais           |  more
+as             |  the; them
+dos            |  de + os
+como           |  as, like
+mas            |  but
+  | foi        from SER
+ao             |  a + o
+ele            |  he
+das            |  de + as
+  | tem        from TER
+à              |  a + a
+seu            |  his
+sua            |  her
+ou             |  or
+  | ser        from SER
+quando         |  when
+muito          |  much
+  | há         from HAV
+nos            |  em + os; us
+já             |  already, now
+  | está       from EST
+eu             |  I
+também         |  also
+só             |  only, just
+pelo           |  per + o
+pela           |  per + a
+até            |  up to
+isso           |  that
+ela            |  he
+entre          |  between
+  | era        from SER
+depois         |  after
+sem            |  without
+mesmo          |  same
+aos            |  a + os
+  | ter        from TER
+seus           |  his
+quem           |  whom
+nas            |  em + as
+me             |  me
+esse           |  that
+eles           |  they
+  | estão      from EST
+você           |  you
+  | tinha      from TER
+  | foram      from SER
+essa           |  that
+num            |  em + um
+nem            |  nor
+suas           |  her
+meu            |  my
+às             |  a + as
+minha          |  my
+  | têm        from TER
+numa           |  em + uma
+pelos          |  per + os
+elas           |  they
+  | havia      from HAV
+  | seja       from SER
+qual           |  which
+  | será       from SER
+nós            |  we
+  | tenho      from TER
+lhe            |  to him, her
+deles          |  of them
+essas          |  those
+esses          |  those
+pelas          |  per + as
+este           |  this
+  | fosse      from SER
+dele           |  of him
+
+ | other words. There are many contractions such as naquele = em+aquele,
+ | mo = me+o, but they are rare.
+ | Indefinite article plural forms are also rare.
+
+tu             |  thou
+te             |  thee
+vocês          |  you (plural)
+vos            |  you
+lhes           |  to them
+meus           |  my
+minhas
+teu            |  thy
+tua
+teus
+tuas
+nosso          | our
+nossa
+nossos
+nossas
+
+dela           |  of her
+delas          |  of them
+
+esta           |  this
+estes          |  these
+estas          |  these
+aquele         |  that
+aquela         |  that
+aqueles        |  those
+aquelas        |  those
+isto           |  this
+aquilo         |  that
+
+               | forms of estar, to be (not including the infinitive):
+estou
+está
+estamos
+estão
+estive
+esteve
+estivemos
+estiveram
+estava
+estávamos
+estavam
+estivera
+estivéramos
+esteja
+estejamos
+estejam
+estivesse
+estivéssemos
+estivessem
+estiver
+estivermos
+estiverem
+
+               | forms of haver, to have (not including the infinitive):
+hei
+há
+havemos
+hão
+houve
+houvemos
+houveram
+houvera
+houvéramos
+haja
+hajamos
+hajam
+houvesse
+houvéssemos
+houvessem
+houver
+houvermos
+houverem
+houverei
+houverá
+houveremos
+houverão
+houveria
+houveríamos
+houveriam
+
+               | forms of ser, to be (not including the infinitive):
+sou
+somos
+são
+era
+éramos
+eram
+fui
+foi
+fomos
+foram
+fora
+fôramos
+seja
+sejamos
+sejam
+fosse
+fôssemos
+fossem
+for
+formos
+forem
+serei
+será
+seremos
+serão
+seria
+seríamos
+seriam
+
+               | forms of ter, to have (not including the infinitive):
+tenho
+tem
+temos
+tém
+tinha
+tínhamos
+tinham
+tive
+teve
+tivemos
+tiveram
+tivera
+tivéramos
+tenha
+tenhamos
+tenham
+tivesse
+tivéssemos
+tivessem
+tiver
+tivermos
+tiverem
+terei
+terá
+teremos
+terão
+teria
+teríamos
+teriam
+nº
+anatel
+s
+º
+http
+document
+br
+gov
+n
+r
+i
+c
+v
+l
+x
+d
+m
+f
+www
+b
+t
+h
+j
+q
+g
+k
+p
+u
+w
+ª
+z
+í
+y
+hdnchk
+ê
+rr
+ões
+ã
+xxxxxxx
+ç
+â
+š
+á
+𝐱
+ä
+ü
+𝐏
+𝐒
+ú
+ï
+ó
+ë
+µ
+ñ
+ò
+õ
+ô
+ø
+xxxx
+ì
+aaaa
+ð
+ß
+ý
+æ
+è
+xxxxx
+iiii
+î
+û
+ffff
+eeeeeee
+錢
+鞺
+å
+ffffffff
+ù
+eeee
+xxxxxx
+ö
+gggggggg
+hhhhhhhh
+cccccccc
+iiiiiiii
+xxxxxxxxxxx
+dddd
+dddddddd
+iiiii
+þ
+bbbbbbbb
+aaaaaaa
+llll
+xxxxxxxx
+𝐢
+cccc
+iiiiii
+jjjjjjjj
+𝐧
+bbbb
+xxxxxxxxxx
+𝐐
+𝐤
+hhhh
+β
+gggg
+liiii
+oooooooo
+ppppppppp
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+lllll
+xxxxxxxxxxxxx
+ƒ
+㪃
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+iiiiiii
+jjjjjjjjd
+kkkkkkkk
+rrrrrrrr
+xxxxxxxxxxxxxxxxxxx
+zzzzzzzz
+qqqqqqqqq
+vvvv
+xxxxxxxxxxxxxxxxxxxxxxx
+ﬁ
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+llllll
+oooo
+fffffffff
+iiiiiiiid
+kkkk
+ooooooo
+stuuvwucxyz
+stuuvwuexyz
+uvwwxywez
+uvwwxywhz
+vvvvvvvv
+wustuuvwuc
+wustuuvwug
+yywwz
+yyyy
+yyyyyyyy
+𝑈
+𝑫
+ffffffffd
+ggggggggg
+iiiiiiiii
+jjjj
+wwwwwwww
+凮
+瀟
+疏
+𝐹
+𝑉
+hhhhhhhhd
+llllllll
+xxxxxxxxx
+ÿ
+bbbbb
+fffffffffffff
+nnnnnnnn
+xxxxxxxxxxxx
+𝑓
+𝑥
+ddddddddddddd
+eeeeeeeed
+ffffffffffespectr
+iiiiiiiiiii
+lllllllll
+ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+rrrrrrrrr
+ggggggggd
+mmmm
+sssssss
+tttt
+wwww
+xxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+yyyyy
+ｾ
+𝑷
+ccccccccccccc
+ggggg
+iiiiiiiiiiiii
+kkkkkkkkd
+lllllll
+llllllllllll
+mmmmmm
+mmmmmmmm
+nnnn
+tttttttt
+ufaaaammddhhmm
+uuuu
+uuuuuuuu
+zzzz
+据
+殈
+aaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+ccccc
+ddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+fffff
+gkgggggfgc
+hhhhh
+iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+illlll
+lllllllllll
+lllllllllllllll
+lllllllllllllllllllllllll
+piiii
+pppp
+pprroocceesssso
+qqqq
+qqqqqqqqqqq
+rrrr
+xxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx
+一
+丁
+盞
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+azxvwxxyzxeb
+azxvwxxyzxhi
+azxvwxxyzxib
+ccccccccd
+ddddddddd
+ggggggggggggg
+hhhhhhhhhhhhh
+iiiiiiiiiiii
+iiiiiiiiiiiiii
+iiiiiiiiiiiiiii
+iiiiiiiiiiiiiiiiii
+illlllll
+kkkkk
+llllllllli
+llllllllll
+miiii
+mmmmm
+nnnnn
+pppppppp
+qqqqqqqq
+rrrrr
+ssss
+uiiii
+vvvvvv
+xxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxx
+yyyyyyyyyyyd
+zxvwxxyzxd
+zxvwxxyzxe
+zxvwxxyzxh
+zxvwxxyzxi
+ı
+α
+η
+ω
+露
+ﬂ
+aaaaa
+aaaaaaaaaaaa
+aaaaqt
+caiiiivibo
+ceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed
+daaaab
+ddddd
+ddddddddddddddddddddddddddddd
+eeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+fffffff
+ffffffffff
+fffffffffffffffffffffffffffffffff
+ffffffg
+ggggggggggggggggggggggggggggggggggg
+hhhhhhh
+ihiiiii
+iihiihiiii
+iiiiiiihii
+iiiiiiiiii
+iiiiiiiiiiiiiiii
+iiiiiiiiiiiiiiiii
+iiiiiiiiiiiiiiiiiiiiiiiiii
+iiiiiiiiiiiiijiiiiiiiiiiimiiiiiiiiiiiiiiiihi
+iiiil
+iiiiw
+illll
+jjijjijjjj
+jjjjjj
+kojjjjj
+lillll
+llilllllllllllll
+llllac
+lllliiii
+llllj
+lllllllllllllllll
+lllllllllllllllllll
+llllllllllllllllllll
+llllllllllllllllllllllllllllllll
+mllll
+mmiissssaao
+muuuu
+nnnnnn
+ooooo
+oooosz
+qqqqqqqqqqqqq
+ttttt
+tttttt
+uuuuu
+uuuuuu
+uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
+vvvvv
+vvvvvvv
+vvvvw
+wvvvv
+wwwwwx
+xxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+zzzzz
+øx
+øù
+ùx
+ùúú
+úf
+úm
+úà
+úâ
+úú
+üai
+üan
+üar
+übs
+üg
+üq
+üun
+üç
+üíf
+üñî
+üñó
+üó
+ýx
+ýßñ
+ýðú
+ýñ
+ýñoeo
+þßoýñ
+œ
+šf
+šw
+šši
+ų
+λ
+ၓ
+ᵒ
+し
+与
+崻
+捌
+磯
+籘
+色
+苃
+词
+轟
+辽
+鰯
+ｬ
+𝑺

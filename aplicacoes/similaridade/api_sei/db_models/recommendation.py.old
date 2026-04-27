@@ -1,0 +1,24 @@
+# from sqlalchemy import Column, Integer, String, DateTime, BigInteger
+# from sqlalchemy.sql import func
+
+# class LogRecommendationDB(Base):
+#     __table_args__ = {'schema': 'public'}
+#     __tablename__ = 'log_recommendations'
+
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     id_protocolo_search = Column(BigInteger)
+#     id_protocolo_interest = Column(BigInteger)
+#     email_user = Column(String)
+#     created_at = Column(DateTime, default=func.now())
+
+
+# class ProcessRecommendationDB(Base):
+#     __table_args__ = {'schema': 'public'}
+#     __tablename__ = 'process_recommendations'
+
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     id_user = Column(BigInteger)
+#     id_protocolo = Column(BigInteger)
+#     id_protocolo_consumed = Column(BigInteger)
+#     id_recomendacao_processo = Column(BigInteger, nullable=True, default=None)
+#     create_at = Column(DateTime, default=func.now())

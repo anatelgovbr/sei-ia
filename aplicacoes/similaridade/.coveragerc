@@ -1,0 +1,15 @@
+[run]
+branch = true
+omit = __init__.py
+       */__init__.py
+       */scripts/*
+
+[paths]
+source = 
+    api_sei/
+
+[report]
+show_missing = true
+sort = Miss
+fail_under = 40
+skip_empty = true

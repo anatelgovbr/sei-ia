@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solr managed schema - automatically generated - DO NOT EDIT -->
+<schema name="default-config" version="1.6">
+<uniqueKey>id</uniqueKey>
+  <!-- <fieldType name="_nest_path_" class="solr.NestPathField" maxCharsForDocValues="-1" omitNorms="true" omitTermFreqAndPositions="true" stored="false" multiValued="false"/> -->
+  <dynamicField name="*" type="string" indexed="true" stored="true"/>
+  <fieldType name="ancestor_path" class="solr.TextField">
+    <analyzer type="index">
+      <tokenizer name="keyword"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer delimiter="/" name="pathHierarchy"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="binary" class="solr.BinaryField"/>
+  <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
+  <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+  <fieldType name="delimited_payloads_float" class="solr.TextField" indexed="true" stored="false">
+    <analyzer>
+      <tokenizer name="whitespace"/>
+      <filter name="delimitedPayload" encoder="float"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="delimited_payloads_int" class="solr.TextField" indexed="true" stored="false">
+    <analyzer>
+      <tokenizer name="whitespace"/>
+      <filter name="delimitedPayload" encoder="integer"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="delimited_payloads_string" class="solr.TextField" indexed="true" stored="false">
+    <analyzer>
+      <tokenizer name="whitespace"/>
+      <filter name="delimitedPayload" encoder="identity"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="descendent_path" class="solr.TextField">
+    <analyzer type="index">
+      <tokenizer delimiter="/" name="pathHierarchy"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer name="keyword"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="embedding_vector" class="solr.DenseVectorField" hnswMaxConnections="10" codecFormat="Lucene90HnswVectorsFormat" vectorDimension="768" similarityFunction="cosine" hnswBeamWidth="40"/>
+  <fieldType name="ignored" class="solr.StrField" indexed="false" stored="false" multiValued="true"/>
+  <fieldType name="location" class="solr.LatLonPointSpatialField" docValues="true"/>
+  <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType" geo="true" maxDistErr="0.001" distErrPct="0.025" distanceUnits="kilometers"/>
+  <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
+    <analyzer>
+      <tokenizer name="keyword"/>
+      <filter name="lowercase"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="pdate" class="solr.DatePointField" docValues="true"/>
+  <fieldType name="pdates" class="solr.DatePointField" docValues="true" multiValued="true"/>
+  <fieldType name="pdouble" class="solr.DoublePointField" docValues="true"/>
+  <fieldType name="pdoubles" class="solr.DoublePointField" docValues="true" multiValued="true"/>
+  <fieldType name="pfloat" class="solr.FloatPointField" docValues="true"/>
+  <fieldType name="pfloats" class="solr.FloatPointField" docValues="true" multiValued="true"/>
+  <fieldType name="phonetic_en" class="solr.TextField" indexed="true" stored="false">
+    <analyzer>
+      <tokenizer name="standard"/>
+      <filter name="doubleMetaphone" inject="false"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="pint" class="solr.IntPointField" docValues="true"/>
+  <fieldType name="pints" class="solr.IntPointField" docValues="true" multiValued="true"/>
+  <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
+  <fieldType name="plongs" class="solr.LongPointField" docValues="true" multiValued="true"/>
+  <fieldType name="point" class="solr.PointType" subFieldSuffix="_d" dimension="2"/>
+  <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
+  <fieldType name="rank" class="solr.RankField"/>
+  <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true"/>
+  <fieldType name="strings" class="solr.StrField" sortMissingLast="true" docValues="true" multiValued="true"/>
+  <fieldType name="text_cjk" class="solr.TextField" positionIncrementGap="100">
+    <analyzer>
+      <tokenizer name="standard"/>
+      <filter name="CJKWidth"/>
+      <filter name="lowercase"/>
+      <filter name="CJKBigram"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_gen_sort" class="solr.SortableTextField" positionIncrementGap="100" multiValued="true">
+    <analyzer type="index">
+      <tokenizer name="standard"/>
+      <filter name="stop" words="stopwords.txt" ignoreCase="true"/>
+      <filter name="lowercase"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer name="standard"/>
+      <filter name="stop" words="stopwords.txt" ignoreCase="true"/>
+      <filter expand="true" name="synonymGraph" synonyms="synonyms.txt" ignoreCase="true"/>
+      <filter name="lowercase"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
+    <analyzer type="index">
+      <tokenizer name="standard"/>
+      <filter name="stop" words="lang/stopwords_pt.txt" ignoreCase="true"/>
+      <filter name="lowercase"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer name="standard"/>
+      <filter name="stop" words="stopwords.txt" ignoreCase="true"/>
+      <filter expand="true" name="synonymGraph" synonyms="synonyms.txt" ignoreCase="true"/>
+      <filter name="lowercase"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_general_rev" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer name="standard"/>
+      <filter name="stop" words="stopwords.txt" ignoreCase="true"/>
+      <filter name="lowercase"/>
+      <filter maxFractionAsterisk="0.33" maxPosAsterisk="3" withOriginal="true" maxPosQuestion="2" name="reversedWildcard"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer name="standard"/>
+      <filter expand="true" name="synonymGraph" synonyms="synonyms.txt" ignoreCase="true"/>
+      <filter name="stop" words="stopwords.txt" ignoreCase="true"/>
+      <filter name="lowercase"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_pt" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <!-- <tokenizer name="standard"/> -->
+      <tokenizer class="solr.LowerCaseTokenizerFactory"/>
+      <!-- <filter name="lowercase"/> -->
+      <filter format="snowball" name="stop" words="lang/stopwords_pt.txt" ignoreCase="true"/>
+      <filter name="portugueseLightStem"/>
+    </analyzer>
+    <analyzer type="query">
+      <!-- <tokenizer name="standard"/> -->
+      <tokenizer class="solr.LowerCaseTokenizerFactory"/>
+      <!-- <filter name="lowercase"/> -->
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_ws" class="solr.TextField" positionIncrementGap="100">
+    <analyzer>
+      <tokenizer name="whitespace"/>
+    </analyzer>
+  </fieldType>
+  <!-- <field name="_nest_path_" type="_nest_path_"/> -->
+  <!-- <field name="_root_" type="string" docValues="false" indexed="true" stored="false"/> -->
+  <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
+  <field name="_version_" type="plong" indexed="false" stored="false"/>
+  <field name="assunto_text" type="text_pt" termVectors="true"/>
+  <field name="conclusao_text" type="text_pt" termVectors="true"/>
+  <field name="corpo_text" type="text_pt" termVectors="true"/>
+  <field name="ementa_text" type="text_pt" termVectors="true"/>
+  <!-- <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/> -->
+  <field name="referencias_text" type="text_pt" termVectors="true"/>
+  <field name="dta_last_update" type="pdate" indexed="true" stored="true"/>
+  <field name="dt_ref_insert" type="pdate" indexed="true" stored="true"/>
+  <field name="version_manager" type="pint" indexed="false" stored="true" multiValued="false"/>
+  <field name="version_manager_id" type="pint" indexed="false" stored="true" multiValued="false"/>
+  <field name="embedding_full" type="embedding_vector"/>
+  <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+  <field name="id_protocolo" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="id_process" type="string" multiValued="false" indexed="true" stored="true"/>
+  <field name="protocolo_formatado" type="string" multiValued="false" indexed="true" stored="true"/>
+  <field name="id_type_process" type="string" multiValued="false" indexed="true" stored="true"/>
+  <field name="metadata_descr_name_id_type_process" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="metadata_name_id_type_process" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="content_citations" type="text_ws" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="metadata_citations" type="text_ws" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="metadata_id_unit_process_generator" type="string" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="metadata_process_specification" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="metadata_interested" type="string" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+  <field name="metadata_id_contact_interested" type="text_ws" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="metadata_related_processes" type="string" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+  <field name="metadata_info_related_processes" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="descr_name_id_type_process" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="citations" type="text_ws" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="id_unit_process_generator" type="string" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="process_specification" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="interested" type="string" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+  <field name="related_processes" type="string" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+  <field name="list_documents" type="string" termVectors="false" multiValued="true" indexed="true" stored="true"/>
+  <dynamicField name="descr_name_id_type_doc_*" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <dynamicField name="embedding_id_type_doc_*" type="embedding_vector" termVectors="false" indexed="false" stored="true"/>
+  <dynamicField name="content_id_type_doc_*" type="text_pt" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+  <dynamicField name="specification_id_type_doc_*" type="text_pt" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+  <dynamicField name="metadata_descr_name_id_type_doc_*" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <dynamicField name="metadata_name_id_type_doc_*" type="text_pt" termVectors="true" multiValued="false" indexed="true" stored="true"/>
+  <dynamicField name="metadata_specification_id_type_doc_*" type="text_pt" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+  <dynamicField name="*_descendent_path" type="descendent_path" indexed="true" stored="true"/>
+  <dynamicField name="*_ancestor_path" type="ancestor_path" indexed="true" stored="true"/>
+  <dynamicField name="*_txt_sort" type="text_gen_sort" indexed="true" stored="true"/>
+  <dynamicField name="ignored_*" type="ignored"/>
+  <dynamicField name="*_txt_rev" type="text_general_rev" indexed="true" stored="true"/>
+  <dynamicField name="*_phon_en" type="phonetic_en" indexed="true" stored="true"/>
+  <dynamicField name="*_s_lower" type="lowercase" indexed="true" stored="true"/>
+  <dynamicField name="*_txt_cjk" type="text_cjk" indexed="true" stored="true"/>
+  <dynamicField name="random_*" type="random"/>
+  <dynamicField name="*_t_sort" type="text_gen_sort" multiValued="false" indexed="true" stored="true"/>
+  <dynamicField name="*_txt_pt" type="text_pt" indexed="true" stored="true"/>
+  <dynamicField name="*_point" type="point" indexed="true" stored="true"/>
+  <dynamicField name="*_srpt" type="location_rpt" indexed="true" stored="true"/>
+  <dynamicField name="attr_*" type="text_general" multiValued="true" indexed="true" stored="true"/>
+  <dynamicField name="*_txt" type="text_general" indexed="true" stored="true"/>
+  <dynamicField name="*_str" type="strings" docValues="true" indexed="false" stored="false" useDocValuesAsStored="false"/>
+  <dynamicField name="*_dts" type="pdate" multiValued="true" indexed="true" stored="true"/>
+  <dynamicField name="*_dpf" type="delimited_payloads_float" indexed="true" stored="true"/>
+  <dynamicField name="*_dpi" type="delimited_payloads_int" indexed="true" stored="true"/>
+  <dynamicField name="*_dps" type="delimited_payloads_string" indexed="true" stored="true"/>
+  <dynamicField name="*_is" type="pints" indexed="true" stored="true"/>
+  <dynamicField name="*_ss" type="strings" indexed="true" stored="true"/>
+  <dynamicField name="*_ls" type="plongs" indexed="true" stored="true"/>
+  <dynamicField name="*_bs" type="booleans" indexed="true" stored="true"/>
+  <dynamicField name="*_fs" type="pfloats" indexed="true" stored="true"/>
+  <dynamicField name="*_ds" type="pdoubles" indexed="true" stored="true"/>
+  <dynamicField name="*_dt" type="pdate" indexed="true" stored="true"/>
+  <dynamicField name="*_ws" type="text_ws" indexed="true" stored="true"/>
+  <dynamicField name="*_i" type="pint" indexed="true" stored="true"/>
+  <dynamicField name="*_s" type="string" indexed="true" stored="true"/>
+  <dynamicField name="*_l" type="plong" indexed="true" stored="true"/>
+  <dynamicField name="*_t" type="text_general" multiValued="false" indexed="true" stored="true"/>
+  <dynamicField name="*_b" type="boolean" indexed="true" stored="true"/>
+  <dynamicField name="*_f" type="pfloat" indexed="true" stored="true"/>
+  <dynamicField name="*_d" type="pdouble" indexed="true" stored="true"/>
+  <dynamicField name="*_p" type="location" indexed="true" stored="true"/>
+  <copyField source="ementa_text" dest="ementa_text_str" maxChars="256"/>
+  <copyField source="assunto_text" dest="assunto_text_str" maxChars="256"/>
+  <copyField source="corpo_text" dest="corpo_text_str" maxChars="256"/>
+  <copyField source="referencias_text" dest="referencias_text_str" maxChars="256"/>
+  <copyField source="conclusao_text" dest="conclusao_text_str" maxChars="256"/>
+  <field name="prompt" type="string" indexed="false" stored="true"  docValues="false" />
+  <field name="system_prompt" type="string" indexed="false" stored="true"  docValues="false" />
+  <field name="user_prompt" type="string" indexed="false" stored="true"  docValues="false" />
+  <field name="assistente_response" type="string" indexed="false" stored="true"  docValues="false" />
+
+</schema>

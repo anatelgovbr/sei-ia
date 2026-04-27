@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "api-sei"
+version = "0.1.0"
+description = "API de Recomendação de Processos SEI"
+authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
+
+dependencies = [
+    "python-multipart",
+    "fastapi",
+    "gunicorn",
+    "uvicorn",
+    "uvloop",
+    "websockets",
+    "httptools",
+    "requests",
+    "PyJWT==2.12.1",
+    "passlib==1.7.4",
+    "pandas==2.2.2",
+    "pymysql==1.1.1",
+    "SQLAlchemy>=2.0.0",
+    "psycopg2-binary",
+    "pgvector",
+    "nest-asyncio",
+    "httpx",
+    "beautifulsoup4==4.12.2",
+    "gensim==4.3.3",
+    "w3lib==2.1.2",
+    "numpy==1.26.4",
+    "oracledb",
+    "pymssql",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-xdist",
+    "pytest-mock",
+    "pytest-cov",
+    "pytest-asyncio",
+    "coverage",
+    "ruff==0.14.10",
+    "pre-commit",
+    "requests-mock",
+    "bcrypt",
+    "docker",
+    "taskipy",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
+otel = [
+    "opentelemetry-distro",
+    "opentelemetry-exporter-otlp",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = ["./tests/*", "./.conda/*"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    "tests/*",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (imports organizados)
+    "B",   # flake8-bugbear (pega bugs comuns)
+    "UP",  # pyupgrade (mantém sintaxe moderna)
+    "SIM", # flake8-simplify (sugere simplificações)
+    "C4",  # flake8-comprehensions (otimiza loops)
+]
+
+ignore = [
+    "E501", # Ignorar tamanho de linha (deixe o formatter cuidar disso)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# B008: FastAPI Query/Path/Depends são padrão idiomático e seguros nos routers
+"api_sei/routers/*.py" = ["B008"]
+# B008: app-api usa Body(...) nos defaults de forma intencional, como no repo individual.
+"app_api/main.py" = ["B008"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

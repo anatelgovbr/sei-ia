@@ -1,0 +1,53 @@
+# Ignorar arquivos de compilação do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Ignorar arquivos de logs
+*.log
+
+
+# Ignorar diretórios de desenvolvimento
+venv/
+.env/
+.idea/
+.vscode/
+.conda/
+
+# Ignorar dependências locais
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# Ignorar arquivos de testes e cache
+*.cover
+.coverage
+.hypothesis/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+.cache
+.tox/
+
+# Ignorar arquivos de documentação
+docs/
+
+# Ignorar chaves e certificados sensíveis
+*.pem
+*.key
+*.crt
+
+# Ignorar arquivos temporários
+*.swp
+*.swo
+*.bak
+*~
+Thumbs.db
+.DS_Store
+
+# Ignorar arquivos de controle de versão
+.git/
+.gitignore

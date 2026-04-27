@@ -1,0 +1,360 @@
+{
+  "9758178": {
+    "id_documento": "9758178",
+    "requests": [
+      {
+        "request": {
+          "service": "md_ia_consulta_documento",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_consulta_documento",
+          "params": {
+            "servico": "md_ia_consulta_documento",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "SinFiltraDocumentosRelevantes": "N",
+            "SinFiltraBloqueados": "N",
+            "SinFiltraAtivos": "N",
+            "IdDocumentos": "9758178"
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "Date": "Thu, 23 Oct 2025 12:16:30 GMT",
+            "Set-Cookie": "PHPSESSID=5mv3dm6qpav4cirartraj01g3m; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f7b5b033fd22b84b4fc207c1dc98982f2ae5a2c0bdb3950c010891327bed0bba16aeb2aa6d7475a30cde55980a89c66d231c4b7bbc7a54855dd2954ed4f2556babc7c0bf3d61261ba216dce16d882a6788; Path=/; Domain=.sei.anatel.gov.br; ",
+            "Expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache",
+            "Content-Length": "517",
+            "Keep-Alive": "timeout=5, max=100",
+            "Connection": "Keep-Alive",
+            "Content-Type": "text/html; charset=ISO-8859-1"
+          },
+          "json": {
+            "status": "success",
+            "data": [
+              {
+                "IdProcedimento": 7578389,
+                "NumeroDocumento": "8642529",
+                "EspecificacaoDocumento": "",
+                "IdTipoDocumento": 10,
+                "DataInclusao": "14/06/2022",
+                "NomeTipoDocumento": "Portaria",
+                "StaTipoDocumento": "X",
+                "NomeArquivo": "SEI_ANATEL - 8634667 - Portaria de Pessoal.html",
+                "NumeroProcesso": "53500.019339/2021-48",
+                "IdDocumento": 9758178
+              }
+            ]
+          },
+          "is_binary": false
+        }
+      },
+      {
+        "request": {
+          "service": "md_ia_consulta_conteudo_documento",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_consulta_conteudo_documento",
+          "params": {
+            "servico": "md_ia_consulta_conteudo_documento",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "IdDocumento": "9758178"
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "date": "Thu, 23 Oct 2025 12:16:31 GMT",
+            "set-cookie": "PHPSESSID=mdrh394be2frfbtoejfji1hidj; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f7703b99f044f7fdf10eefde59e9edd40cad9f151524b9746ded2a39a8cededef9754c116112de60cadb1c634d8c937254345880aa4973422c3cb3ee86a684d24615419e195becdae9825299503f26f3a8; Path=/; Domain=.sei.anatel.gov.br;",
+            "expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+            "cache-control": "no-store, no-cache, must-revalidate",
+            "pragma": "no-cache",
+            "content-length": "3380",
+            "keep-alive": "timeout=5, max=100",
+            "connection": "Keep-Alive",
+            "content-type": "text/html; charset=ISO-8859-1"
+          },
+          "json": {
+            "status": "success",
+            "data": {
+              "TipoConteudo": "text/html; charset=windows-1252",
+              "ConteudoDocumento": " \n \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n SEI/ANATEL - 8634667 - Portaria de Pessoal \n \n \n Boletim de Serviço Eletrônico em 14/06/2022\n\n \n\n    \n\n\n    \n\n\n AGÊNCIA NACIONAL DE TELECOMUNICAÇÕES \n\n\n    \n\n Portaria de Pessoal nº 887, de 13 de junho de 2022 \n\n   \t    \t \n\t\t\t Designar servidores para exercerem a função de Fiscal Técnico, com a finalidade de acompanhar e fiscalizar a execução do Contrato nº 60/2022 (SEI nº   8559348  ), decorrente do processo nº   53500.019339/2021-48  . \n\n\t\t\t  \n  \n\n\n  O SUPERINTENDENTE DE GESTÃO INTERNA DA INFORMAÇÃO DA AGÊNCIA NACIONAL DE TELECOMUNICAÇÕES , no uso das atribuições que lhe foram conferidas pelo art. 242, VIII, do Regimento Interno da Anatel, aprovado pela  Resolução nº 612, de 29 de abril de 2013 , e conforme item 3.2 da Norma de Gestão e Fiscalização de Contratos Administrativos, aprovada pela Portaria nº 2.105, de 18 de outubro de 2019 (SEI nº   4774155  ); \n\n\n CONSIDERANDO o disposto no art. 67 da Lei nº 8.666, de 21 de junho de 1993; e \n\n\n CONSIDERANDO o constante dos autos do processo nº   53500.019339/2021-48  , \n\n\n  RESOLVE:  \n\n\n Art. 1º Designar como  fiscal técnico  o servidor Thiago de Matos Batista, tendo como substitutos os servidores Thiago Pereira de Brito Vieira e Elvis Soriano Rodrigues, ambos da Gerência de Informações e Biblioteca (GIIB), e estabelecer que terão competências e responsabilidades em conformidade com os incisos V e VII do item 2.1 da Norma de Gestão e Fiscalização de Contratos Administrativos, aprovada pela Portaria nº 2.105, de 18 de outubro de 2019 (SEI nº   4774155  ), com a finalidade de acompanhar e fiscalizar o Contrato nº 60/2022 (SEI nº 8559348), decorrente do processo nº   53500.019339/2021-48  , que tem por objeto a contratação de empresa para a \"Prestação de serviços técnicos especializados de desenvolvimento, manutenção, configuração, implantação, operação e sustentação de soluções relacionadas a Business Intelligence (BI), gestão de dados, engenharia de dados e ciência de dado\". \n\n\n Art. 2º Em conformidade com o item 3.2, I, c/c item 1.3.2 da Portaria nº 2.105, de 18 de outubro de 2019 (SEI nº   4774155  ), a designação dos Fiscais Administrativos sobre o mencionado Contrato será efetivada pela Superintendência de Administração e Finanças (SAF). \n\n\n Art. 3º Esta Portaria entra em vigor na data de sua publicação no Boletim de Serviço Eletrônico da Anatel. \n\n  \n     \t            \t    Documento assinado eletronicamente por  Raphael Garcia de Souza ,  Superintendente de Gestão Interna da Informação , em 14/06/2022, às 14:28, conforme horário oficial de Brasília, com fundamento no art. 23, inciso II, da  Portaria nº 912/2017  da Anatel. \n  \n  \n  \n   \t    \t  A autenticidade deste documento pode ser conferida em  http://www.anatel.gov.br/autenticidade , informando o código verificador  8634667  e o código CRC  E147A618 . \n  \n  \n  \n\n   \n\n  \n\n   \t  Referência:  Processo nº 53500.052229/2022-79 \t SEI nº 8634667  \n  \n  \nCriado por  neijobson , versão 3 por  vanessacd  em 14/06/2022 08:20:46.\n\n\n  "
+            }
+          },
+          "is_binary": false
+        }
+      }
+    ],
+    "files": {},
+    "extracted_content": {
+      "length": 3024,
+      "preview": " \n \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n SEI/ANATEL - 8634667 - Portaria de Pessoal \n \n \n Boletim de Serviço Eletrônico em 14/06/2022\n\n \n\n    \n\n\n    \n\n\n AGÊNCIA NACIONAL DE TELECOMUNICAÇÕES \n\n\n    \n\n Portaria de Pessoal nº 887, de 13 de junho de 2022 \n\n   \t    \t \n\t\t\t Designar servidores para exercerem a função de Fiscal Técnico, com a finalidade de acompanhar e fiscalizar a execução do Contrato nº 60/2022 (SEI nº   8559348  ), decorrente do processo nº   53500.019339/2021-48  . \n\n\t\t\t  \n  \n\n\n  O ",
+      "end_preview": ", em 14/06/2022, às 14:28, conforme horário oficial de Brasília, com fundamento no art. 23, inciso II, da  Portaria nº 912/2017  da Anatel. \n  \n  \n  \n   \t    \t  A autenticidade deste documento pode ser conferida em  http://www.anatel.gov.br/autenticidade , informando o código verificador  8634667  e o código CRC  E147A618 . \n  \n  \n  \n\n   \n\n  \n\n   \t  Referência:  Processo nº 53500.052229/2022-79 \t SEI nº 8634667  \n  \n  \nCriado por  neijobson , versão 3 por  vanessacd  em 14/06/2022 08:20:46.\n\n\n  "
+    }
+  },
+  "9664647": {
+    "id_documento": "9664647",
+    "requests": [
+      {
+        "request": {
+          "service": "md_ia_consulta_documento",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_consulta_documento",
+          "params": {
+            "servico": "md_ia_consulta_documento",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "SinFiltraDocumentosRelevantes": "N",
+            "SinFiltraBloqueados": "N",
+            "SinFiltraAtivos": "N",
+            "IdDocumentos": "9664647"
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "Date": "Thu, 23 Oct 2025 12:16:31 GMT",
+            "Set-Cookie": "PHPSESSID=rasil495itkd8178t7amn2itc3; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f7fe39b19bf83834eafb8b8ca91c6d6fcfe01470c95a399583766c481f757bc174778a7193781f5c306580a8d4143c3b25404e8a9410c8e064c65ed603397c36fe5a293f833dc660eb5ee3bc08037946c8; Path=/; Domain=.sei.anatel.gov.br; ",
+            "Expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache",
+            "Content-Length": "490",
+            "Keep-Alive": "timeout=5, max=100",
+            "Connection": "Keep-Alive",
+            "Content-Type": "text/html; charset=ISO-8859-1"
+          },
+          "json": {
+            "status": "success",
+            "data": [
+              {
+                "IdProcedimento": 7578389,
+                "NumeroDocumento": "8564981",
+                "EspecificacaoDocumento": "",
+                "IdTipoDocumento": 30,
+                "DataInclusao": "02/06/2022",
+                "NomeTipoDocumento": "CorrespondÃªncia EletrÃ´nica",
+                "StaTipoDocumento": "A",
+                "NomeArquivo": "",
+                "NumeroProcesso": "53500.019339/2021-48",
+                "IdDocumento": 9664647
+              }
+            ]
+          },
+          "is_binary": false
+        }
+      },
+      {
+        "request": {
+          "service": "md_ia_consulta_conteudo_documento",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_consulta_conteudo_documento",
+          "params": {
+            "servico": "md_ia_consulta_conteudo_documento",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "IdDocumento": "9664647"
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "date": "Thu, 23 Oct 2025 12:16:32 GMT",
+            "set-cookie": "PHPSESSID=smlt02hn7cn7au5sdor21d5eji; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f7f6005aae2dcfbb76ec34ddf479931321d2831e3ada14f5a08db940b765796521785dd82b378ba9b8ba7d3a30c94bb7dbbb80c4c81e3be46ad3d8439bd5ec6bca9badb30022ae09fe9cb168d3663b061d; Path=/; Domain=.sei.anatel.gov.br;",
+            "expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+            "cache-control": "no-store, no-cache, must-revalidate",
+            "pragma": "no-cache",
+            "content-length": "2444",
+            "keep-alive": "timeout=5, max=100",
+            "connection": "Keep-Alive",
+            "content-type": "text/html; charset=ISO-8859-1"
+          },
+          "json": {
+            "status": "success",
+            "data": {
+              "TipoConteudo": "text/html",
+              "ConteudoDocumento": "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<documento>\n<atributo nome=\"Data\" titulo=\"Data de Envio\">02/06/2022 15:57:39</atributo>\n<atributo nome=\"De\" titulo=\"De\">ANATEL/CC - Licitação &lt;licitacao@anatel.gov.br&gt;</atributo>\n<atributo nome=\"Para\" titulo=\"Para\">\n<valores>\n<valor id=\"\">contato@firstdecision.com.br</valor>\n</valores>\n</atributo>\n<atributo nome=\"Assunto\" titulo=\"Assunto\">Contrato 60/2022-Anatel. Correção de Erro Material.</atributo>\n<atributo nome=\"Mensagem\" titulo=\"Mensagem\">Prezado,\r\n\r\nA FIRST DECISION TECNOLOGIAS INOVADORAS E INFORMATICA LTDA. (CNPJ nº 00.681.946/0001-60), sagrou-se vencedora do Pregão Eletrônico do Edital nº 3/2022, cujo objeto é a &quot;Contratação de serviços técnicos especializados de desenvolvimento, manutenção, configuração, implantação, operação e sustentação de soluções relacionadas a Business Intelligence (BI), gestão de dados, engenharia de dados e ciência de dados, visando atender as necessidades de tecnologia da informação da Agência Nacional de Telecomunicações (Anatel)&quot;.\r\nDurante o andamento da sessão pública, a Gerência de Informações e Biblioteca - GIIB identificou erro material no Termo de Referência SEI nº 8113514, mais especificamente no Anexo IV  Níveis  Mínimos de Serviço (NMS) e Cálculo de Pagamento.\r\nDiante disso, aquela Gerência manifestou-se por meio do Despacho Ordinatório GIIB (em anexo), solicitando a correção do documento, ressaltando, contudo, que a redação original não prejudica sua compreensão.\r\nDeste modo, informamos que foi elaborada uma nova versão do Anexo IV, contendo a redação corrigida. Esse documento fará parte do Contrato nº 60/2022, a ser celebrado entre essa empresa e a Anatel.\r\n\r\nFicamos à disposição para maiores esclarecimentos.\r\n\r\nAtenciosamente,\r\n\r\nCoordenação de Licitações, Dispensas e Inexigibilidades\r\n</atributo>\n<atributo nome=\"Anexos\" titulo=\"Anexos\">\n<valores>\n<valor id=\"6021818\" tipo=\"ANEXO\">Despacho_Ordinatorio_8470598.pdf</valor>\n</valores>\n<valores>\n<valor id=\"6021819\" tipo=\"ANEXO\">Termo_8562422_Anexo_IV_TR_ErroMaterialCorrigido.pdf</valor>\n</valores>\n</atributo>\n</documento>",
+              "IdAnexos": [
+                6021818,
+                6021819
+              ]
+            }
+          },
+          "is_binary": false
+        }
+      },
+      {
+        "request": {
+          "service": "md_ia_download_arquivo_documento_externo",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_download_arquivo_documento_externo",
+          "params": {
+            "servico": "md_ia_download_arquivo_documento_externo",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "IdDocumento": "9664647",
+            "IdAnexo": 6021818
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "Date": "Thu, 23 Oct 2025 12:16:32 GMT",
+            "Set-Cookie": "PHPSESSID=of3a2u4mnja9r8otd4ssb236gu; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f7415cead91da81ecd9e4c8f39662cd7b02bf4549412ee1391d184433422f05136b7c1634ba23360f0f277bd0a9adc13a58c7d170e4f05e6c8f6162d8fb23dadd7d9a89fdc8cf1f0b2ee76c3e892fd9ac4; Path=/; Domain=.sei.anatel.gov.br; ",
+            "Expires": "0",
+            "Cache-Control": "private, no-cache, no-store, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "X-Robots-Tag": "noindex",
+            "Content-Disposition": "inline; filename=\"Despacho_Ordinatorio_8470598.pdf\"",
+            "Keep-Alive": "timeout=5, max=100",
+            "Connection": "Keep-Alive",
+            "Content-Type": "application/pdf;",
+            "Transfer-Encoding": "chunked"
+          },
+          "is_binary": true,
+          "content_length": 34166
+        }
+      },
+      {
+        "request": {
+          "service": "md_ia_download_arquivo_documento_externo",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_download_arquivo_documento_externo",
+          "params": {
+            "servico": "md_ia_download_arquivo_documento_externo",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "IdDocumento": "9664647",
+            "IdAnexo": 6021819
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "Date": "Thu, 23 Oct 2025 12:16:33 GMT",
+            "Set-Cookie": "PHPSESSID=3ekol9fdslkbaps67ngqvvddr5; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f79977632bdb55e805179ac53e7f2533e72b6769556c3b8a5b28fa090c198421f0409e399eb2fbbe3fb21d7c7d8485a69b3e82bb6d8fb868c3b5efc70173329b5dee3ef472a77074e6386c369458f3b6b8; Path=/; Domain=.sei.anatel.gov.br; ",
+            "Expires": "0",
+            "Cache-Control": "private, no-cache, no-store, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "X-Robots-Tag": "noindex",
+            "Content-Disposition": "inline; filename=\"Termo_8562422_Anexo_IV_TR_ErroMaterialCorrigido.pdf\"",
+            "Keep-Alive": "timeout=5, max=100",
+            "Connection": "Keep-Alive",
+            "Content-Type": "application/pdf;",
+            "Transfer-Encoding": "chunked"
+          },
+          "is_binary": true,
+          "content_length": 179087
+        }
+      }
+    ],
+    "files": {
+      "md_ia_download_arquivo_documento_externo": {
+        "filename": "Termo_8562422_Anexo_IV_TR_ErroMaterialCorrigido.pdf",
+        "content_length": 179087,
+        "saved_path": "/home/lx.ennio.colab/seiia_stack/sei-similaridade/jobs/tests/integration/fixtures/files/Termo_8562422_Anexo_IV_TR_ErroMaterialCorrigido.pdf"
+      }
+    },
+    "extracted_content": {
+      "length": 12543,
+      "preview": "\n\n\n02/06/2022 15:57:39\nANATEL/CC - Licitação <licitacao@anatel.gov.br>\n\n\ncontato@firstdecision.com.br\n\n\nContrato 60/2022-Anatel. Correção de Erro Material.\nPrezado,\r\n\r\nA FIRST DECISION TECNOLOGIAS INOVADORAS E INFORMATICA LTDA. (CNPJ nº 00.681.946/0001-60), sagrou-se vencedora do Pregão Eletrônico do Edital nº 3/2022, cujo objeto é a \"Contratação de serviços técnicos especializados de desenvolvimento, manutenção, configuração, implantação, operação e sustentação de soluções relacionadas a Busine",
+      "end_preview": "s\nnotificação e abaixo da qual ocorrerá ajuste no pagamento;\nIII.\nIRC < 0,90 é a faixa de ajuste no pagamento na ordem de 1% do valor mensal para cada ponto\npercentual abaixo do limite superior da faixa, limitado ao máximo de 30% do valor mensal do\nserviço.\n31.39. A extrapolação do limite máximo de 30% previsto no item anterior para ajuste no pagamento do valor\nmensal ensejará a aplicação cumulativa de sanção administrativa prevista, incluindo a possibilidade de\nrescisão contratual unilateral.\n\n"
+    }
+  },
+  "8665099": {
+    "id_documento": "8665099",
+    "requests": [
+      {
+        "request": {
+          "service": "md_ia_consulta_documento",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_consulta_documento",
+          "params": {
+            "servico": "md_ia_consulta_documento",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "SinFiltraDocumentosRelevantes": "N",
+            "SinFiltraBloqueados": "N",
+            "SinFiltraAtivos": "N",
+            "IdDocumentos": "8665099"
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "Date": "Thu, 23 Oct 2025 12:16:33 GMT",
+            "Set-Cookie": "PHPSESSID=is97snlghqp5t2m002hnu15i5q; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f7549d1fc7bbb57cf8d5f45ca4c46445ed55a5b2723de4801e554323a06e0a718dc531a2efa74ea0d466515757839b59c8fb078c1846df42c437117ebfcab371a4ff1ff689dec21be6b2110f4eeeacfe7c; Path=/; Domain=.sei.anatel.gov.br; ",
+            "Expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache",
+            "Content-Length": "500",
+            "Keep-Alive": "timeout=5, max=100",
+            "Connection": "Keep-Alive",
+            "Content-Type": "text/html; charset=ISO-8859-1"
+          },
+          "json": {
+            "status": "success",
+            "data": [
+              {
+                "IdProcedimento": 7578389,
+                "NumeroDocumento": "7672032",
+                "EspecificacaoDocumento": "",
+                "IdTipoDocumento": 104,
+                "DataInclusao": "16/11/2021",
+                "NomeTipoDocumento": "Planilha",
+                "StaTipoDocumento": "X",
+                "NomeArquivo": "Planejamento de Demandas.xlsx",
+                "NumeroProcesso": "53500.019339/2021-48",
+                "IdDocumento": 8665099
+              }
+            ]
+          },
+          "is_binary": false
+        }
+      },
+      {
+        "request": {
+          "service": "md_ia_download_arquivo_documento_externo",
+          "url": "https://sei.anatel.gov.br/sei/controlador_ws.php/md_ia_download_arquivo_documento_externo",
+          "params": {
+            "servico": "md_ia_download_arquivo_documento_externo",
+            "SiglaSistema": "Usuario_IA",
+            "IdentificacaoServico": "c25c24fc07861f7270490491d1b5c8fe9443bec6eedfe0c823871b220eb74d788b062282",
+            "IdDocumento": "8665099"
+          },
+          "method": "GET"
+        },
+        "response": {
+          "status_code": 200,
+          "headers": {
+            "Date": "Thu, 23 Oct 2025 12:16:33 GMT",
+            "Set-Cookie": "PHPSESSID=c6t69r6929rbk8gn196acvmjf6; path=/; secure; HttpOnly; SameSite=Lax, BIGipServerpool_https_sei_anatel_pd_php_sei=2868977162.47873.0000; path=/; Httponly; Secure, TS014f843a=01ae57b3f739bbb43379b4b79de6aa6c2c7fccac7ad94b89d897dea8a74be17c4024e3582ebb7c4c2315ff9df5baeec7e55d3e7f14beccd34b79d0aa5cda3803c0974f476b078aa279d8c2a20525bd0ae94b5cd87c; Path=/; Domain=.sei.anatel.gov.br; ",
+            "Expires": "0",
+            "Cache-Control": "private, no-cache, no-store, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "X-Robots-Tag": "noindex",
+            "Content-Disposition": "inline; filename=\"Planejamento_de_Demandas.xlsx\"",
+            "Keep-Alive": "timeout=5, max=100",
+            "Connection": "Keep-Alive",
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;",
+            "Transfer-Encoding": "chunked"
+          },
+          "is_binary": true,
+          "content_length": 90328
+        }
+      }
+    ],
+    "files": {
+      "md_ia_download_arquivo_documento_externo": {
+        "filename": "Planejamento_de_Demandas.xlsx",
+        "content_length": 90328,
+        "saved_path": "/home/lx.ennio.colab/seiia_stack/sei-similaridade/jobs/tests/integration/fixtures/files/Planejamento_de_Demandas.xlsx"
+      }
+    },
+    "extracted_content": {
+      "length": 681225,
+      "preview": "\n\nSheet 1: Analistas de Dados\n|   ID | Área Demandante   | Descrição                                                                                                                                                                                                                                                                                                                                                                                                                                                ",
+      "end_preview": "          |                                  150 |\n| Visualização de Dados           |                                  200 |\n| Análise de Dados                |                                  200 |\n| Qualidade e Saneamento de Dados |                                  200 |\n| Painel sobre Dado Aberto        |                                  200 |\n| Gestão de Metadados             |                                  960 |\n| Extração de Dados               |                                  320 |"
+    }
+  }
+}

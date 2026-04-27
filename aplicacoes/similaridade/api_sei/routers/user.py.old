@@ -1,0 +1,40 @@
+# import logging
+
+# from fastapi import APIRouter, Depends, HTTPException, status
+# from fastapi.security import OAuth2PasswordRequestForm
+
+# from api_sei.middleware.custom_middleware import (
+#     LogRecommendationMiddleware,
+#     MiddlewareCustom,
+# )
+# from api_sei.pydantic_models.user import User
+# from api_sei.services.auth import authenticate_user, create_access_token
+# from api_sei.services.user import create_user as create_user_service
+
+# router = APIRouter(route_class=LogRecommendationMiddleware)
+
+# logger = logging.getLogger(__name__)
+
+
+# @router.post("/token")
+# async def generate_token(form_data: OAuth2PasswordRequestForm = Depends()):
+#     user = authenticate_user(id_usuario=form_data.username, senha=form_data.password)
+#     if user:
+#         return create_access_token(user=user)
+#     else:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED, detail="Credencial Invalida"
+#         )
+
+
+# router_validation = APIRouter(route_class=MiddlewareCustom)
+
+
+# @router_validation.get("/protected")
+# def protected_endpoint(user: str):
+#     return {"message": f"Welcome to the protected endpoint, {user}"}
+
+
+# @router_validation.post("/user/create")
+# async def create_user(user: User) -> None:
+#     create_user_service(id_usuario=user.id_usuario, senha=user.senha, nome=user.nome)

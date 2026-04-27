@@ -1,0 +1,154 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jobs"
+version = "0.1.0"
+description = "API de feedbacks das recomendacoes feitas pelo API SEI"
+authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
+
+dependencies = [
+    'fastapi==0.115.8',
+    'starlette==0.45.3',
+    'gunicorn',
+    'uvicorn',
+    'uvloop',
+    'websockets',
+    'httptools',
+    'requests==2.32.0',
+    'pandas',
+    'pymysql==1.1.1',
+    'SQLAlchemy==1.4.49',
+    'psycopg2-binary',
+    'pgvector',
+    'asyncpg',
+    'tqdm==4.66.3',
+    'pendulum',
+    'ipython',
+    "python-multipart==0.0.7",
+    "PyJWT==2.12.1",
+    "passlib==1.7.4",
+    "nest-asyncio",
+    "httpx[http2]",
+    "beautifulsoup4==4.12.2",
+    "html5lib>=1.1",
+    "w3lib==2.1.2",
+    "lxml",
+    "langchain-core==0.3.33",
+    "langchain==0.3.17",
+    "langchain-community==0.3.16",
+    "langchain-openai==0.3.3",
+    "openai",
+    "docling",
+    "torch>=2.7.0,<3.0.0",
+    "torchvision>=0.22.0,<1.0",
+    "pymupdf>=1.24.0",
+    "python-calamine>=0.2.0",
+    "tiktoken>=0.7.0",
+    "deepsearch-glm[toolkit]",
+    "deepsearch-toolkit",
+    "redis[hiredis]==5.0.8"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=7.0.0",
+    "pytest-mock",
+    "pytest-asyncio",
+    "ruff==0.14.10",
+    "requests-mock",
+    "coverage",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
+
+airflow = [
+    "SQLAlchemy==1.4.49",
+    "apache-airflow==2.9.3",
+    "apache-airflow-providers-postgres",
+]
+etls = [
+    "pyarrow",
+    "beautifulsoup4==4.12.2",
+    "tiktoken==0.7.0"
+]
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = ["./tests/*", "./.conda/*"]
+
+[tool.pytype]
+inputs = [
+    "pytype/*.py",
+    "pytype/overlays/",
+    "pytype/pyc/",
+    "pytype/pyi/",
+    "pytype/pytd/",
+    "pytype/tools/",
+    "pytype/typegraph/",
+    "pytype_extensions/**/*.py",
+]
+exclude = [
+    "tests/*",
+    ".conda",
+    ".pytype*",
+    "__pypackages__",
+    "venv",
+    "*.egg-info",
+    ".pytest*"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    "tests/*",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "SIM", # flake8-simplify
+    "C4",  # flake8-comprehensions
+]
+
+ignore = [
+    "E501", # O formatter cuida do wrapping; manter compatibilidade com o código atual.
+    "B008", # FastAPI Path/Query/Body/Depends em defaults é padrão do projeto.
+]
+
+fixable = ["E", "W", "F", "I", "UP", "SIM", "C4"]
+# Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+[tool.ruff.lint.pydocstyle]
+# Google DocString Convention
+convention = "google"
+
+# Configuração uv para usar PyTorch CPU-only (sem CUDA/nvidia)
+# Reduz imagem Docker de ~14.8GB para ~8GB
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }

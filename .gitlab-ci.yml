@@ -1,0 +1,44 @@
+default:
+  tags:
+    - $RUNNER_TAG
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento)$/'
+      variables:
+        RUNNER_TAG: dev
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME =~ /^(hm|homolog|homologacao)$/'
+      variables:
+        RUNNER_TAG: homologacao
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/'
+      variables:
+        RUNNER_TAG: prod
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      variables:
+        RUNNER_TAG: dev
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME =~ /^(dev|develop|desenvolvimento)$/'
+      variables:
+        RUNNER_TAG: dev
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME =~ /^(hm|homolog|homologacao)$/'
+      variables:
+        RUNNER_TAG: homologacao
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME =~ /^(pd|prod|producao|main|master)$/'
+      variables:
+        RUNNER_TAG: prod
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      variables:
+        RUNNER_TAG: dev
+    - when: never
+
+stages:
+  - precheck
+  - quality
+  - test
+  - deploy
+
+include:
+  - local: .gitlab/ci/runner-branch-check.yml
+  - local: .gitlab/ci/quality-and-test.yml
+  - local: .gitlab/ci/deploy-dev.yml
+  - local: .gitlab/ci/deploy-homolog.yml
+  - local: .gitlab/ci/deploy-prod.yml

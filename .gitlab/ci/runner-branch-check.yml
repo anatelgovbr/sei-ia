@@ -1,0 +1,12 @@
+runner-branch-check:
+  stage: precheck
+  image: alpine:3.20
+  script:
+    - 'test -n "$ENVIRONMENT" || (echo "ENVIRONMENT is required" && exit 1)'
+    - 'test -n "$TARGET_BRANCH" || (echo "TARGET_BRANCH is required" && exit 1)'
+    - 'if [ "$CI_COMMIT_BRANCH" != "$TARGET_BRANCH" ]; then echo "Skipping branch ${CI_COMMIT_BRANCH}; runner is configured for ${TARGET_BRANCH}"; exit 0; fi'
+    - 'echo "Runner and branch configuration validated"'
+    - 'echo "ENVIRONMENT=${ENVIRONMENT}"'
+    - 'echo "TARGET_BRANCH=${TARGET_BRANCH}"'
+    - 'echo "Branch: ${CI_COMMIT_BRANCH}"'
+    - 'echo "Commit: ${CI_COMMIT_SHA}"'

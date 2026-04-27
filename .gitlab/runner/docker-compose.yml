@@ -1,0 +1,30 @@
+name: sei-ia-runner
+
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: sei-ia-gitlab-runner
+    env_file:
+      - .env
+    entrypoint: ["/bin/sh", "/opt/runner/entrypoint.sh"]
+    restart: unless-stopped
+    volumes:
+      - gitlab_runner_home:/home/gitlab-runner
+      - gitlab_runner_cache:/cache
+      - ./entrypoint.sh:/opt/runner/entrypoint.sh:ro
+      - ${DEPLOY_REPO_PATH}/default.env:${DEPLOY_REPO_PATH}/default.env:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: false
+    tty: true
+    stdin_open: true
+    networks:
+      - runner_shared
+
+networks:
+  runner_shared:
+    name: ${RUNNER_NETWORK_NAME:-docker-host-bridge}
+    external: true
+
+volumes:
+  gitlab_runner_home:
+  gitlab_runner_cache:

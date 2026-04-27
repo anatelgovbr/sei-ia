@@ -1,0 +1,18 @@
+# import logging
+
+# from fastapi import APIRouter
+
+# from api_sei.middleware.custom_middleware import MiddlewareCustom
+# from api_sei.pydantic_models.log_recommendation import LogRecommendation
+# from api_sei.services.recommendation import (
+#     create_log_recommendation as create_log_recommendation_service,
+# )
+
+# router = APIRouter(route_class=MiddlewareCustom)
+# logger = logging.getLogger(__name__)
+
+
+# @router.post("/document-recommenders/log-recommendations/create")
+# async def create_log_recommendation(requests: LogRecommendation) -> bool:
+#     create_log_recommendation_service(log_recommendation=requests)
+#     return True
