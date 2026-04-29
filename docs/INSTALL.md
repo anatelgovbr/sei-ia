@@ -15,6 +15,7 @@
   - [Passos para Instalação](#passos-para-instalação)
   - [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente)
   - [Testes de Acessos](#testes-de-acessos)
+  - [Configuração do Certificado HTTPS no SEI](#configuração-do-certificado-https-no-sei)
   - [Mapeamento da Integração no SEI](#mapeamento-da-integração-no-sei)
   - [Resolução de Problemas Conhecidos](#resolução-de-problemas-conhecidos)
   - [Pontos de Atenção para Escalabilidade](#pontos-de-atenção-para-escalabilidade)
@@ -124,13 +125,15 @@ sudo usermod -aG wheel seiia
 4. **Criar as pastas necessárias:**
 
 ```bash
-sudo mkdir -p /opt/seiia/volumes
+sudo mkdir -p /var/seiia/volumes
 ```
+
+> Esse caminho é o valor padrão de `VOL_SEIIA_DIR` em `default.env`. Se for alterar, ajuste também `default.env` antes de subir a stack.
 
 5. **Corrigir as permissoes de pastas:**
 
 ```bash
-sudo chown -R seiia:docker /opt/seiia/volumes
+sudo chown -R seiia:docker /var/seiia/volumes
 ```
 
 6. **Acessar o usuario:**
@@ -191,13 +194,36 @@ su seiia
    0355f600e1d7   none                 null      local
    ```
 
-   O próximo passo é a criação da *user defined bridge network* com a definição da subnet e gateway em conformidade com a política de endereçamento do órgão, semelhante ao comando:
+   O próximo passo é a criação da *user defined bridge network* com a definição da subnet e gateway em conformidade com a política de endereçamento do órgão.
+
+   **Como descobrir uma faixa segura para usar:**
+
+   1. **Pergunte à equipe de redes do órgão** qual sub-rede privada está livre para uso interno do servidor, e peça também o gateway. Esse é o caminho mais seguro.
+   2. Se você precisa decidir sozinho, liste o que já está em uso no host:
+
+      ```bash
+      # Rotas configuradas no host (rede local que o host conhece)
+      ip route
+
+      # Sub-redes de outras redes Docker já existentes
+      docker network ls -q | xargs -r docker network inspect \
+        --format '{{.Name}}: {{range .IPAM.Config}}{{.Subnet}} {{end}}'
+      ```
+
+      Escolha uma `/24` em RFC 1918 (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) **fora** do que aparecer nas saídas acima e que não conflite com a rede corporativa.
+
+   Anote três valores e use no comando abaixo:
+   - `<SUBNET>`  — sua sub-rede em CIDR (ex.: `10.90.0.0/24`)
+   - `<IP_RANGE>` — geralmente igual a `<SUBNET>`
+   - `<GATEWAY>` — primeiro IP da sub-rede (ex.: `10.90.0.1`)
 
    ```bash
-   docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge
+   docker network create --driver=bridge --subnet=<SUBNET> --ip-range=<IP_RANGE> --gateway=<GATEWAY> docker-host-bridge
    ```
 
-   É mandatório que os valores de *--subnet*, *--iprange* e *--gateway* sejam adequadamente definidos pelo órgão, podendo adotar os valores do exemplo acima apenas se houver certeza de inexistência de conflito de endereços.
+   É mandatório que os valores de *--subnet*, *--ip-range* e *--gateway* sejam adequadamente definidos pelo órgão. Errar a sub-rede causa um problema difícil de diagnosticar — o servidor SEI IA fica isolado da rede do órgão (incluindo o próprio SEI). **Confirme antes de criar.**
+
+   O nome da rede (`docker-host-bridge`) **deve permanecer** é o valor de `COMPOSE_NETWORK_NAME` em `default.env` e é também usado pelo builder do Docker (passo 11).
 
 9. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
 
@@ -210,7 +236,7 @@ su seiia
 > cd /opt/sei-ia
 > unzip sei-ia-v.1.0.0.zip . # O nome do arquivo pode mudar. ATENÇÃO: para subir o arquivo zip antes no servidor.
 > ```
->   - **Atenção:** mantenha a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
+>   - **Atenção:** mantenha a estrutura de código deste projeto no GitHub dentro da pasta **/opt/sei-ia**.
 >   - Enquanto o projeto estiver privado no github, para realizar o clone é necessário utilizar as credenciais do usuário do GitHub que possua acesso autorizado no repositório.
 
    Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de [Anexos deste Manual](#anexos) que orienta a instalar o Git no Servidor.
@@ -229,15 +255,18 @@ su seiia
 > - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
 
 
-10. **Configuração do Arquivo env_files/security.env**
+10. **Configuração do Arquivo security.env**
 
-O arquivo `env_files/security.env` contém as variáveis de configuração necessárias para o ambiente do Servidor de Soluções de IA do módulo SEI IA.
+O arquivo `security.env`, na raiz do projeto, contém as variáveis de configuração necessárias para o ambiente do Servidor de Soluções de IA do módulo SEI IA.
 
-O repositório disponibiliza um arquivo de exemplo em `env_files/security_example.env`. Para realizar a configuração, crie uma cópia desse arquivo e utilize-a como base para o arquivo final de configuração:
+> **Mudança em relação a versões anteriores**: a partir da estrutura monorepo, existe **um único** `security.env` na raiz, no lugar dos antigos `env_files/{security,dev,homol,prod}.env`.
+
+O repositório disponibiliza um arquivo de exemplo em `security_example.env`. Para realizar a configuração, crie uma cópia desse arquivo e utilize-a como base para o arquivo final de configuração:
 
 ```bash
-cp env_files/security_example.env env_files/security.env
-````
+cp security_example.env security.env
+chmod 600 security.env
+```
 
 > ⚠️ Atenção: o arquivo `security.env` contém informações sensíveis.
 > Não versionar este arquivo em repositórios públicos e restrinja as permissões de acesso no servidor.
@@ -304,16 +333,17 @@ Você precisará destas informações para **cada modelo** que for usar (standar
 
 ##### Configurar o arquivo `litellm_config.yaml`
 
-O repositório disponibiliza um arquivo de exemplo em `llm_config/litellm_config_example.yaml`. Para realizar a configuração, crie uma cópia desse arquivo e utilize-a como base para o arquivo final de configuração:
+O repositório disponibiliza um arquivo de exemplo em `litellm_config.template.yaml`, na raiz do projeto. Para realizar a configuração, crie uma cópia desse arquivo e utilize-a como base para o arquivo final de configuração:
 
 ```bash
-cp llm_config/litellm_config_example.yaml llm_config/litellm_config.yaml
-````
+cp litellm_config.template.yaml litellm_config.yaml
+chmod 600 litellm_config.yaml
+```
 
 > ⚠️ Atenção: o arquivo `litellm_config.yaml` contém informações sensíveis.
 > Não versionar este arquivo em repositórios públicos e restrinja as permissões de acesso no servidor.
 
-Em seguida, edite o arquivo `llm_config/litellm_config.yaml` e preencha as informações necessárias para integração com o Azure OpenAI, como:
+Em seguida, edite o arquivo `litellm_config.yaml` e preencha as informações necessárias para integração com o Azure OpenAI, como:
 
 ```yaml
 model_list:
@@ -385,7 +415,7 @@ Configure assim:
 ##### Variáveis do security.env
 
 
-O arquivo `env_files/security.env` já possui valores padrão configurados. As principais variáveis relacionadas ao LiteLLM Proxy são:
+O arquivo `security.env` já possui valores padrão configurados. As principais variáveis relacionadas ao LiteLLM Proxy são:
 
 | Variável | Descrição | Valor Padrão |
 |----------|-----------|--------------|
@@ -493,25 +523,43 @@ Para utilização do WebSearch, é necessário:
   - Associação correta entre Agent e Connection
 - Em ambientes com restrição de acesso à internet, recomenda-se manter o WebSearch desabilitado
 
-11. **Executar o deploy**
+11. **Preparar o builder do Docker (Buildx + DNS)**
+
+   Em redes corporativas/governamentais o BuildKit do Docker tenta usar DNS públicos (`8.8.8.8`) por padrão, que costumam ser bloqueados. Sem o passo abaixo, comandos `RUN apt-get update`/`RUN dnf install` dentro do build falham com `Temporary failure in name resolution`.
+
+   O repositório já traz a solução:
+
+   ```bash
+   cd /opt/sei-ia
+   bash .gitlab/scripts/ensure_buildx_builder.sh
+   ```
+
+   O script cria (ou reutiliza) o builder `seiia-bridge`, que roda dentro da rede `docker-host-bridge` e usa o `buildkitd.toml` do projeto para fixar nameservers internos. Se sua rede exige DNS específicos, edite `.gitlab/buildkit/buildkitd.toml` antes de rodar o script.
+
+   > **Pré-requisito**: `docker buildx` instalado. Se `docker buildx version` falhar, veja a seção [Anexos](#anexos) deste manual ou a documentação oficial em <https://github.com/docker/buildx>.
+
+12. **Executar o deploy**
  > **ATENÇÃO**:
  > - Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
  > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
 
-  Vamos criar os diretório que serão utilizados como `volume bind`
-  ***IMPORTANTE*** : o usuário deve ter permissão sudo para criar os volumer no /var
-  ```
-  source env_files/default.env
+  Vamos criar o diretório que será utilizado como `volume bind`.
+  ***IMPORTANTE*** : o usuário deve ter permissão sudo para criar o volume em `/var`.
+  ```bash
+  source default.env
   sudo mkdir --parents --mode=750 $VOL_SEIIA_DIR && sudo chown seiia:docker $VOL_SEIIA_DIR
   ```
 
-  Executar o script de deploy com o usuário seiia.
-  ```
+  Executar o deploy com o usuário seiia:
+  ```bash
   su seiia
-  bash deploy-externo.sh
+  cd /opt/sei-ia
+  make up
   ```
 
-   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr). Logo, se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
+   `make up` valida os volumes, executa o build local das imagens (a partir do código em `aplicacoes/`) e sobe os containers. **A primeira execução pode levar 20–40 minutos**, pois envolve download das imagens base e build de todas as aplicações. Logo, é necessária **autorização para o servidor acessar o Docker Hub e o GitHub**.
+
+   > **Alternativa — usar imagens pré-publicadas (sem build local)**: se o órgão prefere não buildar, é possível subir a stack apontando para imagens publicadas no GitHub Container Registry (`ghcr.io/anatelgovbr/...:<tag>`). Nesse caso, crie um override `docker-compose.images.yml` com `build: !reset null` e `image: ghcr.io/...:<tag>` para cada serviço, e suba com `docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.images.yml up -d`. A lista oficial de tags fica na [página de Releases do projeto](https://github.com/anatelgovbr/sei-ia/releases).
 
    Resultado da finalização do deploy:
 
@@ -523,7 +571,7 @@ A validação deve ser realizada por meio do mecanismo de *Health Checker*. Para
 
 ## Health Checker Geral do Ambiente
 
-O Health Checker é executado como último comando do script `deploy-externo.sh`. Ele faz uma checagem geral de conexões , mapeamento e problemas comuns.
+O Health Checker é executado pelo comando `make check` após o deploy. Ele faz uma checagem geral de conexões, mapeamento e problemas comuns.
 
 1. **Estrutura do Log**
    Os logs seguem a seguinte estrutura:
@@ -612,10 +660,10 @@ O Health Checker é executado como último comando do script `deploy-externo.sh`
   - **Falhas Identificadas:** Relatórios com falhas graves, como falta de conectividade ou erros de autenticação.
   - **Testes Bem-Sucedidos:** Indicação de que todas as verificações foram realizadas com sucesso, e o sistema está em bom estado.
 
-Caso deseje executar o Health Checker manualmente  execute o comando:
+Caso deseje executar o Health Checker manualmente, execute o comando:
 ```bash
-source env_files/default.env
-docker compose -f docker-compose-healthchecker.yml -p $PROJECT_NAME --build
+cd /opt/sei-ia
+make check
 ```
 
 Aguarde a finalização dos testes. Os logs estarão disponíveis, por padrão, em:
@@ -700,37 +748,14 @@ Após finalizar o deploy, você poderá realizar testes acessando cada solução
 > * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação **às aplicações Solr e PostgreSQL** não possuem direcionamento para ambiente externo. E não deve ter esse redirecionamento! Essas duas aplicações **são totalmente internas** e armazenam dados indexados dos documentos do SEI. Ou seja, são os bancos de dados das soluções de IA rodando no servidor e o acesso a eles deve ter alta restrição, sendo recomendável manter acessível apenas internamente no servidor.
 > * Seria uma falha de segurança abrir um acesso externo a essas duas aplicações sem controle, sem restringir o acesso em nível de rede local do órgão para apenas quem pode acessar.
 > * Consideramos que o Administrador do ambiente computacional do SEI, caso precise conferir algo no Solr e PostgreSQL interno do Servidor de Soluções de IA, pode acessar diretamente a partir do acesso dele ao próprio servidor.
-> * Exepcionalmente, em ambiente que não seja de Produção e devendo restringir acesso em nível de rede local do órgão, é possível permitir o acesso externo à rede Docker. Para isso é necessário adicionar a linha afeta ao `docker-compose-dev.yaml` no script de deploy, localizado no arquivo: `deploy-externo.sh`:
->
-> DE:
-> ```bash
-> [...]
-> docker compose --profile externo \
->   -f docker-compose-ext.yaml \
->   -p $PROJECT_NAME \
->   up \
->   --no-build -d
-> [...]
-> ```
-> PARA:
-> ```bash
-> [...]
-> docker compose --profile externo \
->   -f docker-compose-ext.yaml \
->   -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura do acesso externo à rede Docker.
->   -p $PROJECT_NAME \
->   up \
->   --no-build -d
-> [...]
-> ```
->
-> Em seguida faça o redeploy do servidor de solução de IA, conforme abaixo:
+> * No monorepo, o arquivo `docker-compose.override.yml` (carregado automaticamente pelo `make up`) expõe portas de Postgres, Solr, Redis e LiteLLM no host para conveniência operacional/diagnóstico. **Em produção**, o acesso a essas portas deve ser bloqueado em nível de firewall do órgão. Se preferir não expor, suba a stack ignorando o override:
 >
 > ```bash
-> bash deploy-externo.sh
+> cd /opt/sei-ia
+> docker compose --env-file default.env --env-file security.env -f docker-compose.yml up -d
 > ```
 >
-> Aguarde o `FIM` do deploy e em seguida prossiga com os testes.
+> Aguarde a finalização e em seguida prossiga com os testes.
 
 ### Airflow
 - **URL**: http://[Servidor_Solucoes_IA]:8081
@@ -871,6 +896,177 @@ Essa análise dos logs ajudará a entender a causa da falha e facilitará a corr
 - **URL**: [Servidor_Solucoes_IA]:5432
 - **Descrição**: Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.
 
+## Configuração do Certificado HTTPS no SEI
+
+> **Esta etapa é obrigatória** a partir da estrutura monorepo. Sem ela, o passo "Validar Integração" da próxima seção falha com erro de DNS (`Could not resolve host: seiia`) ou de TLS (`certificate issuer has been marked as not trusted`).
+
+A integração do SEI com o Assistente exige HTTPS pelo hostname `seiia`. Para o "Validar Integração" no SEI funcionar, dois pontos precisam estar resolvidos no ambiente onde o SEI está rodando:
+
+1. **DNS** — o servidor (ou container) do SEI precisa resolver `seiia` para o IP do Nginx do Assistente.
+2. **TLS** — o certificado autoassinado do Assistente precisa estar no truststore do sistema operacional onde o SEI roda, para que o `libcurl`/PHP confie nele.
+
+### Como o certificado é gerado
+
+O serviço `assistente-nginx` (build a partir de `aplicacoes/assistente/nginx.dockerfile`) **gera automaticamente** um certificado autoassinado durante o build, com:
+- `CN = ${NB_USER}` (padrão `seiia`, vindo de `default.env`)
+- `Subject Alternative Name (SAN): DNS:${NB_USER},DNS:localhost,IP:127.0.0.1`
+
+Não é necessário gerar nada manualmente — o cert já está dentro da imagem. O que precisamos é **extraí-lo** e **entregá-lo ao SEI**.
+
+### 1. Extrair o PEM do container `assistente-nginx`
+
+Execute como `seiia`, no servidor onde o SEI IA está instalado:
+
+```bash
+cd /opt/sei-ia
+mkdir -p .runtime/certs
+docker compose --env-file default.env --env-file security.env exec -T assistente-nginx \
+  cat /etc/ssl/certs/seiia.cert.pem > .runtime/certs/seiia.cert.pem
+```
+
+Isso gera `/opt/sei-ia/.runtime/certs/seiia.cert.pem`. Esse é o arquivo que será entregue ao SEI nos passos seguintes.
+
+### 2. Configurar conforme o cenário do SEI
+
+Identifique como o SEI está instalado no seu ambiente e siga **apenas** o cenário aplicável.
+
+#### Cenário A — SEI rodando em CONTAINER Docker (`ops_sei-docker`)
+
+Esse é o caso quando o SEI foi instalado pelo deploy oficial via [ops_sei-docker](https://github.com/anatelgovbr/sei) e o Apache (`httpd`) está como container.
+
+**A.1 — Editar o `docker-compose.yml` do SEI**
+
+Em `ops_sei-docker/docker-compose.yml`, ajuste o serviço `httpd` para:
+
+- Estar nas redes `default` (atual) **e** `seiia-bridge` (a ser declarada).
+- Bind-mountar o PEM extraído em (1) na pasta de anchors do SO do `httpd`.
+- Rodar `update-ca-trust extract` antes do bootstrap original do SEI.
+
+```yaml
+services:
+  httpd:
+    networks:
+      - default
+      - seiia-bridge
+    volumes:
+      - /opt/sei-ia/.runtime/certs/seiia.cert.pem:/etc/pki/ca-trust/source/anchors/seiia.crt:ro
+    command: bash -lc "update-ca-trust extract && exec /command.sh"
+
+networks:
+  seiia-bridge:
+    name: docker-host-bridge
+    external: true
+```
+
+Por que cada coisa:
+- **`networks`** — coloca o `httpd` em **duas** redes: continua se comunicando com `database`, `solr`, `memcached` etc. via `default`, e ganha acesso ao SEI IA via `docker-host-bridge` (onde o nome `seiia` resolve para o Nginx do Assistente, graças ao alias declarado no `docker-compose.yml` do SEI IA).
+- **`volumes`** — bind-mount **read-only** do PEM. O caminho de destino é o diretório de anchors do RHEL/CentOS (sistema base mais comum da imagem do `httpd` do SEI). Para Debian/Ubuntu, o destino seria `/usr/local/share/ca-certificates/seiia.crt` e o comando seria `update-ca-certificates` (ver Cenário B).
+- **`command`** — `update-ca-trust extract` regenera o `/etc/pki/tls/certs/ca-bundle.crt` incluindo o anchor montado **antes** do bootstrap original do SEI rodar. Sem isso, o cert ficaria nos anchors mas fora do bundle que o `libcurl` consulta, e o PHP rejeitaria com `certificate issuer has been marked as not trusted`.
+
+**A.2 — Subir o `httpd`**
+
+```bash
+cd /opt/sei/fontes/sei/ops_sei-docker
+docker compose up -d --force-recreate httpd
+```
+
+**A.3 — Validar (de dentro do `httpd`)**
+
+```bash
+# Resolução do hostname (deve retornar um IP da sub-rede docker-host-bridge)
+docker exec httpd getent hosts seiia
+
+# Cert presente nos anchors
+docker exec httpd ls /etc/pki/ca-trust/source/anchors/seiia.crt
+
+# HTTPS via curl (mesmo stack que o PHP usa)
+docker exec httpd curl -sS https://seiia/health
+# resposta esperada: {"status":"OK"}
+
+# HTTPS via PHP (réplica do que o "Validar Integração" executa)
+docker exec httpd php -r '$c=curl_init("https://seiia/health");curl_setopt($c,CURLOPT_RETURNTRANSFER,1);echo curl_exec($c).PHP_EOL;'
+# resposta esperada: {"status":"OK"}
+```
+
+Se os quatro comandos retornarem o esperado, pode prosseguir para [Mapeamento da Integração no SEI](#mapeamento-da-integração-no-sei).
+
+#### Cenário B — SEI rodando direto no HOST (Apache/PHP nativo)
+
+Esse é o caso quando o Apache/PHP do SEI está instalado direto no Linux do servidor, sem containerização.
+
+**B.1 — Resolver o hostname `seiia`**
+
+Descubra o IP do `assistente-nginx` na bridge:
+
+```bash
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \
+  $(docker compose -f /opt/sei-ia/docker-compose.yml ps -q assistente-nginx)
+```
+
+Anote o IP (ex.: `10.90.0.5`) e adicione em `/etc/hosts` do servidor SEI:
+
+```bash
+sudo bash -c 'echo "10.90.0.5 seiia" >> /etc/hosts'
+```
+
+> Em órgãos com DNS interno, o caminho mais robusto é cadastrar `seiia` como registro A apontando para o IP do servidor SEI IA, em vez de usar `/etc/hosts`. **Isso só funciona se o servidor SEI IA também tiver o IP da bridge roteável** ou se você publicar a porta 443 do `assistente-nginx` no host (alterando `ASSISTENTE_PORT=443` em `default.env`).
+
+**B.2 — Instalar o cert no truststore do SO do servidor SEI**
+
+**RHEL / CentOS / Fedora**:
+
+```bash
+sudo cp /opt/sei-ia/.runtime/certs/seiia.cert.pem /etc/pki/ca-trust/source/anchors/seiia.crt
+sudo update-ca-trust extract
+```
+
+**Ubuntu / Debian**:
+
+```bash
+sudo cp /opt/sei-ia/.runtime/certs/seiia.cert.pem /usr/local/share/ca-certificates/seiia.crt
+sudo update-ca-certificates
+```
+
+**B.3 — Reiniciar o Apache/PHP**
+
+Para o `libcurl` carregado pelo PHP reler o trust store:
+
+```bash
+# RHEL/CentOS/Fedora
+sudo systemctl restart httpd php-fpm
+
+# Ubuntu/Debian
+sudo systemctl restart apache2 php*-fpm
+```
+
+**B.4 — Validar**
+
+```bash
+# Resolução
+getent hosts seiia
+
+# HTTPS via curl
+curl -sS https://seiia/health
+# resposta esperada: {"status":"OK"}
+
+# HTTPS via PHP
+php -r '$c=curl_init("https://seiia/health");curl_setopt($c,CURLOPT_RETURNTRANSFER,1);echo curl_exec($c).PHP_EOL;'
+# resposta esperada: {"status":"OK"}
+```
+
+Se os três comandos retornarem o esperado, pode prosseguir para [Mapeamento da Integração no SEI](#mapeamento-da-integração-no-sei).
+
+### Quando refazer este procedimento
+
+- Sempre que `assistente-nginx` for buildado novamente com `--no-cache` (a chave/cert ficam dentro da imagem; um rebuild forçado pode regenerá-los).
+- Sempre que `NB_USER` for alterado em `default.env` (o cert é gerado com base nesse valor).
+
+Nesses casos, repita o passo **1** (extrair o PEM) e, no Cenário A, recrie o `httpd` com `--force-recreate` para que `update-ca-trust extract` rode novamente. No Cenário B, repita os passos **B.2** e **B.3**.
+
+### Alternativa para produção: certificado de CA confiada
+
+Substituir o autoassinado por um certificado emitido por uma CA confiada pelo SO **elimina os passos 1 e 2.B (truststore)** — sobra só a parte de DNS/rede. Veja a seção [Guia de utilização de certificado SSL proprietário](#guia-de-utilização-de-certificado-ssl-proprietário) para esse caminho.
+
 ## Mapeamento da Integração no SEI
 
 **SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
@@ -907,7 +1103,7 @@ Se o SEI não se conectar com sucesso ao Servidor de Soluções de IA que acabou
   Error response from daemon: Range of CPUs is from 0.01 to 4.00, as there are only 4 CPUs available
   ```
 
-  Solução: Alterar o arquivo `prod.env` (caso o `ENVIRONMENT` seja diferente, alterar o `.env` específico) e modificar todas as chaves que possuem `CPU_LIMIT`.
+  Solução: alterar o arquivo `default.env` e modificar todas as chaves que possuem `CPU_LIMIT` para valores compatíveis com a quantidade de CPUs do servidor.
 
 - **Erro de nome de container duplicado**:
 
@@ -936,12 +1132,13 @@ Se o SEI não se conectar com sucesso ao Servidor de Soluções de IA que acabou
   Solução: Por padrão, ao rodar novamente o comando de inicialização, volta a funcionar. Se persistir, deve-se verificar a quantidade de memória disponível no sistema.
 
   ```bash
-  bash deploy-externo.sh
+  cd /opt/sei-ia
+  make up
   ```
 
 ## Pontos de Atenção para Escalabilidade
 
-* Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `env_files/prod.env`.
+* Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `default.env`.
 * Não devem ser alteradas para valores menores, pois isso afetará o funcionamento do sistema.
 
 ### Pontos de Montagem de Volumes
@@ -985,7 +1182,7 @@ Ao escalar a solução, considere os seguintes pontos:
 
 - **Solr**:
   - Aumente a alocação de memória se houver necessidade de lidar com uma maior quantidade de documentos ou consultas simultâneas. Uma boa prática é aumentar a memória em incrementos de 2 GB.
-  - Para isso, altere no arquivo `env_files/prod.env`:
+  - Para isso, altere no arquivo `default.env`:
 
    | Variável                        | Descrição                                                                                  |
    |---------------------------------|--------------------------------------------------------------------------------------------|
@@ -995,7 +1192,7 @@ Ao escalar a solução, considere os seguintes pontos:
 
 - **Airflow**:
   - O Airflow pode ser escalado horizontalmente adicionando mais workers. Para mais informações, consulte a [documentação do Airflow](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/overview.html).
-  - Em nossa solução, é possível configurar mais workers na variável `AIRFLOW_WORKERS_REPLICAS` no `env_files/prod.env`, lembrando que cada réplica usa em média 6 GB.
+  - Em nossa solução, é possível configurar mais workers na variável `AIRFLOW_WORKERS_REPLICAS` no `default.env`, lembrando que cada réplica usa em média 6 GB.
 
 - **Postgres**:
   - Para aumentar o desempenho, considere aumentar a memória disponível. Monitore o uso de disco e ajuste conforme necessário.
@@ -1053,7 +1250,7 @@ sudo bash certificado_ssl_proprietario/script_ativar_ssl_proprietario.sh
 
 > **Observação**:
 > - É possível instalar sem o Git, sobretudo caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
-> - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
+> - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/sei-ia**.
 
    Siga a documentação oficial para instalar o Git: [Documentação Git](https://git-scm.com/book/pt-br/v2/Come%C3%A7ando-Instalando-o-Git)
 

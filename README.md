@@ -1,97 +1,96 @@
-# sei-ia-monorepo
+# Servidor de Soluções de IA do Módulo SEI IA
 
-Relatorio simples do estado atual do bootstrap do monorepo `sei-ia`.
+O *Servidor de Soluções de IA* contém as ferramentas necessárias para o funcionamento do [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia), composto, de forma simplificada, pelos sub-módulos:
 
-## Estrutura atual
+- **SEI-IA-SIMILARIDADE** — recomendação de processos similares e de documentos similares.
+- **SEI-IA-ASSISTENTE** — Assistente baseado em Inteligência Artificial Generativa (GenAI), para executar prompts dos usuários e interagir com documentos do SEI.
+- **SEI-IA-ETL-AIRFLOW** — orquestração das tarefas de indexação e geração de embeddings.
 
-```text
-sei-ia-monorepo/
-├── aplicacoes/assistente/
-├── aplicacoes/similaridade/
-├── aplicacoes/etl-airflow/
-├── docker-compose.yml
-├── docker-compose.override.yml
-├── default.env
-├── security_example.env
-├── litellm_config.template.yaml
-├── healthchecker.yml
-├── ops/
-├── ci/
-├── docs/
-└── migration_notes/
+## Orientações Preliminares
+
+A instalação foi projetada para ser o mais automática possível. Ainda assim, há passos que precisam ser executados manualmente pelo administrador do ambiente, por questões de segurança ou por dependerem de informações específicas da rede do órgão.
+
+> **Antes de começar, leia integralmente este README e o [Manual de Instalação](docs/INSTALL.md)**. Dúvidas que surgirem no início podem ser esclarecidas ao longo do material.
+
+- **ATENÇÃO**: o servidor de SEI IA **não deve ser compartilhado** com outras soluções.
+- **ATENÇÃO**: para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.
+
+## Estrutura do Repositório
+
+A partir desta versão, este repositório passou a ser um **monorepo**: o código-fonte de todas as aplicações (Assistente, Similaridade, ETL/Airflow) está versionado junto com a configuração do `docker compose`. Isso permite duas formas de instalação:
+
+- **Build local** — as imagens são construídas no servidor a partir do código deste repositório (caminho padrão).
+- **Imagens pré-publicadas** — as imagens são puxadas do GitHub Container Registry, sem build local (alternativa para órgãos que preferem não buildar).
+
+Os dois caminhos estão documentados no [Manual de Instalação](docs/INSTALL.md).
+
+```
+sei-ia/
+├── aplicacoes/                      # Código-fonte das aplicações
+│   ├── assistente/
+│   ├── similaridade/
+│   └── etl-airflow/
+├── ops/                             # Suporte de infraestrutura (Solr, Postgres, healthchecker)
+├── docs/                            # Manuais (INSTALL.md, UPGRADE.md)
+├── docker-compose.yml               # Stack principal
+├── docker-compose.override.yml      # Portas para acesso externo (debug)
+├── default.env                      # Variáveis NÃO sensíveis (versionado)
+├── security_example.env             # Modelo de variáveis sensíveis
+├── litellm_config.template.yaml     # Modelo da config dos modelos LLM
+├── Makefile                         # Atalhos make up / make down / make check
+└── .gitlab/                         # Pipelines e scripts de build/deploy
 ```
 
-## O que ja existe
+## Requisitos Mínimos
 
-- o monorepo foi montado a partir de clones reais do GitLab
-- `assistente` veio da `main`
-- `similaridade` veio da `master`
-- `etl-airflow` veio da `main`
-- `deploy` veio da `master` como base para reorganizar os manifests raiz e `ops/`
-- `app-api` veio da `master` como referencia para a fusao do feedback
-- `jobs` foi renomeado para `etl-airflow`
-- `api` foi renomeada para `similaridade`
-- `app-api` deixou de existir como servico separado e teve a primeira fusao feita dentro de `similaridade`
-- a pipeline raiz do GitLab ja existe com estagios de setup, quality, test, build, deploy e sync
-- cada aplicacao ja tem pipeline propria
-- `assistente` ja possui testes automatizados conectados na pipeline
-- `similaridade` e `etl-airflow` ja possuem lint, format, build e deploy, mas ainda sem testes automatizados consolidados
-- o deploy ja foi reorganizado por unidades reais: `assistente`, `similaridade`, `etl-airflow`, `etl-airflow-api` e `infra-shared`
-- os manifests raiz (`docker-compose.yml`, `docker-compose.override.yml`, `default.env`, `security_example.env`, `litellm_config.template.yaml` e `healthchecker.yml`) representam o contrato atual do runtime local
-- `default.env` e `litellm_config.template.yaml` ficam versionados na raiz; os valores sensiveis ficam nos secrets do GitLab e sao gerados automaticamente no deploy
-- os arquivos sensiveis continuam fora do Git ou como template, com destaque para `security_example.env`
-- ja existe um job de espelhamento para GitHub, mas ele ainda nao foi ativado de verdade
+Os requisitos abaixo se referem **apenas** ao Servidor de Soluções de IA — não se confundem com a infraestrutura alocada ao SEI.
 
-## O que falta
+O servidor é baseado em Docker. Recomendamos servidor Linux. **Não recomendamos Windows com WSL em produção.**
 
-- registrar e configurar os runners do GitLab com as tags esperadas para build e deploy
-- configurar as variaveis protegidas do GitLab que alimentam apenas o `security.env` no deploy
-- fechar a estrategia de tags de imagem no deploy para garantir que o ambiente suba exatamente a imagem gerada no build
-- revisar o contrato de variaveis do `compose` para cobrir todos os servicos e imagens usados no runtime novo
-- preparar o host alvo de deploy com Docker, Compose, acesso ao registry, rede e volumes esperados
-- ativar de fato o espelhamento continuo para GitHub
-- ampliar a integracao do `app-api` dentro de `similaridade` alem da primeira fusao de feedback
-- adicionar testes automatizados reais para `similaridade`
-- adicionar testes automatizados reais para `etl-airflow`
+- **Docker**:
+  - Docker Engine ≥ 27.1.1
+  - Docker Compose ≥ 2.29
+  - Docker Buildx ≥ 0.13
+- **Servidor Linux** (referência da Anatel em produção):
+  - **CPU**: 16 cores @ 2.10 GHz
+  - **RAM**: 128 GB
+  - **Disco**: 450 GB
+- **Requisito mínimo do SEI**:
+  - Versão **v4.1.5** (não compatível com versões anteriores).
+  - Para versões mais recentes do SEI, conferir compatibilidade previamente.
 
-## Observacoes
+> **Realidade de cada órgão**: Solr e PostgreSQL crescem proporcionalmente ao volume de documentos do SEI. Cada órgão deve dimensionar conforme seu próprio volume.
 
-- o legado original continua intacto fora desta pasta
-- este repositorio ainda e um bootstrap de migracao, nao a versao final de producao
-- segredos nao devem ser commitados no monorepo
+## Download
 
-## BuildKit e DNS no Docker
+O download do pacote de instalação deve ser obtido na [seção Releases deste projeto](https://github.com/anatelgovbr/sei-ia/releases).
 
-Durante a validacao do `docker compose up -d`, os builds com `buildx` falhavam dentro de `RUN apt-get update`, `RUN dnf ...` e ate `RUN wget ...` com erro de resolucao DNS. O comportamento observado foi:
-
-- `docker run --network docker-host-bridge ...` resolvia e baixava normalmente
-- `docker buildx build ...` falhava dentro do `RUN`
-- dentro do passo de build, o `resolv.conf` estava sendo gerado com DNS publicos do Google (`8.8.8.8`, `8.8.4.4` e equivalentes IPv6), que nao eram alcancaveis neste host
-
-O problema foi isolado com Dockerfiles minimos e resolvido configurando o BuildKit para usar explicitamente os DNS do host:
-
-- [buildkitd.toml](/opt/seiia_deploy/.gitlab/buildkit/buildkitd.toml)
-- [ensure_buildx_builder.sh](/opt/seiia_deploy/.gitlab/scripts/ensure_buildx_builder.sh)
-- [run_deploy_debug.sh](/opt/seiia_deploy/.gitlab/scripts/run_deploy_debug.sh)
-
-Como funciona:
-
-- o script cria ou reutiliza o builder `seiia-bridge`
-- esse builder usa a rede `docker-host-bridge`
-- o arquivo `buildkitd.toml` fixa os nameservers internos do ambiente
-- o deploy em [deploy_changed.sh](/opt/seiia_deploy/.gitlab/scripts/deploy_changed.sh) agora prepara automaticamente esse builder antes dos builds
-- o deploy tambem registra a duracao das fases de `build`, `etl-airflow-init`, `rollout` e `health checks`
-
-Para debug local, o deploy pode ser executado em background sem bloquear o terminal:
+Alternativamente, é possível clonar o repositório em uma tag estável:
 
 ```bash
-bash .gitlab/scripts/run_deploy_debug.sh
-tail -f .gitlab/tmp/deploy-debug-*.log
+git clone --branch <tag> --single-branch https://github.com/anatelgovbr/sei-ia.git /opt/sei-ia
 ```
 
-Se precisar recriar manualmente:
+## Instalação
 
-```bash
-bash .gitlab/scripts/ensure_buildx_builder.sh
-BUILDX_BUILDER=seiia-bridge docker compose --env-file default.env --env-file security.env up -d
-```
+As instruções completas de instalação estão em **[docs/INSTALL.md](docs/INSTALL.md)**.
+
+Resumo dos passos principais:
+
+1. Preparar usuário, pastas e Docker no servidor.
+2. Criar a rede Docker dedicada (`docker-host-bridge`).
+3. Clonar o repositório em `/opt/sei-ia`.
+4. Preparar o builder do Docker (Buildx + DNS).
+5. Configurar `security.env` (a partir de `security_example.env`).
+6. Configurar `litellm_config.yaml` (a partir de `litellm_config.template.yaml`).
+7. Subir a stack: `make up`.
+8. Configurar a integração HTTPS com o SEI.
+9. Validar: `make check`.
+
+## Atualização
+
+As instruções de atualização de versão estão em **[docs/UPGRADE.md](docs/UPGRADE.md)**.
+
+## Suporte
+
+Em caso de dúvidas ou problemas, abra uma issue em <https://github.com/anatelgovbr/sei-ia/issues>.
