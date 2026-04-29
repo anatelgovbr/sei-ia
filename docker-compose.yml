@@ -90,9 +90,15 @@ services:
 
   assistente-nginx:
     <<: *app-common
+    networks:
+      seiia:
+        aliases:
+          - ${NB_USER:-seiia}
     build:
       context: .
       dockerfile: aplicacoes/assistente/nginx.dockerfile
+      args:
+        NB_USER: ${NB_USER}
     image: sei-ia/assistente-nginx:local
     ports:
       - "${ASSISTENTE_PORT:-8088}:443"

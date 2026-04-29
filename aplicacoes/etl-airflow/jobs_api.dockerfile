@@ -73,7 +73,7 @@ RUN chown -R ${NB_USER}:${NB_GID} ${MICROMAMBA_ENV_PATH}
 ### Instalar o mysql 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     curl -sSLO https://dev.mysql.com/get/mysql80-community-release-el7-11.noarch.rpm \
-    && sudo rpm -ivh mysql80-community-release-el7-11.noarch.rpm \
+    && rpm -ivh mysql80-community-release-el7-11.noarch.rpm \
     && yum -y install gcc python3-devel mysql-devel pkgconfig
 
 USER ${NB_USER}
