@@ -71,7 +71,6 @@ async def classify_disclaimer_need(state: UserState) -> UserState:
     if disclaimer_case not in (
         "orientacao_sobre_uso_do_sei",
         "totalidade_do_sei",
-        "fora_do_escopo_tecnologico",
         "outro",
     ):
         logger.warning(
