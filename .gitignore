@@ -26,3 +26,4 @@ litellm_config.yaml
 llm_config.yaml
 alteracoes_sei_ssl/
 aplicacoes/assistente/data
+GUIA_BUILD_NETWORK.md
