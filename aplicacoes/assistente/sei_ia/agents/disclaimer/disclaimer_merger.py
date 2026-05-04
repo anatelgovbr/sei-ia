@@ -32,49 +32,38 @@ async def prepare_disclaimer_for_response(state: UserState) -> dict:
     disclaimer_case_condition = disclaimer_case in (
         "orientacao_sobre_uso_do_sei",
         "totalidade_do_sei",
-        "fora_do_escopo_tecnologico",
     )
 
     if disclaimer_case_condition:
         disclaimer_introduction = "⚠️ **Atenção:** "
 
-        if disclaimer_case == "fora_do_escopo_tecnologico":
-            disclaimer_content = (
-                "O assistente do SEI IA não processa "
-                "arquivos de áudio, de vídeo ou de imagem, e tampouco "
-                "extrai caracteres por meio de OCR. Portanto, a "
-                "resposta a seguir pode conter imprecisão."
-            )
-            disclaimer_text = disclaimer_introduction + disclaimer_content + "\n\n"
+        # Verificar se há documentos no contexto
+        has_no_documents = (
+            state["id_procedimentos"] is None or len(state["id_procedimentos"]) == 0
+        )
 
-        else:
-            # Verificar se há documentos no contexto
-            has_no_documents = (
-                state["id_procedimentos"] is None or len(state["id_procedimentos"]) == 0
-            )
+        if has_no_documents:
+            if disclaimer_case == "orientacao_sobre_uso_do_sei":
+                disclaimer_content = (
+                    "O assistente do SEI IA não ensina o uso do "
+                    "SEI. Portanto, a resposta a seguir pode conter "
+                    "imprecisão."
+                )
 
-            if has_no_documents or state["id_procedimentos"] is None:
-                if disclaimer_case == "orientacao_sobre_uso_do_sei":
-                    disclaimer_content = (
-                        "O assistente do SEI IA não ensina o uso do "
-                        "SEI. Portanto, a resposta a seguir pode conter "
-                        "imprecisão."
-                    )
+            elif disclaimer_case == "totalidade_do_sei":
+                disclaimer_content = (
+                    "A funcionalidade de responder a "
+                    "solicitações relacionadas ao SEI como um todo ainda "
+                    "não foi implementada. Portanto, a resposta a seguir "
+                    "pode conter imprecisão."
+                )
+            else:
+                disclaimer_content = None
 
-                elif disclaimer_case == "totalidade_do_sei":
-                    disclaimer_content = (
-                        "A funcionalidade de responder a "
-                        "solicitações relacionadas ao SEI como um todo ainda "
-                        "não foi implementada. Portanto, a resposta a seguir "
-                        "pode conter imprecisão."
-                    )
-                else:
-                    disclaimer_content = None
-
-                if disclaimer_content:
-                    disclaimer_text = (
-                        disclaimer_introduction + disclaimer_content + "\n\n"
-                    )
+            if disclaimer_content:
+                disclaimer_text = (
+                    disclaimer_introduction + disclaimer_content + "\n\n"
+                )
 
     logger.debug(
         f">> saindo de {inspect.currentframe().f_code.co_name} com disclaimer_text={'definido' if disclaimer_text else 'None'}"

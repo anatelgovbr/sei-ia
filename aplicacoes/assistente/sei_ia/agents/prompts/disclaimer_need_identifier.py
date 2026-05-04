@@ -15,13 +15,6 @@ DICT_DISCLAIMER_CASES = {
         "modelo 'Os documentos no Sistema Eletrônico de Informações (SEI) com "
         "a característica X são Y e Z'."
     ),
-    "fora_do_escopo_tecnologico": (
-        "Pergunta ou solicitação cuja "
-        "resposta depende (i) do processamento de dados não-textuais "
-        "fornecidos pelo usuário, como arquivos de áudio, vídeos ou "
-        "imagens; ou (ii) de extração de caracteres por meio de OCR "
-        "(optical character recognition)"
-    ),
     "outro": (
         "Pergunta ou solicitação que não se enquadra em nenhum "
         "dos casos definidos acima."
@@ -31,9 +24,8 @@ DICT_DISCLAIMER_CASES = {
 PONDER_DISCLAIMER_ADDITION_PROMPT = """Responda apenas com um JSON
 válido (sem markdown e sem comentários).
 Campos obrigatórios: "justificativa" e "caso".
-A chave "caso" deve ser exatamente uma destas quatro opções:
-orientacao_sobre_uso_do_sei, totalidade_do_sei,
-fora_do_escopo_tecnologico, outro.
+A chave "caso" deve ser exatamente uma destas três opções:
+orientacao_sobre_uso_do_sei, totalidade_do_sei, outro.
 
 Exemplo de formato esperado:
 {{"justificativa": "texto da justificativa do motivo da seleção", "caso": "totalidade_do_sei"}}
