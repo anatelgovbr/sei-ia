@@ -41,6 +41,7 @@ class LiteLLMEmbeddingProvider(EmbeddingProvider):
             msg = "Não foi possível importar o pacote openai. Verifique se está instalado."
             raise ImportError(msg)
 
+        self.base_url = base_url
         self.model = model
         self.base_model = base_model or "text-embedding-3-small"
         self.max_context_size = max_context_size * 0.99
@@ -51,7 +52,6 @@ class LiteLLMEmbeddingProvider(EmbeddingProvider):
             api_key=api_key or "dummy-key",  # LiteLLM pode não requerer API key
         )
 
-        self.test_connection()
         self.tokenizer_type = self._tokenizer_libname()
 
         # Configura timeout para o cliente assíncrono
@@ -122,12 +122,12 @@ class LiteLLMEmbeddingProvider(EmbeddingProvider):
         return embeddings
 
     def test_connection(self) -> bool:
-        """Testa a conexão com o LiteLLM proxy."""
+        """Verifica que o LiteLLM Proxy está alcançável."""
         try:
-            test_text = "Teste de conexão."
-            self.generate_embeddings(test_text)
-            logging.info("Conexão com LiteLLM proxy bem-sucedida.")
+            resp = httpx.get(f"{self.base_url}/health/liveliness", timeout=5.0)
+            resp.raise_for_status()
+            logging.info("LiteLLM Proxy alcançável em %s", self.base_url)
             return True
         except Exception:
-            logging.exception("Falha na conexão com LiteLLM proxy.")
+            logging.exception("Falha ao alcançar LiteLLM Proxy em %s", self.base_url)
             return False

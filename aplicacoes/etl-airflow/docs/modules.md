@@ -215,7 +215,6 @@ Parsers específicos por tipo de documento:
 ```python
 from jobs.services.embedder.embedding_generator import EmbeddingGenerator
 from jobs.services.embedder.providers.litellm import LiteLLMEmbeddingProvider
-from jobs.services.embedder.providers.azure import AzureOpenAIProvider
 ```
 
 Geração de embeddings vetoriais:
@@ -224,8 +223,7 @@ Geração de embeddings vetoriais:
 |--------|-----------|
 | `embedding_generator.py` | Orquestrador de geração de embeddings com pooling |
 | `providers/provider_interface.py` | Interface abstrata para providers |
-| `providers/litellm.py` | **Implementação LiteLLM Proxy (recomendado)** |
-| `providers/azure.py` | Implementação Azure OpenAI direta (legado) |
+| `providers/litellm.py` | Implementação LiteLLM Proxy (gateway para Azure OpenAI) |
 
 !!! note "Provider Recomendado"
     O `LiteLLMEmbeddingProvider` é o provider padrão e recomendado.

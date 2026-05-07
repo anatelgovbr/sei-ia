@@ -30,6 +30,7 @@ from sei_ia.routers.chat.rlm_stream import router as rlm_stream_router
 from sei_ia.routers.feedback import router as feedback_router
 from sei_ia.routers.healthcheck import api_router as healthcheck
 from sei_ia.routers.tests import api_router as tests_router
+from sei_ia.services.embedder.pipeline import embedding_generator
 
 # Suprime warnings do Pydantic sobre conflitos de namespace com a biblioteca docling
 # Colocado após os imports para evitar E402 do Ruff
@@ -103,6 +104,9 @@ async def initialize_database_tables(app: FastAPI) -> AsyncGenerator[None, None]
         logger.exception("Failed to ensure database tables at startup")
         masked_conn = app_db_instance.hide_password(app_db_instance.conn_str)
         raise RuntimeError(f"Falha ao inicializar tabelas. DB: {masked_conn}") from e
+
+    if not embedding_generator.provider.test_connection():
+        logger.warning("LiteLLM Proxy inalcançável no startup — pipeline pode falhar")
 
     yield
 

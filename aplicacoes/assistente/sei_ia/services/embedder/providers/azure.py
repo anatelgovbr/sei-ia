@@ -57,6 +57,8 @@ class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
         self.max_context_size = max_context_size * 0.99
         self.encoding_name = encoding_name  # Encoding configurável
 
+        self.endpoint = endpoint
+
         # Detecta se está usando Azure direto ou proxy
         self.is_proxy = "openai.azure.com" not in endpoint
 
@@ -83,7 +85,6 @@ class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
 
             logging.info(f"Embedding provider inicializado em modo AZURE: {endpoint}")
 
-        self.test_connection()
         self.tokenizer_type = self._tokenizer_libname()
 
         # Configura timeout para o cliente assíncrono
@@ -215,10 +216,18 @@ class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
         return embeddings
 
     def test_connection(self) -> bool:
-        """Testa a conexão com o Azure OpenAI."""
+        """Verifica que o LiteLLM Proxy está alcançável.
+
+        Modo proxy: HTTP GET /health/liveliness (sem custo, sem upstream).
+        Modo Azure direto: skip — não há endpoint barato equivalente.
+        """
+        if not self.is_proxy:
+            return True
         try:
-            test_text = "Teste de conexão."
-            self.generate_embeddings(test_text)
-            logging.info("Conexão com Azure OpenAI bem-sucedida.")
+            resp = httpx.get(f"{self.endpoint}/health/liveliness", timeout=5.0)
+            resp.raise_for_status()
+            logging.info("LiteLLM Proxy alcançável em %s", self.endpoint)
+            return True
         except Exception:
-            logging.exception("Falha na conexão com Azure OpenAI.")
+            logging.exception("Falha ao alcançar LiteLLM Proxy em %s", self.endpoint)
+            return False
