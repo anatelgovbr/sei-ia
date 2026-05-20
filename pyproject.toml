@@ -7,6 +7,7 @@ name = "sei-ia"
 version = "0.1.0"
 description = "SEI-IA - Inteligência Artificial para o SEI"
 authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
+license = {file = "LICENSE"}
 requires-python = ">=3.10"
 
 dependencies = [
