@@ -132,12 +132,18 @@ def get_model(
     # Obtém configurações do modelo
     config = get_model_config(model_type)
 
-    # Para modelos de raciocínio (think), força temperature=1.0
-    # O proxy LiteLLM/Azure OpenAI exige isso para modelos GPT-5
-    if model_type.lower() == "think":
+    # Para modelos de raciocínio (think), força temperature=1.0 para Azure/OpenAI
+    # O proxy LiteLLM/Azure OpenAI exige isso para modelos GPT-5 / o1 / o3
+    if model_type.lower() == "think" and (
+        config["model"].startswith("azure/") 
+        or config["model"].startswith("openai/")
+        or "gpt" in config["model"].lower()
+        or "o1" in config["model"].lower()
+        or "o3" in config["model"].lower()
+    ):
         temperature = 1.0
         logger.debug(
-            "Modelo 'think' detectado - forçando temperature=1.0 (exigido pelo Azure)"
+            f"Modelo 'think' Azure/OpenAI detectado ({config['model']}) - forçando temperature=1.0"
         )
 
     # Prepara parâmetros do ChatOpenAI

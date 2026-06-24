@@ -5,6 +5,9 @@ model_list:
       api_base: ${LITELLM_STANDARD_API_BASE}
       api_key: ${LITELLM_STANDARD_API_KEY}
       api_version: "${LITELLM_STANDARD_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
       max_completion_tokens: 32768
     model_info:
       base_model: ${LITELLM_STANDARD_MODEL}
@@ -15,6 +18,9 @@ model_list:
       api_base: ${LITELLM_STANDARD_API_BASE}
       api_key: ${LITELLM_STANDARD_API_KEY}
       api_version: "${LITELLM_STANDARD_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
       max_completion_tokens: 32768
     model_info:
       base_model: ${LITELLM_MINI_MODEL}
@@ -25,6 +31,9 @@ model_list:
       api_base: ${LITELLM_STANDARD_API_BASE}
       api_key: ${LITELLM_STANDARD_API_KEY}
       api_version: "${LITELLM_STANDARD_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
       max_completion_tokens: 32000
     model_info:
       base_model: ${LITELLM_NANO_MODEL}
@@ -35,6 +44,9 @@ model_list:
       api_base: ${LITELLM_STANDARD_API_BASE}
       api_key: ${LITELLM_STANDARD_API_KEY}
       api_version: "${LITELLM_STANDARD_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
       max_completion_tokens: ${LITELLM_THINK_MAX_TOKENS}
       reasoning_effort: "medium"
     model_info:
@@ -46,6 +58,9 @@ model_list:
       api_base: ${LITELLM_STANDARD_API_BASE}
       api_key: ${LITELLM_STANDARD_API_KEY}
       api_version: "${LITELLM_STANDARD_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
       max_completion_tokens: ${LITELLM_THINK_MAX_TOKENS}
       reasoning_effort: "low"
     model_info:
@@ -57,6 +72,9 @@ model_list:
       api_base: ${LITELLM_STANDARD_API_BASE}
       api_key: ${LITELLM_STANDARD_API_KEY}
       api_version: "${LITELLM_STANDARD_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
       max_completion_tokens: ${LITELLM_THINK_MAX_TOKENS}
       reasoning_effort: "none"
     model_info:
@@ -68,6 +86,9 @@ model_list:
       api_base: ${LITELLM_EMBEDDING_API_BASE}
       api_key: ${LITELLM_EMBEDDING_API_KEY}
       api_version: "${LITELLM_EMBEDDING_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
     model_info:
       base_model: ${LITELLM_EMBEDDING_MODEL}
 
@@ -77,8 +98,12 @@ model_list:
       api_base: ${LITELLM_STT_API_BASE}
       api_key: ${LITELLM_STT_API_KEY}
       api_version: "${LITELLM_STT_API_VERSION}"
+      vertex_project: "${LITELLM_VERTEX_PROJECT}"
+      vertex_location: "${LITELLM_VERTEX_LOCATION}"
+      vertex_credentials: "${LITELLM_VERTEX_CREDENTIALS}"
     model_info:
       base_model: ${LITELLM_STT_MODEL}
+
 
 # ============================================================================
 # Configuracoes de Retry e Reliability

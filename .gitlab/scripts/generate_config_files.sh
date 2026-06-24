@@ -95,6 +95,9 @@ generate_security_env() {
     printf '%s=%s\n' "LITELLM_STANDARD_MODEL"                    "${LITELLM_STANDARD_MODEL:-}"
     printf '%s=%s\n' "LITELLM_MINI_MODEL"                        "${LITELLM_MINI_MODEL:-}"
     printf '%s=%s\n' "LITELLM_NANO_MODEL"                        "${LITELLM_NANO_MODEL:-}"
+    printf '%s=%s\n' "LITELLM_VERTEX_PROJECT"                    "${LITELLM_VERTEX_PROJECT:-}"
+    printf '%s=%s\n' "LITELLM_VERTEX_LOCATION"                   "${LITELLM_VERTEX_LOCATION:-}"
+    printf '%s=%s\n' "LITELLM_VERTEX_CREDENTIALS"                "${LITELLM_VERTEX_CREDENTIALS:-}"
     printf '%s=%s\n' "SEI_API_DB_IDENTIFIER_SERVICE"             "${SEI_API_DB_IDENTIFIER_SERVICE:-}"
     printf '%s=%s\n' "SEI_ADDRESS"                       "${SEI_ADDRESS:-}"
     printf '%s=%s\n' "PROJECT_ENDPOINT"                  "${PROJECT_ENDPOINT:-}"
@@ -122,8 +125,8 @@ generate_litellm_config() {
     return 0
   fi
 
-  if [ -z "${LITELLM_STANDARD_API_KEY:-}" ]; then
-    log "LITELLM_STANDARD_API_KEY nao configurada no GitLab; pulando geracao de $out"
+  if [ -z "${LITELLM_STANDARD_API_KEY:-}" ] && [ -z "${LITELLM_VERTEX_CREDENTIALS:-}" ]; then
+    log "Nem LITELLM_STANDARD_API_KEY nem LITELLM_VERTEX_CREDENTIALS configuradas no GitLab; pulando geracao de $out"
     return 0
   fi
 
@@ -142,7 +145,10 @@ ${LITELLM_EMBEDDING_API_VERSION}
 ${LITELLM_STT_MODEL}
 ${LITELLM_STT_API_BASE}
 ${LITELLM_STT_API_KEY}
-${LITELLM_STT_API_VERSION}' \
+${LITELLM_STT_API_VERSION}
+${LITELLM_VERTEX_PROJECT}
+${LITELLM_VERTEX_LOCATION}
+${LITELLM_VERTEX_CREDENTIALS}' \
     < "$template" > "$out"
   log "litellm_config.yaml gerado com sucesso"
 }

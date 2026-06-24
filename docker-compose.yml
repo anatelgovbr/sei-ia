@@ -463,6 +463,9 @@ services:
     networks:
       - seiia
     command: --config /app/config.yaml --port ${LITELLM_PORT:-4000} --host 0.0.0.0
+    env_file:
+      - default.env
+      - security.env
     volumes:
       - ./litellm_config.yaml:/app/config.yaml:ro
 
