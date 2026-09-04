@@ -1,4 +1,7 @@
 model_list:
+  # ============================================================================
+  # EXEMPLO 1: AZURE OPENAI (Padrão)
+  # ============================================================================
   - model_name: standard
     litellm_params:
       model: azure/gpt-4.1 # Nome do modelo implantado
@@ -40,6 +43,51 @@ model_list:
       api_version: "2025-03-01-preview"
     model_info:
       base_model: text-embedding-3-small # Nome do modelo original
+
+  # ============================================================================
+  # EXEMPLO 2: GOOGLE CLOUD VERTEX AI (Gemini / Claude / Gemma / GPT-OSS)
+  # Para usar Vertex AI, descomente as linhas abaixo ou substitua o bloco acima:
+  # ============================================================================
+  # - model_name: standard
+  #   litellm_params:
+  #     model: vertex_ai/gemini-2.5-pro # Ou vertex_ai/claude-sonnet-4-6, vertex_ai/gemma-4-26b-a4b-it-maas
+  #     vertex_project: os.environ/LITELLM_VERTEX_PROJECT # Ou "seu-projeto-gcp"
+  #     vertex_location: os.environ/LITELLM_VERTEX_LOCATION # Ou "us-central1"
+  #     vertex_credentials: os.environ/LITELLM_VERTEX_CREDENTIALS # Ou caminho para JSON da Service Account
+  #     max_completion_tokens: 32768
+  #   model_info:
+  #     base_model: gemini-2.5-pro
+  #
+  # - model_name: mini
+  #   litellm_params:
+  #     model: vertex_ai/gemini-3.5-flash # Ou vertex_ai/gemini-3.1-flash-lite, vertex_ai/claude-haiku-4-5, vertex_ai/gpt-oss-20b-maas
+  #     vertex_project: os.environ/LITELLM_VERTEX_PROJECT
+  #     vertex_location: os.environ/LITELLM_VERTEX_LOCATION
+  #     vertex_credentials: os.environ/LITELLM_VERTEX_CREDENTIALS
+  #     max_completion_tokens: 32768
+  #   model_info:
+  #     base_model: gemini-3.5-flash
+  #
+  # - model_name: think
+  #   litellm_params:
+  #     model: vertex_ai/gemini-2.5-pro # Ou vertex_ai/claude-opus-4-8, vertex_ai/gpt-oss-120b-maas
+  #     vertex_project: os.environ/LITELLM_VERTEX_PROJECT
+  #     vertex_location: os.environ/LITELLM_VERTEX_LOCATION
+  #     vertex_credentials: os.environ/LITELLM_VERTEX_CREDENTIALS
+  #     max_completion_tokens: 102400
+  #     stream_timeout: 1800
+  #     timeout: 1800
+  #   model_info:
+  #     base_model: gemini-2.5-pro
+  #
+  # - model_name: embedding
+  #   litellm_params:
+  #     model: vertex_ai/gemini-embedding-2
+  #     vertex_project: os.environ/LITELLM_VERTEX_PROJECT
+  #     vertex_location: os.environ/LITELLM_VERTEX_LOCATION
+  #     vertex_credentials: os.environ/LITELLM_VERTEX_CREDENTIALS
+  #   model_info:
+  #     base_model: gemini-embedding-2
 
 # ============================================================================
 # Configuracoes de Retry e Reliability

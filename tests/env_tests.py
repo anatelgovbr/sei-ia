@@ -207,11 +207,19 @@ allowed_empty_vars = [
     "LANGFUSE_SECRET_KEY",
     "LANGFUSE_SECRET_SALT",
     "LANGFUSE_URL",
-    "ASSISTENTE_LITELLM_PROXY_API_KEY"
+    "ASSISTENTE_LITELLM_PROXY_API_KEY",
+    "LITELLM_VERTEX_PROJECT",
+    "LITELLM_VERTEX_LOCATION",
+    "LITELLM_VERTEX_CREDENTIALS",
 ]
 
 # Lista de variáveis que podem estar presentes nos arquivos .env sem serem consideradas erros
-allowed_extra_vars = ["AZURE_OPENAI_ENDPOINT_GPT4o"]
+allowed_extra_vars = [
+    "AZURE_OPENAI_ENDPOINT_GPT4o",
+    "LITELLM_VERTEX_PROJECT",
+    "LITELLM_VERTEX_LOCATION",
+    "LITELLM_VERTEX_CREDENTIALS",
+]
 
 def create_env_vars_df(env_vars: dict) -> pd.DataFrame:
     dfs = []

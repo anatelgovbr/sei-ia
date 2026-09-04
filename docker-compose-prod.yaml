@@ -879,6 +879,11 @@ services:
       UVICORN_LOG_LEVEL: "warning"  # Controla o nivel de log do Uvicorn (critical | error | warning | info | debug | trace)
       LITELLM_REQUEST_TIMEOUT: "1800"  # 30 minutos para prompts grandes
       UVICORN_TIMEOUT_KEEP_ALIVE: "1800"  # Keep-alive timeout
+      LITELLM_VERTEX_PROJECT: ${LITELLM_VERTEX_PROJECT:-}
+      LITELLM_VERTEX_LOCATION: ${LITELLM_VERTEX_LOCATION:-us-central1}
+      LITELLM_VERTEX_CREDENTIALS: ${LITELLM_VERTEX_CREDENTIALS:-}
+    env_file:
+      - .env
     deploy:
       resources:
         limits:
