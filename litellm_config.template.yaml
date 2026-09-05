@@ -1,0 +1,92 @@
+model_list:
+  - model_name: mini
+    litellm_params:
+      model: os.environ/LITELLM_MINI_MODEL
+      api_base: os.environ/LITELLM_MINI_API_BASE
+      api_key: os.environ/LITELLM_MINI_API_KEY
+      api_version: os.environ/LITELLM_MINI_API_VERSION
+      tags: ["agents:classificador", "agents:busca_web"]
+    model_info:
+      base_model: os.environ/LITELLM_MINI_MODEL
+      # __LITELLM_MINI_REASONING_LEVELS__
+
+  - model_name: nano
+    litellm_params:
+      model: os.environ/LITELLM_NANO_MODEL
+      api_base: os.environ/LITELLM_NANO_API_BASE
+      api_key: os.environ/LITELLM_NANO_API_KEY
+      api_version: os.environ/LITELLM_NANO_API_VERSION
+      tags: ["agents:explorador", "agents:ocr", "agents:triagem_busca"]
+    model_info:
+      base_model: os.environ/LITELLM_NANO_MODEL
+      # __LITELLM_NANO_REASONING_LEVELS__
+
+  - model_name: standard
+    litellm_params:
+      model: os.environ/LITELLM_STANDARD_MODEL
+      api_base: os.environ/LITELLM_STANDARD_API_BASE
+      api_key: os.environ/LITELLM_STANDARD_API_KEY
+      api_version: os.environ/LITELLM_STANDARD_API_VERSION
+      tags: ["agents:principal"]
+    model_info:
+      base_model: os.environ/LITELLM_STANDARD_MODEL
+      # __LITELLM_STANDARD_REASONING_LEVELS__
+      # Metadado publicado pelo proxy para clientes administrativos. O limite de
+      # contexto usado pelo Assistente continua definido nas ASSISTENTE_CTX_LEN_*.
+      max_input_tokens: 1000000
+
+  # O deploy interno substitui somente o marcador abaixo pelas entradas extras
+  # não secretas de LITELLM_MODEL_CATALOG. Na instalação externa, copiar este
+  # template mantém um YAML válido sem modelos adicionais.
+# __LITELLM_MODEL_CATALOG_ENTRIES__
+
+  - model_name: embedding
+    litellm_params:
+      model: os.environ/LITELLM_EMBEDDING_MODEL
+      api_base: os.environ/LITELLM_EMBEDDING_API_BASE
+      api_key: os.environ/LITELLM_EMBEDDING_API_KEY
+      api_version: os.environ/LITELLM_EMBEDDING_API_VERSION
+      tags: ["agents:embedding"]
+    model_info:
+      base_model: os.environ/LITELLM_EMBEDDING_MODEL
+
+  - model_name: speech-to-text  # Whisper via proxy central (openai/<alias>)
+    litellm_params:
+      model: os.environ/LITELLM_STT_MODEL
+      api_base: os.environ/LITELLM_STT_API_BASE
+      api_key: os.environ/LITELLM_STT_API_KEY
+      api_version: os.environ/LITELLM_STT_API_VERSION
+      tags: ["agents:audio_transcription"]
+    model_info:
+      base_model: os.environ/LITELLM_STT_MODEL
+
+# ============================================================================
+# Configuracoes de Retry e Reliability
+# Suporta conexao direta com Azure (azure/<modelo>) e via proxy central
+# (openai/<alias>) — o provedor e definido pelas variaveis de CI/CD.
+# ============================================================================
+
+litellm_settings:
+  num_retries: 3
+  request_timeout: 900
+  drop_params: true
+  modify_params: true
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 3
+  timeout: 900
+  retry_policy:
+    AuthenticationErrorRetries: 0
+    TimeoutErrorRetries: 3
+    RateLimitErrorRetries: 3
+    ContentPolicyViolationErrorRetries: 0
+    InternalServerErrorRetries: 4
+    BadRequestErrorRetries: 0
+  enable_tag_filtering: true
+
+general_settings:
+  master_key: os.environ/LITELLM_PROXY_API_KEY
+
+settings:
+  model_list: model_list

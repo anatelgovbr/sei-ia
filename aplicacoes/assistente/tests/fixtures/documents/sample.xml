@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documento>
+    <titulo>Documento de Teste XML</titulo>
+    <autor>Sistema SEI-IA</autor>
+    <data>2026-02-02</data>
+    <conteudo>
+        <secao id="1">
+            <nome>Introdução</nome>
+            <texto>Este é um documento XML de teste para validar a extração de texto.</texto>
+        </secao>
+        <secao id="2">
+            <nome>Dados</nome>
+            <item>Valor A: 100</item>
+            <item>Valor B: 200</item>
+            <item>Valor C: 300</item>
+        </secao>
+        <secao id="3">
+            <nome>Conclusão</nome>
+            <texto>O sistema deve extrair todo o texto contido neste XML.</texto>
+        </secao>
+    </conteudo>
+</documento>

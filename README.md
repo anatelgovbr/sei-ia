@@ -1,55 +1,95 @@
 # Servidor de Soluções de IA do Módulo SEI IA
 
 O *Servidor de Soluções de IA* contém as ferramentas necessárias para o funcionamento do [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia), composto, de forma simplificada, pelos sub-módulos:
-- SEI-IA-SIMILARIDADE: Responsável pela recomendação de processos similares e de documentos similares;
-- SEI-IA-ASSISTENTE: Responsável pelo Assistente baseado em Inteligência Artificial Generativa (GenAI), para executar *prompts* dos usuários e interagir com documentos do SEI.
+
+- **SEI-IA-SIMILARIDADE** — recomendação de processos similares e de documentos similares.
+- **SEI-IA-ASSISTENTE** — Assistente baseado em Inteligência Artificial Generativa (GenAI), para executar prompts dos usuários e interagir com documentos do SEI.
+- **SEI-IA-ETL-AIRFLOW** — orquestração das tarefas de indexação e geração de embeddings.
 
 ## Orientações Preliminares
 
-A instalação do *Servidor de Soluções de IA* foi projetada para ser simples, automatizando todos os procedimentos possíveis. No entanto, há alguns procedimentos que, por questões de segurança ou por estarem relacionados ao ambiente onde a instalação é realizada, precisam ser realizados manualmente pelo administrador do ambiente computacional.
+A instalação foi projetada para ser o mais automática possível. Ainda assim, há passos que precisam ser executados manualmente pelo administrador do ambiente, por questões de segurança ou por dependerem de informações específicas da rede do órgão.
 
-Para melhor entendimento do manual, é **mandatório** que seja feita uma leitura integral deste README e do **[Manual de Instalação](docs/INSTALL.md)** antes de iniciar a instalação do *Servidor de Soluções de IA*, pois dúvidas que possam surgir no início da instalação podem ser esclarecidas ao longo da leitura das demais orientações contidas nos citados documentos.
+> **Antes de começar, leia integralmente este README e o [Manual de Instalação](docs/INSTALL.md)**. Dúvidas que surgirem no início podem ser esclarecidas ao longo do material.
 
-- **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
+- **ATENÇÃO**: o servidor de SEI IA **não deve ser compartilhado** com outras soluções.
+- **ATENÇÃO**: para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.
 
-## Repositorio
+## Estrutura do Repositório
 
-Este repositório no GitHub é o local oficial onde será mantido todo o desenvolvimento do *Servidor de Soluções de IA* do Módulo SEI IA.
+A partir desta versão, este repositório passou a ser um **monorepo**: o código-fonte de todas as aplicações (Assistente, Similaridade, ETL/Airflow) está versionado junto com a configuração do `docker compose`.
+
+- **Build local** — as imagens são construídas no servidor a partir do código desta release.
+
+O procedimento está documentado no [Manual de Instalação](docs/INSTALL.md). Esta release distribui código-fonte; não publica imagens de container.
+
+```
+sei-ia/
+├── aplicacoes/                      # Código-fonte das aplicações
+│   ├── assistente/
+│   ├── similaridade/
+│   └── etl-airflow/
+├── ops/                             # Suporte de infraestrutura (Solr, Postgres, healthchecker)
+├── docs/                            # Manuais de instalação e atualização
+├── docker-compose.yml               # Stack principal
+├── docker-compose.debug.yml         # Portas locais opcionais para diagnóstico
+├── default.env                      # Variáveis NÃO sensíveis (versionado)
+├── security_example.env             # Modelo de variáveis sensíveis
+├── litellm_config.template.yaml     # Modelo da config dos modelos LLM
+└── Makefile                         # Atalhos make up / make down / make check
+```
 
 ## Requisitos Mínimos
 
-Os requisitos aqui apresentados são exclusivamente relacionados ao *Servidor de Soluções de IA*, não se confundindo com a infraestrutura alocada para o core do SEI ou seus módulos.
+Os requisitos abaixo se referem **apenas** ao Servidor de Soluções de IA — não se confundem com a infraestrutura alocada ao SEI.
 
-O *Servidor de Soluções de IA* é baseado em Docker, com todos os containers instalados e executados em um *Docker Host* de um servidor Linux. Não recomendamos a utilização de servidores Windows com WSL em ambiente produtivo.
+O servidor é baseado em Docker. Recomendamos servidor Linux. **Não recomendamos Windows com WSL em produção.**
 
-O *Docker Host* deve atender aos requisitos mínimos descritos abaixo:
 - **Docker**:
-  - Docker Engine (versão >= 27.1.1).
-  - Docker Compose (versão >= 2.29).
-- **Servidor Linux com**:
-  - **CPU**: 16 cores com 2.10GHz.
-  - **RAM**: 128 GB.
+  - Docker Engine ≥ 27.1.1
+  - Docker Compose ≥ 2.29
+  - Docker Buildx ≥ 0.13
+- **Servidor Linux** (referência da Anatel em produção):
+  - **CPU**: 16 cores @ 2.10 GHz
+  - **RAM**: 128 GB
+  - **Disco**: 450 GB
+- **Conjunto compatível desta candidata**:
+  - SEI **5.0.4.22**.
+  - Módulo SEI IA **1.5.0**.
+  - Servidor de Soluções de IA **1.3**.
 
- **Requisito Mínimo do SEI**:
-  - Versão v4.1.5
-  - Não é compatível com versões anteriores do SEI.
-  - Para utilizar versões mais recentes do SEI, é necessário conferir previamente a compatibilidade.
-  - **Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente.**
- > Observação:
- > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
+> **Realidade de cada órgão**: Solr e PostgreSQL crescem proporcionalmente ao volume de documentos do SEI. Cada órgão deve dimensionar conforme seu próprio volume.
 
 ## Download
 
-O download do pacote de instalação do *Servidor de Soluções de IA* deve ser obtido na [seção Releases deste projeto no GitHub](https://github.com/anatelgovbr/sei-ia/releases).
+O download do pacote de instalação deve ser obtido na [seção Releases deste projeto](https://github.com/anatelgovbr/sei-ia/releases).
+
+Alternativamente, é possível clonar o repositório em uma tag estável:
+
+```bash
+git clone --branch <tag> --single-branch https://github.com/anatelgovbr/sei-ia.git /opt/sei-ia
+```
 
 ## Instalação
 
-As instruções de instalação podem ser encontradas na pasta `docs/` ou diretamente em **[Manual de Instalação](docs/INSTALL.md)**.
+As instruções completas de instalação estão em **[docs/INSTALL.md](docs/INSTALL.md)**.
+
+Resumo dos passos principais:
+
+1. Preparar usuário, pastas e Docker no servidor.
+2. Criar a rede Docker dedicada (`docker-host-bridge`).
+3. Clonar o repositório em `/opt/sei-ia`.
+4. Preparar o builder do Docker (Buildx + DNS).
+5. Configurar `security.env` (a partir de `security_example.env`).
+6. Configurar `litellm_config.yaml` (a partir de `litellm_config.template.yaml`).
+7. Subir a stack: `make up`.
+8. Configurar a integração HTTPS com o SEI.
+9. Validar: `make check`.
 
 ## Atualização
 
-As instruções de atualização de versão podem ser encontradas na pasta `docs/` ou diretamente em **[Guia de Atualização do Servidor de Soluções de IA do módulo SEI IA](docs/UPGRADE.md)**.
+As instruções de atualização de versão estão em **[docs/UPGRADE.md](docs/UPGRADE.md)**.
 
 ## Suporte
 
-Em caso de dúvidas ou problemas, abra uma issue em: [https://github.com/anatelgovbr/sei-ia/issues](https://github.com/anatelgovbr/sei-ia/issues)
+Em caso de dúvidas ou problemas, abra uma issue em <https://github.com/anatelgovbr/sei-ia/issues>.

@@ -1,0 +1,280 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "assistente"
+version = "0.9.0"
+description = "Assistente Virtual"
+authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    "fastapi[standard]==0.115.8",
+    "uvicorn==0.30.5",
+    "python-dotenv==1.0.1",
+    "langchain-core>=1.4.7,<2.0.0",
+    "langchain>=1.3.9,<2.0.0",
+    "langchain-openai==1.2.2",
+    "deepagents>=0.6.10,<0.7.0",
+    "langgraph-checkpoint-postgres>=3.0.0,<4.0.0",
+    "psycopg[binary]>=3.3,<4.0.0",
+    "litellm==1.63.14",
+    "tiktoken==0.13.0",
+    "openai==2.38.0",
+    "pydantic-settings==2.7.1",
+    "pydantic==2.9.2",
+    "beautifulsoup4==4.12.3",
+    "html5lib>=1.1",
+    "SQLAlchemy>=2.0.0",
+    "pandas==2.2.2",
+    "psycopg2-binary==2.9.9",
+    "cryptography==44.0.0",
+    "pgvector==0.2.5",
+    "zeep==4.2.1",
+    "defusedxml>=0.7.1",
+    "langfuse==3.9.3",
+    "jsonschema==4.26.0",
+    "timeout_decorator==0.5.0",
+    "starlette==0.45.3",
+    "gunicorn==23.0.0",
+    "tabulate==0.9.0",
+    "odfpy==1.4.1",
+    "openpyxl==3.1.5",
+    "python-calamine==0.3.1",
+    "func_timeout==4.3.5",
+    "backoff==2.2.1",
+    "duckduckgo_search==7.3.0",
+    "httpx>=0.27.0",
+    "asyncpg==0.30.0",
+    "python-settings==0.2.3",
+    "langgraph>=1.2.5,<2.0.0",
+    "langgraph-checkpoint>=4.1.0,<5.0.0",
+    "langgraph-prebuilt>=1.1.0,<2.0.0",
+    "langgraph-sdk>=0.4.2,<0.5.0",
+    "langsmith>=0.8.11",
+    "opentelemetry-instrumentation-httpx>=0.50b0",
+    "pymupdf>=1.26.3",
+    "nest-asyncio>=1.6.0",
+    "docling>=1.16.0",
+    "unstructured[all-docs]>=0.16.0",
+    "torch>=2.7.0,<3.0.0",
+    "torchvision>=0.22.0,<1.0",
+    "redis[hiredis]==5.0.8",
+    "langchain-text-splitters>=1.0,<2.0",
+    "sei-extraction[extract]",
+    "sei-api",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "async-timeout>=5.0.1",
+    "flake8",
+    "flake8-cognitive-complexity",
+    "pytest>=6.0",
+    "pytest-xdist",
+    "coverage==7.11.0",
+    "pytest-cov==7.0.0",
+    "ruff==0.14.10",
+    "requests-mock",
+    "pytest-mock",
+    "taskipy",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pytest-asyncio==1.2.0",
+    "responses==0.25.8",
+    "respx==0.21.1",
+    "testcontainers>=4.13.2",
+]
+
+otel = [
+    'Deprecated==1.2.16',
+    'importlib_metadata==8.5.0',
+    'opentelemetry-api==1.33.1',
+    'opentelemetry-distro==0.54b1',
+    'opentelemetry-instrumentation==0.54b1',
+    'opentelemetry-sdk==1.33.1',
+    'opentelemetry-semantic-conventions==0.54b1',
+    'opentelemetry-exporter-otlp==1.33.1',
+    'opentelemetry-instrumentation-fastapi==0.54b1',
+    'opentelemetry-instrumentation-requests==0.54b1',
+    'opentelemetry-instrumentation-sqlalchemy==0.54b1',
+    'opentelemetry-instrumentation-logging==0.54b1',
+    'opentelemetry-instrumentation-httpx==0.54b1',
+    'zipp==3.21.0'
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sei_ia*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = [
+    "--cov=sei_ia",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=json",
+    "--cov-report=xml",
+    "--cov-config=pyproject.toml",
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["sei_ia"]
+parallel = true
+concurrency = ["multiprocessing", "thread"]
+disable_warnings = ["no-data-collected"]
+omit = [
+    "*/tests/*",
+    "*/.conda/*",
+    "*/conftest.py",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
+skip_empty = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.taskipy.tasks]
+pre-commit = """
+set -e
+ruff check --statistics .
+ruff format --check .
+python scripts/check_coverage_gate.py --min-coverage=80 --new-code-base=${COVERAGE_NEW_CODE_BASE:-origin/dev} -- tests/unit
+"""
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort (imports organizados)
+    "B",    # flake8-bugbear (pega bugs comuns)
+    "UP",   # pyupgrade (mantém sintaxe moderna)
+    "SIM",  # flake8-simplify (sugere simplificações)
+    "C4",   # flake8-comprehensions (otimiza loops)
+    "RUF",  # ruff-specific: RUF029 async sem await
+    "ERA",  # eradicate: ERA001 codigo comentado
+    "ARG",  # flake8-unused-arguments: ARG001/ARG002 parametros nao usados
+    "FURB", # refurb: FURB167 re.sub onde str.replace resolve
+    "C90",  # mccabe: C901 complexidade ciclomatica (proxy cognitiva)
+    "TRY",  # flake8-try-except-raise: TRY002/BLE001 excecoes genericas
+    "PLR",  # pylint refactoring: PLR0912/PLR0915/PLR0911 muitos branches/returns
+    "S",    # flake8-bandit: S324 hash inseguro (→ S4790), S608 SQL injection (→ S3649)
+]
+
+ignore = [
+    "E501",    # tamanho de linha (deixe o formatter cuidar)
+    "TRY003",  # mensagens longas em raise (muito verboso na pratica)
+    "TRY301",  # raise dentro de try (padrao comum no projeto)
+    "TRY300",  # mover return para else: preferência de estilo, não obrigatorio
+    "TRY400",  # logger.error vs logger.exception: decisão intencional da equipe
+    "PLR0913", # muitos argumentos em funcao (comum em handlers)
+    "PLR2004", # magic values (muito ruido em codigo existente)
+    "ERA001",  # codigo comentado: muitos blocos de fallback intencionais no projeto
+    "RUF100",  # noqa nao usada: evita ciclo com ERA001 cujo contexto muda com noqa
+    # bandit S — regras que não se aplicam ou são intencionais neste projeto
+    "S101",  # assert: aceito em helpers de teste (debug.py)
+    "S105", "S106", "S107",  # hardcoded password: falso positivo em nomes de vars de config
+    "S110",  # try-except-pass: intencional no crawl JSON (best-effort parsing)
+    "S113",  # requests sem timeout: coberto pelo hook S7483
+    "S310",  # audit url open: falso positivo em URLs internas
+    "S501",  # requests verify=False: intencional (certificados auto-assinados SEI)
+]
+
+[tool.ruff.lint.mccabe]
+# Espelha o quality gate do SonarQube para Cognitive Complexity (python:S3776).
+# O Ruff não calcula Cognitive Complexity do Sonar, mas esse limite local reduz
+# a chance de subir funções complexas demais antes do scan do Sonar.
+max-complexity = 15
+
+[tool.flake8]
+max-cognitive-complexity = 15
+select = ["CCR"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.lint.per-file-ignores]
+# Testes podem ter imports após configuração de mocks/fixtures
+"tests/**/test_*.py" = ["E402"]
+"tests/**/conftest.py" = ["E402"]
+# Variáveis não usadas em testes podem ser intencionais (debugging, documentação)
+# Fixtures pytest e fakes podem exigir assinaturas/atributos que Ruff não enxerga.
+"tests/**/*.py" = ["ARG001", "ARG002", "ARG005", "F841", "RUF001", "RUF012", "RUF059", "TRY002", "S101", "S105", "S106", "S108", "S311", "S603", "S606", "S607", "S608"]
+# Scripts de dev usam subprocess com argumentos controlados — não há risco real de injection.
+"scripts/*.py" = ["S603", "S606", "S607"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# Configuração uv para usar PyTorch CPU-only (sem CUDA/nvidia)
+# Reduz .venv de ~7.5GB para ~1.5GB
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+sei-extraction = { path = "../../libs/sei_extraction", editable = true }
+sei-api = { path = "../../libs/sei_api", editable = true }
+
+[dependency-groups]
+ # Ferramentas usadas apenas na camada efemera dos jobs que executam uma imagem
+ # candidata. O ambiente de runtime nao recebe estas dependencias.
+ci-test = [
+    "flake8==7.3.0",
+    "flake8-cognitive-complexity==0.1.0",
+    "pytest==8.4.1",
+    "pytest-asyncio==1.2.0",
+    "pytest-cov==7.0.0",
+    "pytest-mock==3.15.1",
+    "pytest-xdist==3.8.0",
+    "responses==0.25.8",
+    "respx==0.21.1",
+]
+dev = [
+    "flake8>=7.3.0",
+    "flake8-cognitive-complexity>=0.1.0",
+    "ipython>=9.12.0",
+    "pre-commit>=4.5.1",
+    "pytest-asyncio>=1.2.0",
+    "responses==0.25.8",
+    "respx==0.21.1",
+    # Necessário pelos testes de integração que sobem Postgres e Redis via Docker.
+    "rich>=14.3.1",
+    "testcontainers>=4.13.2",
+]

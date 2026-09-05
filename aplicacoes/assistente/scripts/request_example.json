@@ -1,0 +1,9 @@
+{
+  "id_usuario": 1,
+  "id_topico": 1,
+  "text": "Oi",
+  "system_prompt": "Você é um assistente útil. Responda de forma breve.",
+  "use_thinking": false,
+  "use_websearch": false,
+  "id_procedimentos": []
+}

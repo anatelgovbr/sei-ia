@@ -1,0 +1,2 @@
+Hello world
+Sample fixture for plain text extraction.

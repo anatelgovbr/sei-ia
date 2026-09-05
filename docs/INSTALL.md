@@ -1,1103 +1,777 @@
 # Instalação do Servidor de Soluções de IA do módulo SEI IA
 
-- Este guia descreve os procedimentos para instalação do *Servidor de Soluções de IA* do módulo SEI IA, em um ambiente Linux.
-- É importante observar que este manual não tem como objetivo fornecer conhecimento sobre as tecnologias adotadas. Para isto recomendamos buscar fontes mais apropriadas.
-- Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
-- **Para atualização de versão**, seguir o [Guia de Atualização do Servidor de Soluções de IA do módulo SEI IA](UPGRADE.md).
-- **ATENÇÃO:** O Servidor a ser instalado NÃO DEVE ser compartilhado com outras soluções.
-- **ATENÇÃO:** Na seção [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente) temos um detalhamento de como usar os testes automatizados para validar a conformidade da instalação e configuração, nesta seção também orientamos como deve ser feita a leitura dos logs que indicarão eventuais erros e necessidades de ajustes para a total conformidade da instalação e configuração.
+- Este guia descreve a instalação nova, por código-fonte, do *Servidor de Soluções
+  de IA* do módulo SEI IA em um servidor Linux dedicado.
+- Para instalar o servidor é obrigatório ter o Módulo SEI IA previamente instalado
+  e configurado no SEI e no SIP do ambiente correspondente.
+- Execute as etapas na ordem apresentada e use os arquivos da mesma tag. Não misture
+  `default.env`, `security_example.env`, `litellm_config.template.yaml` ou arquivos
+  Compose de versões diferentes.
+- **Para atualizar uma instalação existente**, siga o
+  [Guia de Atualização](UPGRADE.md). Uma instalação 1.2.x deve usar
+  o [procedimento específico de 1.2.x para 1.3](upgrades/1.2-to-1.3.md),
+  que preserva configurações e dados.
+- **ATENÇÃO:** o servidor não deve ser compartilhado com outras soluções. O
+  dimensionamento e os limites versionados consideram o uso dedicado pela stack.
+- **ATENÇÃO:** a instalação somente é considerada concluída quando `make check`
+  termina sem erros e o Assistente responde pela interface do SEI.
 
 ---
+
 ## Sumário
 
-- [Instalação do Servidor de Soluções de IA do módulo SEI IA](#instalação-do-servidor-de-soluções-de-ia-do-módulo-sei-ia)
-  - [Pré-requisitos](#pré-requisitos)
-  - [Passos para Instalação](#passos-para-instalação)
-  - [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente)
-  - [Testes de Acessos](#testes-de-acessos)
-  - [Mapeamento da Integração no SEI](#mapeamento-da-integração-no-sei)
-  - [Resolução de Problemas Conhecidos](#resolução-de-problemas-conhecidos)
-  - [Pontos de Atenção para Escalabilidade](#pontos-de-atenção-para-escalabilidade)
-  - [Backup periódico dos dados do Servidor de Soluções de IA](#backup-periódico-dos-dados-do-servidor-de-soluções-de-ia)
-  - [Guia de utilização de certificado SSL proprietário](#guia-de-utilização-de-certificado-ssl-proprietário)
-  - [Anexos](#anexos)
+- [1. Pré-requisitos](#1-pré-requisitos)
+  - [1.1. Versões homologadas](#11-versões-homologadas)
+  - [1.2. Instalação do SEI e do Módulo SEI IA](#12-instalação-do-sei-e-do-módulo-sei-ia)
+  - [1.3. Servidor e recursos](#13-servidor-e-recursos)
+  - [1.4. Configurações na rede local do órgão](#14-configurações-na-rede-local-do-órgão)
+- [2. Passos para instalação](#2-passos-para-instalação)
+  - [2.1. Criar usuário, diretórios e rede Docker](#21-criar-usuário-diretórios-e-rede-docker)
+  - [2.2. Baixar uma tag estável](#22-baixar-uma-tag-estável)
+  - [2.3. Definir os parâmetros locais no `default.env`](#23-definir-os-parâmetros-locais-no-defaultenv)
+  - [2.4. Configurar o `security.env`](#24-configurar-o-securityenv)
+    - [2.4.1. Criar e proteger o arquivo](#241-criar-e-proteger-o-arquivo)
+    - [2.4.2. Serviços internos](#242-serviços-internos)
+    - [2.4.3. LiteLLM e provedores de modelos](#243-litellm-e-provedores-de-modelos)
+    - [2.4.4. Integrações e recursos opcionais](#244-integrações-e-recursos-opcionais)
+    - [2.4.5. Escolha do DNS do gateway](#245-escolha-do-dns-do-gateway)
+    - [2.4.6. Exemplo completo](#246-exemplo-completo)
+    - [2.4.7. Validar o contrato](#247-validar-o-contrato)
+- [3. Configuração dos modelos LLM e LiteLLM](#3-configuração-dos-modelos-llm-e-litellm)
+  - [3.1. Prepare o LiteLLM](#31-prepare-o-litellm)
+    - [3.1.1. Credenciais do LiteLLM](#311-credenciais-do-litellm)
+  - [3.2. Descrição dos agentes e seus modelos](#32-descrição-dos-agentes-e-seus-modelos)
+- [4. Configuração do certificado HTTPS](#4-configuração-do-certificado-https)
+  - [4.1. Certificado gerado automaticamente](#41-certificado-gerado-automaticamente)
+  - [4.2. Certificado emitido pela PKI do órgão](#42-certificado-emitido-pela-pki-do-órgão)
+- [5. Executar o deploy](#5-executar-o-deploy)
+- [6. Configuração da confiança TLS no SEI](#6-configuração-da-confiança-tls-no-sei)
+  - [6.1. SEI e SEI IA no mesmo host Docker](#61-sei-e-sei-ia-no-mesmo-host-docker)
+  - [6.2. SEI e SEI IA em hosts diferentes](#62-sei-e-sei-ia-em-hosts-diferentes)
+- [7. Mapeamento da integração no SEI](#7-mapeamento-da-integração-no-sei)
+- [8. Health Checker geral do ambiente](#8-health-checker-geral-do-ambiente)
+- [9. Resolução de problemas conhecidos](#9-resolução-de-problemas-conhecidos)
+- [10. Dimensionamento](#10-dimensionamento)
 
-## Pré-requisitos
+---
 
-Os pré-requisitos aqui apresentados foram testados no ambiente da Anatel, considerando os dados e a carga de trabalho da Anatel. Outras configurações de alocação de recursos podem ser avaliadas por pessoas devidamente capacitadas.
+## 1. Pré-requisitos
 
-- **CPU**:
-  - Provisionado: 16 Cores com 2.10GHz
-  - Consumo na ANATEL (Produção):
-    - médio: 60%
-    - máximo: 100%
+### 1.1. Versões homologadas
 
-- **Memória**:
-  - Provisionado: 128GB
-  - Consumo na ANATEL (Produção):
-    - mínimo: 64GB
-    - máximo: 115GB
+Instale as três versões como um conjunto:
 
-- **Espaço em Disco**:
-  - Provisionado: 450GB.
-  - Consumo na ANATEL (Produção):
-      | Aplicação  | Caminho                                          | Tamanho em disco |
-      |------------|--------------------------------------------------|------------------|
-      | Solr       | /var/lib/docker/volumes/sei_ia_solr-db-volume    | 100 GB           |
-      | PostgreSQL | /var/lib/docker/volumes/sei_ia_pgvector-db-volume-all | 300 GB      |
-      | Docker     | /var/lib/docker/                                 | 50 GB            |
+| Componente | Versão |
+|---|---:|
+| SEI | 5.0.4.22 |
+| Módulo SEI IA | 1.5.0 |
+| Servidor de Soluções de IA | 1.3 |
 
-- **ATENÇÃO**: As informações acima sobre **"Consumo na ANATEL (Produção)"**, em 04/11/2024, possuem como contexto os números abaixo do SEI de Produção na Agência:
-  - **Quantidade de Processos**: 1.5 milhão
-  - **Quantidade de Documentos Gerados** (Editor do SEI - salvos no banco): 4.2 milhões
-  - **Quantidade de Documentos Externos** (Filesystem do SEI): 8 milhões
-  - **Usuários Internos**: cerca de 1.800, dentre servidores públicos e colaboradores em geral
-> **Realidade de Cada Órgão**:
->  - A partir dos dados acima, cada órgão deve avaliar o ambiente do SEI e prever recursos proporcionais, especialmente sobre o Solr e o PostgreSQL, pois essas duas aplicações na arquitetura apresentam crescimento diretamente proporcional ao volume de documentos existentes no ambiente do SEI.
-> - Ao final deste Manual são fornecidas algumas dicas de escalabilidade para ajustar o sistema conforme a demanda.
+### 1.2. Instalação do SEI e do Módulo SEI IA
 
-### Configurações na Rede Local do Órgão
+Instale o SEI `5.0.4.22` conforme seu manual oficial. Baixe o Módulo SEI IA `1.5.0`
+em [Releases do módulo](https://github.com/anatelgovbr/mod-sei-ia/releases) e siga o
+README incluído no pacote. O procedimento do módulo é a fonte de verdade para a
+instalação no SEI e no SIP.
 
-Para garantir a comunicação entre os serviços do *Servidor de Soluções de IA* e o SEI, são necessárias as seguintes permissões de conexões de rede:
+Os pontos que devem estar concluídos antes de instalar este servidor são:
 
-1. **Do Servidor de Soluções de IA para o SEI**:
-   - **HTTP do SEI**: Permissão de acesso ao host e porta do SEI, para permitir acesso ao Webservice do Módulo SEI IA (p. ex., 192.168.2.17:8000).
+1. conferir no módulo os requisitos de PHP, extensões e PyMuPDF;
+2. copiar os arquivos do módulo para as árvores correspondentes do SEI e do SIP;
+3. declarar `'IaIntegracao' => 'ia'` na lista `Modulos` de
+   `ConfiguracaoSEI.php`, preservando o charset do arquivo;
+4. confirmar o módulo em **Infra > Módulos**;
+5. executar os scripts `sip_atualizar_versao_modulo_ia.php` e
+   `sei_atualizar_versao_modulo_ia.php` com o PHP CLI correto;
+6. confirmar que os dois scripts terminam com `FIM`, sem erros;
+7. confirmar `VERSAO_MODULO_IA=1.5.0` tanto no SEI quanto no SIP;
+8. disponibilizar os recursos do módulo aos perfis que utilizarão o Assistente.
 
-2. **Do servidor do SEI para o Servidor de Soluções de IA**:
-   - **Portas Necessárias**:
-      - **Airflow**: Porta 8081
-        - Também pode ser liberada a conexão para o Administrador do ambiente computacional do SEI, para ter acesso às DAGS das tasks de toda a arquitetura de Soluções de IA.
-      - **API SEI IA**: Porta 8082
-      - **API SEI IA Feedback**: Porta 8086
-      - **API SEI IA Assistente**: Porta 8088
+A configuração do hostname das integrações e do certificado será concluída depois
+que o gateway estiver em execução.
 
-As configurações de rede acima são mandatórias para o funcionamento correto dos sub-módulos de recomendação de processos/documentos e do Assistente.
+### 1.3. Servidor e recursos
 
-**ATENÇÃO**: Se as configurações de conexões na rede local do órgão não forem efetivadas, conforme acima, antes dos "Passos para Instalação", abaixo, e não for garantido que estão funcionando adequadamente, poderá ter problemas no meio do deploy do servidor ou durante o funcionamento de algumas das aplicações. Assim que criadas as conexões indicadas, é importante testá-las a partir do servidor correspondente, antes de seguir para os "Passos para Instalação". Seguir para a instalação somente depois que confirmar que as conexões em ambos os sentidos estiverem efetivamente funcionando.
+Use um servidor Linux dedicado. O ambiente de referência possui 16 vCPUs, 128 GB
+de RAM e 450 GB de disco. A infraestrutura do SEI não está incluída nesses valores.
 
-## Passos para Instalação
-
-Antes de começar a instalação, certifique-se de que os seguintes pacotes estejam instalados no Linux do servidor:
-- Docker Engine (versão >= 27.1.1).
-- Docker Compose (versão >= 2.29).
-
-Caso não estejam instalados, consulte o pequeno tutorial de instalação do Docker na seção de [Anexos](#anexos) deste Manual.
-- Também é possível seguir a documentação oficial do Docker para a instalação do [Docker Engine](https://docs.docker.com/engine/install/) e do [Docker Compose](https://docs.docker.com/compose/install/), desde que observados os requisitos de compatibilidade com as versões docker e docker compose homologadas para o SEI IA.
-
-> **Observação**:
-> - Todos os comandos ilustrados neste Manual são exemplos de comandos executados via terminal/console/CLI.
-
-1. **Criar o usuário:**
+Instale e valide:
 
 ```bash
-sudo useradd -m -s /bin/bash -u 4000 seiia
+git --version
+make --version
+openssl version
+docker version
+docker compose version
+docker buildx version
 ```
 
-Atualize a senha do usuario com o comando
+Versões mínimas: Docker Engine 27.1.1, Compose 2.29 e Buildx 0.13. O Docker deve ser
+rootful: o checker usa o socket local para validar os contêineres.
+
+### 1.4. Configurações na rede local do órgão
+
+O servidor precisa de:
+
+- saída HTTPS e DNS para baixar o código, imagens base e dependências de build;
+- relógio sincronizado por NTP;
+- portas `8088/tcp`, `8082/tcp` e `8086/tcp` livres para o gateway;
+- porta `8081/tcp` livre no loopback para a interface administrativa do Airflow;
+- um hostname DNS reservado para o gateway, por exemplo
+  `seiia.producao.orgao.gov.br`.
+
+Verifique conflitos antes da instalação:
 
 ```bash
-sudo passwd seiia
+ss -ltn | grep -E ':(8088|8082|8086|8081)\b' || true
+docker network ls
+df -h /opt /var
+free -h
 ```
 
-2. **Adicionar o usuário ao grupo docker:**
+As permissões mínimas de rede são:
+
+| Origem | Destino | Porta/protocolo | Finalidade |
+|---|---|---|---|
+| Servidor SEI IA | SEI | HTTP ou HTTPS do SEI | consumo do Webservice do Módulo SEI IA |
+| Nós PHP do SEI | Gateway SEI IA | `8088/tcp` | Assistente |
+| Nós PHP do SEI | Gateway SEI IA | `8082/tcp` | Similaridade |
+| Nós PHP do SEI | Gateway SEI IA | `8086/tcp` | Feedback |
+| Administradores autorizados | Servidor SEI IA | `8081/tcp` no loopback/túnel | interface administrativa do Airflow |
+| Servidor SEI IA | Internet ou repositórios internos aprovados | HTTPS e DNS | código-fonte, imagens base, pacotes e provedores de modelos |
+
+As portas HTTPS devem aceitar conexões somente dos servidores do SEI e dos pontos
+administrativos autorizados. A interface do Airflow é publicada apenas em
+`127.0.0.1:8081`; para administração remota, use túnel SSH ou um acesso controlado
+equivalente.
+
+Antes de seguir, valide DNS, rota, firewall e o acesso ao provedor de modelos a
+partir do servidor. Uma credencial correta não resolve um endpoint que o host não
+alcança.
+
+## 2. Passos para instalação
+
+### 2.1. Criar usuário, diretórios e rede Docker
+
+Os valores versionados usam o usuário `seiia` com UID/GID `4000`. Antes de criá-lo,
+confirme que esses IDs estão livres:
 
 ```bash
-sudo usermod -aG docker seiia
+getent passwd 4000 || true
+getent group 4000 || true
 ```
 
-3. **Adicionar o usuário ao grupo root:**
+Se houver conflito, escolha IDs livres e atualize `NB_UID` e `NB_GID` em
+`default.env` antes do primeiro `make up`.
 
-Nesse caso deve-se atentar ao sistema operacional usado.
-
-**Debian/Ubuntu**
+Exemplo com os valores padrão:
 
 ```bash
-sudo usermod -aG sudo seiia
+sudo useradd --create-home --shell /bin/bash --uid 4000 seiia
+sudo usermod --append --groups docker seiia
+sudo install --directory --owner=seiia --group=docker --mode=0750 /opt/sei-ia
+sudo install --directory --owner=seiia --group=docker --mode=0750 /var/seiia/volumes
 ```
 
-**RHEL/CentOS/Fedora**
+Encerre e abra novamente a sessão do usuário para aplicar o grupo `docker`. Confirme
+sem `sudo`:
 
 ```bash
-sudo usermod -aG wheel seiia
+docker info >/dev/null
 ```
 
-4. **Criar as pastas necessárias:**
+Crie a rede externa usada pela stack. Não fixe um subnet sem antes verificar as
+redes corporativas, VPNs e redes Docker existentes. Consulte a equipe de redes e
+liste rotas e subnets já utilizadas:
 
 ```bash
-sudo mkdir -p /opt/seiia/volumes
+ip route
+docker network ls -q | xargs -r docker network inspect \
+  --format '{{.Name}}: {{range .IPAM.Config}}{{.Subnet}} {{end}}'
 ```
 
-5. **Corrigir as permissoes de pastas:**
+Quando a equipe fornecer uma faixa aprovada, crie a rede com `--subnet` e
+`--gateway`:
 
 ```bash
-sudo chown -R seiia:docker /opt/seiia/volumes
+docker network create --driver bridge \
+  --subnet <SUBNET_APROVADA> --gateway <GATEWAY_APROVADO> \
+  docker-host-bridge
 ```
 
-6. **Acessar o usuario:**
-
-Antes de iniciar a instalação tenha certeza de que está no usuário correto.
+Se o órgão optar pela alocação automática, use o comando abaixo, inspecione a faixa
+escolhida pelo Docker e confirme que ela não se sobrepõe à LAN, VPN ou redes de
+outros hosts antes de iniciar a stack:
 
 ```bash
-su seiia
+docker network create --driver bridge docker-host-bridge
+docker network inspect docker-host-bridge
 ```
 
-7. **Iniciar o Docker:**
+Se o órgão usar outro nome, altere somente `COMPOSE_NETWORK_NAME` em `default.env`.
+O nome precisa corresponder a uma rede externa já existente.
 
-   Inicie o serviço do Docker.
+Em hosts com SELinux enforcing, rotule `/var/seiia/volumes`, `/opt/sei-ia/.runtime`
+e os arquivos de configuração para uso por contêineres conforme a política do
+órgão. Não desabilite o SELinux para contornar erros de permissão.
 
-   ```bash
-   sudo systemctl start docker
-   docker --version # deve aparecer algo como Docker version 27.2.0, build 3ab4256
-   ```
+### 2.2. Baixar uma tag estável
 
-8. **Criar a rede Docker**
-
-   O Docker utiliza como default a faixa de IP `172.17.*.*`, que pode ser utilizada internamente por uma organização e causar conflitos. Desta forma, se faz necessária a utilização de uma faixa de IPs dedicadas para os containers Docker rodando no Servidor, com objetivo de evitar erros de roteamento causados pela sobreposição de endereços IP.
-
-   A restrição da subnet deve ser feita através da criação de *user defined bridge network*. Também deve remover a default bridge, como forma de evitar o uso de uma bridge fora da subnet, dado que novos containers adotam a default bridge por padrão se uma rede não for especificada e se a default bridge estiver disponível.
-
-   Para os seguintes procedimentos, é necessário assegurar que o Docker está instalado e parado.
-
-   ```bash
-   sudo systemctl stop docker
-   ```
-
-   A remoção da default bridge é feita através de uma configuração do daemon.json, através de:
-
-   ```bash
-   sudo vim /etc/docker/daemon.json
-   ```
-
-   Deve ser configurado o daemon.json com o seguinte conteúdo:
-
-   ```bash
-   {
-        "bridge": "none"
-   }
-   ```
-
-   Após a configuração é necessário inicializar o Docker e verificar o resultado obtido:
-
-   ```bash
-   sudo systemctl start docker
-   docker network ls
-   ```
-
-   O resultado deve exibir uma lista de docker networks, sem a presença da bridge, conforme abaixo:
-
-   ```bash
-   NETWORK ID     NAME                 DRIVER    SCOPE
-   7cee8287f256   host                 host      local
-   0355f600e1d7   none                 null      local
-   ```
-
-   O próximo passo é a criação da *user defined bridge network* com a definição da subnet e gateway em conformidade com a política de endereçamento do órgão, semelhante ao comando:
-
-   ```bash
-   docker network create --driver=bridge --subnet=192.168.144.0/24 --ip-range=192.168.144.0/24 --gateway=192.168.144.1 docker-host-bridge
-   ```
-
-   É mandatório que os valores de *--subnet*, *--iprange* e *--gateway* sejam adequadamente definidos pelo órgão, podendo adotar os valores do exemplo acima apenas se houver certeza de inexistência de conflito de endereços.
-
-9. **Clonar o repositório dos códigos-fonte do *Servidor de Soluções de IA***
-
-  > **Observação**:
-  > - Aqui consta apenas um exemplo, fazendo o clone direto de Tag de Release estável do projeto no GitHub para o Servidor. Trocar no comando de exemplo abaixo do `git clone` o trecho `[identificacao_release_estavel]` pela identificação correta da Release estável de interesse, constante na [página de Releases do projeto](https://github.com/anatelgovbr/sei-ia/releases), por exemplo, `v1.0.0`, `v1.0.1`, `v1.2.0` etc.
-> - Contudo, caso o órgão possua procedimentos e ferramentas de deploy próprias para seu ambiente computacional, como GitLab e Jenkins, deve adaptar esse passo aos seus próprios procedimentos.
-> - Alternativamente, é possível fazer o download direto da release e utilizar os seguintes comandos para configuração:
-> ```bash
-> # Coloque o arquivo da release no diretório /opt/sei-ia
-> cd /opt/sei-ia
-> unzip sei-ia-v.1.0.0.zip . # O nome do arquivo pode mudar. ATENÇÃO: para subir o arquivo zip antes no servidor.
-> ```
->   - **Atenção:** mantenha a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
->   - Enquanto o projeto estiver privado no github, para realizar o clone é necessário utilizar as credenciais do usuário do GitHub que possua acesso autorizado no repositório.
-
-   Instale o Git, seguindo os passos da [documentação oficial](https://git-scm.com/downloads/linux) ou da seção de [Anexos deste Manual](#anexos) que orienta a instalar o Git no Servidor.
-
-   ```bash
-   git clone --branch [identificacao_release_estavel] --single-branch git@github.com:anatelgovbr/sei-ia.git
-   cd sei-ia
-   ```
-
-> **Observação**
-> Para clonar o repositório com um usuário específico, enquanto o repositório está privado no GitHub, substitua `USERNAME` pelo usuário autorizado:
-> ```bash
-> git clone --branch [identificacao_release_estavel] --single-branch https://USERNAME@github.com/anatelgovbr/sei-ia.git
-> cd sei-ia
-> ```
-> - Assim que for dado o comando acima, será apresentada linhas de comando solicitando as credenciais de acesso no GitHub do usuário informado, conforme suas configurações pessoais no cadastro dele no GitHub.
-
-
-10. **Configuração do Arquivo env_files/security.env**
-
-O arquivo `env_files/security.env` contém as variáveis de configuração necessárias para o ambiente do Servidor de Soluções de IA do módulo SEI IA.
-
-O repositório disponibiliza um arquivo de exemplo em `env_files/security_example.env`. Para realizar a configuração, crie uma cópia desse arquivo e utilize-a como base para o arquivo final de configuração:
+Execute como o usuário `seiia`:
 
 ```bash
-cp env_files/security_example.env env_files/security.env
-````
+git clone --branch v1.3.0 --single-branch \
+  https://github.com/anatelgovbr/sei-ia.git /opt/sei-ia
+cd /opt/sei-ia
+git status --short
+git describe --tags --exact-match
+```
 
-> ⚠️ Atenção: o arquivo `security.env` contém informações sensíveis.
-> Não versionar este arquivo em repositórios públicos e restrinja as permissões de acesso no servidor.
+O status deve estar limpo e a tag deve ser `v1.3.0`. Não instale diretamente de uma
+branch de trabalho.
 
-As tabelas abaixo foram organizadas com base no novo arquivo `security.env`.
+### 2.3. Definir os parâmetros locais no `default.env`
 
+O arquivo contém somente parâmetros não sensíveis e limites para o ambiente de
+referência. Antes da primeira subida, revise pelo menos:
 
-### Ambiente
+- `NB_USER`, `NB_UID` e `NB_GID`;
+- `VOL_SEIIA_DIR`;
+- `COMPOSE_NETWORK_NAME`;
+- `TZ`;
+- os limites de CPU e memória, apenas se o dimensionamento aprovado pelo órgão for
+  diferente do ambiente de referência.
 
-| Variável              | Descrição | Exemplo |
-|-----------------------|-----------|---------|
-| `GID_DOCKER`         | O GID (Group ID) do grupo Docker no host do ambiente de instalação. Deve ser obtido executando o comando: <code>cat /etc/group &#124; grep ^docker: &#124; cut -d: -f3</code> | 983 |
-| `ENVIRONMENT`        | Indicativo do tipo de ambiente de instalação. Para usuários externos, manter sempre como "prod". Opções disponíveis: dev, homol, prod. | `prod` |
+Não copie limites de um ambiente de laboratório. A soma dos limites e das réplicas
+precisa caber no host dedicado com margem para Docker, kernel, cache de disco e picos
+do Solr.
 
-### Banco de Dados da Aplicação SEI IA
+O `default.env` não recebe credenciais, tokens nem chaves. Esses valores e os
+endpoints específicos do órgão pertencem ao `security.env`, configurado na próxima
+etapa.
 
-| Variável        | Descrição | Exemplo |
-|----------------|-----------|---------|
-| `DB_SEIIA_USER` | Usuário de acesso ao banco de dados PostgreSQL interno do Servidor de IA. | `seiia_user` |
-| `DB_SEIIA_PWD`  | Senha do usuário de banco a ser criado. **Não deve conter**: "`'`" (aspas simples), "`"`" (aspas duplas), "`\`", "` `" (espaço), "`$`", "`(`", "`)`", "`:`", "`@`", "`;`", "`` ` ``" (crase), "`&`", "`*`", "`+`" (mais), "`-`" (menos), "`=`", "`/`", "`?`", "`!`", "`[`", "`]`", "`{`", "`}`", "`<`", "`>`", "`\|`", "`%`", "`^`", "`~`".                   | `iJI_YTuygb`                 |
+### 2.4. Configurar o `security.env`
 
-### Solr da Aplicação SEI IA
+O `security.env` concentra credenciais, nomes de modelos, endpoints de provedores e
+os endereços privados da integração. Ele não é versionado. Preencha-o a partir do
+template da mesma tag e mantenha todas as variáveis declaradas em
+`security_example.env`.
 
-| Variável       | Descrição | Exemplo |
-|---------------|-----------|---------|
-| `SOLR_USER`   | Usuário de acesso ao Solr SEI IA. | `seiia` |
-| `SOLR_PASSWORD` | Senha do usuário de acesso ao Solr SEI IA. | `solr_password` |
+#### 2.4.1. Criar e proteger o arquivo
 
-### Airflow
-
-| Variável                     | Descrição | Exemplo |
-|------------------------------|-----------|---------|
-| `_AIRFLOW_WWW_USER_USERNAME` | Usuário para acesso à UI do Airflow. Não alterar. | `seiia` |
-| `_AIRFLOW_WWW_USER_PASSWORD` | Senha para acesso à UI do Airflow. Não alterar. | `seiia` |
-| `AIRFLOW_POSTGRES_USER` | Usuário de acesso ao PostgreSQL do Airflow. Não alterar. | `seiia` |
-| `AIRFLOW_POSTGRES_PASSWORD` | Senha para acesso ao PostgreSQL do Airflow. Não alterar. | `seiia` |
-| `AIRFLOW_AMQP_USER` | Usuário para acesso ao RabbitMQ do Airflow. Não alterar. | `seiia` |
-| `AIRFLOW_AMQP_PASSWORD` | Senha para acesso ao RabbitMQ do Airflow. Não alterar. | `seiia` |
-| `AIRFLOW__WEBSERVER__SECRET_KEY` | Chave secreta para assinatura de sessões do webserver do Airflow. **Gerada automaticamente pelo script de deploy** caso não esteja definida em `security.env`. | *(auto-gerada)* |
-
-#### Configuração de Modelos LLM - LiteLLM Proxy
-
-**A partir da versão 1.2, o SEI IA usa o LiteLLM Proxy para gerenciar conexões com Azure OpenAI.**
-
-O LiteLLM Proxy centraliza a configuração de todos os modelos de IA em um único arquivo YAML. As chaves de API e endpoints do Azure OpenAI são configurados diretamente neste arquivo.
-
-##### Obter informações do Azure OpenAI
-
-Antes de configurar, obtenha as seguintes informações do Azure Portal para cada modelo:
-
-1. **Acesse o Azure Portal**: https://portal.azure.com
-2. **Navegue até Azure OpenAI**: Busque por "Azure OpenAI" nos recursos
-3. **Selecione seu recurso**: Clique no recurso Azure OpenAI
-4. **Obtenha o Endpoint e API Key**:
-   - Vá em "Keys and Endpoint"
-   - Copie o **Endpoint** (ex: https://meurecurso.openai.azure.com)
-   - Copie a **API Key** (KEY 1 ou KEY 2)
-5. **Obtenha o nome do Deployment**:
-   - Vá em "Model deployments" > "Manage Deployments"
-   - No Azure OpenAI Studio, vá em "Deployments"
-   - Anote o **nome exato** de cada deployment
-
-Você precisará destas informações para **cada modelo** que for usar (standard, mini, think, embedding).
-
-##### Configurar o arquivo `litellm_config.yaml`
-
-O repositório disponibiliza um arquivo de exemplo em `llm_config/litellm_config_example.yaml`. Para realizar a configuração, crie uma cópia desse arquivo e utilize-a como base para o arquivo final de configuração:
+Crie o arquivo e restrinja a leitura:
 
 ```bash
-cp llm_config/litellm_config_example.yaml llm_config/litellm_config.yaml
-````
+cd /opt/sei-ia
+cp security_example.env security.env
+chmod 600 security.env
+```
 
-> ⚠️ Atenção: o arquivo `litellm_config.yaml` contém informações sensíveis.
-> Não versionar este arquivo em repositórios públicos e restrinja as permissões de acesso no servidor.
+Não adicione, remova nem repita nomes de variáveis. As variáveis opcionais continuam
+presentes, com valor vazio. Os textos entre `<` e `>` nas tabelas e no exemplo abaixo
+são marcadores: substitua todos eles pelos valores reais antes do deploy.
 
-Em seguida, edite o arquivo `llm_config/litellm_config.yaml` e preencha as informações necessárias para integração com o Azure OpenAI, como:
+Gere segredos independentes. Exemplos:
+
+```bash
+openssl rand -hex 32
+printf 'sk-%s\n' "$(openssl rand -hex 32)"
+```
+
+Use o primeiro formato para senhas/chaves gerais e o segundo para
+`LITELLM_PROXY_API_KEY` em instalações novas. Não rotacione automaticamente as
+credenciais de uma instalação existente.
+
+#### 2.4.2. Serviços internos
+
+Preencha primeiro as credenciais dos serviços persistentes. Os exemplos não são
+senhas reais.
+
+| Variável | Como preencher | Exemplo |
+|---|---|---|
+| `ENVIRONMENT` | mantenha o contrato externo de produção | `prod` |
+| `DB_SEIIA_USER` | usuário do PostgreSQL/pgvector do SEI IA | `seiia_app` |
+| `DB_SEIIA_PWD` | senha exclusiva do PostgreSQL/pgvector | `<SEGREDO_DB_SEIIA>` |
+| `SOLR_USER` | usuário administrativo do Solr | `seiia` |
+| `SOLR_PASSWORD` | senha exclusiva do Solr | `<SEGREDO_SOLR>` |
+| `AIRFLOW_POSTGRES_DB` | nome do metastore do Airflow | `airflow` |
+| `AIRFLOW_POSTGRES_USER` | usuário do metastore do Airflow | `airflow` |
+| `AIRFLOW_POSTGRES_PASSWORD` | senha exclusiva do metastore | `<SEGREDO_POSTGRES_AIRFLOW>` |
+| `AIRFLOW_AMQP_USER` | usuário do RabbitMQ usado pelo Airflow | `airflow` |
+| `AIRFLOW_AMQP_PASSWORD` | senha exclusiva do RabbitMQ | `<SEGREDO_RABBITMQ>` |
+| `_AIRFLOW_WWW_USER_USERNAME` | usuário inicial da interface administrativa | `seiia_admin` |
+| `_AIRFLOW_WWW_USER_PASSWORD` | senha inicial forte da interface | `<SENHA_UI_AIRFLOW>` |
+| `AIRFLOW__WEBSERVER__SECRET_KEY` | chave de assinatura das sessões; gere com `openssl rand -hex 32` | `<64_HEXADECIMAIS>` |
+
+Em uma atualização, preserve os usuários e senhas que os volumes existentes já
+utilizam. Trocar uma credencial sem migrar o serviço impede a abertura dos dados
+persistentes.
+
+#### 2.4.3. LiteLLM e provedores de modelos
+
+Gere a chave local do proxy com o formato exigido pelo checker:
+
+| Variável | Como preencher | Exemplo |
+|---|---|---|
+| `LITELLM_PROXY_API_KEY` | chave apresentada por Assistente, ETL e checker ao proxy local; gere com `printf 'sk-%s\n' "$(openssl rand -hex 32)"` | `sk-<64_HEXADECIMAIS>` |
+
+Depois preencha, para cada tier, o modelo físico, o endpoint e a credencial fornecida
+pelo provedor:
+
+| Tier | Modelo | Endpoint | Chave do provedor | Versão da API |
+|---|---|---|---|---|
+| Standard | `LITELLM_STANDARD_MODEL` — `openai/modelo-principal` | `LITELLM_STANDARD_API_BASE` — `https://modelos.orgao.gov.br/v1` | `LITELLM_STANDARD_API_KEY` — `<CHAVE_STANDARD>` | `LITELLM_STANDARD_API_VERSION` — vazio ou `2025-03-01-preview` |
+| Mini | `LITELLM_MINI_MODEL` — `openai/modelo-mini` | `LITELLM_MINI_API_BASE` — `https://modelos.orgao.gov.br/v1` | `LITELLM_MINI_API_KEY` — `<CHAVE_MINI>` | `LITELLM_MINI_API_VERSION` — vazio ou `2025-03-01-preview` |
+| Nano | `LITELLM_NANO_MODEL` — `openai/modelo-nano` | `LITELLM_NANO_API_BASE` — `https://modelos.orgao.gov.br/v1` | `LITELLM_NANO_API_KEY` — `<CHAVE_NANO>` | `LITELLM_NANO_API_VERSION` — vazio ou `2025-03-01-preview` |
+| Embedding | `LITELLM_EMBEDDING_MODEL` — `openai/modelo-embedding` | `LITELLM_EMBEDDING_API_BASE` — `https://modelos.orgao.gov.br/v1` | `LITELLM_EMBEDDING_API_KEY` — `<CHAVE_EMBEDDING>` | `LITELLM_EMBEDDING_API_VERSION` — vazio ou `2025-03-01-preview` |
+| Speech-to-text | `LITELLM_STT_MODEL` — `openai/modelo-transcricao` | `LITELLM_STT_API_BASE` — `https://modelos.orgao.gov.br/v1` | `LITELLM_STT_API_KEY` — `<CHAVE_STT>` | `LITELLM_STT_API_VERSION` — vazio ou `2025-03-01-preview` |
+
+O prefixo do modelo deve ser aceito pelo LiteLLM, como `azure/...` ou `openai/...`.
+Standard, Mini e Nano podem apontar para o mesmo deployment, mas cada tier mantém
+suas quatro variáveis. A versão da API só pode ficar vazia quando o provedor não usa
+esse parâmetro. Consulte a [seção 3](#3-configuração-dos-modelos-llm-e-litellm) para
+o papel de cada tier e a separação entre a chave local do proxy e as chaves dos
+provedores.
+
+#### 2.4.4. Integrações e recursos opcionais
+
+| Variável | Obrigatoriedade | Como preencher | Exemplo |
+|---|---|---|---|
+| `SEI_ADDRESS` | Obrigatória | URL base do SEI, sem `/sei/controlador_ws.php` | `https://sei.orgao.gov.br` |
+| `SEI_API_DB_IDENTIFIER_SERVICE` | Obrigatória | Chave de Acesso do serviço `consultarDocumentoExternoIA` do sistema `Usuario_IA`, gerada no painel do SEI | `<CHAVE_DE_ACESSO_GERADA_NO_SEI>` |
+| `SEIIA_GATEWAY_HOST` | Obrigatória | DNS/FQDN do gateway, sem protocolo, porta ou caminho | `seiia.orgao.gov.br` |
+| `SEIIA_CERT_DNS` | Opcional | Nomes DNS adicionais do certificado, separados por vírgula | vazio ou `seiia-alias.orgao.gov.br` |
+| `SEARXNG_SECRET_KEY` | Obrigatória, com geração automática | Deixe vazia inicialmente para `make config`, `make up` ou `make check` gerar e salvar a chave | vazio |
+| `LANGFUSE_URL` | Opcional | Preencha junto com as duas chaves somente se `ASSISTENTE_USE_LANGFUSE=true` no `default.env` | vazio ou `https://langfuse.orgao.gov.br` |
+| `LANGFUSE_PUBLIC_KEY` | Opcional | Chave pública do mesmo projeto Langfuse | vazio ou `<CHAVE_PUBLICA_LANGFUSE>` |
+| `LANGFUSE_SECRET_KEY` | Opcional | Chave secreta do mesmo projeto Langfuse | vazio ou `<CHAVE_SECRETA_LANGFUSE>` |
+
+> **ATENÇÃO:** `SEI_API_DB_IDENTIFIER_SERVICE` não é uma chave arbitrária. O script
+> de instalação do Módulo SEI IA cria o sistema `Usuario_IA` e o serviço
+> `consultarDocumentoExternoIA`, mas a Chave de Acesso deve ser gerada no SEI em
+> **Administração > Sistemas > Usuario_IA > Serviços >
+> consultarDocumentoExternoIA > Gerar Chave de Acesso**.
+
+#### 2.4.5. Escolha do DNS do gateway
+
+Reserve um FQDN estável e exclusivo para o gateway, por exemplo
+`seiia.orgao.gov.br`. Substitua o exemplo pelo nome aprovado pelo órgão e publique
+um registro DNS `A` e/ou `AAAA` apontando o FQDN para o servidor SEI IA. Use
+exatamente o mesmo nome, sem protocolo, porta ou caminho:
+
+1. em `SEIIA_GATEWAY_HOST` no `security.env`;
+2. no SAN do certificado apresentado pelo gateway;
+3. na URL base cadastrada nas integrações do Módulo SEI IA, com o prefixo
+   `https://` somente nessa tela.
+
+Não use o endereço IP como substituto do FQDN. Antes da validação pelo SEI, confirme
+no próprio nó PHP que o FQDN resolve para o endereço esperado e que as portas do
+gateway estão acessíveis.
+
+Nunca coloque credenciais em `default.env`, `litellm_config.yaml`, arquivos Compose,
+commits ou chamados de suporte.
+
+#### 2.4.6. Preencher o template
+
+Não copie credenciais de exemplos de documentação. O arquivo
+`security_example.env` da tag é a fonte de verdade para nomes, ordem e comentários
+das variáveis. Copie-o para `security.env` e preencha localmente todos os campos
+obrigatórios descritos nas seções anteriores.
+
+Use valores diferentes para cada senha ou chave. Gere os segredos aleatórios com
+os comandos indicados no próprio template e mantenha vazias somente as integrações
+opcionais que não serão habilitadas. O arquivo `security.env` não deve ser
+commitado nem enviado em chamados de suporte.
+
+#### 2.4.7. Validar o contrato
+
+Depois de copiar `litellm_config.template.yaml` conforme a
+[seção 3.1](#31-prepare-o-litellm), valide a interpolação do Compose:
+
+```bash
+cd /opt/sei-ia
+make config
+```
+
+O comando gera `SEARXNG_SECRET_KEY` quando necessário e deve terminar com código
+zero. Depois do deploy, `make check` valida o inventário exato dos dois arquivos
+`.env`: variável ausente, extra, duplicada, inválida ou obrigatória vazia reprova a
+instalação.
+
+## 3. Configuração dos modelos LLM e LiteLLM
+
+O LiteLLM é o proxy local entre as aplicações e os provedores de modelos. Assistente,
+ETL e Health Checker chamam o proxy com uma chave local; o proxy usa as credenciais
+do provedor configuradas em `security.env` para encaminhar cada requisição.
+
+### 3.1. Prepare o LiteLLM
+
+O template publica cinco aliases fixos: `standard`, `mini`, `nano`, `embedding` e
+`speech-to-text`. O `make check` exige cada alias com suas respectivas tags; uma
+entrada com nome físico e as mesmas tags não substitui esse contrato. Os modelos
+físicos permanecem em `litellm_params.model` e `model_info.base_model` via ambiente.
+
+| Alias (`model_name`) | Modelo físico no `security.env` | Papéis autorizados | Uso principal |
+|---|---|---|---|
+| `standard` | `LITELLM_STANDARD_MODEL` | `agents:principal` | resposta final, coordenação da sessão e pesquisa profunda |
+| `mini` | `LITELLM_MINI_MODEL` | `agents:classificador`, `agents:busca_web` | classificação/extração e planejamento de consultas web |
+| `nano` | `LITELLM_NANO_MODEL` | `agents:explorador`, `agents:ocr`, `agents:triagem_busca` | exploração de documentos, OCR com capacidade multimodal e triagem de evidências web |
+| `embedding` | `LITELLM_EMBEDDING_MODEL` | `agents:embedding` | geração de vetores para documentos e consultas |
+| `speech-to-text` | `LITELLM_STT_MODEL` | `agents:audio_transcription` | transcrição de anexos de áudio |
+
+Mantenha os aliases da primeira coluna em `model_name`, mesmo quando dois deles
+usam o mesmo modelo. Configure os modelos do provedor nas variáveis correspondentes
+do `security.env`, sem alterar os aliases no template.
+
+As tags esperadas são:
+
+```text
+agents:principal
+agents:classificador
+agents:busca_web
+agents:explorador
+agents:ocr
+agents:triagem_busca
+agents:embedding
+agents:audio_transcription
+```
+
+Não existem mais os modelos ou aliases `think`, `think-low` e `think-none`.
+Raciocínio é uma característica da chamada do papel `principal`: o Assistente envia
+`reasoning_effort` quando aplicável, usando o mesmo modelo Standard.
+
+#### 3.1.1. Credenciais do LiteLLM
+
+As seis chaves protegem fronteiras diferentes:
+
+| Chave | Quem apresenta a chave | O que ela libera |
+|---|---|---|
+| `LITELLM_PROXY_API_KEY` | Assistente, ETL e checker | acesso autenticado ao proxy LiteLLM local e às entradas publicadas |
+| `LITELLM_STANDARD_API_KEY` | proxy LiteLLM | acesso ao provedor do modelo Standard |
+| `LITELLM_MINI_API_KEY` | proxy LiteLLM | acesso ao provedor do modelo Mini |
+| `LITELLM_NANO_API_KEY` | proxy LiteLLM | acesso ao provedor do modelo Nano |
+| `LITELLM_EMBEDDING_API_KEY` | proxy LiteLLM | acesso ao provedor do modelo de embeddings |
+| `LITELLM_STT_API_KEY` | proxy LiteLLM | acesso ao provedor de speech-to-text |
+
+Standard, Mini, Nano, Embedding e speech-to-text possuem endpoint, chave e versão de
+API próprios. Os valores podem coincidir quando o provedor entregar o mesmo contrato,
+mas nenhuma entrada herda silenciosamente a credencial de outra. `*_API_VERSION`
+pode ficar vazio somente quando o provedor não utiliza esse parâmetro.
+
+Exemplo de preenchimento no `security.env` usando nomes fictícios:
+
+```dotenv
+LITELLM_STANDARD_MODEL=openai/modelo-principal
+LITELLM_STANDARD_API_BASE=https://modelos.exemplo.orgao.gov.br/v1
+LITELLM_STANDARD_API_VERSION=
+LITELLM_MINI_MODEL=openai/modelo-mini
+LITELLM_MINI_API_BASE=https://modelos-mini.exemplo.orgao.gov.br/v1
+LITELLM_MINI_API_VERSION=
+LITELLM_NANO_MODEL=openai/modelo-nano
+LITELLM_NANO_API_BASE=https://modelos-nano.exemplo.orgao.gov.br/v1
+LITELLM_NANO_API_VERSION=
+```
+
+Use os nomes, endpoints e as chaves fornecidos pelo provedor do órgão. Preencha a
+chave diretamente no arquivo privado, sem reproduzi-la em documentação, terminal
+compartilhado ou chamado. Não copie os valores fictícios do exemplo.
+
+Copie o template sem substituir as referências `os.environ/VAR` por credenciais:
+
+```bash
+cd /opt/sei-ia
+cp litellm_config.template.yaml litellm_config.yaml
+chmod 600 litellm_config.yaml
+```
+
+O arquivo gerado mantém aliases literais e referências ao ambiente para modelos
+físicos, endpoints e credenciais. Os valores sensíveis permanecem somente no
+`security.env`. O `make check` verifica a saúde do proxy e a presença dos cinco
+aliases com suas oito tags obrigatórias; essa checagem não substitui o teste
+funcional pelo SEI.
+
+### 3.2. Descrição dos agentes e seus modelos
+
+Nem todo papel representa um agente independente. Alguns são tarefas especializadas
+executadas dentro do fluxo principal.
+
+| Agente ou operação | Modelo configurado | Papel | Função |
+|---|---|---|---|
+| Agente principal da sessão | Standard (`LITELLM_STANDARD_MODEL`) | `principal` | interpreta o pedido, decide quais documentos e ferramentas consultar, coordena subagentes e produz a resposta final; usa Responses API e reasoning |
+| Subagente explorador | Nano (`LITELLM_NANO_MODEL`) | `explorador` | no modo filesystem, lê um documento específico da sessão e devolve evidências estruturadas ao principal; na pesquisa profunda, o mesmo papel atua como `compress_llm` |
+| Classificação e extração | Mini (`LITELLM_MINI_MODEL`) | `classificador` | classifica a complexidade da solicitação e extrai informações de páginas ou evidências usadas pela pesquisa profunda |
+| Planejador de busca web | Mini (`LITELLM_MINI_MODEL`) | `busca_web` | formula consultas especulativas antes do agente principal; a ferramenta `WebResearchAgent` coleta e grava páginas sem executar outro LLM internamente |
+| Triagem de evidências web | Nano (`LITELLM_NANO_MODEL`) | `triagem_busca` | seleciona evidências relevantes e identifica lacunas antes de entregar o material pesquisado ao principal |
+| OCR | Nano (`LITELLM_NANO_MODEL`) | `ocr` | interpreta páginas digitalizadas ou imagens quando a extração textual comum não é suficiente |
+| Vetorização | Embedding (`LITELLM_EMBEDDING_MODEL`) | `embedding` | gera embeddings usados pelo Assistente e pela ETL para indexação e recuperação vetorial |
+| Transcrição | Speech-to-text (`LITELLM_STT_MODEL`) | `audio_transcription` | converte anexos de áudio em texto antes que o conteúdo seja entregue ao fluxo do Assistente |
+
+Não há um agente separado de imagem ou de anexos: imagens são entregues ao principal
+como conteúdo multimodal, e os anexos são preparados antes da construção do agente.
+
+A busca web do Assistente usa SearXNG e os serviços de crawling da própria stack.
+Ela não usa Bing Grounding, Azure AI Agent, `AZURE_WEB_AGENT_ID` nem
+`BING_CONNECTION_NAME`. A opção é habilitada na configuração do Assistente no SEI.
+
+## 4. Configuração do certificado HTTPS
+
+O gateway Nginx encerra TLS nas três portas públicas. Os backends permanecem HTTP
+dentro da rede Docker. Antes do primeiro `make up`, escolha entre deixar o comando
+gerar um par autoassinado ou fornecer o certificado institucional do órgão.
+
+### 4.1. Certificado gerado automaticamente
+
+Quando os dois arquivos ainda não existem, o primeiro `make up` gera:
+
+```text
+/opt/sei-ia/.runtime/certs/seiia.cert.pem
+/opt/sei-ia/.runtime/certs/seiia.cert.key
+```
+
+O certificado cobre `SEIIA_GATEWAY_HOST`; a chave gerada fica com modo `0600`. O PEM público
+autoassinado é também o material de confiança que será fornecido ao servidor SEI.
+Nunca copie a chave privada para o SEI.
+
+### 4.2. Certificado emitido pela PKI do órgão
+
+Antes do primeiro `make up`, coloque o par diretamente nos caminhos esperados:
+
+```bash
+cd /opt/sei-ia
+mkdir -p .runtime/certs
+install -m 0644 /caminho/seguro/certificado-com-cadeia.pem \
+  .runtime/certs/seiia.cert.pem
+install -m 0600 /caminho/seguro/chave-privada.pem \
+  .runtime/certs/seiia.cert.key
+```
+
+- `seiia.cert.pem`: certificado do gateway seguido da cadeia intermediária servida
+  pelo Nginx;
+- `seiia.cert.key`: chave privada RSA ou EC correspondente, sem senha interativa.
+
+O modo `0600` é o padrão recomendado. O modo `0640` também é aceito quando o grupo
+é restrito aos administradores ou ao serviço responsável. Escrita ou execução pelo
+grupo e qualquer permissão para outros usuários não são aceitas.
+
+O certificado deve estar válido e conter `SEIIA_GATEWAY_HOST` no SAN. O script valida
+o par e não sobrescreve silenciosamente um certificado fornecido pelo operador.
+
+Para o módulo, forneça depois uma CA bundle confiável emitida pela PKI. Ela pode ser
+diferente do certificado e da cadeia servidos pelo Nginx.
+
+## 5. Executar o deploy
+
+Depois de preparar o contrato privado e decidir o TLS, execute:
+
+```bash
+cd /opt/sei-ia
+make up
+```
+
+`make up` completa `SEARXNG_SECRET_KEY` quando necessário, valida a composição,
+preserva ou gera o certificado, prepara os diretórios persistentes, limita a três o
+número de builds simultâneos e só então inicia os serviços. Na primeira execução, o
+download e o build podem demorar. Em um host com
+menos memória disponível, reduza a concorrência, por exemplo:
+
+```bash
+make BUILD_PARALLELISM=2 up
+```
+
+
+Aguarde até os serviços permanentes ficarem `running` e `healthy`. O contêiner de
+inicialização do Airflow termina com código zero; ele não permanece em execução.
+Depois da subida, execute obrigatoriamente:
+
+```bash
+make check
+```
+
+O comando deve terminar com código zero e sem erros.
+
+Para interromper e iniciar novamente a stack de forma controlada:
+
+```bash
+cd /opt/sei-ia
+make down
+make up
+make check
+```
+
+`make down` preserva os dados. `make down-volumes` remove volumes Compose e não faz
+parte da operação normal nem de um upgrade.
+
+Não use `docker-compose.debug.yml` na instalação padrão. Ele publica PostgreSQL,
+Solr, Redis e LiteLLM somente no loopback do host e existe apenas para diagnóstico
+local controlado.
+
+## 6. Configuração da confiança TLS no SEI
+
+O certificado ou a CA que assina o gateway precisa estar no nó onde o PHP do SEI
+executa. Esta instalação não altera automaticamente o truststore do SEI: o órgão
+deve instalar a confiança conforme seu sistema operacional e seu modelo de deploy.
+
+### 6.1. SEI e SEI IA no mesmo host Docker
+
+Declare `docker-host-bridge` como rede externa também no Compose do SEI e conecte o
+serviço PHP/HTTP do SEI a ela. Exemplo de override a adaptar ao nome real do serviço:
 
 ```yaml
-model_list:
-  # Modelo Standard - Modelo principal para respostas do assistente
-  - model_name: standard
-    litellm_params:
-      model: azure/gpt-4.1                              # Nome do deployment no Azure
-      api_base: https://seu-endpoint.openai.azure.com   # Endpoint do Azure
-      api_key: sua-api-key-standard                     # API Key do Azure
-      api_version: "2025-03-01-preview"
-      max_completion_tokens: 32768
+services:
+  httpd:
+    networks:
+      - default
+      - seiia-runtime
+    volumes:
+      - /caminho/ca-bundle-confiavel.pem:/opt/sei/config/mod-ia/seiia.cert.pem:ro
 
-  # Modelo Mini - Modelo econômico para tarefas mais simples
-  - model_name: mini
-    litellm_params:
-      model: azure/gpt-4.1-mini
-      api_base: https://seu-endpoint.openai.azure.com
-      api_key: sua-api-key-mini
-      api_version: "2025-03-01-preview"
-      max_completion_tokens: 32768
-
-  # Modelo Think - Modelo com raciocínio avançado (GPT-5)
-  - model_name: think
-    litellm_params:
-      model: azure/gpt-5.2
-      api_base: https://seu-endpoint-think.openai.azure.com
-      api_key: sua-api-key-think
-      api_version: "2025-03-01-preview"
-      max_completion_tokens: 102400
-      reasoning_effort: "medium"                        # Apenas para GPT-5
-
-  # Modelo Embedding - Para geração de embeddings (RAG)
-  - model_name: embedding
-    litellm_params:
-      model: azure/text-embedding-3-small
-      api_base: https://seu-endpoint-embedding.openai.azure.com
-      api_key: sua-api-key-embedding
-      api_version: "2025-03-01-preview"
+networks:
+  seiia-runtime:
+    name: docker-host-bridge
+    external: true
 ```
 
-**Observações importantes:**
+No campo `name`, use o valor efetivo de `COMPOSE_NETWORK_NAME` da stack SEI IA. O
+exemplo mostra o valor padrão.
 
-- O campo model: deve seguir o formato azure/<nome-do-deployment>, utilizando exatamente o nome configurado no Azure OpenAI Studio.
-- O parâmetro reasoning_effort é exclusivo dos modelos GPT-5 (think) e não deve ser utilizado com modelos GPT-4.1.
-- Cada modelo pode estar associado a endpoints diferentes, conforme os recursos configurados no Azure.
-- Utilize a versão de API 2025-03-01-preview para todos os modelos (GPT-4.1, GPT-5 e embeddings).
-  - Versão da API vs. modelo (Azure OpenAI): a variável api_version define o contrato da API e deve permanecer inalterada, pois não está vinculada à versão do modelo. Alterá-la pode causar incompatibilidades. Já a versão do modelo deve ser mantida sempre atualizada, preferencialmente com atualização automática habilitada.
-- Modelo Think – modelo com raciocínio avançado (GPT-5): modelos da família gpt-5.x podem não estar disponíveis por padrão no Azure OpenAI. É necessário solicitar liberação para a assinatura no portal do Azure antes de criar o endpoint correspondente.
-
-**Exemplo prático:**
-
-Se no Azure você configurou:
-- Recurso: "minha-org-openai"
-- Endpoint: `https://minha-org-openai.openai.azure.com`
-- Deployment do modelo gpt-4.1 com nome: `gpt-4-deployment`
-- API Key: `abc123xyz456`
-
-Configure assim:
-```yaml
-- model_name: standard
-  litellm_params:
-    model: azure/gpt-4-deployment                          # Nome do deployment
-    api_base: https://minha-org-openai.openai.azure.com    # Endpoint
-    api_key: abc123xyz456                                   # API Key
-    api_version: "2025-03-01-preview"
-    max_completion_tokens: 32768
-```
-
-##### Variáveis do security.env
-
-
-O arquivo `env_files/security.env` já possui valores padrão configurados. As principais variáveis relacionadas ao LiteLLM Proxy são:
-
-| Variável | Descrição | Valor Padrão |
-|----------|-----------|--------------|
-| `ASSISTENTE_LITELLM_PROXY_URL` | URL do proxy no Docker | `http://litellm:4000` |
-| `ASSISTENTE_LITELLM_PROXY_API_KEY` | API Key do proxy (vazio se sem auth) | *(vazio)* |
-| `ASSISTENTE_EMBEDDING_MODEL` | Modelo de embeddings | `text-embedding-3-small` |
-| `ASSISTENTE_EMBEDDING_ENCODING_NAME` | Encoding tiktoken para tokenização (**não alterar se já possui base de dados**) | `o200k_base` |
-| `ASSISTENTE_DEFAULT_RESPONSE_MODEL` | Modelo padrão | `standard` |
-
-**Importante sobre `EMBEDDING_ENCODING_NAME`:**
-- Este parâmetro define qual encoding (tokenizador) será usado para dividir os documentos em chunks antes de gerar embeddings
-- **Se você já possui uma base de dados de embeddings criada**, NÃO altere este valor, pois mudá-lo tornará os novos embeddings incompatíveis com os existentes
-- Para instalações novas, pode usar `o200k_base` (padrão) ou `cl100k_base`
-
-##### Verificar a configuração
-
-Após editar o `litellm_config.yaml`, reinicie o container e verifique a saúde dos modelos:
+O alias Docker criado no gateway é o valor de `SEIIA_GATEWAY_HOST`. Confirme dentro
+do contêiner do SEI:
 
 ```bash
-# Verificar saúde dos modelos (requer jq instalado)
-curl -s http://localhost:4000/health | jq '{
-  status: (if .unhealthy_count == 0 then "healthy" else "unhealthy" end),
-  healthy_count: .healthy_count,
-  unhealthy_count: .unhealthy_count,
-  models: [.healthy_endpoints[].model] | unique
-}'
+getent hosts <SEIIA_GATEWAY_HOST>
+curl --cacert /opt/sei/config/mod-ia/seiia.cert.pem \
+  https://<SEIIA_GATEWAY_HOST>:8088/health
 ```
 
-**Saída esperada:**
-```json
-{
-  "status": "healthy",
-  "healthy_count": 5,
-  "unhealthy_count": 0,
-  "models": [
-    "azure/gpt-4.1",
-    "azure/gpt-4.1-mini",
-    "azure/gpt-5.2",
-    "azure/text-embedding-3-small"
-  ]
-}
-```
+Para o certificado autoassinado gerado pela stack, a origem desse bind pode ser
+`/opt/sei-ia/.runtime/certs/seiia.cert.pem`. Para certificado institucional, monte a
+CA bundle aprovada pela PKI, não a chave privada e não obrigatoriamente o certificado
+folha.
 
-> **Nota:** Se não tiver o `jq` instalado, pode usar `curl http://localhost:4000/health` diretamente. A saída será mais verbosa mas conterá as mesmas informações em `healthy_endpoints` e `unhealthy_endpoints`.
+### 6.2. SEI e SEI IA em hosts diferentes
 
-**Se algum modelo aparecer como "unhealthy" ou em `unhealthy_endpoints`, verifique:**
-- API Key está correta
-- Endpoint está acessível e corresponde ao recurso Azure
-- Nome do deployment corresponde ao configurado em `model:` (ex: `azure/gpt-4.1`)
-- Parâmetros específicos do modelo (ex: `reasoning_effort` só é válido para GPT-5)
+1. publique no DNS o FQDN de `SEIIA_GATEWAY_HOST` apontando para o host do SEI IA;
+2. permita `8088/tcp`, `8082/tcp` e `8086/tcp` do servidor SEI até esse host;
+3. copie somente o PEM autoassinado ou a CA bundle da PKI para cada nó PHP do SEI;
+4. monte o arquivo, legível pelo PHP, em
+   `/opt/sei/config/mod-ia/seiia.cert.pem`;
+5. confirme resolução DNS, rota, SAN e relógio a partir do próprio nó do SEI.
 
-#### WsIa (API REST CENTRAL DE INTEGRAÇÃO COM OS DADOS DO SEI)
-
-| Variável             | Descrição                                                                              | Exemplo |
-|----------------------|----------------------------------------------------------------------------------------|---------|
-| `SEI_ADDRESS`        | Endereço raiz do SEI.                                                                   | http://www.sei.gov.br |
-| `SEI_API_DB_IDENTIFIER_SERVICE`   | Chave de Acesso que deve ser gerada na Administração do SEI, pelo menu Administração > Sistemas > "Usuario_IA" > Serviços > "consultarDocumentoExternoIA".                |         |
-| `SEI_API_DB_TIMEOUT` | Timeout padrão da conexão da aplicação SEI IA junto à API do SEI de integração dos dados do SEI.  | 120     |
-| `SEI_API_DB_USER` | SiglaSistema criado automaticamente pelo script de instalação do Módulo SEI IA. Não alterar.  | `Usuario_IA` |
-
-### Integração com WebSearch (Bing) - Opcional
-
-A integração com WebSearch (Bing Grounding) permite que o Assistente utilize informações externas (internet) para complementar respostas.
-
-> **ATENÇÃO**:
-> - Esta funcionalidade é **opcional**
-> - Caso não seja configurada, o sistema continuará funcionando normalmente
-> - Para desabilitar completamente, basta não configurar as variáveis abaixo e desativar a opção de WebSearch na Administração do SEI
-
-#### Variáveis de Ambiente - WebSearch
-
-| Variável | Descrição |
-|----------|----------|
-| `PROJECT_ENDPOINT` | Endpoint do projeto no Azure AI Foundry |
-| `AZURE_TENANT_ID` | Identificador do tenant no Entra ID |
-| `AZURE_SUBSCRIPTION_ID` | Identificador da assinatura Azure |
-| `AZURE_CLIENT_ID` | Client ID do App registrado no Entra ID |
-| `AZURE_CLIENT_SECRET` | Client Secret do App registrado no Entra ID |
-| `AGENT_ID` | Identificador do Agent configurado no Azure AI Foundry |
-| `AZURE_WEB_AGENT_ID` | Identificador do Agent com WebSearch habilitado |
-| `BING_CONNECTION_NAME` | Nome da conexão com o Bing Grounding |
-| `MODEL_DEPLOYMENT_NAME` | Nome do deployment do modelo no Azure |
-
-#### Configuração Básica
-
-Para utilização do WebSearch, é necessário:
-
-1. Criar um registro de aplicativo no Entra ID para autenticação
-2. Criar um projeto no Azure AI Foundry
-3. Provisionar o recurso de Bing Grounding Search
-4. Configurar um Agent no projeto
-5. Criar uma conexão com o recurso de Bing Grounding  
-   - Observação: a associação do Agent com o Bing Grounding está disponível apenas para modelos compatíveis (ex: GPT-4.1)
-6. Associar a conexão ao Agent
-7. Preencher as variáveis no arquivo `security.env`
-
-#### Observações
-
-- Caso as variáveis não sejam informadas:
-  - O Assistente continuará funcionando normalmente
-  - Apenas não realizará consultas externas, e essa funcionalidade deverá ser desabilitada na Administração do SEI
-- Recomenda-se validar:
-  - Permissões do aplicativo no Entra ID
-  - Existência da conexão com Bing Grounding
-  - Associação correta entre Agent e Connection
-- Em ambientes com restrição de acesso à internet, recomenda-se manter o WebSearch desabilitado
-
-11. **Executar o deploy**
- > **ATENÇÃO**:
- > - Para instalar o *Servidor de Soluções de IA do Módulo SEI IA* é mandatório ter o [Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia) previamente instalado e configurado no SEI do ambiente correspondente. **Ou seja, antes, instale o módulo no SEI!**
- > - A funcionalidade de "Pesquisa de Documentos" (recomendação de documentos similares) somente funcionará depois que configurar pelo menos um Tipo de Documento como Alvo da Pesquisa no menu Administração > Inteligência Artificial > Pesquisa de Documentos (na seção "Tipos de Documentos Alvo da Pesquisa").
-
-  Vamos criar os diretório que serão utilizados como `volume bind`
-  ***IMPORTANTE*** : o usuário deve ter permissão sudo para criar os volumer no /var
-  ```
-  source env_files/default.env
-  sudo mkdir --parents --mode=750 $VOL_SEIIA_DIR && sudo chown seiia:docker $VOL_SEIIA_DIR
-  ```
-
-  Executar o script de deploy com o usuário seiia.
-  ```
-  su seiia
-  bash deploy-externo.sh
-  ```
-
-   Este passo pode levar bastante tempo, pois é realizado o download de todas as imagens do [repositório da Anatel no dockerhub](https://hub.docker.com/u/anatelgovbr). Logo, se faz necessária a devida **autorização que o servidor possa acessar a dockerhub**.
-
-   Resultado da finalização do deploy:
-
-   ![Resultado após deploy finalizado](image/deploy_finalizado.png)
-
-Nas seções a seguir são apresentados os procedimentos para **validar a instalação e a configuração do Servidor de IA**, bem como para **interpretar o estado de saúde dos serviços executados**.
-
-A validação deve ser realizada por meio do mecanismo de *Health Checker*. Para instruções detalhadas sobre os testes disponíveis, interpretação dos resultados e localização dos logs gerados, consulte o documento [Health Checker Geral do Ambiente](#health-checker-geral-do-ambiente).
-
-## Health Checker Geral do Ambiente
-
-O Health Checker é executado como último comando do script `deploy-externo.sh`. Ele faz uma checagem geral de conexões , mapeamento e problemas comuns.
-
-1. **Estrutura do Log**
-   Os logs seguem a seguinte estrutura:
-   - **Timestamp:** Data e hora do evento.
-   - **Nível de severidade:**
-     - **INFO:** Informações gerais e mensagens de sucesso.
-     - **WARNING:** Avisos de possíveis problemas ou inconsistências.
-     - **ERROR:** Erros que requerem atenção imediata.
-     - **Mensagem:** Detalhes do evento ou do problema detectado.
-
-### Explicação dos Logs por Seção
-
-#### 1. **Testes**
-
-##### 1.1 **ENVS**
-- **Descrição:** Esta seção descreve variáveis de ambiente encontradas em arquivos `.env`.
-- **Objetivo:** Verificar se todas as variáveis necessárias estão presentes e com valores corretos.
-- **Tipos de Mensagens Comuns:**
-  - **Variáveis Sobrando:** Variáveis que estão definidas mas não são utilizadas pelo sistema.
-  - **Variáveis Duplicadas:** Variáveis que aparecem mais de uma vez, podendo causar conflitos.
-  - **Variáveis Vazias ou Inválidas:** Variáveis sem valor ou com valores incorretos.
-
-##### 1.2 **CONECTIVIDADE**
-
-###### 1.2.1 **TESTE DE CONECTIVIDADE - RESUMO**
-- **Descrição:** Verifica a disponibilidade e acessibilidade de endpoints ou serviços externos.
-- **Objetivo:** Confirmar se os sistemas externos estão acessíveis.
-- **Mensagens Comuns:**
-  - **Falha de Conexão:** O sistema não conseguiu acessar o serviço especificado.
-  - **Tempo de Resposta Alto:** O serviço respondeu lentamente, sugerindo um possível problema de desempenho.
-
-###### 1.2.2 **TESTE DE SAÚDE DOS ENDPOINTS**
-- **Descrição:** Realiza uma verificação do status (saúde) de endpoints críticos da aplicação.
-- **Objetivo:** Confirmar que os endpoints principais estão funcionando corretamente.
-- **Mensagens Comuns:**
-  - **Serviço Indisponível:** O endpoint não respondeu conforme esperado.
-  - **Falha ao Testar:** Testes não puderam ser realizados devido a erro de configuração ou conectividade.
-
-###### 1.2.3 **TESTE DE CONEXÃO COM SOLR do SEI IA**
-- **Descrição:** Verifica a conectividade com o servidor SOLR IA, utilizado para busca e indexação de dados.
-- **Objetivo:** Garantir que a aplicação consiga se comunicar corretamente com o servidor SOLR.
-- **Mensagens Comuns:**
-  - **Falha de Conexão:** Erro ao tentar conectar ao SOLR.
-  - **Configuração de Endpoint Inválida:** A URL ou as credenciais de conexão podem estar incorretas.
-
-##### 1.3 **TESTE DE CONEXÃO COM BANCO DE DADOS**
-
-
-###### 1.3.2 **INTERNOS**
-
-**1.3.2.1 TABELAS DO ASSISTENTE**
-- **Descrição:** Verifica a conexão e o estado das tabelas do banco de dados utilizadas pelo Assistente Virtual.
-- **Objetivo:** Garantir que o sistema do Assistente Virtual tenha acesso adequado ao banco de dados interno.
-- **Mensagens Comuns:**
-  - **Tabela Inexistente:** Falta de tabelas necessárias para o funcionamento do Assistente.
-  - **Erro de Consulta:** Falhas em queries ou na execução de operações SQL.
-
-**1.3.2.2 TABELAS DE SIMILARIDADE**
-- **Descrição:** Verifica a integridade e acessibilidade das tabelas usadas para comparação de dados (por exemplo, comparação de documentos ou consultas de similaridade).
-- **Objetivo:** Assegurar que as operações de comparação de dados funcionem corretamente.
-- **Mensagens Comuns:**
-  - **Falha ao Buscar Dados:** Erros ao tentar recuperar dados das tabelas de similaridade.
-  - **Desempenho Baixo:** Consultas muito lentas ou com alta latência.
-
-##### 1.4 **DOCKER**
-
-###### 1.4.1 **DOCKER - LOGS**
-- **Descrição:** Relata o estado dos containers Docker executando a aplicação.
-- **Objetivo:** Verificar se todos os containers estão em funcionamento e sem problemas de saúde.
-- **Mensagens Comuns:**
-  - **Containers Parados:** Containers não estão em execução ou foram reiniciados inesperadamente.
-  - **Falha de Saúde:** Containers com status `unhealthy` que indicam falhas internas.
-  - **Reinicializações Frequentes:** Containers que estão reiniciando constantemente devido a falhas.
-
-##### 1.5 **AIRFLOW**
-- **Descrição:** Registra as execuções dos DAGs (Direcionadores de Fluxos de Trabalho) do Airflow, incluindo falhas de execução ou dependências não atendidas.
-- **Objetivo:** Garantir que as tarefas programadas no Airflow sejam executadas corretamente.
-- **Mensagens Comuns:**
-  - **Falhas de Tarefa:** Tarefas que não foram executadas ou falharam durante a execução.
-  - **Dependências Não Satisfeitas:** Problemas ao tentar executar tarefas devido a dependências não resolvidas.
-
-##### 1.6 **RESUMO - TESTES**
-- **Descrição:** Apresenta um resumo geral de todos os testes realizados, destacando falhas críticas e informações importantes.
-- **Objetivo:** Facilitar a visão geral dos resultados dos testes, indicando onde ações corretivas são necessárias.
-- **Mensagens Comuns:**
-  - **Falhas Identificadas:** Relatórios com falhas graves, como falta de conectividade ou erros de autenticação.
-  - **Testes Bem-Sucedidos:** Indicação de que todas as verificações foram realizadas com sucesso, e o sistema está em bom estado.
-
-Caso deseje executar o Health Checker manualmente  execute o comando:
-```bash
-source env_files/default.env
-docker compose -f docker-compose-healthchecker.yml -p $PROJECT_NAME --build
-```
-
-Aguarde a finalização dos testes. Os logs estarão disponíveis, por padrão, em:
-`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/logs/{DATA}`
-
-Além disso, será gerado um arquivo `.zip` para facilitar a transmissão dos dados.
-
-A compreensão do LOG deve iniciar pela criteriosa análise de:
-`/var/lib/docker/volumes/sei_ia_health_checker_logs/_data/logs/{DATA}/tests_{DATA}.log`,
-que tem sua estrutura descrita a seguir.
-
-**Dica:** Os containers do Airflow podem emitir alguns erros e avisos devido a pequenas falhas momentâneas de comunicação entre eles, que podem ser ignorados.
-
-> **Observação:**
-> 1. Por questões de segurança, essa pasta, por padrão, não é acessível. É necessário entrar como `root` para ter acesso a esses arquivos.
-> 2. Caso os arquivos não estejam nesse local, oriente-se pelo local de montagem dos seus volumes Docker com o comando:
->    ```bash
->    docker volume inspect sei_ia_health_checker_logs
->    ```
->    A saída deve ser algo como:
->    ```bash
->    [
->        {
->            "CreatedAt": "2024-12-05T00:20:58Z",
->            "Driver": "local",
->            "Labels": {
->                "com.docker.compose.project": "sei_ia",
->                "com.docker.compose.version": "2.29.2",
->                "com.docker.compose.volume": "health_checker_logs"
->            },
->            "Mountpoint": "/var/lib/docker/volumes/sei_ia_health_checker_logs/_data", <- LOCAL DO ARQUIVO
->            "Name": "sei_ia_health_checker_logs",
->            "Options": null,
->            "Scope": "local"
->        }
->    ]
->    ```
-
-## Testes de Acessos
-
-Você pode verificar o status das aplicações rodando o comando abaixo:
+Valide as três portas a partir do servidor ou contêiner do SEI:
 
 ```bash
-docker ps --format "table {{.Names}}	{{.Status}}"
+for port in 8088 8082 8086; do
+  curl --fail --silent --show-error \
+    --cacert /opt/sei/config/mod-ia/seiia.cert.pem \
+    "https://<SEIIA_GATEWAY_HOST>:${port}/health"
+done
 ```
 
-O comando acima deverá retornar algo semelhante à imagem abaixo:
+Cada resposta deve indicar sucesso. Não use `curl -k`: isso esconderia exatamente os
+problemas de CA e hostname que o módulo precisa validar.
 
-![Docker Status](image/docker_status.png)
+## 7. Mapeamento da integração no SEI
 
-* **Vale ressaltar que algumas aplicações podem levar até 5 minutos para atingir o status de "healthy".** Então, espere esse tempo e confira novamente.
+Antes de cadastrar as integrações, confirme que a Chave de Acesso foi gerada em
+**Administração > Sistemas > Usuario_IA > Serviços >
+consultarDocumentoExternoIA > Gerar Chave de Acesso** e copiada para
+`SEI_API_DB_IDENTIFIER_SERVICE` no `security.env`. Sem essa chave, o Servidor de
+Soluções de IA não consegue consultar os documentos do SEI.
 
-Caso um longo tempo tenha se passado e ainda não tenha obtido o status **healthy**, favor seguir as orientações do [Health Checker](#health-checker-geral-do-ambiente) e rever os passos anteriores deste manual, até que não haja mais ERROR no log do Health Checker. Caso os erros persistam, deve ser repostado o problema para a Anatel, juntamente com o arquivo gerado pelo Health Checker.
+Entre novamente no SEI com perfil administrador e abra
+**Administração > Inteligência Artificial > Mapeamento das Integrações**.
 
-Após a finalização do deploy, o Airflow iniciará a indexação dos documentos já existentes no SEI do ambiente correspondente. Esse processo pode levar dias para ser concluído, dependendo do volume de documentos a serem indexados e da capacidade computacional alocada para o servidor.
+Nos dois registros criados pelo módulo, a integração da solução de IA e a integração
+da interface LLM, informe a mesma URL base:
 
-Se a instalação não for concluída com sucesso **e for exclusivamente a primeira instalação**, antes de realizar uma nova instalação é necessário realizar a limpeza completa do ambiente, para eliminar qualquer lixo que a instalação com erro possa deixar no ambiente.
+```text
+https://<SEIIA_GATEWAY_HOST>
+```
 
-Utilize os comando abaixo para a limpeza total do ambiente:
+Não inclua porta, barra final ou caminho. Mantenha os registros ativos e use a ação
+de validação da tela. O Módulo SEI IA 1.5.0 já contém o mapeamento de operações
+exigido por esta release; não altere manualmente as URLs individuais.
+
+Conclua as demais parametrizações negociais descritas no README do módulo, incluindo
+as permissões de perfil e as configurações do Assistente e da Similaridade. Para a
+recomendação de documentos, configure ao menos um tipo de documento como alvo em
+**Administração > Inteligência Artificial > Pesquisa de Documentos**.
+
+Para ativar o Assistente, abra **Administração > Inteligência Artificial >
+Assistente IA > Configurações do Assistente IA**, marque **Exibir** em **Exibir
+Funcionalidade** e selecione **Salvar**.
+
+## 8. Health Checker geral do ambiente
+
+Com toda a stack em execução:
 
 ```bash
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
-docker system prune -a --volumes
-# Verifique se os volumes foram deletados:
-docker volumes ls
-# caso nao tenham sido deverá ser removido com o comando docker volume rm [nome-do-volume]
+cd /opt/sei-ia
+make check
 ```
 
-Após finalizar o deploy, você poderá realizar testes acessando cada solução da arquitetura:
-
-| Solução                                     | URL de Acesso                          | Descrição                                                                                   | Recomendações                                                                       |
-|---------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| Airflow                                     | http://[Servidor_Solucoes_IA]:8081    | Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings. | - Alterar a senha do Airflow                                                   |
-| API SEI IA                                  | https://[Servidor_Solucoes_IA]:8082    | API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI. | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI IA Feedback                         | https://[Servidor_Solucoes_IA]:8086/docs | API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.           | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| API SEI IA Assistente                       | https://[Servidor_Solucoes_IA]:8088    | API que fornece funcionalidades do Assistente de IA do SEI.                                      | - Bloquear em nível de rede o acesso a todos, exceto aos servidores do SEI do ambiente correspondente. |
-| Solr do Servidor de Soluções de IA  | https://[Servidor_Solucoes_IA]:8084    | Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.                                    | - Por padrão, já vem bloqueado.                                                 |
-| Banco de Dados do Servidor de Soluções de IA (PostgreSQL)  | [Servidor_Solucoes_IA]:5432  | Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.                   | - Por padrão, já vem bloqueado.                                                 |
-
-> **Observações:**
-> * Por padrão, as portas de acesso externo à rede Docker criada no passo 5 de Instalação **às aplicações Solr e PostgreSQL** não possuem direcionamento para ambiente externo. E não deve ter esse redirecionamento! Essas duas aplicações **são totalmente internas** e armazenam dados indexados dos documentos do SEI. Ou seja, são os bancos de dados das soluções de IA rodando no servidor e o acesso a eles deve ter alta restrição, sendo recomendável manter acessível apenas internamente no servidor.
-> * Seria uma falha de segurança abrir um acesso externo a essas duas aplicações sem controle, sem restringir o acesso em nível de rede local do órgão para apenas quem pode acessar.
-> * Consideramos que o Administrador do ambiente computacional do SEI, caso precise conferir algo no Solr e PostgreSQL interno do Servidor de Soluções de IA, pode acessar diretamente a partir do acesso dele ao próprio servidor.
-> * Exepcionalmente, em ambiente que não seja de Produção e devendo restringir acesso em nível de rede local do órgão, é possível permitir o acesso externo à rede Docker. Para isso é necessário adicionar a linha afeta ao `docker-compose-dev.yaml` no script de deploy, localizado no arquivo: `deploy-externo.sh`:
->
-> DE:
-> ```bash
-> [...]
-> docker compose --profile externo \
->   -f docker-compose-ext.yaml \
->   -p $PROJECT_NAME \
->   up \
->   --no-build -d
-> [...]
-> ```
-> PARA:
-> ```bash
-> [...]
-> docker compose --profile externo \
->   -f docker-compose-ext.yaml \
->   -f docker-compose-dev.yaml \ # Linha adicional que permite a abertura do acesso externo à rede Docker.
->   -p $PROJECT_NAME \
->   up \
->   --no-build -d
-> [...]
-> ```
->
-> Em seguida faça o redeploy do servidor de solução de IA, conforme abaixo:
->
-> ```bash
-> bash deploy-externo.sh
-> ```
->
-> Aguarde o `FIM` do deploy e em seguida prossiga com os testes.
-
-### Airflow
-- **URL**: http://[Servidor_Solucoes_IA]:8081
-- **Descrição**: Orquestrador de tarefas para gerar insumos necessários à recomendação de documentos e embeddings.
-
-**Recomendamos bloquear o acesso de rede, exceto para o administrador do ambiente computacional.
-
-#### Principais DAGs
-- **documents_indexing**: Processa os documentos para serem indexados no Solr do SEI IA para recomendação.
-- **documents_update_index**: Atualiza o índice de documentos no Solr do SEI IA.
-- **process_indexing**: Processa os processos para serem indexados no Solr do SEI IA para recomendação.
-- **process_update_index**: Cria a fila para indexar os processos e documentos no Solr do SEI IA.
-- **system_clean_airflow_logs**: Realiza a limpeza de logs do Airflow.
-- **system_create_mlt_weights_config**: Gera o arquivo de pesos para a pesquisa de documentos relevantes da API SEI IA.
-
-Ao acessar o Airflow, será apresentada a tela:
-![Airflow Interface](image/airflow_interface.png)
-
-No primeiro acesso, o usuário padrão é `seiia` (variável _AIRFLOW_WWW_USER_USERNAME no security.env) e a senha padrão é `seiia` (variável _AIRFLOW_WWW_USER_PASSWORD no security.env).
-
-A senha padrão acima **deve ser alterada**! Seguir os passos abaixo para alterar a senha padrão do Airflow.
-  - Inicialmente, você deve acessar `Your Profile`
-  ![Airflow troca de senha - Passo 1](image/airflow_2.png)
-  - Em seguida, clique em `Reset my password`
-  ![Airflow troca de senha - Passo 2](image/airflow_3.png)
-  - Por fim, insira sua nova senha (`password`), confirme-a (`confirm password`) e clique em `save`
-  ![Airflow troca de senha - Passo 3](image/airflow_4.png)
-  - Sua senha foi alterada com sucesso.
-
-#### Monitoramento e Significado das Cores das DAGs
-
-Para garantir o funcionamento correto do sistema, acompanhe o status das DAGs, que usam um esquema de cores para indicar o estado atual de cada uma:
-- **Verde escuro**: Execução bem-sucedida, indicando que a DAG foi concluída sem erros.
-- **Verde claro**: DAG em execução. Caso esteja em execução por um longo período, pode indicar um possível atraso ou alta carga de processamento.
-- **Vermelho**: Falha na execução. Verifique e corrija o erro para evitar impacto nas recomendações e na criação de embeddings para o RAG.
-- **Cinza**: DAG sem execução agendada ou manual. Pode ser normal em processos que são executados apenas em intervalos específicos.
-- **Amarelo**: Indica que a execução foi interrompida antes de sua conclusão. Necessita ser retomada ou reiniciada conforme necessário.
-
-#### Como Obter o Log de Execução em Caso de Falha (DAG Vermelha)
-
-Se uma DAG estiver marcada em vermelho, isso indica que houve uma falha durante a execução. Para investigar o problema:
-1. **Clique no nome da DAG** para abrir uma visão detalhada.
-2. Navegue até a execução com falha (marcada em vermelho no diagrama).
-3. **Clique na tarefa específica que falhou** para acessar as opções de log.
-4. Selecione a aba **Log** para ver o histórico detalhado de execução e identificar o erro.
-
-Essa análise dos logs ajudará a entender a causa da falha e facilitará a correção do problema antes de reiniciar a DAG.
-
-### API de Recomendação de Processos e Documentos do SEI IA
-- **URL**: http://[Servidor_Solucoes_IA]:8082
-- **Descrição**: API que utiliza Solr para encontrar processos e documentos semelhantes no banco de dados do SEI.
-![Tela da API de Recomendação de Processos do SEI IA](image/API_SEIIA.png)
-- **Health Check**:
-  - API
-      ```bash
-      curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8082/health' -H 'accept: application/json'
-      ```
-
-      deve retornar:
-
-      ```bash
-      {
-         "status":"OK",
-         "response_time": null
-      }
-      ```
-  - Banco de dados
-      ```bash
-      curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8082/health/database' -H 'accept: application/json'
-      ```
-      deve retornar:
-      ```bash
-      {
-         "status":"OK",
-         "response_time": null
-      }
-      ```
-  - Recomendação de processos
-      ```bash
-      curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8082/health/process-recommendation' -H 'accept: application/json'
-      ```
-      deve retornar:
-      ```bash
-      {
-         "status":"OK",
-         "response_time": tempo de resposta
-      }
-      ```
-  - Recomendação de documentos
-      ```bash
-      curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8082/health/document-recommendation' -H 'accept: application/json'
-      ```
-      deve retornar:
-      ```bash
-      {
-         "status":"OK",
-         "response_time": tempo de resposta
-      }
-      ```
-
-### API SEI IA Feedback de Processos
-- **URL**: http://[Servidor_Solucoes_IA]:8086/docs
-- **Descrição**: API para registrar feedbacks dos usuários sobre as recomendações feitas pela API SEI.
-![Tela da API de Feedback de Processos do SEI IA](image/API_SEIIA_feedback.png)
-- **Health Check**:
-   ```bash
-   curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8086/health' -H 'accept: application/json'
-   ```
-   deve retornar:
-   ```bash
-   {
-      "status":"OK",
-      "timestamp":"DATA"
-   }
-   ```
-
-### API SEI IA Assistente
-- **URL**: http://[Servidor_Solucoes_IA]:8088
-- **Descrição**: API que fornece funcionalidades do Assistente de IA do SEI.
-![Tela do Assistente de IA do SEI IA](image/API_SEIIA_ASSISTENTE.png)
-- **Health Check**:
-   ```bash
-   curl -X 'GET' 'http://[Servidor_Solucoes_IA]:8088/health' -H 'accept: application/json'
-   ```
-   deve retornar:
-   ```bash
-   {"status":"OK"}
-   ```
-
-### Bancos de Dados
-
-#### Solr do Servidor de Soluções de IA
-- **URL**: http://[Servidor_Solucoes_IA]:8084
-- **Descrição**: Interface do Solr do Servidor de Soluções de IA, utilizado na recomendação de processos e de documentos similares.
-![Tela do Solr do Servidor de Soluções de IA do SEI](image/Solr_SEIIA.png)
-
-#### PostgreSQL
-- **URL**: [Servidor_Solucoes_IA]:5432
-- **Descrição**: Banco de dados PostgreSQL interno, que armazena informações do SEI e os embeddings no seu módulo pgvector.
-
-## Mapeamento da Integração no SEI
-
-**SEI > Administração > Inteligência Artificial > Mapeamento das Integrações**
-
-Conforme consta orientado no [README do Módulo SEI IA](https://github.com/anatelgovbr/mod-sei-ia?tab=readme-ov-file#orienta%C3%A7%C3%B5es-negociais), somente com tudo configurado na Administração do módulo no SEI do ambiente correspondente será possível o uso adequado de toda a solução.
-
-Assim, com todas as soluções do servidor em status "Up", conforme verificado acima, a primeira verificação no SEI para confirmar que a comunicação entre SEI <> Servidor de Soluções de IA está funcionando com sucesso é configurar os dois registros existentes no menu do SEI de Administração > Inteligência Artificial > Mapeamento das Integrações.
-- Nos dois registros existentes no menu acima, é necessário entrar na tela "Alterar Integração" para cadastrar o host do Servidor de Soluções de IA instalado e "Validar" a integração, conforme print abaixo.
-
-![Mapeamento das Integrações OK na Administração do SEI](image/mod_sei_Validar_Integracao_com_Servidor_1.png)
-
-Se o SEI não se conectar com sucesso ao Servidor de Soluções de IA que acabou de instalar, conforme acima, vai dar uma mensagem de crítica abaixo e, com isso, é necessário ajustar configurações de rede para que a comunicação funcione.
-
-![Mapeamento das Integrações não OK na Administração do SEI](image/mod_sei_Validar_Integracao_com_Servidor_2.png)
-
-## Resolução de Problemas Conhecidos
-
-- **Erro de montagem de arquivo**:
-
-  ```bash
-  Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: error mounting "/opt/sei/sei-ia/solr_config/log4j2.xml" to rootfs at "/opt/solr/server/resources/log4j2.xml": create mount destination for /opt/solr/server/resources/log4j2.xml mount: cannot mkdir in /var/lib/docker/overlay2/...: not a directory: unknown
-  ```
-
-  Solução:
-
-  ```bash
-  rmdir /opt/sei/sei-ia/solr_config/log4j2.xml
-  touch /opt/sei/sei-ia/solr_config/log4j2.xml
-  ```
-
-- **Erro de limite de CPU**:
-
-  ```bash
-  Error response from daemon: Range of CPUs is from 0.01 to 4.00, as there are only 4 CPUs available
-  ```
-
-  Solução: Alterar o arquivo `prod.env` (caso o `ENVIRONMENT` seja diferente, alterar o `.env` específico) e modificar todas as chaves que possuem `CPU_LIMIT`.
-
-- **Erro de nome de container duplicado**:
-
-  ```bash
-  Error response from daemon: Conflict. The container name "/3bd4ff6aae26_sei_ia-jobs_api-1" is already in use by container "64856a9070ccf94bbc1803a98749bee282813cd6d65dab51ecab827449ee0423".
-  ```
-
-  Solução: Identificar qual o processo que ainda está rodando:
-
-  ```bash
-  docker ps -a
-  ```
-
-  Buscar o ID do container e parar:
-
-  ```bash
-  docker stop [NUMERO_do_container] # no exemplo seria 3bd4ff6aae26
-  ```
-
-- **Dependência falhando ao iniciar**:
-
-  ```bash
-  dependency failed to start: container sei_ia-rabbitmq-pd-1 is unhealthy
-  ```
-
-  Solução: Por padrão, ao rodar novamente o comando de inicialização, volta a funcionar. Se persistir, deve-se verificar a quantidade de memória disponível no sistema.
-
-  ```bash
-  bash deploy-externo.sh
-  ```
-
-## Pontos de Atenção para Escalabilidade
-
-* Caso necessário, podem ser alteradas as variáveis de `..._MEM_LIMIT` no `env_files/prod.env`.
-* Não devem ser alteradas para valores menores, pois isso afetará o funcionamento do sistema.
-
-### Pontos de Montagem de Volumes
-
-Os pontos de montagem dos volumes Docker estão localizados em `/var/lib/docker/volumes/`.
-* Esses volumes tendem a crescer de acordo com a quantidade de documentos e processos armazenados, conforme descrito nos requisitos de sistema.
-
-É possível também alterar os pontos de montagem dos volumes Docker modificando o arquivo `daemon.json`. Mais informações podem ser encontradas na [documentação do Docker](https://docs.docker.com/reference/cli/dockerd/#configure-runtimes-using-daemonjson).
-  - Como alternativa, pode-se criar links simbólicos para cada um dos volumes.
-
-- Exemplo de criação de um link simbólico para `/var/lib/docker/volumes/sei_ia_pgvector-db-volume-all`:
-  - Deve parar o Docker para evitar problemas durante a movimentação dos dados:
-
-   ```bash
-   sudo systemctl stop docker
-   ```
-
-  - Mova a pasta de volumes para o novo caminho:
-
-  ```bash
-
-  sudo mv /var/lib/docker/volumes/sei_ia_pgvector-db-volume-all /novo/caminho/para/volumes
-  ```
-
-  - Crie o link simbólico apontando para o novo local dos volumes:
-
-  ```bash
-
-  sudo ln -s /novo/caminho/para/volumes /var/lib/docker/volumes/sei_ia_pgvector-db-volume-all
-  ```
-
-  - Reinicie o Docker:
-
-  ```bash
-  sudo systemctl start docker
-  ```
-
-### Ajustes Necessários
-
-Ao escalar a solução, considere os seguintes pontos:
-
-- **Solr**:
-  - Aumente a alocação de memória se houver necessidade de lidar com uma maior quantidade de documentos ou consultas simultâneas. Uma boa prática é aumentar a memória em incrementos de 2 GB.
-  - Para isso, altere no arquivo `env_files/prod.env`:
-
-   | Variável                        | Descrição                                                                                  |
-   |---------------------------------|--------------------------------------------------------------------------------------------|
-   | `SOLR_JAVA_MEM="-Xms8g -Xmx24g"` | Define as opções de memória Java para Solr, com um mínimo de 8 GB e um máximo de 24 GB.     |
-   | `SOLR_MEM_LIMIT=28g`            | Define o limite de memória para Solr como 8 GB.                                           |
-   | `SOLR_CPU_LIMIT='8'`            | Define o limite de CPU para Solr como 8 unidades de CPU.                                   |
-
-- **Airflow**:
-  - O Airflow pode ser escalado horizontalmente adicionando mais workers. Para mais informações, consulte a [documentação do Airflow](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/overview.html).
-  - Em nossa solução, é possível configurar mais workers na variável `AIRFLOW_WORKERS_REPLICAS` no `env_files/prod.env`, lembrando que cada réplica usa em média 6 GB.
-
-- **Postgres**:
-  - Para aumentar o desempenho, considere aumentar a memória disponível. Monitore o uso de disco e ajuste conforme necessário.
-
-   | Variável                    | Descrição                                                     |
-   |-----------------------------|---------------------------------------------------------------|
-   | `PGVECTOR_MEM_LIMIT=16g`     | Define o limite de memória para Pgvector como 16 GB.           |
-   | `PGVECTOR_CPU_LIMIT='4'`    | Define o limite de CPU para Pgvector como 4 unidades de CPU.  |
-
-## Backup periódico dos dados do Servidor de Soluções de IA
-
-Um ponto importante em relação ao Servidor de Soluções de IA é a realização de backup periódico, principalmente dos bancos de dados utilizados pelas aplicações. Todos os dados do servidor são armazenados em volumes Docker e, via de regra, estão localizados na pasta `/var/lib/docker/volume`. O comando abaixo lista os volumes relacionados ao servidor:
+O comando constrói e executa um checker efêmero, grava seus artefatos no volume de
+logs e não derruba a stack. A instalação só é aceita quando ele termina com código
+zero e **sem erros**. Avisos devem ser lidos e justificados; não considere uma
+execução incompleta como aprovação.
+
+| Seção do checker | O que valida | Resultado exigido |
+|---|---|---|
+| ENVS | inventário exato de `default.env` e `security.env`, duplicidades, valores obrigatórios e formatos | nenhuma variável ausente, extra, duplicada ou obrigatória vazia |
+| CONECTIVIDADE | DNS, endpoints internos e serviços externos configurados | todos os destinos obrigatórios alcançáveis |
+| ENDPOINTS | `/health` e contratos esperados das APIs | respostas válidas nas APIs do gateway e nos serviços internos |
+| LITELLM PROXY | saúde do proxy e presença de `standard`, `mini`, `nano`, `embedding` e `speech-to-text` com suas oito tags `agents:*` | nenhum alias obrigatório ausente ou com papéis incompletos |
+| CERTIFICADO | validade temporal e SAN do gateway | `SEIIA_GATEWAY_HOST` e nomes adicionais presentes no SAN |
+| SOLR | autenticação e acesso aos cores | consultas de validação sem erro |
+| BANCOS INTERNOS | conexão e tabelas do Assistente e Similaridade | tabelas obrigatórias acessíveis |
+| DOCKER | containers, healthchecks, reinícios, OOM e erros recentes | serviços esperados saudáveis e sem erro não tratado |
+| AIRFLOW | importação e listagem das DAGs | nenhuma falha de importação |
+
+Os artefatos ficam no volume Docker `health_checker_logs`, sob `logs/<data>`. Para
+localizar o ponto de montagem no host:
 
 ```bash
-docker volume ls | grep "^sei_ia-"
+docker volume inspect sei-ia_health_checker_logs
 ```
 
-## Guia de utilização de certificado SSL proprietário
+O nome pode receber outro prefixo se o projeto Compose tiver sido deliberadamente
+renomeado. Use o campo `Mountpoint` retornado pelo próprio Docker; não presuma o
+caminho físico do volume.
 
-Este guia tem como objetivo auxiliar na configuração de um certificado SSL proprietário para as aplicações de backend do SEI IA.
+## 9. Resolução de problemas conhecidos
 
-### Passos para a configuração do certificado SSL proprietário
+| Sintoma | Causa provável | Verificação/correção |
+|---|---|---|
+| `network ... declared as external, but could not be found` | Rede externa não criada ou nome divergente | Compare `COMPOSE_NETWORK_NAME` com `docker network ls` e crie a rede correta. |
+| Conflito de subnet ou serviço inacessível | Rede Docker sobreposta a LAN/VPN | Inspecione todas as subnets e recrie a rede com uma faixa aprovada pela equipe de rede. |
+| `address already in use` | Porta 8088, 8082, 8086 ou 8081 ocupada | Identifique o processo com `ss -ltnp`; não publique os serviços internos como solução. |
+| Falha de build por DNS/timeout | Host sem egress, proxy ou DNS para BuildKit | Valide resolução e HTTPS no host e no builder; configure o proxy corporativo antes de repetir. |
+| `permission denied` em volume | UID/GID, proprietário ou SELinux incorretos | Compare `default.env`, `ls -ln` e os contextos SELinux; execute `make ensure-volumes` após corrigir a raiz. |
+| Falha TLS por hostname | DNS usado pelo SEI não está no SAN | Corrija `SEIIA_GATEWAY_HOST`/certificado e valide com `openssl x509 -text`; não desative a verificação. |
+| `unable to get local issuer certificate` | CA bundle ausente ou cadeia incorreta no SEI | Monte o PEM/CA correto em `/opt/sei/config/mod-ia/seiia.cert.pem`. |
+| Certificado e chave não formam par | Arquivos de PKI trocados | Compare as chaves públicas e instale o par correto; o script não sobrescreve o material do órgão. |
+| LiteLLM retorna 401/403 | Chave do proxy divergente | Confirme a mesma `LITELLM_PROXY_API_KEY` no contrato e recrie os serviços sem expor o valor. |
+| Alias ou tag de modelo ausente | `litellm_config.yaml` alterado ou incompleto | Compare com o template da mesma tag e confira os cinco aliases e suas tags conforme a seção 3.1. |
+| Airflow não inicializa | Credenciais/metastore ou migração falharam | Leia o log de `etl-airflow-init`; corrija a primeira falha antes de executar `make up` novamente. |
+| Checker acusa variável extra/ausente | `security.env` veio de outra versão | Recrie-o a partir do `security_example.env` da mesma tag e transfira somente os valores correspondentes. |
+| Assistente não aparece no SEI | Funcionalidade ainda não exibida | Em **Administração > Inteligência Artificial > Assistente IA > Configurações do Assistente IA**, marque **Exibir** em **Exibir Funcionalidade** e salve. |
 
-**IMPORTANTE:** O usuário que vai executar o script deve ter permissão sudo.
+Não use comandos globais de remoção de contêineres, volumes ou imagens. Eles podem
+afetar outras aplicações do host e apagar evidências úteis para o diagnóstico.
 
-1. **Criar a pasta certificado na raiz do projeto:**
+## 10. Dimensionamento
 
-```bash
-sudo mkdir certificado
-```
+Os limites versionados em `default.env` representam o ambiente de referência. Antes
+de reduzi-los ou ampliá-los, some memória e CPU de todas as réplicas e preserve
+margem para Docker, kernel, cache de arquivos, builds e picos do Solr.
 
-2. **Configuração do certificado:**
+| Componente | Variáveis principais | Observação |
+|---|---|---|
+| Solr | `SOLR_JAVA_MEM`, `SOLR_MEM_LIMIT`, `SOLR_CPU_LIMIT` | o limite do container deve ser maior que o heap Java |
+| Airflow | `AIRFLOW_WORKERS_REPLICAS`, `AIRFLOW_WORKER_MEM_LIMIT`, `AIRFLOW_WORKER_CPU_LIMIT` | cada réplica multiplica o consumo configurado |
+| PostgreSQL/pgvector | `PGVECTOR_MEM_LIMIT`, `PGVECTOR_CPU_LIMIT` | cresce com embeddings e volume documental |
+| Assistente | `ASSISTENTE_MEM_LIMIT`, `ASSISTENTE_CPU_LIMIT` | considerar sessões simultâneas e processamento de anexos |
+| Busca web | limites `SEARXNG_*`, `FASTCRW_*`, `LIGHTPANDA_*`, `CHROME_*`, `BYPARR_*` e `MARKER_*` | cada serviço deve caber no dimensionamento total da stack |
 
-   **Opção A - Se você já possui um certificado SSL:**
-
-   Copie os arquivos .key e .pem para a pasta certificado:
-   ```bash
-   cp [caminho do arquivo .key] certificado/seiia.key
-   cp [caminho do arquivo .pem] certificado/seiia.pem
-   ```
-
-   **Opção B - Se você NÃO possui um certificado SSL:**
-
-   O certificado será criado automaticamente durante a execução do script.
-
-3. **Executar o script de ativação:**
-
-```bash
-sudo bash certificado_ssl_proprietario/script_ativar_ssl_proprietario.sh
-```
-
-## Anexos
-
-### **Instalar Git - OPCIONAL**
-
-> **Observação**:
-> - É possível instalar sem o Git, sobretudo caso o órgão possua procedimentos e ferramentas de Deploy próprios de seu ambiente computacional, como um GitLab e Jenkins, deve adequar este passo aos seus próprios procedimentos.
-> - Apenas tenha certeza de manter a estrutura de código deste projeto no GitHub dentro da pasta **/opt/seiia/sei-ia**.
-
-   Siga a documentação oficial para instalar o Git: [Documentação Git](https://git-scm.com/book/pt-br/v2/Come%C3%A7ando-Instalando-o-Git)
-
-   Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-   ```bash
-   sudo apt-get update
-   sudo apt-get install git
-   ```
-
-   Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-   ```bash
-   sudo yum install git-all
-   ```
-
-### **Instalar Docker - CASO AINDA NÃO ESTEJA INSTALADO**
-
-   Siga a documentação oficial para instalar o Docker: [Documentação Docker](https://docs.docker.com/engine/install/)
-
-   Aqui está o resumo dos comandos necessários para Ubuntu/Debian:
-   ```bash
-   for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-
-   # Adicionar a chave GPG oficial do Docker:
-   sudo apt-get update
-   sudo apt-get install ca-certificates curl
-   sudo install -m 0755 -d /etc/apt/keyrings
-   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-   sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-   # Adicionar o repositório do Docker:
-   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-   # Instalar o Docker
-   sudo apt-get update
-   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-   ```
-
-   Aqui está o resumo dos comandos necessários para o CentOS/RHEL:
-   ```bash
-   # Remover pacotes antigos do Docker, caso existam
-   for pkg in docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine podman containerd runc; do sudo yum remove $pkg; done
-
-   # Instalar o Docker
-   sudo yum install -y yum-utils
-   sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-   sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-   ```
+Não copie limites reduzidos de um laboratório para produção. O dimensionamento deve
+ser proporcional ao acervo e à concorrência do órgão.

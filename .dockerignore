@@ -1,0 +1,93 @@
+# =============================================================================
+# .dockerignore raiz — protege o contexto de build de qualquer Dockerfile que
+# use `context: .` no docker-compose.yml.
+#
+# Objetivo central: impedir que `.git/`, credenciais e caches grandes entrem
+# no tar enviado ao builder, e ao mesmo tempo manter o build atual funcionando.
+#
+# Estilo conservador: não bloqueia `tests/`, `docs/` ou `*.md` internos a
+# aplicações, porque os Dockerfiles atuais usam `COPY ./aplicacoes/<app> /app`
+# sem filtro. Quem quiser COPY seletivo deve ajustar o Dockerfile, não confiar
+# em `.dockerignore` que excluiria por baixo.
+# =============================================================================
+
+# --- Git ---------------------------------------------------------------------
+.git
+.git/
+.gitmodules
+.gitattributes
+
+# --- Worktrees temporárias (auto-gerenciadas) --------------------------------
+.worktree/
+
+# --- Credenciais e configs sensíveis -----------------------------------------
+# Importante: nenhum Dockerfile atual COPIA arquivos `.env` para a imagem;
+# o `env_file:` do compose lê fora do contexto de build.
+.env
+.env.*
+**/.env
+**/.env.*
+security.env
+**/security.env
+litellm_config.yaml
+litellm_config.*.yaml
+llm_config.yaml
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.kdb
+*.jks
+id_rsa*
+id_ed25519*
+.netrc
+.npmrc
+
+# --- Caches Python / Node / lint ---------------------------------------------
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/.venv/
+**/venv/
+**/.conda/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.coverage
+**/.coverage.*
+**/coverage.xml
+**/coverage.json
+**/htmlcov/
+**/*.egg-info/
+**/.tox/
+**/node_modules/
+
+# --- IDEs --------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*~
+
+# --- Logs e temporários ------------------------------------------------------
+**/logs/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# --- Sonar / quality gates ---------------------------------------------------
+docker-compose.sonarqube.yml
+ops/sonarqube/
+**/.sonar/
+**/.scannerwork/
+
+# --- Documento original grande não usado em runtime --------------------------
+# 78 KB PDF preservado no repo só por contexto histórico; nenhuma imagem
+# precisa dele. Aceita-se ainda ficar no repositório, mas não na imagem.
+aplicacoes/assistente/220524_original.pdf
+
+# --- Compose alternativos não consumidos por build com context=. -------------
+aplicacoes/etl-airflow/docker-compose-local-desenv.yml

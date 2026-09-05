@@ -1,0 +1,3 @@
+.venv/
+run_test_uploads_local.py
+tmp_session/

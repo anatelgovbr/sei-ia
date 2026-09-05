@@ -1,0 +1,20 @@
+[
+  {
+    "model": "openai/seiia-ds-gpt-terra",
+    "roles": ["principal"],
+    "reasoning_effort_levels": ["none", "low", "medium", "high"]
+  },
+  {
+    "model": "openai/seiia-ds-gpt-luna",
+    "roles": ["classificador", "busca_web", "explorador", "ocr", "triagem_busca"],
+    "reasoning_effort_levels": ["none", "low", "medium", "high"]
+  },
+  {
+    "model": "openai/seiia-ds-embedding",
+    "roles": ["embedding"]
+  },
+  {
+    "model": "openai/seiia-whisper-ds",
+    "roles": ["audio_transcription"]
+  }
+]

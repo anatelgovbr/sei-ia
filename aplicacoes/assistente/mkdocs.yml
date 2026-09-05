@@ -1,0 +1,113 @@
+site_name: SEI-IA Assistente
+repo_url: https://github.com/Anatel/sei-ia
+site_url: https://Anatel.github.io/sei-ia
+site_description: Assistente Virtual baseado em IA para o Sistema Eletrônico de Informações (SEI) da ANATEL
+site_author: Anatel
+edit_uri: edit/main/docs/
+repo_name: Anatel/sei-ia
+copyright: Maintained by <a href="https://www.gov.br/anatel">ANATEL</a>.
+
+nav:
+  - Home: index.md
+  - Início Rápido:
+    - getting-started/README.md
+    - Instalação: getting-started/installation.md
+    - Variáveis de Ambiente: getting-started/environment.md
+    - Quickstart: getting-started/quickstart.md
+  - Arquitetura:
+    - architecture/README.md
+    - Visão Geral: architecture/overview.md
+    - Componentes: architecture/components.md
+    - Workflow LangGraph: architecture/workflow.md
+  - API:
+    - api/README.md
+    - Endpoints: api/endpoints.md
+    - Modelos de Dados: api/models.md
+    - Exemplos: api/examples.md
+  - Sistema RAG:
+    - rag-system/README.md
+    - Visão Geral: rag-system/overview.md
+    - Embeddings: rag-system/embeddings.md
+    - Retrieval: rag-system/retrieval.md
+    - Auto-Indexação: rag-system/auto-indexing.md
+  - Agentes:
+    - agents/README.md
+    - Visão Geral: agents/overview.md
+    - Intent Selector: agents/intent-selector.md
+    - Question Handler: agents/question-handler.md
+    - Summarizer: agents/summarizer.md
+    - Web Search: agents/websearch.md
+  - Prompts:
+    - prompts/README.md
+    - System Prompts: prompts/system-prompts.md
+    - Intent Prompts: prompts/intent-prompts.md
+    - Generation Prompts: prompts/generation-prompts.md
+  - Integrações:
+    - integrations/README.md
+    - Azure OpenAI: integrations/azure-openai.md
+    - SEI API: integrations/sei-api.md
+    - PostgreSQL: integrations/postgresql.md
+    - Redis: integrations/redis.md
+    - Observabilidade: integrations/observability.md
+  - OCR:
+    - OCR PDF Escaneado: ocr-pdf-escaneado.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["sei_ia"]
+
+theme:
+  name: material
+  language: pt-BR
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Modo escuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Modo claro
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Anatel/sei-ia
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
