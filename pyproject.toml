@@ -27,6 +27,7 @@ dev = [
     "ruff==0.14.10",
     "requests-mock",
     "coverage",
+    "pytest-cov",
     "pytest-mock",
     "pre-commit",
 ]
@@ -41,6 +42,9 @@ pythonpath = ["."]
 branch = true
 source = ["."]
 omit = ["./tests/*", "./.conda/*"]
+
+[tool.coverage.report]
+fail_under = 90
 
 [tool.ruff]
 line-length = 88
