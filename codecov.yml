@@ -1,0 +1,19 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  precision: 2
+  round: down
+  status:
+    project:
+      default:
+        target: 90%
+        threshold: 0%
+    patch:
+      default:
+        target: 90%
+        threshold: 0%
+
+comment:
+  layout: "condensed_header, diff, files"
+  require_changes: false
