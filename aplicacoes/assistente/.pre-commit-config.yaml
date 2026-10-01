@@ -1,0 +1,52 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v5.0.0"
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+        # litellm_config.template.yaml (raiz do monorepo): o placeholder
+        # ${LITELLM_MODEL_CATALOG_ENTRIES} injeta um bloco inteiro de
+        # model_list via envsubst no deploy — só vira YAML válido depois da
+        # substituição, não como template puro.
+        exclude: (^mkdocs\.yml$|^litellm_config\.template\.yaml$|^aplicacoes/assistente/experimentos/latencia-session-vs-classico/docker-compose\.isolated\.yml$)
+      - id: check-added-large-files
+        args: ['--maxkb=1024']
+        exclude: ^tests/fixtures/documents/
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.14.10"
+    hooks:
+      # tests/connectivity_tests.py e .gitlab/scripts/**/*.py: scripts fora
+      # de aplicacoes/*, sem ruff.toml próprio, caem no ruleset default
+      # (estrito) do ruff — débito de lint pré-existente nos arquivos
+      # inteiros (~800 erros em .gitlab/scripts sozinho), sem relação com
+      # commits pontuais.
+      - id: ruff
+        exclude: (^tests/connectivity_tests\.py$|^\.gitlab/scripts/)
+      - id: ruff-format
+        exclude: (^tests/connectivity_tests\.py$|^\.gitlab/scripts/)
+
+  - repo: local
+    hooks:
+      - id: redos-scan
+        name: "ReDoS scanner (regexploit)"
+        entry: bash .gitlab/scripts/redos_check.sh
+        language: python
+        additional_dependencies: ["regexploit==1.0.0"]
+        types: [python]
+        pass_filenames: true
+
+      - id: noqa-needs-nosonar
+        name: "noqa (regras SonarQube) precisa de # NOSONAR"
+        language: pygrep
+        entry: "^(?!.*NOSONAR).*# noqa:.*\\b(?:ARG001|ARG002|C901|PLR0912|PLR0915|ERA001|PLW0603|S\\d+)\\b"
+        types: [python]
+        files: "^sei_ia/"
+
+      - id: timeout-param-needs-nosonar
+        name: "parâmetro timeout precisa de # NOSONAR (SonarQube S7483)"
+        language: pygrep
+        entry: "^(?!.*NOSONAR)\\s+timeout\\s*:\\s*[A-Za-z][\\w\\[\\]| ]*\\s*="
+        types: [python]
+        files: "^sei_ia/"

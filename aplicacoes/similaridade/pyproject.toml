@@ -1,0 +1,142 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "api-sei"
+version = "0.1.0"
+description = "API de Recomendação de Processos SEI"
+authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.10,<3.13"
+
+dependencies = [
+    "python-multipart",
+    "fastapi",
+    "gunicorn",
+    "uvicorn",
+    "uvloop",
+    "websockets",
+    "httptools",
+    "requests",
+    "PyJWT==2.12.1",
+    "pandas==2.2.2",
+    "SQLAlchemy>=2.0.0",
+    "psycopg2-binary",
+    "pgvector",
+    "nest-asyncio",
+    "httpx",
+    "beautifulsoup4==4.12.2",
+    "gensim==4.3.3",
+    "w3lib==2.1.2",
+    "numpy==1.26.4",
+    "sei-api",
+]
+
+[tool.uv.sources]
+sei-api = { path = "../../libs/sei_api", editable = true }
+sei-extraction = { path = "../../libs/sei_extraction", editable = true }
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-xdist",
+    "pytest-mock",
+    "pytest-cov",
+    "pytest-asyncio",
+    "coverage",
+    "ruff==0.14.10",
+    "pre-commit",
+    "requests-mock",
+    "bcrypt",
+    "docker",
+    "taskipy",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
+
+otel = [
+    "opentelemetry-distro",
+    "opentelemetry-exporter-otlp",
+]
+
+[dependency-groups]
+# Instalada somente no container efemero do job de teste da candidata.
+ci-test = [
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "pytest-cov==7.1.0",
+    "pytest-mock==3.15.1",
+    "pytest-xdist==3.8.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+"api_sei" = ["configs/*.txt", "configs/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = ["./tests/*", "./.conda/*"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    "tests/*",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort (imports organizados)
+    "B",    # flake8-bugbear (pega bugs comuns)
+    "UP",   # pyupgrade (mantém sintaxe moderna)
+    "SIM",  # flake8-simplify (sugere simplificações)
+    "C4",   # flake8-comprehensions (otimiza loops)
+    "RUF",  # ruff-specific: RUF029 async sem await (→ SonarQube S7503)
+    "TRY",  # try-except-raise: TRY002 exceções genéricas (→ SonarQube S112)
+    "S",    # flake8-bandit: S324 hash inseguro (→ S4790), S608 SQL injection (→ S3649)
+    "ARG",  # flake8-unused-arguments: ARG001/ARG002 parâmetros não usados
+    "C90",  # mccabe: C901 complexidade ciclomática (proxy SonarQube S3776)
+]
+
+ignore = [
+    "E501",    # tamanho de linha (deixe o formatter cuidar disso)
+    "TRY003",  # mensagens longas em raise (muito verboso na prática)
+    "TRY300",  # mover return para else: preferência de estilo
+    "TRY301",  # raise dentro de try: padrão comum no projeto
+    "TRY400",  # logger.error vs logger.exception: decisão intencional
+    "TRY201",  # verbose raise: padrão existente no projeto
+    "TRY401",  # verbose log message: padrão existente no projeto
+    "TRY004",  # type check without TypeError: padrão existente
+    "RUF100",  # noqa não usada: gerenciado manualmente
+    # bandit S — regras que não se aplicam ou são intencionais neste projeto
+    "S101",  # assert: aceito em helpers de teste
+    "S105", "S106", "S107",  # hardcoded password: falso positivo em vars de config
+    "S113",  # requests sem timeout: intencional em alguns clients internos
+    "S310",  # audit url open: URLs internas controladas
+    "S501",  # requests verify=False: intencional (certificados auto-assinados SEI)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# B008: FastAPI Query/Path/Depends são padrão idiomático e seguros nos routers
+"api_sei/routers/*.py" = ["B008"]
+# B008: app-api usa Body(...) nos defaults de forma intencional, como no repo individual.
+"app_api/main.py" = ["B008"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

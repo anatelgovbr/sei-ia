@@ -1,0 +1,84 @@
+{
+  "schema_version": "benchmark-long-context-v2-evaluation-contract-1",
+  "version": "benchmark-decision-v2-long-context-adapter-1",
+  "inherits": "benchmark-decision-v2@339564c",
+  "context_adapter": "context-disclosure-evidence-1",
+  "canonical_metrics": [
+    "groundedness",
+    "completeness",
+    "citation_quality",
+    "hallucination",
+    "negativa_correta",
+    "overall"
+  ],
+  "auxiliary_metrics": ["target_alignment", "hallucination_count"],
+  "availability": {
+    "statuses": [
+      "pending_trace",
+      "pending_evaluation",
+      "evaluated",
+      "technical_unavailable"
+    ],
+    "nd_status": "technical_unavailable",
+    "unsupported_policy": "groundedness_denominator_not_hallucination"
+  },
+  "judge": {
+    "requested_profile": "mini",
+    "deployment": "seiia-ds-mini",
+    "canonical_model": "gpt-5.4-mini",
+    "provider": "openai",
+    "system_prompt_ref": "judge-prompts/long-context-v2-system.txt",
+    "system_prompt_sha256": "a1ae0fda01c9fbc2ecedf6eb41373baa3af5fc910c34f5535d890a78130535d0",
+    "user_prompt_ref": "judge-prompts/long-context-v2-user.txt",
+    "user_prompt_sha256": "a33ee5514316143a787caf0f4f2f337f9cd55dbc4da7481feb6dafb03107e856",
+    "response_schema_ref": "dataset/long-context/benchmark-long-context-v2-judge.schema.json",
+    "response_schema_sha256": "5c0fd6a77553aae5769e0a88e1373f7c27810ffa20560add4b81144dfc0a8d53",
+    "temperature": 0,
+    "max_output_tokens": 4000,
+    "response_format": "json_schema_strict"
+  },
+  "model_profiles": {
+    "standard": {
+      "deployment": "seiia-ds",
+      "canonical_model": "gpt-5.4",
+      "provider": "openai"
+    },
+    "mini": {
+      "deployment": "seiia-ds-mini",
+      "canonical_model": "gpt-5.4-mini",
+      "provider": "openai"
+    },
+    "nano": {
+      "deployment": "seiia-ds-nano",
+      "canonical_model": "gpt-5.4-nano",
+      "provider": "openai"
+    }
+  },
+  "rate_card": {
+    "ref": "rate_cards/v2.json",
+    "sha256": "b785dbd11ca06d449ee50b954c43b7abb72a713bf7a4ad3fb6ee7a3f0efd7375",
+    "version": "v2",
+    "effective_on": "2026-07-21",
+    "currency": "USD"
+  },
+  "usage_semantics": {
+    "agent_source": "langfuse_generation_usage_details",
+    "judge_source": "openai_compatible_response_usage",
+    "agent_input": "input_excludes_cache_read",
+    "agent_output": "output_excludes_reasoning",
+    "judge_input": "prompt_tokens_includes_cached_tokens",
+    "judge_output": "completion_tokens_includes_reasoning",
+    "canonical_total": "input_uncached + cache_read + output + reasoning",
+    "missing_usage": "technical_unavailable_no_estimation"
+  },
+  "thresholds": {
+    "context_disclosure": 200000,
+    "completeness": 0.8,
+    "groundedness": 0.8,
+    "hallucination": false,
+    "target_alignment": true,
+    "negativa_correta_for_negative": true,
+    "citation_quality": null,
+    "overall": null
+  }
+}

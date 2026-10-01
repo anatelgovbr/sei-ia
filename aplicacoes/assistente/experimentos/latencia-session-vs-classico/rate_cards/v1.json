@@ -1,0 +1,26 @@
+{
+  "version": "v1",
+  "effective_on": "2026-07-13",
+  "source": "OpenAI API model pricing: https://developers.openai.com/api/docs/models/gpt-5.4 ; https://developers.openai.com/api/docs/models/gpt-5.4-mini ; https://developers.openai.com/api/docs/models/gpt-5.4-nano",
+  "usd_to_brl": null,
+  "models": {
+    "seiia-ds": {
+      "source_model": "gpt-5.4",
+      "input_per_million_usd": 2.5,
+      "cache_read_per_million_usd": 0.25,
+      "output_per_million_usd": 15.0
+    },
+    "seiia-ds-mini": {
+      "source_model": "gpt-5.4-mini",
+      "input_per_million_usd": 0.75,
+      "cache_read_per_million_usd": 0.075,
+      "output_per_million_usd": 4.5
+    },
+    "seiia-ds-nano": {
+      "source_model": "gpt-5.4-nano",
+      "input_per_million_usd": 0.2,
+      "cache_read_per_million_usd": 0.02,
+      "output_per_million_usd": 1.25
+    }
+  }
+}

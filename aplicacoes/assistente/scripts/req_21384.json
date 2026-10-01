@@ -1,0 +1,9 @@
+{
+  "id_usuario": 100005821,
+  "id_topico": 21384,
+  "text": "Você lembra do que já conversamos neste tópico? Liste em tópicos curtos o que tratamos antes, com base no histórico.",
+  "system_prompt": "Sou um Assistente de IA integrado ao Sistema Eletrônico de Informações (SEI) da Agência Nacional de Telecomunicações (ANATEL).",
+  "use_thinking": false,
+  "use_websearch": false,
+  "id_procedimentos": []
+}

@@ -1,0 +1,547 @@
+{
+  "corpora": [
+    {
+      "canonical_manifest_sha256": "0983d6e6613f03a102cf3727c98477d4d3df0fd5e2864bcc5934c547f0bc8cb6",
+      "case_id": "case-0960k",
+      "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-0960k",
+      "document_count": 59,
+      "document_inventory_sha256": "15f6af1a50070f35181baebbe97e2e97aa62ce757e2e18e3f9207dfa5eedf652",
+      "payload_sha256": "ee60917ba35f6aff06e313a7460f22b997e25f67c93b3a96d5821243a0ad2aa8",
+      "process_metadata_ref": {
+        "ref": "protected://benchmark-long-context-v2/corpora/case-0960k/process-metadata.json",
+        "sha256": "7aa6a9dad334b707a4b2c65eae97e91d79d64b3809ec211fa6dc32830a116593"
+      },
+      "runtime_bundle_inventory_sha256": "5fae67873d0d40bf6cccbcd874e4b3944f9bbd752b75c0a1861db824acb5ed38",
+      "token_count": 960682,
+      "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+    },
+    {
+      "canonical_manifest_sha256": "eef63f9a7127ff9417b5f0c24a409f4e195247469f07b215e8c9badc9848eeae",
+      "case_id": "case-5120k",
+      "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-5120k",
+      "document_count": 331,
+      "document_inventory_sha256": "d82a497ac3d7a28cf14739864d00c970c5ba1c6b15ed41397694f145989533b0",
+      "payload_sha256": "7cb1ba5480b317ba52d4fedfccf19f175c06713c6eb8b2450f4c3aa04b163bb4",
+      "process_metadata_ref": {
+        "ref": "protected://benchmark-long-context-v2/corpora/case-5120k/process-metadata.json",
+        "sha256": "527658759b0e05e1a1584d5a1598f7cec3802dcd61c906fe6550e96c04534c07"
+      },
+      "runtime_bundle_inventory_sha256": "3986f4d15cef9b05345d23a531624ba77a0c6b086c67e99ede170af342ee0a64",
+      "token_count": 5120866,
+      "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+    },
+    {
+      "canonical_manifest_sha256": "43665a6faabb1bb5403cd84d285378531baeffd333f92e388c4cd2e806cdd101",
+      "case_id": "case-6260k",
+      "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-6260k",
+      "document_count": 61,
+      "document_inventory_sha256": "3a36c4407c07222159afb20a0e554e6170ba752320e917ad351d2f83df05a279",
+      "payload_sha256": "47f25dcc091a4f3bc1be9f8d82b6320b82048ce50eec05269cd945545af2dfb5",
+      "process_metadata_ref": {
+        "ref": "protected://benchmark-long-context-v2/corpora/case-6260k/process-metadata.json",
+        "sha256": "d8aa1ce0e1db782a0c82172f7c12014d69f96473490927da37871f0da88f7bb2"
+      },
+      "runtime_bundle_inventory_sha256": "c70a2d4bd6f75c5792d15f872e56c4d95d4c4afeaeab0111f4d2066795747e85",
+      "token_count": 6260548,
+      "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+    }
+  ],
+  "dataset_name": "benchmark-long-context",
+  "description": "Campanha long-context v2: manifesto reproduzível com conteúdo protegido resolvido apenas em runtime.",
+  "evaluation_contract": {
+    "ref": "dataset/long-context/benchmark-long-context-v2-evaluation-contract.json",
+    "sha256": "ed0bfcda426f906302ddb9c4402fa9625acf045d80c4c4f15c7d73214f5e8761"
+  },
+  "items": [
+    {
+      "absence_evidence": {
+        "ref": null,
+        "required": false,
+        "scope": "not_applicable"
+      },
+      "case_id": "case-0960k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": [
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-0960k-q1-factual/evidence-1.json",
+            "sha256": "9f6d243203f40f3e313f699a1693dd68fe3c173f395f87666672d1f25d2436bb"
+          }
+        ]
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q1-factual/gold.txt",
+        "sha256": "39a09c56bc099551be232e02f14ae68d3a3c2d83a27ab103df8f9dde7ce83fbb"
+      },
+      "item_id": "case-0960k-q1-factual",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q1-factual/question.txt",
+        "sha256": "4419405b009f8b4697a10dfd4cb5878e763ffad8a5f36ba9746ae594e3bbf988"
+      },
+      "question_type": "factual",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q1-factual/rubric.json",
+        "sha256": "3093dc88dbbdae303e963d4e9db280c6c2003b1ee69da29e387a2693a05569a7"
+      },
+      "target": {
+        "anchor_kind": "unique_regulatory_obligation",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-0960k-q1-factual/target-anchor.json",
+          "sha256": "949212186adcee42af2c2261ab14213899bb217c0e3c0fc8de3169d497db0ec7"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": null,
+        "required": false,
+        "scope": "not_applicable"
+      },
+      "case_id": "case-0960k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": [
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-0960k-q2-synthesis/evidence-1.json",
+            "sha256": "24692885a928c6b6a6142cde07f51ec3df11b85866ffcd7db575af8a59852175"
+          },
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-0960k-q2-synthesis/evidence-2.json",
+            "sha256": "3bd6e6493d215ed8310f227ddf1faf644f6902031f559a5ef82c658e7d56fbda"
+          }
+        ]
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q2-synthesis/gold.txt",
+        "sha256": "3af21ac3bba2bb5cd90a2e9c1572e7fb5ff4474a74f08f67489b7bd21265b745"
+      },
+      "item_id": "case-0960k-q2-synthesis",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q2-synthesis/question.txt",
+        "sha256": "df01c3aed7a08e962c2473af90df67796cf6b6ea16b5fcfb65a0a1f0c8a59f7f"
+      },
+      "question_type": "synthesis",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q2-synthesis/rubric.json",
+        "sha256": "199363efc08ef5ff339b775b572089591b66597be8b7522065a5c4b1fd7db40a"
+      },
+      "target": {
+        "anchor_kind": "official_document_pair",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-0960k-q2-synthesis/target-anchor.json",
+          "sha256": "b3696c3f05763bc1eaf915fdcdff073dddbcfe3e3f7440065677c37788168a59"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-0960k-q3-insufficient-evidence/absence-evidence.json",
+          "sha256": "35fdf67e2f2fd7a8473ef3ef1d0afcda2141e34cd3f144b2dfe67ca222b7be3c"
+        },
+        "required": true,
+        "scope": "protected_lexical_search_only"
+      },
+      "case_id": "case-0960k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": []
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q3-insufficient-evidence/gold.txt",
+        "sha256": "88195119935db89cf2ad8ee3f17483a83e7f50fccc46a819c11d6e8d58c96836"
+      },
+      "item_id": "case-0960k-q3-insufficient-evidence",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q3-insufficient-evidence/question.txt",
+        "sha256": "f22de7c67bf944041ed1bc5154c264330c6e7899882904afdd6dd77c067344d7"
+      },
+      "question_type": "insufficient-evidence",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-0960k-q3-insufficient-evidence/rubric.json",
+        "sha256": "601e0f942a81ce1cc9b68bcd184977e47cb2a88af989c29fe2cd3f7657ddd367"
+      },
+      "target": {
+        "anchor_kind": "corpus_wide_period_scope",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-0960k-q3-insufficient-evidence/target-anchor.json",
+          "sha256": "490a0f62aa0415f60a9c10d98b9cd47609e8330f5bea1cb16ae4070fcc58cc3c"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": null,
+        "required": false,
+        "scope": "not_applicable"
+      },
+      "case_id": "case-5120k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": [
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-5120k-q1-factual/evidence-1.json",
+            "sha256": "ee2c0e5713d5c60f18d76b904d16cf35a576d62ed5e872b4acf94f94efa00321"
+          }
+        ]
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q1-factual/gold.txt",
+        "sha256": "d58d542091e716b0071c47face1f40a495c35fd6755afb90eac3380994649568"
+      },
+      "item_id": "case-5120k-q1-factual",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q1-factual/question.txt",
+        "sha256": "4fa2e2d9c3b422dd7eb64c7a5330fd31cb88e24a128899560a72011c9535bc34"
+      },
+      "question_type": "factual",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q1-factual/rubric.json",
+        "sha256": "9b8f61ddd9e8309fff3685a028d3989726ca00ed7067566b3c123ec252b6cb2a"
+      },
+      "target": {
+        "anchor_kind": "named_regulatory_initiative",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-5120k-q1-factual/target-anchor.json",
+          "sha256": "5893c073b662be9801e25829bae9e12b5cbfffdb0fad64ea9d7f3abf0999acd5"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": null,
+        "required": false,
+        "scope": "not_applicable"
+      },
+      "case_id": "case-5120k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": [
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-5120k-q2-synthesis/evidence-1.json",
+            "sha256": "2186561d6f69487375eaef2e7c19f2bf06837c305c7c6ebf6e9dc1dc0a152bc4"
+          },
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-5120k-q2-synthesis/evidence-2.json",
+            "sha256": "28f8ca86a28b785d9011d57fae6b280d8177bf81906d6bf85c87826aee38568e"
+          }
+        ]
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q2-synthesis/gold.txt",
+        "sha256": "7152fec141eb06f93e8816ef15a1d4b3f0e9c6019ef0ecf4c3e1d3ebc32a311e"
+      },
+      "item_id": "case-5120k-q2-synthesis",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q2-synthesis/question.txt",
+        "sha256": "154d5ec4f0a20a12cedd5293348feb2f4ee04e24eff51a4d7d3c6bc9f4fb7c3f"
+      },
+      "question_type": "synthesis",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q2-synthesis/rubric.json",
+        "sha256": "fd86ff91c10d1b809e29c0ad3414ad48fd0fff51003435b482a24d6ec6060593"
+      },
+      "target": {
+        "anchor_kind": "named_participation_sequence",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-5120k-q2-synthesis/target-anchor.json",
+          "sha256": "f0bae9f3dec6f7e20c33600c2d2679a123480b967d8355f14598d0c33597156d"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-5120k-q3-insufficient-evidence/absence-evidence.json",
+          "sha256": "eaca462913ca80447dec9523fb195e254153312c4f673d6ae5b4251993e3213b"
+        },
+        "required": true,
+        "scope": "protected_lexical_search_only"
+      },
+      "case_id": "case-5120k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": []
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q3-insufficient-evidence/gold.txt",
+        "sha256": "71b697d53d8d3564d599d08bb48145757719a8a1430fe4605ff554f4a1c6a3a0"
+      },
+      "item_id": "case-5120k-q3-insufficient-evidence",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q3-insufficient-evidence/question.txt",
+        "sha256": "9425032450ea64a431a1a16507f69b2685917b3a66882814e9dfe36f8ec98e4e"
+      },
+      "question_type": "insufficient-evidence",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-5120k-q3-insufficient-evidence/rubric.json",
+        "sha256": "6e3dc6538675bbf1ac50d848bb4ce46f4b58e1f9506bb3d009a5febab58aef39"
+      },
+      "target": {
+        "anchor_kind": "numbered_consultation_scope",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-5120k-q3-insufficient-evidence/target-anchor.json",
+          "sha256": "fcd151bf6391d7be4c53a6b4f0a78978efc344675f606eceafbda16a09401f2a"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": null,
+        "required": false,
+        "scope": "not_applicable"
+      },
+      "case_id": "case-6260k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": [
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-6260k-q1-factual/evidence-1.json",
+            "sha256": "aab452b72f24987ce2633b7faf8e5eca22af46b02f89733fe5308c80d8bb45fc"
+          }
+        ]
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q1-factual/gold.txt",
+        "sha256": "7808e3b735fea80f160555dd81e284a08be78824d809f195583dda4594ca0f01"
+      },
+      "item_id": "case-6260k-q1-factual",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q1-factual/question.txt",
+        "sha256": "17d03926e1ef6eab822b21109c4316fd42680b759130827b5fe359c573704f81"
+      },
+      "question_type": "factual",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q1-factual/rubric.json",
+        "sha256": "545a10d671cb8bd00fc84b08689dc28d683303c0e7f4d2ee6d01222e6fed90a2"
+      },
+      "target": {
+        "anchor_kind": "numbered_inspection_scope",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-6260k-q1-factual/target-anchor.json",
+          "sha256": "f1ae56a59a6d4fed0db7b20505325cc47aac7d26d01e0967da6594b0eeb144da"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": null,
+        "required": false,
+        "scope": "not_applicable"
+      },
+      "case_id": "case-6260k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": [
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-6260k-q2-synthesis/evidence-1.json",
+            "sha256": "64087578540ff3a074b0766a5b34dfb72f5f2a423d32ba4f8346d746f442c882"
+          },
+          {
+            "ref": "protected://benchmark-long-context-v2/items/case-6260k-q2-synthesis/evidence-2.json",
+            "sha256": "079ddbc59c140485c16c3b5f414f87cdbcfed3b3317b926c1158afb1c5441b27"
+          }
+        ]
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q2-synthesis/gold.txt",
+        "sha256": "cccee4f32faa9f075bfea0436895945d11735f74208ff17671bf42078e70aef2"
+      },
+      "item_id": "case-6260k-q2-synthesis",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q2-synthesis/question.txt",
+        "sha256": "a4ec45e268d5507f28a500b5e9e0f8b1fc10ecd1cbd92a40fd0986aa487a48a4"
+      },
+      "question_type": "synthesis",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q2-synthesis/rubric.json",
+        "sha256": "1e0c2f29b8bea77204d05050d7eadd7f60337c58adccb21572643114a150b0f4"
+      },
+      "target": {
+        "anchor_kind": "origin_request_final_report_pair",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-6260k-q2-synthesis/target-anchor.json",
+          "sha256": "cabc200cb1a8597f77c6ee6c071ed65febb2c8ad404a25a0a585c35516dc2e6b"
+        },
+        "lock_required": true
+      }
+    },
+    {
+      "absence_evidence": {
+        "ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-6260k-q3-insufficient-evidence/absence-evidence.json",
+          "sha256": "dc3305537f9121c95a282b7e2545697d2f3c8dfde0807026914ff2809acc1dd6"
+        },
+        "required": true,
+        "scope": "protected_lexical_search_only"
+      },
+      "case_id": "case-6260k",
+      "evidence": {
+        "allowed": [
+          "exact_opened_excerpts",
+          "document_metadata",
+          "explicit_protected_absence"
+        ],
+        "forbidden": [
+          "judge_world_knowledge",
+          "question_only",
+          "gold_only",
+          "unopened_document"
+        ],
+        "source_refs": []
+      },
+      "gold": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q3-insufficient-evidence/gold.txt",
+        "sha256": "c462821edc4bda0c03b0d82a0b0a2814187af87ae4675ac5eadc5eb67cadf21a"
+      },
+      "item_id": "case-6260k-q3-insufficient-evidence",
+      "question": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q3-insufficient-evidence/question.txt",
+        "sha256": "49d98d4ebbc03c724249d53e20762c22168bae10638971517c86804e116dd00e"
+      },
+      "question_type": "insufficient-evidence",
+      "rubric": {
+        "ref": "protected://benchmark-long-context-v2/items/case-6260k-q3-insufficient-evidence/rubric.json",
+        "sha256": "27d4eee136942fc873284ccbef99d1c09f2542cec715115f2fbfc061fcdc14a5"
+      },
+      "target": {
+        "anchor_kind": "whole_requested_document_universe",
+        "anchor_ref": {
+          "ref": "protected://benchmark-long-context-v2/items/case-6260k-q3-insufficient-evidence/target-anchor.json",
+          "sha256": "4f05fa0f66dcd258a5340616850a46a47a1c13bc43091ccb3335fa53bf5587a6"
+        },
+        "lock_required": true
+      }
+    }
+  ],
+  "metadata": {
+    "allowed_retries": [
+      "ingestion_readback",
+      "evaluation"
+    ],
+    "classic_enabled": false,
+    "context_disclosure_threshold_tokens": 200000,
+    "desired_model_context_window_tokens": 500000,
+    "document_source": "sei_no_cache_with_pinned_validation",
+    "endpoint": "session_stream",
+    "inference_retries": 0,
+    "max_concurrency": 1,
+    "n_per_question": 1,
+    "no_cache": true,
+    "process_source": "sei_no_cache",
+    "route": "/llm_lang/session_stream",
+    "sequential": true,
+    "tokenizer": "o200k_base",
+    "warmups": 0,
+    "websearch": false
+  },
+  "preflight_invariants": [
+    "exactly_nine_natural_items",
+    "question_and_gold_hashes_match_independent_constants",
+    "exactly_three_frozen_corpora",
+    "three_by_three_question_type_distribution",
+    "n1_reserved_before_post",
+    "no_inference_retry",
+    "session_stream_only",
+    "default_model_profiles_only",
+    "judge_mini_only",
+    "protected_refs_resolve_without_symlinks",
+    "rate_card_hash_matches",
+    "no_cache_true",
+    "documents_fetched_from_sei_and_validated_against_pinned_snapshot",
+    "processes_fetched_fresh_from_sei"
+  ],
+  "protected_bundle": {
+    "bundle_id": "benchmark-long-context-v2",
+    "content_policy": "refs-and-hashes-only-in-git",
+    "scheme": "protected"
+  },
+  "schema_version": "benchmark-long-context-v2-manifest-1"
+}

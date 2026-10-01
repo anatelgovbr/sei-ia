@@ -1,0 +1,3 @@
+= Documento de teste
+
+CANARY_FIXTURE_ASCIIDOC conteúdo público e determinístico.

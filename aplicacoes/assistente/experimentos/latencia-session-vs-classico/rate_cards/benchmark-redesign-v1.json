@@ -1,0 +1,235 @@
+{
+  "version": "benchmark-redesign-v1",
+  "effective_on": "2026-07-30",
+  "retrieved_on": "2026-08-03",
+  "currency": "USD",
+  "usd_to_brl": null,
+  "pricing_service_tier": "standard",
+  "aggregation_compatibility_key": "openai-session-two-arm-2026-08-03",
+  "judge_policy": {
+    "temperature_by_model": {
+      "gpt-5.4-mini": 0,
+      "gpt-5.6-luna": null
+    }
+  },
+  "sources": [
+    {
+      "kind": "model_card",
+      "model": "gpt-5.4",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.4",
+      "snapshot_url": "https://developers.openai.com/api/docs/models/gpt-5.4.md",
+      "retrieved_on": "2026-08-03",
+      "source_snapshot_sha256": "c7cddcf7d616694f3fdc6d92e130c01b0b0272f65d439e89d408c23e0664ea3d"
+    },
+    {
+      "kind": "model_card",
+      "model": "gpt-5.4-mini",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+      "snapshot_url": "https://developers.openai.com/api/docs/models/gpt-5.4-mini.md",
+      "retrieved_on": "2026-08-03",
+      "source_snapshot_sha256": "2b4ec047adff27f002a61fbf6323b98033501b68f81862ec0671579461e1f9c5"
+    },
+    {
+      "kind": "model_card",
+      "model": "gpt-5.4-nano",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.4-nano",
+      "snapshot_url": "https://developers.openai.com/api/docs/models/gpt-5.4-nano.md",
+      "retrieved_on": "2026-08-03",
+      "source_snapshot_sha256": "1f6a71dfd66a58d6fcb702f5f7dce72b4e78a569ae995344739891fdb1b6e9f5"
+    },
+    {
+      "kind": "model_card",
+      "model": "gpt-5.6-terra",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+      "snapshot_url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra.md",
+      "retrieved_on": "2026-07-31",
+      "source_snapshot_sha256": "ae457ff287074c2872046fbb330047cce9aecae2b356c8a3d007832325282432"
+    },
+    {
+      "kind": "model_card",
+      "model": "gpt-5.6-luna",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+      "snapshot_url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna.md",
+      "retrieved_on": "2026-07-31",
+      "source_snapshot_sha256": "2936932a747dea148910179c316d4efebbdc638fad76db0074e39e433e93ab01"
+    },
+    {
+      "kind": "pricing",
+      "url": "https://developers.openai.com/api/docs/pricing",
+      "snapshot_url": "https://developers.openai.com/api/docs/pricing.md",
+      "retrieved_on": "2026-08-03",
+      "source_snapshot_sha256": "2e8818bf672d681e711a9e8b63e950bd839f0477914104b83300e779438d48c3"
+    }
+  ],
+  "model_cards": {
+    "gpt-5.4": {
+      "default_snapshot": "gpt-5.4",
+      "model_type": "reasoning",
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text"],
+      "context_window_tokens": 1050000,
+      "max_input_tokens": 922000,
+      "max_output_tokens": 128000,
+      "knowledge_cutoff": "2025-08-31",
+      "supported_features": ["streaming", "structured_outputs", "function_calling", "image_input", "web_search", "prompt_caching"]
+    },
+    "gpt-5.4-mini": {
+      "default_snapshot": "gpt-5.4-mini",
+      "model_type": "reasoning",
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text"],
+      "context_window_tokens": 400000,
+      "max_input_tokens": 272000,
+      "max_output_tokens": 128000,
+      "knowledge_cutoff": "2025-08-31",
+      "supported_features": ["streaming", "structured_outputs", "function_calling", "image_input", "web_search", "prompt_caching"]
+    },
+    "gpt-5.4-nano": {
+      "default_snapshot": "gpt-5.4-nano",
+      "model_type": "reasoning",
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text"],
+      "context_window_tokens": 400000,
+      "max_input_tokens": 272000,
+      "max_output_tokens": 128000,
+      "knowledge_cutoff": "2025-08-31",
+      "supported_features": ["streaming", "structured_outputs", "function_calling", "image_input", "web_search", "prompt_caching"]
+    },
+    "gpt-5.6-terra": {
+      "default_snapshot": "gpt-5.6-terra",
+      "model_type": "reasoning",
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text"],
+      "context_window_tokens": 1050000,
+      "max_input_tokens": 922000,
+      "max_output_tokens": 128000,
+      "knowledge_cutoff": "2026-02-16",
+      "supported_features": ["streaming", "structured_outputs", "function_calling", "image_input", "web_search", "prompt_caching"]
+    },
+    "gpt-5.6-luna": {
+      "default_snapshot": "gpt-5.6-luna",
+      "model_type": "reasoning",
+      "input_modalities": ["text", "image"],
+      "output_modalities": ["text"],
+      "context_window_tokens": 1050000,
+      "max_input_tokens": 922000,
+      "max_output_tokens": 128000,
+      "knowledge_cutoff": "2026-02-16",
+      "supported_features": ["streaming", "structured_outputs", "function_calling", "image_input", "web_search", "prompt_caching"]
+    }
+  },
+  "deployments": {
+    "seiia-ds": {
+      "profile": "standard",
+      "canonical_model": "gpt-5.4",
+      "provider": "openai",
+      "context_window_tokens": 1050000,
+      "capabilities": ["text", "image_url"]
+    },
+    "seiia-ds-mini": {
+      "profile": "mini",
+      "canonical_model": "gpt-5.4-mini",
+      "provider": "openai",
+      "context_window_tokens": 400000,
+      "capabilities": ["text", "image_url"]
+    },
+    "seiia-ds-nano": {
+      "profile": "nano",
+      "canonical_model": "gpt-5.4-nano",
+      "provider": "openai",
+      "context_window_tokens": 400000,
+      "capabilities": ["text", "image_url"]
+    },
+    "seiia-ds-gpt-terra": {
+      "profile": "standard",
+      "canonical_model": "gpt-5.6-terra",
+      "provider": "openai",
+      "context_window_tokens": 1050000,
+      "capabilities": ["text", "image_url"]
+    },
+    "seiia-ds-gpt-luna": {
+      "profile": "mini",
+      "canonical_model": "gpt-5.6-luna",
+      "provider": "openai",
+      "context_window_tokens": 1050000,
+      "capabilities": ["text", "image_url"]
+    }
+  },
+  "models": {
+    "gpt-5.4": {
+      "threshold_input_tokens": 272000,
+      "threshold_operator": ">",
+      "threshold_scope": "input_uncached + cache_read + cache_write",
+      "long_context_applies_to": "entire_request",
+      "short_context": {
+        "input_per_million_usd": 2.5,
+        "cache_read_per_million_usd": 0.25,
+        "cache_write_per_million_usd": null,
+        "output_per_million_usd": 15.0
+      },
+      "long_context": {
+        "input_per_million_usd": 5.0,
+        "cache_read_per_million_usd": 0.5,
+        "cache_write_per_million_usd": null,
+        "output_per_million_usd": 22.5
+      }
+    },
+    "gpt-5.4-mini": {
+      "short_context": {
+        "input_per_million_usd": 0.75,
+        "cache_read_per_million_usd": 0.075,
+        "cache_write_per_million_usd": null,
+        "output_per_million_usd": 4.5
+      },
+      "long_context": null
+    },
+    "gpt-5.4-nano": {
+      "short_context": {
+        "input_per_million_usd": 0.2,
+        "cache_read_per_million_usd": 0.02,
+        "cache_write_per_million_usd": null,
+        "output_per_million_usd": 1.25
+      },
+      "long_context": null
+    },
+    "gpt-5.6-terra": {
+      "threshold_input_tokens": 272000,
+      "threshold_operator": ">",
+      "threshold_scope": "input_uncached + cache_read + cache_write",
+      "long_context_applies_to": "entire_request",
+      "short_context": {
+        "input_per_million_usd": 2.0,
+        "cache_read_per_million_usd": 0.2,
+        "cache_write_per_million_usd": 2.5,
+        "output_per_million_usd": 12.0
+      },
+      "long_context": {
+        "input_per_million_usd": 4.0,
+        "cache_read_per_million_usd": 0.4,
+        "cache_write_per_million_usd": 5.0,
+        "output_per_million_usd": 18.0
+      }
+    },
+    "gpt-5.6-luna": {
+      "threshold_input_tokens": 272000,
+      "threshold_operator": ">",
+      "threshold_scope": "input_uncached + cache_read + cache_write",
+      "long_context_applies_to": "entire_request",
+      "short_context": {
+        "input_per_million_usd": 0.2,
+        "cache_read_per_million_usd": 0.02,
+        "cache_write_per_million_usd": 0.25,
+        "output_per_million_usd": 1.2
+      },
+      "long_context": {
+        "input_per_million_usd": 0.4,
+        "cache_read_per_million_usd": 0.04,
+        "cache_write_per_million_usd": 0.5,
+        "output_per_million_usd": 1.8
+      }
+    }
+  },
+  "cache_usage_required": true,
+  "missing_rate_policy": "N/D",
+  "reasoning_billed_as_output": true
+}

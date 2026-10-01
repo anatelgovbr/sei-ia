@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "benchmark-long-context-v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "dataset_name", "description", "metadata", "evaluation_contract", "protected_bundle", "corpora", "items", "preflight_invariants"],
+  "properties": {
+    "schema_version": {"const": "benchmark-long-context-v2-manifest-1"},
+    "dataset_name": {"const": "benchmark-long-context"},
+    "description": {"type": "string", "minLength": 1},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["n_per_question", "endpoint", "route", "sequential", "max_concurrency", "warmups", "inference_retries", "allowed_retries", "classic_enabled", "websearch", "no_cache", "document_source", "process_source", "context_disclosure_threshold_tokens", "desired_model_context_window_tokens", "tokenizer"],
+      "properties": {
+        "n_per_question": {"const": 1},
+        "endpoint": {"const": "session_stream"},
+        "route": {"const": "/llm_lang/session_stream"},
+        "sequential": {"const": true},
+        "max_concurrency": {"const": 1},
+        "warmups": {"const": 0},
+        "inference_retries": {"const": 0},
+        "allowed_retries": {"const": ["ingestion_readback", "evaluation"]},
+        "classic_enabled": {"const": false},
+        "websearch": {"const": false},
+        "no_cache": {"const": true},
+        "document_source": {"const": "sei_no_cache_with_pinned_validation"},
+        "process_source": {"const": "sei_no_cache"},
+        "context_disclosure_threshold_tokens": {"const": 200000},
+        "desired_model_context_window_tokens": {"const": 500000},
+        "tokenizer": {"const": "o200k_base"}
+      }
+    },
+    "evaluation_contract": {"$ref": "#/$defs/refHash"},
+    "protected_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "bundle_id", "content_policy"],
+      "properties": {
+        "scheme": {"const": "protected"},
+        "bundle_id": {"const": "benchmark-long-context-v2"},
+        "content_policy": {"const": "refs-and-hashes-only-in-git"}
+      }
+    },
+    "corpora": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/corpus"}},
+    "items": {"type": "array", "minItems": 9, "maxItems": 9, "items": {"$ref": "#/$defs/item"}},
+    "preflight_invariants": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "sha": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "protectedRef": {"type": "string", "pattern": "^protected://benchmark-long-context-v2/[A-Za-z0-9._/-]+$"},
+    "refHash": {
+      "type": "object", "additionalProperties": false, "required": ["ref", "sha256"],
+      "properties": {"ref": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha"}}
+    },
+    "protectedRefHash": {
+      "type": "object", "additionalProperties": false, "required": ["ref", "sha256"],
+      "properties": {"ref": {"$ref": "#/$defs/protectedRef"}, "sha256": {"$ref": "#/$defs/sha"}}
+    },
+    "corpus": {
+      "type": "object", "additionalProperties": false,
+      "required": ["case_id", "corpus_ref", "process_metadata_ref", "payload_sha256", "canonical_manifest_sha256", "document_inventory_sha256", "runtime_bundle_inventory_sha256", "document_count", "token_count", "token_count_semantics"],
+      "properties": {
+        "case_id": {"enum": ["case-0960k", "case-5120k", "case-6260k"]},
+        "corpus_ref": {"$ref": "#/$defs/protectedRef"},
+        "process_metadata_ref": {"$ref": "#/$defs/protectedRefHash"},
+        "payload_sha256": {"$ref": "#/$defs/sha"},
+        "canonical_manifest_sha256": {"$ref": "#/$defs/sha"},
+        "document_inventory_sha256": {"$ref": "#/$defs/sha"},
+        "runtime_bundle_inventory_sha256": {"$ref": "#/$defs/sha"},
+        "document_count": {"type": "integer", "minimum": 1},
+        "token_count": {"type": "integer", "minimum": 1},
+        "token_count_semantics": {"const": "tiktoken_o200k_base_full_payload_serialization"}
+      }
+    },
+    "item": {
+      "type": "object", "additionalProperties": false,
+      "required": ["item_id", "case_id", "question_type", "question", "gold", "rubric", "target", "evidence", "absence_evidence"],
+      "properties": {
+        "item_id": {"type": "string", "pattern": "^case-(0960k|5120k|6260k)-q[123]-(factual|synthesis|insufficient-evidence)$"},
+        "case_id": {"enum": ["case-0960k", "case-5120k", "case-6260k"]},
+        "question_type": {"enum": ["factual", "synthesis", "insufficient-evidence"]},
+        "question": {"$ref": "#/$defs/protectedRefHash"},
+        "gold": {"$ref": "#/$defs/protectedRefHash"},
+        "rubric": {"$ref": "#/$defs/protectedRefHash"},
+        "target": {
+          "type": "object", "additionalProperties": false, "required": ["anchor_kind", "anchor_ref", "lock_required"],
+          "properties": {"anchor_kind": {"type": "string", "minLength": 1}, "anchor_ref": {"$ref": "#/$defs/protectedRefHash"}, "lock_required": {"const": true}}
+        },
+        "evidence": {
+          "type": "object", "additionalProperties": false, "required": ["allowed", "forbidden", "source_refs"],
+          "properties": {
+            "allowed": {"const": ["exact_opened_excerpts", "document_metadata", "explicit_protected_absence"]},
+            "forbidden": {"const": ["judge_world_knowledge", "question_only", "gold_only", "unopened_document"]},
+            "source_refs": {"type": "array", "items": {"$ref": "#/$defs/protectedRefHash"}}
+          }
+        },
+        "absence_evidence": {
+          "type": "object", "additionalProperties": false, "required": ["required", "ref", "scope"],
+          "properties": {
+            "required": {"type": "boolean"},
+            "ref": {"anyOf": [{"$ref": "#/$defs/protectedRefHash"}, {"type": "null"}]},
+            "scope": {"enum": ["not_applicable", "protected_lexical_search_only"]}
+          }
+        }
+      }
+    }
+  }
+}

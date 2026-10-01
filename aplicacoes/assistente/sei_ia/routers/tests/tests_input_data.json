@@ -1,0 +1,378 @@
+[
+    {
+      "test_description": "'Olá'",
+      "expected_status_code": 200,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Olá!",
+        "temperature": 0,
+        "max_tokens": 4000
+      }
+    },
+    {
+      "test_description": "memória tópico 365",
+      "expected_status_code": 200,
+      "verification_code": "MEMORY_RETURN_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 365,
+        "text": "Qual foi a minha última pergunta?",
+        "temperature": 0,
+        "max_tokens": 4000
+      }
+    },
+    {
+      "test_description": "resumo documento interno",
+      "expected_status_code": 200,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento interno não paginado #0000046",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "58"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "resumo documento externo paginado",
+      "expected_status_code": 200,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento externo paginado #12118331[1:1]",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "13631856"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "resumo documento interno paginado",
+      "expected_status_code": 406,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento interno paginado #0000046[1:1]",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "58"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "resumo documento externo não PDF paginado",
+      "expected_status_code": 406,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento externo não PDF paginado #0000167[1:1]",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "233"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "'Olá'",
+      "expected_status_code": 200,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Olá!",
+        "temperature": 0,
+        "max_tokens": 4000
+      }
+    },
+    {
+      "test_description": "memória tópico 365",
+      "expected_status_code": 200,
+      "verification_code": "MEMORY_RETURN_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 365,
+        "text": "Qual foi a minha última pergunta?",
+        "temperature": 0,
+        "max_tokens": 4000
+      }
+    },
+    {
+      "test_description": "resumo documento interno",
+      "expected_status_code": 200,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento interno não paginado #0000046",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "58"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "resumo documento externo paginado",
+      "expected_status_code": 200,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento externo paginado #12118331[1:1]",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "13631856"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "resumo documento interno paginado",
+      "expected_status_code": 406,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento interno paginado #0000046[1:1]",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "58"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "resumo documento externo não PDF paginado",
+      "expected_status_code": 406,
+      "verification_code": "SIMPLE_STATUS_CODE_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resumo documento externo não PDF paginado #0000167[1:1]",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "233"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de 2+ documentos que cabem no contexto e nao acionam rag",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_NO_RAG_VERIRIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "resuma #12118331 e #0546979",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "13631856",
+              "650229"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de 2+ documentos que cabem no contexto para geracao de novos documentos",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_GENERATE_NEW_DOCUMENT_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "considerando que #0000046 foi utilizado como referência para gerar #0000288, utilize #0000045 como referência para gerar um novo despacho decisório, seguindo os mesmos padrões observadospara gerar #0000288 a partir de #0000046",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "390",
+              "58"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de 2+ documentos que nao cabem no contexto e deveriam acionar rag false",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_FALSE_RAG_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "quais as partes interessadas do #0437693 e #0721678",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "524133",
+              "850278"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de 2+ documentos que nao cabem no contexto e deveriam acionar resumo",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_SUMMARIZATION_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Resuma o documentos #1817816, #2839858 e #12118331",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "2138246",
+              "3276527",
+              "13631856"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de 2+ documentos cabem no contexto e que nao deveria acionar rag, rag falsa nem resumo",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_NO_RAG_NO_SUMMARY_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Escreva um texto retirando as informações dos documentos #1115327 e #0525170 colocando apenas os objetivos e as partes interessadas",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "1296713",
+              "624956"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de processo que cabe no contexto e que nao deveria acionar rag, rag falsa nem resumo",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_NO_RAG_NO_SUMMARY_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Escreva um texto retirando as informações dos documentos #1115327 e #0525170 colocando apenas os objetivos e as partes interessadas",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "N/A",
+            "id_documentos": [
+              "1296713",
+              "624956"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de processo que nao cabe no contexto e que deveria acionar rag",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_RAG_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Do que se trata o documento #1817816 do processo #53528.006849/2012-56?",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "147322",
+            "id_documentos": [
+              "2138246","2138246","2138246","2138246","2138246","2138246","2138246","2138246",
+              "2138246","2138246","2138246","2138246","2138246","2138246","2138246","2138246"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "test_description": "citacao de processo que nao cabe no contexto e que deveria acionar rag false",
+      "expected_status_code": 200,
+      "verification_code": "STATUS_CODE_AND_FALSE_RAG_VERIFICATION",
+      "body": {
+        "id_usuario": 0,
+        "id_topico": 0,
+        "text": "Considerando o processo #53500.052390/2017-85, identifique os fatos que ocorreram em dezembro de 2020",
+        "temperature": 0,
+        "max_tokens": 4000,
+        "id_procedimentos": [
+          {
+            "id_procedimento": "1587512",
+            "id_documentos": [
+              "8392044"
+            ]
+          }
+        ]
+      }
+    }
+  ]

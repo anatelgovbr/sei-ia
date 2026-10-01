@@ -1,0 +1,1068 @@
+{
+  "_comment": "Casos do dataset comparativo-deepagents-classico, versionados como codigo. Cada expected_output segue os campos que judge.py le (categoria, gold_answer_exemplo, elementos_obrigatorios, credito_parcial, indicadores_alucinacao, doc_fonte, regra). O campo 'evidencia' e trilha de grounding (judge ignora chaves desconhecidas): cada item do gold aponta o doc que o sustenta. size_class por tokens (token_counter len/3.5): small<25k, medium<100k, large>=100k. | MERGE: 25 casos medium (8116731) do dataset comparativo original + small(17210509)/large(14564832). Inputs reconstruidos pelo upsert com id_topico distinto por qid (isolamento de sessao).",
+  "cases": [
+    {
+      "qid": "SMALL-CONF-01",
+      "input": {
+        "text": "Elabore um relatorio de conformidade do processo: identifique a entidade fiscalizada e seu CNPJ, o objeto da fiscalizacao, o resultado (se houve ou nao comprovacao de irregularidade) e as providencias indicadas. Cite o documento-fonte."
+      },
+      "expected_output": {
+        "categoria": "resumo",
+        "gold_answer_exemplo": "O Relatorio de Fiscalizacao no 33/2026/UO072FI/UO072/GR07/SFI (SEI 15903399) trata da entidade fiscalizada Parati Net Ltda, CNPJ 15.113.625/0001-37. O objeto foi averiguar possivel exploracao clandestina do Servico de Comunicacao Multimidia - SCM (Servico 045, banda larga fixa) em Campo Grande/MS. As diligencias ocorreram em 30 de junho de 2026. Em campo, o endereco abrigava a Grafica Parati e o socio Raike dos Anjos Martins informou ter vendido, em janeiro de 2025, a carteira de clientes e a infraestrutura de SCM a Internet Mais Ltda (CNPJ 34.058.207/0001-39). A conclusao (item 9.1) foi que NAO ficou comprovada a exploracao do SCM pela Parati Net Ltda; o relatorio foi encaminhado para revisao e aprovacao das autoridades competentes.",
+        "elementos_obrigatorios": [
+          "Entidade fiscalizada: Parati Net Ltda, CNPJ 15.113.625/0001-37",
+          "Objeto: possivel exploracao clandestina do SCM (Servico 045) em Campo Grande/MS",
+          "Resultado: NAO ficou comprovada a exploracao do SCM pela Parati Net Ltda",
+          "Diligencias realizadas em 30 de junho de 2026",
+          "Constatacao em campo: funcionava a Grafica Parati; infraestrutura de SCM vendida em jan/2025 a Internet Mais Ltda (CNPJ 34.058.207/0001-39)"
+        ],
+        "credito_parcial": "Credito parcial se acertar a entidade fiscalizada e o resultado (nao comprovado) sem os detalhes das diligencias.",
+        "indicadores_alucinacao": [
+          "Afirmar que ficou comprovada a exploracao clandestina de SCM (contradiz o item 9.1)",
+          "Afirmar aplicacao de multa ou instauracao de PADO neste relatorio (ele conclui pela nao comprovacao e apenas encaminha para aprovacao)",
+          "Apuracao de valores de Funttel/Fust (item 7.13: nao apura por ser optante do Simples Nacional)",
+          "CNPJ da Parati Net diferente de 15.113.625/0001-37"
+        ],
+        "doc_fonte": "SEI 15903399 (Relatorio de Fiscalizacao no 33/2026/UO072FI/UO072/GR07/SFI)",
+        "regra": "Ancorar cada afirmacao no Relatorio de Fiscalizacao; a conclusao correta e a nao comprovacao da irregularidade.",
+        "evidencia": [
+          {
+            "item": "Entidade + CNPJ",
+            "doc": "SEI 15903399, itens 2.2.1 e 2.3.1"
+          },
+          {
+            "item": "Objeto SCM/Servico 045 em Campo Grande/MS",
+            "doc": "SEI 15903399, itens 1.1.1 e 2.5.1"
+          },
+          {
+            "item": "Resultado nao comprovado",
+            "doc": "SEI 15903399, item 9.1"
+          },
+          {
+            "item": "Diligencias 30/06/2026",
+            "doc": "SEI 15903399, itens 3.3 e 8.1"
+          },
+          {
+            "item": "Grafica Parati / venda a Internet Mais Ltda",
+            "doc": "SEI 15903399, itens 8.3 e 8.4"
+          },
+          {
+            "item": "Simples Nacional, sem Funttel/Fust",
+            "doc": "SEI 15903399, item 7.13"
+          }
+        ]
+      },
+      "metadata": {
+        "processo": "17210509",
+        "size_class": "small",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "SMALL-NEG-01",
+      "input": {
+        "text": "Qual foi o valor da multa aplicada a Parati Net Ltda neste processo? Cite o documento-fonte."
+      },
+      "expected_output": {
+        "categoria": "negativa",
+        "gold_answer_exemplo": "Nao consta. O Relatorio de Fiscalizacao no 33/2026 (SEI 15903399) concluiu, no item 9.1, que NAO ficou comprovada a exploracao do SCM pela Parati Net Ltda, e nao aplica qualquer multa; nao ha valor de multa nos autos deste documento.",
+        "elementos_obrigatorios": [
+          "Reconhecer que nao consta valor de multa nos autos",
+          "Mencionar que a conclusao foi pela nao comprovacao da irregularidade"
+        ],
+        "credito_parcial": "Credito parcial se reconhecer a ausencia de multa sem citar a conclusao de nao comprovacao.",
+        "indicadores_alucinacao": [
+          "Qualquer valor monetario apresentado como multa aplicada",
+          "Afirmar que foi aplicada sancao ou instaurado PADO com penalidade"
+        ],
+        "doc_fonte": "SEI 15903399 (Relatorio de Fiscalizacao no 33/2026/UO072FI/UO072/GR07/SFI)",
+        "regra": "A resposta correta e reconhecer a ausencia (negativa). Inventar um valor de multa e erro grave.",
+        "evidencia": [
+          {
+            "item": "Nao ha multa; conclusao de nao comprovacao",
+            "doc": "SEI 15903399, item 9.1"
+          },
+          {
+            "item": "Relatorio encaminhado para aprovacao, sem sancao",
+            "doc": "SEI 15903399, item 9.2"
+          }
+        ]
+      },
+      "metadata": {
+        "processo": "17210509",
+        "size_class": "small",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "LARGE-OFICIOS-01",
+      "input": {
+        "text": "Liste todos os Oficios COGE/SCO-ANATEL expedidos pela Anatel neste processo (documentos nativos do SEI), informando o numero completo de cada oficio e o respectivo protocolo SEI."
+      },
+      "expected_output": {
+        "categoria": "factual",
+        "gold_answer_exemplo": "Sao 8 Oficios COGE/SCO-ANATEL expedidos pela Anatel: Oficio no 1110/2024/COGE/SCO-ANATEL (SEI 12968296); Oficio no 1172/2024/COGE/SCO-ANATEL (SEI 13080643); Oficio no 654/2025/COGE/SCO-ANATEL (SEI 13729107); Oficio no 858/2025/COGE/SCO-ANATEL (SEI 13898148); Oficio no 1513/2025/COGE/SCO-ANATEL (SEI 14500480); Oficio no 1723/2025/COGE/SCO-ANATEL (SEI 14711018); Oficio no 1797/2025/COGE/SCO-ANATEL (SEI 14799698); Oficio no 980/2026/COGE/SCO-ANATEL (SEI 15713283).",
+        "elementos_obrigatorios": [
+          "Oficio no 1110/2024/COGE/SCO-ANATEL - SEI 12968296",
+          "Oficio no 1172/2024/COGE/SCO-ANATEL - SEI 13080643",
+          "Oficio no 654/2025/COGE/SCO-ANATEL - SEI 13729107",
+          "Oficio no 858/2025/COGE/SCO-ANATEL - SEI 13898148",
+          "Oficio no 1513/2025/COGE/SCO-ANATEL - SEI 14500480",
+          "Oficio no 1723/2025/COGE/SCO-ANATEL - SEI 14711018",
+          "Oficio no 1797/2025/COGE/SCO-ANATEL - SEI 14799698",
+          "Oficio no 980/2026/COGE/SCO-ANATEL - SEI 15713283"
+        ],
+        "credito_parcial": "Credito parcial proporcional ao numero de oficios corretos listados; penalizar tanto omissoes quanto inclusoes indevidas. Acertar 6+ dos 8 sem incluir documento errado ja e forte.",
+        "indicadores_alucinacao": [
+          "Incluir o protocolo SEI 14921003 (CT/Oi/GCOR/2586/2025) como oficio da Anatel: e uma carta da Oi (upload externo, download_ext=true) que apenas cita o Oficio 1513/2025, nao um oficio expedido pela Anatel",
+          "Apresentar numeros de oficio ou protocolos SEI ausentes da lista dos 8",
+          "Atribuir os oficios a area diferente de COGE/SCO"
+        ],
+        "doc_fonte": "Documentos nativos SEI 12968296, 13080643, 13729107, 13898148, 14500480, 14711018, 14799698, 15713283 (processo 14564832)",
+        "regra": "Varredura completa dos 33 documentos nativos. A lista correta tem exatamente 8 Oficios COGE/SCO-ANATEL expedidos pela Anatel (download_ext=false). Cartas/CTs da Oi que apenas citam um oficio nao contam.",
+        "evidencia": [
+          {
+            "item": "Oficio 1110/2024 = SEI 12968296",
+            "doc": "candidatos/14564832 idx 2 (02_14564861_12968296.txt), cabecalho"
+          },
+          {
+            "item": "Oficio 1172/2024 = SEI 13080643",
+            "doc": "idx 7 (07_14687537_13080643.txt), cabecalho"
+          },
+          {
+            "item": "Oficio 654/2025 = SEI 13729107",
+            "doc": "idx 15 (15_15398592_13729107.txt), cabecalho"
+          },
+          {
+            "item": "Oficio 858/2025 = SEI 13898148",
+            "doc": "idx 20 (20_15584187_13898148.txt), cabecalho"
+          },
+          {
+            "item": "Oficio 1513/2025 = SEI 14500480",
+            "doc": "idx 29 (29_16245195_14500480.txt), cabecalho"
+          },
+          {
+            "item": "Oficio 1723/2025 = SEI 14711018",
+            "doc": "idx 36 (36_16474966_14711018.txt), cabecalho"
+          },
+          {
+            "item": "Oficio 1797/2025 = SEI 14799698",
+            "doc": "idx 41 (41_16570775_14799698.txt), cabecalho"
+          },
+          {
+            "item": "Oficio 980/2026 = SEI 15713283",
+            "doc": "idx 58 (58_17571849_15713283.txt), cabecalho"
+          },
+          {
+            "item": "Exclusao verificada: SEI 14921003 (idx 43) e carta da Oi, download_ext=true, cita o Oficio 1513 no assunto",
+            "doc": "idx 43 (43_16702419_14921003.txt) + index.json download_ext=true"
+          }
+        ]
+      },
+      "metadata": {
+        "processo": "14564832",
+        "size_class": "large",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "LARGE-NEG-01",
+      "input": {
+        "text": "Existe neste processo algum Oficio expedido pela Superintendencia de Fiscalizacao (SFI) da Anatel? Se sim, informe o numero e o protocolo."
+      },
+      "expected_output": {
+        "categoria": "negativa",
+        "gold_answer_exemplo": "Nao consta. Todos os oficios expedidos pela Anatel neste processo sao da COGE/SCO (Superintendencia de Controle de Obrigacoes - SCO). Nao ha oficio expedido pela Superintendencia de Fiscalizacao (SFI) nos autos.",
+        "elementos_obrigatorios": [
+          "Reconhecer que nao consta oficio expedido pela SFI",
+          "Indicar que os oficios expedidos pela Anatel neste processo sao da COGE/SCO"
+        ],
+        "credito_parcial": "Credito parcial se reconhecer a ausencia sem identificar a area (COGE/SCO) dos oficios existentes.",
+        "indicadores_alucinacao": [
+          "Afirmar a existencia de um oficio expedido pela SFI",
+          "Apresentar numero ou protocolo SEI de um suposto oficio da SFI"
+        ],
+        "doc_fonte": "Varredura dos oficios nativos do processo 14564832 (todos COGE/SCO-ANATEL)",
+        "regra": "A resposta correta e reconhecer a ausencia (negativa). Todos os 8 oficios expedidos sao COGE/SCO-ANATEL; nenhum e da SFI.",
+        "evidencia": [
+          {
+            "item": "Todos os 8 oficios expedidos sao COGE/SCO-ANATEL",
+            "doc": "cabecalhos dos docs 12968296, 13080643, 13729107, 13898148, 14500480, 14711018, 14799698, 15713283"
+          }
+        ]
+      },
+      "metadata": {
+        "processo": "14564832",
+        "size_class": "large",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "SMALL-WEB-01",
+      "input": {
+        "text": "A empresa Internet Mais Ltda (CNPJ 34.058.207/0001-39), citada neste processo, consta atualmente com situacao cadastral ativa na Receita Federal? Pesquise na internet e cite a fonte."
+      },
+      "expected_output": {
+        "categoria": "websearch",
+        "gold_answer_exemplo": "Sim. A Internet Mais Ltda, CNPJ 34.058.207/0001-39, consta com situacao cadastral ATIVA na Receita Federal, sediada em Campo Grande/MS, com atividade de Servico de Comunicacao Multimidia (SCM). (Fonte web, consultada em 06/07/2026.)",
+        "elementos_obrigatorios": [
+          "Situacao cadastral ATIVA",
+          "Sediada em Campo Grande/MS",
+          "Cita ao menos uma fonte da web (URL)"
+        ],
+        "credito_parcial": "Credito parcial se acertar 'ativa' sem o municipio/atividade, desde que cite fonte web.",
+        "indicadores_alucinacao": [
+          "Afirmar que a empresa esta baixada/inapta/suspensa sem fonte que sustente",
+          "CNPJ diferente de 34.058.207/0001-39",
+          "Nao citar nenhuma fonte da web"
+        ],
+        "doc_fonte": "Fonte web (a situacao cadastral na Receita nao consta nos autos); pesquisa em 06/07/2026",
+        "regra": "Categoria websearch. a resposta deve vir de busca web com fonte citada. A situacao cadastral e volatil, consultada em 06/07/2026. O CNPJ da Internet Mais aparece nos autos (item 8.4 do Relatorio), mas sua situacao na Receita nao.",
+        "evidencia": [
+          {
+            "item": "CNPJ da Internet Mais citado nos autos",
+            "doc": "SEI 15903399 (proc 17210509), item 8.4"
+          },
+          {
+            "item": "Situacao cadastral ATIVA, Campo Grande/MS, SCM",
+            "doc": "web. cnpj.biz/econodata, consultado 2026-07-06"
+          }
+        ]
+      },
+      "metadata": {
+        "processo": "17210509",
+        "size_class": "small",
+        "requires_web": true
+      }
+    },
+    {
+      "qid": "LARGE-WEB-01",
+      "input": {
+        "text": "Pesquise na internet a situacao empresarial atual da Oi S.A. (interessada neste processo) e cite as fontes da web."
+      },
+      "expected_output": {
+        "categoria": "websearch",
+        "gold_answer_exemplo": "A Oi S.A. teve a falencia decretada em 10 de novembro de 2025 pela Justica do Rio de Janeiro, apos o fracasso de dois planos de recuperacao judicial (divida na casa de R$ 15 bilhoes, patrimonio liquido negativo). A empresa ja havia vendido sua operacao movel e segregado a rede de fibra na V.tal. (Fontes web, consultadas em 06/07/2026.)",
+        "elementos_obrigatorios": [
+          "Oi S.A. em falencia/liquidacao decretada em 2025 (ou recuperacao judicial fracassada)",
+          "Cita ao menos uma fonte da web (URL)"
+        ],
+        "credito_parcial": "Credito parcial se identificar a crise/recuperacao judicial da Oi sem a falencia de 2025, desde que cite fonte web.",
+        "indicadores_alucinacao": [
+          "Afirmar que a Oi S.A. esta financeiramente saudavel ou sem problemas",
+          "Afirmar que saiu da recuperacao/crise com sucesso",
+          "Nao citar nenhuma fonte da web"
+        ],
+        "doc_fonte": "Fonte web (situacao empresarial atual nao consta nos autos); pesquisa em 06/07/2026",
+        "regra": "Categoria websearch. a resposta deve vir de busca web com fonte citada. Fato volatil, consultado em 06/07/2026. A Oi S.A. e a interessada dos oficios COGE/SCO deste processo.",
+        "evidencia": [
+          {
+            "item": "Oi S.A. e a interessada do processo",
+            "doc": "cabecalhos dos oficios COGE/SCO (proc 14564832), enderecados a Oi S.A."
+          },
+          {
+            "item": "Falencia decretada em 10/11/2025, apos 2 planos de RJ fracassados",
+            "doc": "web. Rio Times / DatacenterDynamics, consultado 2026-07-06"
+          }
+        ]
+      },
+      "metadata": {
+        "processo": "14564832",
+        "size_class": "large",
+        "requires_web": true
+      }
+    },
+    {
+      "qid": "Q25",
+      "input": {
+        "text": "Em que cidade/UF esta a sede da empresa de CNPJ 03.327.988/0001-96 segundo fontes na internet, e isso coincide com o que consta no processo?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "websearch",
+        "doc_fonte": "doc 01 (Corumba/MS nos autos) + verificacao externa",
+        "gold_answer": "Verificacao externa: buscar a sede (municipio/UF) registrada para o CNPJ 03.327.988/0001-96 em fonte oficial e comparar com o que consta nos autos (Corumba/MS). Deve citar a fonte web e indicar se coincide.",
+        "credito_parcial": "Credito parcial se trouxer a sede externa sem comparar com os autos.",
+        "gold_answer_exemplo": "[Exemplo de FORMATO esperado — a sede externa vem da busca real] 'Consultei a sede do CNPJ 03.327.988/0001-96 em fonte oficial: segundo <fonte/URL>, o municipio/UF de registro e <municipio>/<UF>. Nos documentos do processo, a sede consta como Corumba/MS. Comparando, os dados <coincidem / nao coincidem>.' A resposta correta deve trazer a sede obtida na web com fonte citada e compara-la explicitamente com Corumba/MS, que e o que consta nos autos.",
+        "elementos_obrigatorios": [
+          "buscar sede do CNPJ na web",
+          "comparar com Corumba/MS dos autos",
+          "citar fonte"
+        ],
+        "indicadores_alucinacao": [
+          "afirmar a sede sem fonte",
+          "ignorar o dado Corumba/MS dos autos"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": true
+      }
+    },
+    {
+      "qid": "Q24",
+      "input": {
+        "text": "A empresa deste processo (CNPJ 03.327.988/0001-96) tem relacao com algum grupo economico maior? Pesquise na internet e cite as fontes."
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "websearch",
+        "doc_fonte": "pista interna docs 03/10 (acionistas) + verificacao externa",
+        "gold_answer": "Requer pesquisa externa sobre o grupo economico/controlador associado ao CNPJ 03.327.988/0001-96, com citacao de fontes da web. Como pista interna, os documentos do processo mostram acionistas que variaram no tempo (Vale S.A. e Docepar S.A. em 2019; J&F Mineracao Ltda. em 2022), o que pode orientar a busca — mas a conclusao sobre grupo atual deve vir de fonte externa citada.",
+        "credito_parcial": "Credito parcial se trouxer indicios com fonte mas sem conclusao firme.",
+        "gold_answer_exemplo": "[Exemplo de FORMATO esperado — a conclusao externa vem da busca real] 'Pesquisei na web a relacao do CNPJ 03.327.988/0001-96 com grupos economicos. Segundo <fonte/URL>, a empresa <faz/nao faz> parte do grupo <nome do grupo>. Como contexto interno, as atas do processo mostram que o controle acionario variou no tempo — Vale S.A. e Docepar S.A. em 2019 e J&F Mineracao Ltda. em 2022 — o que serve de pista, mas a vinculacao atual a um grupo foi confirmada pela fonte externa citada.' A resposta correta deve basear a conclusao em fonte web citada, sem tratar o acionista historico dos autos como controlador atual sem verificacao.",
+        "elementos_obrigatorios": [
+          "pesquisar na web o grupo/controlador do CNPJ",
+          "citar fonte(s)",
+          "nao apresentar a pista interna (acionistas dos autos) como conclusao externa"
+        ],
+        "indicadores_alucinacao": [
+          "afirmar grupo economico sem fonte",
+          "tratar acionista historico dos autos como controlador atual sem verificar"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": true
+      }
+    },
+    {
+      "qid": "Q23",
+      "input": {
+        "text": "A razao social 'Lhg Mining Corumba S.A.' que aparece nos documentos mais recentes do processo confere com o registro atual do CNPJ 03.327.988/0001-96 em fontes oficiais na internet? Cite as fontes."
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "websearch",
+        "doc_fonte": "doc 20 (Lhg Mining nos autos) + verificacao externa",
+        "gold_answer": "Requer verificacao externa: comparar 'Lhg Mining Corumba S.A.' (presente nos docs de 2025/2026 do processo) com o nome empresarial atualmente registrado para o CNPJ 03.327.988/0001-96 em fonte oficial (Receita Federal/Junta Comercial), citando as URLs. Deve deixar claro o que vem do processo e o que vem da web.",
+        "credito_parcial": "Credito parcial se buscar mas nao comparar explicitamente com o dado dos autos.",
+        "gold_answer_exemplo": "[Exemplo de FORMATO esperado — o dado externo vem da busca real] 'Nos documentos do processo (a partir de 2025), a razao social consta como Lhg Mining Corumba S.A. para o CNPJ 03.327.988/0001-96. Consultando fonte oficial na web, o nome empresarial atualmente registrado para esse CNPJ e <nome registrado>, conforme <URL>. Comparando: <confere / nao confere / confere parcialmente>, porque <justificativa>.' A resposta correta deve buscar o registro atual na web, comparar explicitamente com 'Lhg Mining Corumba S.A.' dos autos e citar a fonte; nada do registro externo deve ser afirmado sem URL.",
+        "elementos_obrigatorios": [
+          "buscar na web o registro atual do CNPJ",
+          "comparar com 'Lhg Mining Corumba S.A.' dos autos",
+          "citar fonte(s)"
+        ],
+        "indicadores_alucinacao": [
+          "afirmar conferencia sem citar fonte web",
+          "inventar nome registrado"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": true
+      }
+    },
+    {
+      "qid": "Q22",
+      "input": {
+        "text": "Pesquise na internet a denominacao atual e a situacao cadastral da empresa de CNPJ 03.327.988/0001-96 e cite as fontes da web."
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "websearch",
+        "doc_fonte": "externo (web) + CNPJ confirmado nos docs",
+        "gold_answer": "Resposta depende de fonte externa (Receita Federal / consultas de CNPJ). Deve trazer a denominacao e a situacao cadastral atual do CNPJ 03.327.988/0001-96 e citar URLs das fontes consultadas. (Nos autos, o CNPJ aparece tanto como Mineracao Corumbaense Reunida S.A. quanto Lhg Mining Corumba S.A.)",
+        "credito_parcial": "Credito parcial se retornar denominacao sem situacao, ou sem citar fonte.",
+        "gold_answer_exemplo": "[Exemplo de FORMATO esperado — o conteudo factual externo deve vir da busca real, nao deste template] 'Consultei a situacao cadastral do CNPJ 03.327.988/0001-96 em fonte oficial. Segundo [fonte, ex.: Receita Federal/consulta CNPJ], a denominacao atual e <denominacao registrada> e a situacao cadastral e <ativa/baixada/etc.>, com data da situacao em <data>. Fonte: <URL consultada>. Observacao: nos documentos deste processo, esse mesmo CNPJ aparece como Mineracao Corumbaense Reunida S.A. e, mais recentemente, como Lhg Mining Corumba S.A.' A resposta correta DEVE trazer denominacao + situacao cadastral obtidas na web e citar a(s) URL(s); marcadores <...> sao preenchidos pela busca real.",
+        "elementos_obrigatorios": [
+          "consultar fonte externa para o CNPJ 03.327.988/0001-96",
+          "informar situacao cadastral",
+          "citar URL(s)"
+        ],
+        "indicadores_alucinacao": [
+          "responder so com os docs sem buscar na web",
+          "inventar situacao cadastral sem fonte",
+          "CNPJ trocado"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": true
+      }
+    },
+    {
+      "qid": "Q21",
+      "input": {
+        "text": "Qual procurador foi outorgado por Odilon Rodrigues Silva apos a assembleia de 2022?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "negativa",
+        "doc_fonte": "docs 09/11 (substituicao) vs docs 12+ (procuracoes sob Andre)",
+        "gold_answer": "Pergunta com pressuposto falso: apos a assembleia de 24/11/2022, Odilon ja havia renunciado e foi substituido como Responsavel Legal por Andre Alcantara Ocampos (em 22/03/2024); as procuracoes a partir de 2024 foram outorgadas tendo Andre como Responsavel Legal, nao Odilon. Nao consta procuracao outorgada por Odilon apos 2022.",
+        "credito_parcial": "Credito parcial se negar a premissa sem explicar a substituicao.",
+        "gold_answer_exemplo": "A pergunta parte de um pressuposto incorreto. Nao consta, no processo, nenhuma procuracao outorgada por Odilon Rodrigues Silva apos a assembleia de 2022. Odilon renunciou ao cargo de Diretor em 24/11/2022 e, no processo, foi substituido como Responsavel Legal por Andre Alcantara Ocampos em 22/03/2024. As procuracoes posteriores (a partir de 2024) constam outorgadas tendo Andre Alcantara Ocampos como responsavel legal, e nao Odilon. (Fonte: docs SEI 11701405 (substituicao) e 11701433/11976278 (procuracoes sob Andre).)",
+        "elementos_obrigatorios": [
+          "apontar que Odilon nao outorgou procuracao apos 2022",
+          "Andre Ocampos e quem passa a constar como RL"
+        ],
+        "indicadores_alucinacao": [
+          "atribuir a Odilon uma procuracao pos-2022 (ex.: Walter Sanuki) como se ele fosse o outorgante"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q20",
+      "input": {
+        "text": "Este processo trata de alguma outorga de radiofrequencia ou licenciamento de estacao especifico? Qual a frequencia autorizada?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "negativa",
+        "doc_fonte": "ausente; procuracoes citam poderes genericos, nao outorga concreta",
+        "gold_answer": "Nao consta. O processo e de credenciamento/Responsavel Legal e procuracoes eletronicas; nao ha outorga de radiofrequencia nem frequencia autorizada nos autos (as procuracoes apenas mencionam, em abstrato, poder para operar sistemas de outorga e licenciamento).",
+        "credito_parcial": "Credito parcial se reconhecer a ausencia mas confundir com a mencao generica de 'poderes' nas procuracoes.",
+        "gold_answer_exemplo": "Nao consta nos autos. Este processo e de credenciamento de Responsavel Legal e procuracoes eletronicas, e nao de outorga de radiofrequencia. As procuracoes mencionam, de forma generica, poderes para 'Operar Sistemas de Outorga e Licenciamento de Estacoes', mas isso e apenas um poder de representacao — nao ha, nos documentos, nenhuma outorga concedida nem frequencia autorizada. Portanto, nao ha frequencia a informar.",
+        "elementos_obrigatorios": [
+          "afirmar que nao ha outorga de radiofrequencia/frequencia especifica nos autos"
+        ],
+        "indicadores_alucinacao": [
+          "informar uma frequencia/faixa",
+          "afirmar que ha outorga concedida"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q19",
+      "input": {
+        "text": "Qual o numero de telefone e o e-mail de contato de Andre Alcantara Ocampos informados no processo?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "negativa",
+        "doc_fonte": "ausente nos docs (recibos trazem so nome/CPF de assinatura)",
+        "gold_answer": "Nao consta. Os documentos do processo nao trazem telefone nem e-mail de contato de Andre Alcantara Ocampos.",
+        "credito_parcial": "Sem credito parcial.",
+        "gold_answer_exemplo": "Nao consta nos autos. Os documentos do processo identificam Andre Alcantara Ocampos pelo nome e, nas atas, por dados como CPF, mas nao trazem numero de telefone nem e-mail de contato dele. Logo, essa informacao nao pode ser fornecida a partir do processo.",
+        "elementos_obrigatorios": [
+          "afirmar que nao consta telefone/e-mail nos autos"
+        ],
+        "indicadores_alucinacao": [
+          "inventar telefone ou e-mail",
+          "apresentar contato de outro doc externo como se fosse dos autos"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q18",
+      "input": {
+        "text": "Qual e o valor do faturamento anual ou da receita da empresa informado neste processo?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "negativa",
+        "doc_fonte": "ausente em todos os docs",
+        "gold_answer": "Nao consta. O processo trata de vinculo de Responsavel Legal e procuracoes eletronicas; nao ha informacao de faturamento ou receita da empresa nos autos.",
+        "credito_parcial": "Sem credito parcial: ou reconhece a ausencia, ou alucina.",
+        "gold_answer_exemplo": "Nao consta nos autos. Os documentos deste processo tratam de vinculo de Responsavel Legal, procuracoes eletronicas e atos societarios da empresa; nenhum deles informa faturamento ou receita da pessoa juridica. Portanto, nao e possivel responder esse valor com base nos documentos do processo.",
+        "elementos_obrigatorios": [
+          "afirmar que nao consta / nao ha essa informacao nos autos"
+        ],
+        "indicadores_alucinacao": [
+          "informar qualquer valor de faturamento/receita",
+          "estimar valor"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q17",
+      "input": {
+        "text": "Resuma o historico de mudancas de Responsavel Legal e diretoria da companhia ao longo deste processo, citando os documentos-fonte."
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "resumo-amplo",
+        "doc_fonte": "docs 01/09 (RL) + docs 03/10 (atas 2019/2022)",
+        "gold_answer": "RL: Odilon Rodrigues Silva (inicial, 2021) -> Andre Alcantara Ocampos (a partir de 22/03/2024). Diretoria: ata de 2019 elege Antonio Sergio da Silva Mello (Presidente), Helder Joao Assad Carneiro (Vice) e Odilon Rodrigues Silva (Diretor); ata de 2022 registra renuncia de Odilon, elege Lucio Flavo Gallon Cavalli e recompoe a diretoria como Andre Ocampos (Presidente), Darlan Jose Carvalho (Vice) e Lucio Cavalli (Diretor). Contexto valido (opcional): a mesma ata de 2019 consigna o termino do mandato da diretoria anterior — Alexandre de Paula Campanha (Presidente), Danilo Campos Pereira (Vice) e Jose Ricardo Gatti Cinquini (Diretor) — que foi SUBSTITUIDA pelos eleitos; mencionar essa saida corretamente e bonus de completude, nao erro.",
+        "credito_parcial": "Credito parcial proporcional; aceitar foco em RL + uma das atas.",
+        "gold_answer_exemplo": "Historico de Responsavel Legal: Odilon Rodrigues Silva foi o responsavel legal inicial (desde 27/07/2021); em 22/03/2024 foi substituido por Andre Alcantara Ocampos, que segue como responsavel legal. (Fonte: docs SEI 7184509 e 11701405.)\nHistorico de diretoria: a ata de 04/02/2019 registrou o termino do mandato da diretoria anterior (Alexandre de Paula Campanha, Danilo Campos Pereira e Jose Ricardo Gatti Cinquini) e elegeu Antonio Sergio da Silva Mello (Diretor-Presidente), Helder Joao Assad Carneiro (Diretor Vice-Presidente) e Odilon Rodrigues Silva (Diretor). (Fonte: ata doc SEI 7184511.) Ja a ata de 24/11/2022 registrou a renuncia de Odilon, elegeu Lucio Flavo Gallon Cavalli e recompos a diretoria como Andre Alcantara Ocampos (Diretor Presidente), Darlan Jose Carvalho (Diretor Vice-Presidente) e Lucio Flavo Gallon Cavalli (Diretor), com mandatos ate 24/11/2025. (Fonte: ata doc SEI 11701406.)",
+        "elementos_obrigatorios": [
+          "troca de RL Odilon->Andre (a sequencia/ordem; as datas exatas 27/07/2021 e 22/03/2024 sao metadados de registro do SEI que NAO constam no texto extraido dos formularios — nao penalizar resposta sem elas)",
+          "diretoria eleita em 2019 (Antonio Sergio, Helder, Odilon)",
+          "diretoria 2022 (3 nomes/cargos)",
+          "cita doc-fonte"
+        ],
+        "indicadores_alucinacao": [
+          "atribuir Alexandre de Paula Campanha, Danilo Campos Pereira ou Jose Ricardo Gatti Cinquini como a diretoria ELEITA em 2019 — eles sao a diretoria de SAIDA (a propria ata de 04/02/2019, doc SEI 7184511, consigna o TERMINO do mandato deles no item 6.2 e elege Antonio Sergio/Helder/Odilon no item 6.3); mencionar os tres corretamente como diretoria que saiu NAO e alucinacao e nao deve ser penalizado",
+          "misturar a diretoria eleita em 2019 com a composicao de 2022",
+          "nomes, cargos ou datas que nao constam em nenhum documento do processo"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q16",
+      "input": {
+        "text": "Faca um resumo objetivo dos pontos principais deste processo e cite o documento-fonte de cada ponto."
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "resumo-amplo",
+        "doc_fonte": "sintese de todos os docs",
+        "gold_answer": "Processo de Responsavel Legal/Procuracao Eletronica da Mineracao Corumbaense Reunida S.A. (depois Lhg Mining Corumba S.A.), CNPJ 03.327.988/0001-96, processo 53500.051698/2021-90. Pontos: (1) vinculo inicial de RL a Odilon Rodrigues Silva em 2021 com atos constitutivos; (2) substituicao do RL para Andre Alcantara Ocampos em 22/03/2024; (3) sucessivas procuracoes eletronicas simples a procuradores (Leonardo Varanda, Murray de Souza, Walter Sanuki, Virgilio Mota, Eduardo Weidner, Eduardo da Silva Pinto) e respectivas revogacoes; (4) mudanca de razao social para Lhg Mining Corumba S.A. em 2025 (mesmo CNPJ).",
+        "credito_parcial": "Credito parcial proporcional a cobertura dos pontos; penalizar ausencia de citacao de doc-fonte.",
+        "gold_answer_exemplo": "Este e um processo de credenciamento de Responsavel Legal e procuracoes eletronicas, no SEI da ANATEL, processo 53500.051698/2021-90, referente a Mineracao Corumbaense Reunida S.A. (posteriormente Lhg Mining Corumba S.A.), CNPJ 03.327.988/0001-96. Pontos principais:\n- Vinculo inicial de Responsavel Legal a Odilon Rodrigues Silva, em 27/07/2021, acompanhado dos atos constitutivos da empresa (Contrato MCR e Ato Diretoria Executiva). (Fonte: docs SEI 7184509, 7184510, 7184511, 7184512.)\n- Substituicao do Responsavel Legal para Andre Alcantara Ocampos em 22/03/2024, com nova ata societaria anexada. (Fonte: docs SEI 11701405, 11701406.)\n- Sucessivas procuracoes eletronicas simples a procuradores (Leonardo de Sousa Varanda, Murray Evangelista de Souza, Walter Katsumi Sanuki, Virgilio Ribeiro Mota, Eduardo Luiz Weidner, Eduardo da Silva Pinto), com revogacoes por 'alteracao' e 'Desligamento'. (Fonte: docs SEI 7184515, 7184523, 11701433, 11976224, 11976278, 12025097, 13690995, 13690999, 15838184.)\n- Mudanca da razao social para Lhg Mining Corumba S.A. a partir de 2025, mantido o mesmo CNPJ. (Fonte: docs SEI 13690995 e 15838184.)",
+        "elementos_obrigatorios": [
+          "natureza do processo (RL/procuracao)",
+          "identifica a empresa e o processo",
+          "cita troca de RL Odilon->Andre",
+          "cita procuracoes/revogacoes",
+          "cita documento-fonte por ponto"
+        ],
+        "indicadores_alucinacao": [
+          "fatos nao presentes nos docs",
+          "citar doc-fonte inexistente"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q15",
+      "input": {
+        "text": "Apos a assembleia de 24/11/2022, como ficou composta a diretoria da companhia (nomes e cargos)?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "cross-document",
+        "doc_fonte": "doc 10 (Ata AGE 24/11/2022, deliberacoes (ii) e (iii))",
+        "gold_answer": "Andre Alcantara Ocampos como Diretor Presidente; Darlan Jose Carvalho como Diretor Vice-Presidente; e Lucio Flavo Gallon Cavalli como Diretor.",
+        "credito_parcial": "Credito parcial por cada cargo/nome correto; precisa acertar pelo menos o Diretor Presidente para credito.",
+        "gold_answer_exemplo": "Apos a assembleia de 24/11/2022, a diretoria passou a ser composta por: Andre Alcantara Ocampos como Diretor Presidente; Darlan Jose Carvalho como Diretor Vice-Presidente; e Lucio Flavo Gallon Cavalli como Diretor (este ultimo eleito na assembleia, em razao da renuncia de Odilon Rodrigues Silva). Os mandatos foram unificados ate 24/11/2025. (Fonte: Ata de Assembleia Geral Extraordinaria de 24/11/2022, doc SEI 11701406.)",
+        "elementos_obrigatorios": [
+          "Andre Alcantara Ocampos - Diretor Presidente",
+          "Darlan Jose Carvalho - Vice-Presidente",
+          "Lucio Flavo Gallon Cavalli - Diretor"
+        ],
+        "indicadores_alucinacao": [
+          "cargos trocados entre os nomes",
+          "incluir Odilon (que renunciou) na composicao final",
+          "nome inventado"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q14",
+      "input": {
+        "text": "Quantos atos constitutivos (documentos societarios anexados como 'Atos Constitutivos') foram juntados ao processo e em quais peticionamentos?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "cross-document",
+        "doc_fonte": "doc 04 (recibo lista 7184510/7184511) + doc 11 (recibo lista 11701406)",
+        "gold_answer": "Foram juntados 3 (TRES) documentos como 'Atos Constitutivos', distribuidos em 2 (DOIS) peticionamentos: no peticionamento inicial de 27/07/2021, 2 documentos — 'Contrato MCR' (doc 7184510) e 'Ato Diretoria Executiva' (doc 7184511); na alteracao de RL de 22/03/2024, 1 documento — 'Ata de Assembleia Geral Extraordinaria' (doc 11701406). ATENCAO ao avaliar: a contagem de DOCUMENTOS e 3 e a de PETICIONAMENTOS e 2; resposta que diz '3 atos em 2 peticionamentos' esta CORRETA.",
+        "credito_parcial": "Credito parcial se identificar os anexos de um dos peticionamentos.",
+        "gold_answer_exemplo": "Foram juntados 3 atos constitutivos ao processo, em 2 peticionamentos. No peticionamento inicial de 27/07/2021, os atos constitutivos anexados foram o 'Contrato MCR' (doc SEI 7184510) e o 'Ato Diretoria Executiva' (doc SEI 7184511). Na alteracao de Responsavel Legal de 22/03/2024, foi anexada a 'Ata de Assembleia Geral Extraordinaria' (doc SEI 11701406). (Fonte: Recibo de Peticionamento de 27/07/2021, doc SEI 7184512, e Recibo de Peticionamento de 22/03/2024, doc SEI 11701407.)",
+        "elementos_obrigatorios": [
+          "anexos em 2021 (contrato/ato — docs 7184510 e 7184511)",
+          "anexo em 22/03/2024 (ata — doc 11701406)"
+        ],
+        "indicadores_alucinacao": [
+          "contagem de documentos diferente de 3 ou de peticionamentos diferente de 2 (CUIDADO: '3 atos em 2 peticionamentos' e a resposta CORRETA, nao alucinacao)",
+          "atribuir anexos a peticionamentos errados (ex.: a ata 11701406 no peticionamento de 2021)"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q13",
+      "input": {
+        "text": "A procuracao outorgada a Walter Katsumi Sanuki em 22/03/2024 chegou a ser revogada? Em caso afirmativo, quando e por qual motivo?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "cross-document",
+        "doc_fonte": "doc 12 (Procuracao 11701433) + doc 14/15 (Revogacao 11976224 em 14/05/2024, motivo alteracao)",
+        "gold_answer": "Sim. A procuracao 11701433 (22/03/2024) foi revogada em 14/05/2024, motivo 'alteracao'. Na mesma data foi emitida nova procuracao (11976278) ao mesmo outorgado.",
+        "credito_parcial": "Credito parcial se acertar a revogacao e a data sem o motivo, ou sem notar a nova procuracao.",
+        "gold_answer_exemplo": "Sim. A procuracao outorgada a Walter Katsumi Sanuki em 22/03/2024 (doc SEI 11701433) foi revogada em 14/05/2024, por meio do documento de Revogacao doc SEI 11976224, cujo motivo registrado foi 'alteracao'. Na mesma data (14/05/2024) foi emitida uma nova procuracao (doc SEI 11976278) ao mesmo outorgado. (Fonte: Procuracao Eletronica Simples doc SEI 11701433 e Revogacao de Procuracao Eletronica doc SEI 11976224.)",
+        "elementos_obrigatorios": [
+          "sim, foi revogada",
+          "em 14/05/2024",
+          "motivo alteracao"
+        ],
+        "indicadores_alucinacao": [
+          "dizer que nao foi revogada",
+          "motivo 'Desligamento' (esse e o da revogacao posterior, 13/05/2025)"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q12",
+      "input": {
+        "text": "Comparando a ata de 2019 e a ata de 2022 do processo, como mudou a composicao acionaria (acionistas) da companhia?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "cross-document",
+        "doc_fonte": "doc 03 (acionistas Vale/Docepar) vs doc 10 (acionista J&F Mineracao)",
+        "gold_answer": "Na ata de 04/02/2019 os acionistas presentes eram Vale S.A. e Docepar S.A.; na ata de 24/11/2022 o acionista presente, representando a totalidade do capital, era a J&F Mineracao Ltda.",
+        "credito_parcial": "Credito parcial se identificar um dos conjuntos de acionistas corretamente.",
+        "gold_answer_exemplo": "A composicao acionaria mudou entre as duas atas. Na Ata de 04/02/2019, os acionistas presentes eram Vale S.A. e Docepar S.A. Ja na Ata de 24/11/2022, o acionista presente, representando a totalidade do capital social, era a J&F Mineracao Ltda. Houve, portanto, mudanca de controle acionario entre 2019 e 2022. (Fonte: Ata de 04/02/2019, doc SEI 7184511, e Ata de 24/11/2022, doc SEI 11701406.)",
+        "elementos_obrigatorios": [
+          "2019: Vale S.A. e Docepar S.A.",
+          "2022: J&F Mineracao Ltda."
+        ],
+        "indicadores_alucinacao": [
+          "acionistas trocados de ano",
+          "acionista inventado"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q11",
+      "input": {
+        "text": "A razao social da pessoa juridica muda ao longo dos documentos do processo? Descreva a mudanca e o que permanece constante."
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "cross-document",
+        "doc_fonte": "docs 1-19 (Mineracao Corumbaense) vs docs 20+ (Lhg Mining Corumba), CNPJ constante",
+        "gold_answer": "Sim: nos documentos ate 2024 consta 'Mineracao Corumbaense Reunida S.A.'; a partir de maio/2025 passa a constar 'Lhg Mining Corumba S.A.'. O CNPJ permanece o mesmo (03.327.988/0001-96).",
+        "credito_parcial": "Credito parcial se notar a mudanca de nome sem afirmar que o CNPJ se mantem.",
+        "gold_answer_exemplo": "Sim, a razao social muda ao longo do processo. Nos documentos ate 2024 a pessoa juridica consta como 'Mineracao Corumbaense Reunida S.A.'; a partir dos documentos de maio de 2025 ela passa a constar como 'Lhg Mining Corumba S.A.'. O que permanece constante e o CNPJ, 03.327.988/0001-96, em todos os documentos — indicando ser a mesma pessoa juridica com nome empresarial alterado. (Fonte: procuracoes/recibos ate 2024, ex. doc SEI 7184515, vs. procuracoes de 2025/2026, ex. doc SEI 13690995 e 15838184.)",
+        "elementos_obrigatorios": [
+          "de Mineracao Corumbaense Reunida S.A.",
+          "para Lhg Mining Corumba S.A.",
+          "mesmo CNPJ 03.327.988/0001-96"
+        ],
+        "indicadores_alucinacao": [
+          "afirmar que mudou o CNPJ",
+          "negar a mudanca de razao social",
+          "nomes inventados"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q10",
+      "input": {
+        "text": "Segundo a ata de 2019 constante do processo, em que data Odilon Rodrigues Silva foi originalmente eleito Diretor da companhia?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "temporal",
+        "doc_fonte": "doc 03 (Ata AGE 04/02/2019)",
+        "gold_answer": "04 de fevereiro de 2019 (Assembleia Geral Extraordinaria de 04/02/2019).",
+        "credito_parcial": "Credito parcial se citar 'fevereiro de 2019' sem o dia.",
+        "gold_answer_exemplo": "Segundo a ata constante do processo, Odilon Rodrigues Silva foi eleito Diretor da companhia em 04 de fevereiro de 2019, na Assembleia Geral Extraordinaria realizada nessa data, em substituicao ao Sr. Jose Ricardo Gatti Cinquini. (Fonte: Ata das Assembleias Gerais Extraordinarias de 04/02/2019, doc SEI 7184511; observacao: essa ata foi registrada na Junta Comercial do MS posteriormente, em 14/01/2020.)",
+        "elementos_obrigatorios": [
+          "04/02/2019"
+        ],
+        "indicadores_alucinacao": [
+          "outra data de eleicao",
+          "confundir com data de registro na junta (14/01/2020)"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q09",
+      "input": {
+        "text": "Qual e a data de peticionamento do documento mais recente deste processo e qual procurador foi outorgado nele?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "temporal",
+        "doc_fonte": "docs 24/25 (Procuracao 15838184, recibo 19/06/2026)",
+        "gold_answer": "19/06/2026; procuracao eletronica simples outorgada a Eduardo da Silva Pinto (doc SEI 15838184).",
+        "credito_parcial": "Credito parcial se acertar a data sem o outorgado, ou vice-versa.",
+        "gold_answer_exemplo": "O documento mais recente do processo foi peticionado em 19/06/2026. Trata-se de uma Procuracao Eletronica Simples (doc SEI 15838184), outorgada a Eduardo da Silva Pinto, tendo Andre Alcantara Ocampos como responsavel legal outorgante. (Fonte: Procuracao Eletronica Simples, doc SEI 15838184, e respectivo Recibo de Peticionamento de 19/06/2026.)",
+        "elementos_obrigatorios": [
+          "19/06/2026",
+          "Eduardo da Silva Pinto"
+        ],
+        "indicadores_alucinacao": [
+          "outra data como mais recente",
+          "outro outorgado"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q08",
+      "input": {
+        "text": "Em que data Odilon Rodrigues Silva renunciou ao cargo de Diretor da companhia, segundo a ata de assembleia constante do processo?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "temporal",
+        "doc_fonte": "doc 10 (Ata AGE 24/11/2022, Anexo I carta de renuncia)",
+        "gold_answer": "24 de novembro de 2022 (renuncia comunicada e registrada na Assembleia Geral Extraordinaria de 24/11/2022).",
+        "credito_parcial": "Credito parcial se citar 'novembro de 2022' sem o dia exato.",
+        "gold_answer_exemplo": "Odilon Rodrigues Silva renunciou ao cargo de Diretor da companhia em 24 de novembro de 2022. A renuncia foi comunicada por carta (Anexo I) e registrada na Ata da Assembleia Geral Extraordinaria realizada nessa mesma data, 24/11/2022. (Fonte: Ata de Assembleia Geral Extraordinaria da Mineracao Corumbaense Reunida S.A. de 24/11/2022, doc SEI 11701406; observacao: o registro na Junta Comercial do MS ocorreu depois, em 09/12/2022.)",
+        "elementos_obrigatorios": [
+          "24/11/2022"
+        ],
+        "indicadores_alucinacao": [
+          "data de renuncia diferente",
+          "confundir com a data de registro na junta (09/12/2022)"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q07",
+      "input": {
+        "text": "Liste em ordem cronologica as datas de peticionamento dos documentos deste processo, do mais antigo ao mais recente."
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "temporal",
+        "doc_fonte": "recibos docs 04,06,08,11,13,15,17,19,21,23,25",
+        "gold_answer": "27/07/2021 (vinculo inicial e duas procuracoes); 22/03/2024 (alteracao de RL e procuracao a Walter Sanuki); 14/05/2024 (revogacao e nova procuracao a Walter Sanuki); 23/05/2024 (procuracao a Virgilio Mota); 13/05/2025 (procuracao a Eduardo Weidner e revogacao); 19/06/2026 (procuracao a Eduardo da Silva Pinto).",
+        "credito_parcial": "Credito parcial se a ordem global estiver certa mesmo faltando uma ou duas datas intermediarias.",
+        "gold_answer_exemplo": "Em ordem cronologica, as datas de peticionamento dos documentos do processo sao: (1) 27/07/2021 - vinculo inicial de Responsavel Legal e duas procuracoes eletronicas simples; (2) 22/03/2024 - alteracao de Responsavel Legal e procuracao a Walter Katsumi Sanuki; (3) 14/05/2024 - revogacao dessa procuracao e nova procuracao ao mesmo outorgado; (4) 23/05/2024 - procuracao a Virgilio Ribeiro Mota; (5) 13/05/2025 - procuracao a Eduardo Luiz Weidner e revogacao de procuracao anterior; (6) 19/06/2026 - procuracao a Eduardo da Silva Pinto. (Fonte: Recibos de Peticionamento dos respectivos documentos do processo.)",
+        "elementos_obrigatorios": [
+          "comeca em 2021",
+          "passa por 2024 (mar e mai)",
+          "2025",
+          "termina em 2026",
+          "ordem crescente correta"
+        ],
+        "indicadores_alucinacao": [
+          "datas fora dos docs",
+          "ordem invertida",
+          "ano inexistente"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q06",
+      "input": {
+        "text": "Quem e o Responsavel Legal atual da pessoa juridica neste processo e desde quando ele assumiu essa condicao?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "temporal",
+        "doc_fonte": "docs 09/11 (Vinculacao/Alteracao 11701405, recibo 22/03/2024)",
+        "gold_answer": "Andre Alcantara Ocampos, Responsavel Legal desde 22/03/2024 (peticionamento 'Responsavel Legal - Alteracao'), substituindo Odilon Rodrigues Silva.",
+        "credito_parcial": "Credito parcial se acertar o nome sem a data, ou a data sem citar a substituicao.",
+        "gold_answer_exemplo": "O Responsavel Legal atual e Andre Alcantara Ocampos. Ele assumiu essa condicao em 22/03/2024, por meio do peticionamento 'Responsavel Legal - Alteracao' (doc SEI 11701405), que substituiu o responsavel legal anterior, Odilon Rodrigues Silva. Ele permanece como responsavel legal nos documentos posteriores do processo, ate o mais recente (19/06/2026). (Fonte: Vinculacao de Responsavel Legal - Alteracao, doc SEI 11701405, e Recibo de Peticionamento de 22/03/2024.)",
+        "elementos_obrigatorios": [
+          "Andre Alcantara Ocampos",
+          "desde 22/03/2024",
+          "substituiu Odilon Rodrigues Silva"
+        ],
+        "indicadores_alucinacao": [
+          "Odilon como RL atual",
+          "data anterior a 2024",
+          "outro nome"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q05",
+      "input": {
+        "text": "Qual foi o motivo registrado para a revogacao da procuracao eletronica de numero SEI 11976278?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "factual-pontual",
+        "doc_fonte": "doc 22 (Revogacao 13690999, revoga a 11976278, motivo Desligamento)",
+        "gold_answer": "Motivo da revogacao: 'Desligamento'.",
+        "credito_parcial": "Credito parcial se identificar 'Desligamento' mas referenciar a procuracao errada.",
+        "gold_answer_exemplo": "O motivo registrado foi 'Desligamento'. A procuracao eletronica de numero SEI 11976278 (outorgada a Walter Katsumi Sanuki) foi revogada em 13/05/2025 por meio do documento de Revogacao doc SEI 13690999, no qual o campo 'Motivo da Revogacao' consta como 'Desligamento'. (Fonte: Revogacao de Procuracao Eletronica, doc SEI 13690999.)",
+        "elementos_obrigatorios": [
+          "Desligamento",
+          "procuracao 11976278"
+        ],
+        "indicadores_alucinacao": [
+          "motivo 'alteracao' para a 11976278 (esse foi o da 11701433)",
+          "motivo inventado"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q04",
+      "input": {
+        "text": "A procuracao eletronica simples outorgada a Walter Katsumi Sanuki em 22/03/2024 tinha validade indeterminada ou data limite? Se determinada, qual a data?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "factual-pontual",
+        "doc_fonte": "doc 12 (Procuracao 11701433)",
+        "gold_answer": "Validade determinada, com data limite 22/03/2025.",
+        "credito_parcial": "Credito parcial se disser 'determinada' sem a data, ou data aproximada.",
+        "gold_answer_exemplo": "A procuracao tinha validade determinada, com data limite em 22/03/2025. Trata-se da Procuracao Eletronica Simples doc SEI 11701433, outorgada a Walter Katsumi Sanuki, cujo campo 'Validade' consta como 'Determinado (Data Limite: 22/03/2025)'. (Fonte: Procuracao Eletronica Simples, doc SEI 11701433.)",
+        "elementos_obrigatorios": [
+          "validade determinada",
+          "data limite 22/03/2025"
+        ],
+        "indicadores_alucinacao": [
+          "validade indeterminada",
+          "outra data limite"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q03",
+      "input": {
+        "text": "Em qual cidade e UF fica a sede da pessoa juridica deste processo?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "factual-pontual",
+        "doc_fonte": "doc 01 (Vinculacao: UF MS, Cidade Corumba)",
+        "gold_answer": "Corumba, Mato Grosso do Sul (MS).",
+        "credito_parcial": "Credito parcial se acertar so a UF ou so a cidade.",
+        "gold_answer_exemplo": "A sede da pessoa juridica fica na cidade de Corumba, no estado do Mato Grosso do Sul (MS). (Fonte: Vinculacao de Responsavel Legal a Pessoa Juridica, doc SEI 7184509, que registra UF 'MS' e Cidade 'Corumba'.)",
+        "elementos_obrigatorios": [
+          "Corumba",
+          "MS / Mato Grosso do Sul"
+        ],
+        "indicadores_alucinacao": [
+          "outra cidade/UF",
+          "Rio de Janeiro/Sao Paulo como sede"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q02",
+      "input": {
+        "text": "Quem foi indicado como Responsavel Legal inicial da pessoa juridica neste processo, no peticionamento de 2021?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "factual-pontual",
+        "doc_fonte": "docs 01/04 (doc_sei 7184509/7184512), data 27/07/2021",
+        "gold_answer": "Odilon Rodrigues Silva, no peticionamento inicial 'Responsavel Legal - Inicial' de 27/07/2021.",
+        "credito_parcial": "Credito parcial se citar Odilon Rodrigues Silva sem amarrar a 2021/inicial.",
+        "gold_answer_exemplo": "O Responsavel Legal inicial indicado foi Odilon Rodrigues Silva. Ele consta no peticionamento do tipo 'Responsavel Legal - Inicial', assinado em 27/07/2021, como responsavel legal da Mineracao Corumbaense Reunida S.A. (Fonte: Vinculacao de Responsavel Legal, doc SEI 7184509, e Recibo de Peticionamento, doc SEI 7184512).",
+        "elementos_obrigatorios": [
+          "Odilon Rodrigues Silva",
+          "vinculo inicial / 2021"
+        ],
+        "indicadores_alucinacao": [
+          "Andre Alcantara Ocampos como inicial",
+          "qualquer outro nome como RL inicial"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "Q01",
+      "input": {
+        "text": "Qual e o numero do processo SEI e a razao social e o CNPJ da pessoa juridica a que este processo se refere?"
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (e, para categoria websearch, em fonte externa citada). Para categoria negativa, a resposta correta e reconhecer que a informacao nao consta nos autos.",
+        "categoria": "factual-pontual",
+        "doc_fonte": "docs 01/04 (Vinculacao e Recibo, doc_sei 7184509/7184512)",
+        "gold_answer": "Processo SEI 53500.051698/2021-90; pessoa juridica Mineracao Corumbaense Reunida S.A. (em documentos mais recentes consta como Lhg Mining Corumba S.A.), CNPJ 03.327.988/0001-96.",
+        "credito_parcial": "Credito parcial se acertar processo + CNPJ mas omitir a razao social, ou vice-versa.",
+        "gold_answer_exemplo": "Este processo e o de numero SEI 53500.051698/2021-90. Ele se refere a pessoa juridica Mineracao Corumbaense Reunida S.A. (que em documentos mais recentes do processo passa a constar como Lhg Mining Corumba S.A.), inscrita no CNPJ 03.327.988/0001-96 (Fonte: Vinculacao de Responsavel Legal, doc SEI 7184509, e Recibo de Peticionamento, doc SEI 7184512).",
+        "elementos_obrigatorios": [
+          "processo 53500.051698/2021-90",
+          "CNPJ 03.327.988/0001-96",
+          "razao social Mineracao Corumbaense Reunida S.A. (ou Lhg Mining Corumba S.A.)"
+        ],
+        "indicadores_alucinacao": [
+          "CNPJ diferente de 03.327.988/0001-96",
+          "numero de processo inventado",
+          "outra empresa"
+        ]
+      },
+      "metadata": {
+        "processo": "8116731",
+        "size_class": "medium",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "MEDLARGE-SINTESE-01",
+      "input": {
+        "text": "Resuma o acompanhamento pela COGE/SCO-ANATEL do cumprimento, pela Oi S.A. - Em Recuperacao Judicial, da obrigacao de manutencao dos servicos de tridigitos (Servicos de Utilidade Publica - SUP): o que instaurou o processo, o que foi solicitado a Oi e as falhas na resposta inicial, as principais inconsistencias apontadas pela fiscalizacao (com numeros) e a posicao da Oi em sede recursal. Cite os documentos-fonte.",
+        "exclude_doc_ids": [
+          "14564959"
+        ]
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo. Sintese ampla cruzando o despacho de instauracao, o oficio de notificacao, os informes de analise (1259/2025 e 413/2026) e o Relatorio de Fiscalizacao 1/2026. Nao ha componente de websearch.",
+        "categoria": "resumo-amplo",
+        "doc_fonte": "Despacho Instauracao 134/2024 (SEI 12968275) + Oficio 1110/2024 (SEI 12968296) + Informe 1259/2025 (SEI 14981938) + Informe 413/2026 (SEI 15641002) + RF 1/2026/GR07FI1/GR07/SFI",
+        "gold_answer": "O processo 53500.098386/2024-92 e um PAC instaurado pelo Despacho de Instauracao 134/2024/COGE/SCO para acompanhar o cumprimento, pela Oi S.A. - Em Recuperacao Judicial, da Clausula 1 do Anexo 2 do Termo de Autocomposicao (adaptacao STFC->autorizacao), relativa a manutencao dos servicos de tridigitos ate 31/12/2028. Pelo Oficio 1110/2024/COGE/SCO a Oi foi notificada a apresentar o status/panorama dos tridigitos e os contratos; sua resposta (CT/Oi/GCOR/1809/2025) veio com campos essenciais vazios (Instituicao, Status, Tecnologia, Previsao de Migracao, UC4X) e sem campos exigidos (codigos SGMU/IBGE). O Relatorio de Fiscalizacao 1/2026 (analisado no Informe 413/2026) apontou: 10.363 tridigitos/SUP em 2.794 localidades com chamadas completadas mas nao declarados pela Oi; 52.496 divergentes do CADUP (ABR Telecom) em 11.598 localidades; 685 declarados sem chamadas e sem CADUP; 3.370 migracoes de tecnologia (fibra/UC4X/SIP) entre 12/2022 e 12/2025; e 929 tridigitos retirados desde 2017, sendo 675 apos o Termo; alem de a Oi nao ter publicado o relatorio de execucao previsto no POS. Em sede recursal a Oi sustenta ter atualizado a base em 16/01/2026 (CT/Oi/GCOR/2631/2026), que a maioria dos tridigitos ja migrou para UC4X/SIP e que a fiscalizacao se baseou em amostragem reduzida de CDRs e bases desatualizadas, requerendo a reforma da decisao de nao atesto (Despacho Decisorio 97/2026/COUN/SCO).",
+        "credito_parcial": "Credito parcial proporcional; aceitar cobertura de origem + falhas iniciais + ao menos parte dos numeros da fiscalizacao. Nao exigir TODOS os numeros nem citacao exata de SEI.",
+        "gold_answer_exemplo": "Trata-se do PAC do Processo 53500.098386/2024-92, instaurado pelo Despacho de Instauracao no 134/2024/COGE/SCO (SEI 12968275), para acompanhar o cumprimento pela Oi S.A. - Em Recuperacao Judicial da Clausula 1 do Anexo 2 do Termo de Autocomposicao (adaptacao dos contratos de concessao do STFC para autorizacao), relativa a manutencao dos servicos de tridigitos ate 31/12/2028. Pelo Oficio no 1110/2024/COGE/SCO-ANATEL (SEI 12968296) a Oi foi notificada a apresentar o status/panorama dos tridigitos e a copia dos contratos; sua resposta (Carta CT/Oi/GCOR/1809/2025) deixou campos essenciais vazios (Instituicao, Status, Tecnologia, Previsao de Migracao, Servico UC4X) e nao apresentou campos exigidos (ex.: codigos SGMU/IBGE), conforme o Informe no 1259/2025/COGE/SCO (SEI 14981938). O Relatorio de Fiscalizacao no 1/2026/GR07FI1/GR07/SFI, analisado no Informe no 413/2026/COGE/SCO (SEI 15641002), apontou inconsistencias na gestao dos clientes SUP: 10.363 tridigitos/clientes SUP em 2.794 localidades com chamadas completadas mas nao declarados pela Oi; 52.496 divergentes do CADUP (ABR Telecom) em 11.598 localidades; 685 declarados sem chamadas e sem CADUP; 3.370 tridigitos com migracao de tecnologia (fibra/UC4X/SIP) entre 12/2022 e 12/2025; e 929 tridigitos retirados desde 2017, sendo 675 apos o Termo de Autocomposicao. A Oi nao publicou o relatorio de execucao semestral previsto no POS. Em sede recursal, a Oi sustenta que atualizou a base em 16/01/2026 (Carta CT/Oi/GCOR/2631/2026), que a maior parte dos tridigitos ja migrou para UC4X/SIP, que a fiscalizacao se baseou em amostragem reduzida de CDRs e bases desatualizadas, e requer a reforma da decisao de nao atesto (Despacho Decisorio no 97/2026/COUN/SCO).",
+        "elementos_obrigatorios": [
+          "objeto/origem: PAC do proc 53500.098386/2024-92 (Despacho de Instauracao 134/2024/COGE/SCO) p/ acompanhar o cumprimento pela Oi da Clausula 1 do Anexo 2 do Termo de Autocomposicao (STFC->autorizacao) — manutencao dos servicos de tridigitos, ate 31/12/2028",
+          "notificacao + falha inicial: Oficio 1110/2024/COGE/SCO notificou a Oi; a resposta (CT/Oi/GCOR/1809/2025) deixou campos essenciais vazios/ausentes (ex.: Instituicao, Status, Tecnologia, Previsao de Migracao, UC4X, codigos)",
+          "inconsistencias da fiscalizacao (RF 1/2026, via Informe 413/2026): ao menos parte dos numeros — 10.363 em 2.794 localidades (nao declarados, com chamadas); 52.496 divergentes do CADUP; 685 declarados sem uso; 3.370 migracoes; 929 retirados desde 2017 (675 apos o Termo); e a Oi nao publicou o relatorio de execucao do POS",
+          "posicao recursal da Oi: atualizou a base em 16/01/2026 (CT/Oi/GCOR/2631/2026), maioria ja migrou p/ UC4X/SIP, alega amostragem reduzida de CDRs / bases desatualizadas, e requer reforma da decisao de nao atesto (Despacho Decisorio 97/2026/COUN/SCO)",
+          "cita documentos-fonte"
+        ],
+        "indicadores_alucinacao": [
+          "inventar numeros divergentes dos do Informe 413/2026 (ex.: trocar 10.363/52.496/929/675 por outros valores)",
+          "afirmar que a Anatel ATESTOU o cumprimento ou que a Oi foi considerada adimplente (os autos trazem NAO atesto e inconsistencias relevantes)",
+          "atribuir a obrigacao a outro servico que nao os tridigitos/SUP, ou a outro processo/empresa"
+        ]
+      },
+      "metadata": {
+        "processo": "14564832",
+        "size_class": "medium-larger",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "MEDLARGE-FISCAL-01",
+      "input": {
+        "text": "Segundo o Informe no 413/2026/COGE/SCO (que analisa o Relatorio de Fiscalizacao no 1/2026), quantos tridigitos/clientes SUP a Oi NAO declarou como seus clientes mas que apareciam com chamadas completadas nos CDRs da propria operadora, e em quantas localidades diferentes? E quantos tridigitos foram retirados desde 2017, sendo quantos deles apos o Termo de Autocomposicao?",
+        "exclude_doc_ids": [
+          "14564959"
+        ]
+      },
+      "expected_output": {
+        "regra": "Resposta correta deve ser ancorada nos documentos do processo (Informe 413/2026 / RF 1/2026). Extracao de numeros especificos.",
+        "categoria": "cross-document",
+        "doc_fonte": "Informe 413/2026/COGE/SCO (SEI 15641002), itens 4.3 e 4.6; RF 1/2026/GR07FI1/GR07/SFI",
+        "gold_answer": "Nao declarados pela Oi mas com chamadas completadas nos proprios CDRs: 10.363 tridigitos/clientes SUP/localidades, em 2.794 localidades diferentes. Retirados desde 2017: 929 tridigitos, sendo 675 apos a formalizacao do Termo de Autocomposicao.",
+        "credito_parcial": "Credito parcial se acertar um dos dois blocos (o 10.363/2.794 OU o 929/675).",
+        "gold_answer_exemplo": "Conforme o Informe no 413/2026/COGE/SCO (SEI 15641002), item 4.3, a partir dos CDRs da propria Oi foram identificados 10.363 tridigitos/clientes SUP/localidades, em 2.794 localidades diferentes, nao declarados pela Oi como seus clientes mas com registros de chamadas completadas pela propria prestadora. Quanto as retiradas (item 4.6), foram retirados 929 tridigitos/clientes SUP/municipios desde 2017, sendo 675 deles apos a formalizacao do Termo de Autocomposicao da Oi.",
+        "elementos_obrigatorios": [
+          "10.363 tridigitos/clientes SUP (nao declarados, com chamadas completadas nos CDRs da propria Oi)",
+          "2.794 localidades diferentes",
+          "929 tridigitos retirados desde 2017",
+          "675 desses apos o Termo de Autocomposicao",
+          "cita a fonte (Informe 413/2026 / RF 1/2026)"
+        ],
+        "indicadores_alucinacao": [
+          "numeros diferentes de 10.363 / 2.794 / 929 / 675",
+          "confundir com os 52.496 (divergencia CADUP) ou os 685 (declarados sem uso) — sao outras categorias do relatorio",
+          "inventar valores"
+        ]
+      },
+      "metadata": {
+        "processo": "14564832",
+        "size_class": "medium-larger",
+        "requires_web": false
+      }
+    },
+    {
+      "qid": "WEB-FII-01",
+      "input": {
+        "text": "# Persona\nVoce e um especialista financeiro com mais de 15 anos de experiencia em analise de Fundos de Investimento Imobiliario (FIIs), reconhecido por avaliacoes criteriosas de rentabilidade, estabilidade e seguranca para investidores brasileiros.\n\n# Contexto\nFoi contratado por um investidor pessoa fisica que deseja identificar os FIIs brasileiros que pagam renda mensal (dividendos mensais) e que, simultaneamente, apresentam maior rentabilidade conciliada com maior estabilidade e baixo risco. As informacoes precisam ser atualizadas e embasadas em fontes confiaveis da internet.\n\n# Tarefa/Objetivo\nPesquisar bastante na Internet para elaborar um relatorio detalhado contendo a lista dos principais FIIs que atendem aos requisitos, citando dados de rendimento, metricas de risco e link de cada fonte utilizada.\n\n# Restricoes\n- Nao invente nada e se baseie exclusivamente nas instrucoes.\n- Utilize apenas dados publicados em sites confiaveis de portais financeiros reconhecidos.\n- Nao inclua FIIs com distribuicao trimestral ou sem historico minimo de 12 meses de pagamento.\n- Sem restricao de preco por cota; avaliar apenas metricas de rentabilidade, risco e estabilidade.\n\n# Instrucoes\n1. Pesquisar cuidadosamente na internet as informacoes mais recentes sobre FIIs que distribuem dividendos mensalmente de forma consistente.\n2. Filtrar para incluir apenas FIIs que possuam: Listagem exclusiva na B3; Dividend Yield consistente (media >= 0,8% ao mes nos ultimos 12 meses); Patrimonio liquido >= R$ 500 milhoes; Baixa vacancia ou contratos atipicos; Liquidez media diaria >= R$ 500 mil; Atenda algum criterio de isencao de imposto de renda.\n3. Para cada FII selecionado, coletar (usando metricas ja publicadas por plataformas confiaveis; nao calcular manualmente): Nome e ticker; Segmento; Valor distribuido nos ultimos 3 meses (R$/cota mes a mes); Dividend Yield (DY) 12M; Volatilidade 12M; Razao DY 12M/Volatilidade 12M; Motivos da Recomendacao (max 4 frases); Links das fontes.\n4. Verificar a data de cada fonte antes de inclui-la; rejeitar dados desatualizados.\n5. Apresentar os FIIs em ordem decrescente de atratividade (maior relacao rentabilidade/risco primeiro).\n6. Priorizar fontes do setor financeiro brasileiro: Funds Explorer, TFI Analytics, Suno e B3.\n7. Reserve o tempo necessario para pensar bem e seja cuidadoso, sem pressa.\n8. Execute cada passo com o tempo e atencao necessarios.\n9. Isso e muito importante para mim!\n\n# Formato de Resposta\n- Titulo em H2: ## FIIs com Dividendos Mensais - Ranking Top 10 Atualizado\n- Tabela em Markdown com as colunas: | Ranking | Fundo (Ticker) | Segmento | Distribuicao 3M (R$/cota) | DY 12M | Volatilidade 12M | Razao DY/Volatilidade | Motivos da Recomendacao | Fontes |\n- Apos a tabela, secao \"### Observacoes Importantes\" com: criterios de exclusao aplicados; breve explicacao sobre a metodologia de calculo do DY e da volatilidade."
+      },
+      "expected_output": {
+        "regra": "Tarefa de deep research PURAMENTE WEB (sem documentos de processo). Como os dados de FII sao vivos (DY, volatilidade e distribuicao mudam), NAO ha gabarito factual fixo — avaliar COMPORTAMENTALMENTE: entrega, aterramento em fontes e honestidade. Comparacao clássico vs session e RELATIVA (rodados no mesmo instante).",
+        "categoria": "websearch",
+        "doc_fonte": "N/A (web pura, sem processo)",
+        "gold_answer": "Resposta correta ENTREGA um ranking (nao-vazio) de FIIs brasileiros REAIS negociados na B3 que pagam dividendos mensais, em tabela no formato pedido (colunas Ranking/Fundo(Ticker)/Segmento/Distribuicao 3M/DY 12M/Volatilidade 12M/Razao/Motivos/Fontes), com CADA linha ancorada em fonte(s) citada(s) por URL, seguida da secao 'Observacoes Importantes' com criterios de exclusao e metodologia. Tickers devem ser FIIs reais (formato XXXX11: HGLG11, MXRF11, XPML11, KNRI11, VISC11, etc.), nunca indices/acoes/lixo. Onde faltar dado confiavel, a resposta deve dizer que nao encontrou em vez de inventar.",
+        "credito_parcial": "Credito parcial se entregar ranking parcial (menos de 10) porem com tickers reais e fontes; ou se coletar/analisar snippets mas nao preencher todas as colunas.",
+        "gold_answer_exemplo": "[Exemplo de FORMATO — os dados vem da busca real, nao deste exemplo] '## FIIs com Dividendos Mensais - Ranking Top 10 Atualizado\\n| Ranking | Fundo (Ticker) | Segmento | Distribuicao 3M | DY 12M | Volatilidade 12M | Razao | Motivos | Fontes |\\n| 1 | HGLG11 | Logistica | ... | ... | ... | ... | ... | <URL Funds Explorer> |\\n...\\n### Observacoes Importantes\\n- Excluidos: <FIIs> por <criterio>.\\n- Metodologia: DY 12M = ... ; Volatilidade 12M = ...' — com tickers reais da B3 e URL por dado; nada afirmado sem fonte.",
+        "elementos_obrigatorios": [
+          "entregar ranking nao-vazio de FIIs reais da B3 (tickers formato XXXX11)",
+          "tabela no formato pedido com as colunas solicitadas",
+          "citar fonte/URL para os dados (aterramento na web)",
+          "secao de criterios de exclusao / observacoes",
+          "nao inventar dados ausentes (dizer que nao encontrou)"
+        ],
+        "indicadores_alucinacao": [
+          "tickers inventados ou nao-FII (indices como NIFTY 50, acoes como STT, ou a palavra 'FIIs')",
+          "afirmar DY/volatilidade/distribuicao sem citar fonte",
+          "inventar numeros para preencher a tabela onde a busca nao trouxe dado"
+        ]
+      },
+      "metadata": {
+        "processo": null,
+        "size_class": "web",
+        "requires_web": true
+      }
+    }
+  ]
+}

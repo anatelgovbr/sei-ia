@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "benchmark-long-context-v2-evaluation-contract.schema.json",
+  "title": "Long-context v2 evaluation contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "version",
+    "inherits",
+    "context_adapter",
+    "canonical_metrics",
+    "auxiliary_metrics",
+    "availability",
+    "judge",
+    "model_profiles",
+    "rate_card",
+    "usage_semantics",
+    "thresholds"
+  ],
+  "properties": {
+    "schema_version": {"const": "benchmark-long-context-v2-evaluation-contract-1"},
+    "version": {"const": "benchmark-decision-v2-long-context-adapter-1"},
+    "inherits": {"const": "benchmark-decision-v2@339564c"},
+    "context_adapter": {"const": "context-disclosure-evidence-1"},
+    "canonical_metrics": {
+      "const": [
+        "groundedness",
+        "completeness",
+        "citation_quality",
+        "hallucination",
+        "negativa_correta",
+        "overall"
+      ]
+    },
+    "auxiliary_metrics": {"const": ["target_alignment", "hallucination_count"]},
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statuses", "nd_status", "unsupported_policy"],
+      "properties": {
+        "statuses": {
+          "const": [
+            "pending_trace",
+            "pending_evaluation",
+            "evaluated",
+            "technical_unavailable"
+          ]
+        },
+        "nd_status": {"const": "technical_unavailable"},
+        "unsupported_policy": {"const": "groundedness_denominator_not_hallucination"}
+      }
+    },
+    "judge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requested_profile",
+        "deployment",
+        "canonical_model",
+        "provider",
+        "system_prompt_ref",
+        "system_prompt_sha256",
+        "user_prompt_ref",
+        "user_prompt_sha256",
+        "response_schema_ref",
+        "response_schema_sha256",
+        "temperature",
+        "max_output_tokens",
+        "response_format"
+      ],
+      "properties": {
+        "requested_profile": {"const": "mini"},
+        "deployment": {"const": "seiia-ds-mini"},
+        "canonical_model": {"const": "gpt-5.4-mini"},
+        "provider": {"const": "openai"},
+        "system_prompt_ref": {"type": "string", "minLength": 1},
+        "system_prompt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "user_prompt_ref": {"type": "string", "minLength": 1},
+        "user_prompt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "response_schema_ref": {"type": "string", "minLength": 1},
+        "response_schema_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "temperature": {"const": 0},
+        "max_output_tokens": {"const": 4000},
+        "response_format": {"const": "json_schema_strict"}
+      }
+    },
+    "model_profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["standard", "mini", "nano"],
+      "properties": {
+        "standard": {"$ref": "#/$defs/modelProfile"},
+        "mini": {"$ref": "#/$defs/modelProfile"},
+        "nano": {"$ref": "#/$defs/modelProfile"}
+      }
+    },
+    "rate_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "sha256", "version", "effective_on", "currency"],
+      "properties": {
+        "ref": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "version": {"const": "v2"},
+        "effective_on": {"const": "2026-07-21"},
+        "currency": {"const": "USD"}
+      }
+    },
+    "usage_semantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_source", "judge_source", "agent_input", "agent_output", "judge_input", "judge_output", "canonical_total", "missing_usage"],
+      "properties": {
+        "agent_source": {"const": "langfuse_generation_usage_details"},
+        "judge_source": {"const": "openai_compatible_response_usage"},
+        "agent_input": {"const": "input_excludes_cache_read"},
+        "agent_output": {"const": "output_excludes_reasoning"},
+        "judge_input": {"const": "prompt_tokens_includes_cached_tokens"},
+        "judge_output": {"const": "completion_tokens_includes_reasoning"},
+        "canonical_total": {"const": "input_uncached + cache_read + output + reasoning"},
+        "missing_usage": {"const": "technical_unavailable_no_estimation"}
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_disclosure",
+        "completeness",
+        "groundedness",
+        "hallucination",
+        "target_alignment",
+        "negativa_correta_for_negative",
+        "citation_quality",
+        "overall"
+      ],
+      "properties": {
+        "context_disclosure": {"const": 200000},
+        "completeness": {"const": 0.8},
+        "groundedness": {"const": 0.8},
+        "hallucination": {"const": false},
+        "target_alignment": {"const": true},
+        "negativa_correta_for_negative": {"const": true},
+        "citation_quality": {"type": "null"},
+        "overall": {"type": "null"}
+      }
+    }
+  },
+  "$defs": {
+    "modelProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deployment", "canonical_model", "provider"],
+      "properties": {
+        "deployment": {"type": "string", "pattern": "^seiia-ds(?:-mini|-nano)?$"},
+        "canonical_model": {"type": "string", "pattern": "^gpt-5\\.4(?:-mini|-nano)?$"},
+        "provider": {"const": "openai"}
+      }
+    }
+  }
+}

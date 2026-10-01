@@ -1,0 +1,8 @@
+{
+  "title": "Sample fixture",
+  "marker": "CANARY_UPLOAD_JSON",
+  "items": [
+    {"id": 1, "name": "alpha"},
+    {"id": 2, "name": "beta"}
+  ]
+}

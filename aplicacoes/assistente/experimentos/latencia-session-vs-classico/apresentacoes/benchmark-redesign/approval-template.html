@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Benchmark Session — template para aprovação</title>
+  <style>
+    :root {
+      --ink: #14213d; --muted: #62708a; --canvas: #f4f7fb; --surface: #fff;
+      --line: #dce3ef; --navy: #0c2340; --navy-2: #162f58;
+      --accent: #176b87; --ok: #12693d; --warn: #8a5b00; --stop: #9a2f2f;
+      --shadow: 0 16px 38px rgba(12,35,64,.09); --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--canvas); font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: inherit; }
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+    .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; min-width: 0; }
+    .hero { padding: 54px 0 44px; color: #fff; background: linear-gradient(135deg, var(--navy), var(--navy-2)); }
+    .eyebrow { margin: 0 0 10px; color: #b9d7e3; font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { max-width: 900px; margin: 0; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.05; letter-spacing: -.045em; }
+    .hero p { max-width: 800px; margin: 18px 0 0; color: #d8e5f2; font-size: 1.08rem; }
+    .statusline { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .badge { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; padding: 7px 11px; border: 1px solid currentColor; border-radius: 999px; font-size: .82rem; font-weight: 800; overflow-wrap: anywhere; }
+    .badge.stop { color: #ffe1e1; background: rgba(154,47,47,.25); }
+    .badge.pending { color: #ffe4a3; background: rgba(138,91,0,.24); }
+    .badge.neutral { color: #d8e5f2; background: rgba(255,255,255,.08); }
+    nav { position: sticky; top: 0; z-index: 4; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.94); backdrop-filter: blur(12px); }
+    nav .wrap { display: flex; gap: 20px; padding: 12px 0; overflow-x: auto; }
+    nav a { white-space: nowrap; color: var(--muted); font-size: .86rem; font-weight: 750; text-decoration: none; }
+    main { padding: 32px 0 72px; }
+    section { margin-top: 28px; padding: 28px; min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    section:first-child { margin-top: 0; }
+    h2 { margin: 0 0 8px; font-size: clamp(1.35rem, 3vw, 2rem); letter-spacing: -.025em; }
+    h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    .lead, .note { color: var(--muted); }
+    .lead { max-width: 850px; margin: 0 0 20px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    .grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .card { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdff; }
+    .card p:last-child { margin-bottom: 0; }
+    .arm { border-top: 5px solid var(--accent); }
+    .arm strong { display: block; font-size: 1.12rem; }
+    .table-shell { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; min-width: 780px; background: #fff; }
+    caption { padding: 12px 14px; color: var(--muted); font-weight: 700; text-align: left; background: #f7f9fc; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+    th { color: #30415f; background: #f7f9fc; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    .state { font-weight: 800; }
+    .state.pending { color: var(--warn); }
+    .state.blocked { color: var(--stop); }
+    .flow { counter-reset: stage -1; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+    .stage { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdff; }
+    .stage::before { counter-increment: stage; content: counter(stage); display: grid; place-items: center; width: 32px; height: 32px; margin-bottom: 12px; color: #fff; background: var(--navy-2); border-radius: 50%; font-weight: 850; }
+    .stage p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .callout { margin: 18px 0; padding: 16px 18px; border-left: 5px solid var(--stop); border-radius: 10px; background: #fff5f5; }
+    .callout strong { color: var(--stop); }
+    .metric-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 10px; }
+    .metric { min-width: 0; padding: 14px; border: 1px dashed #aab7ca; border-radius: 12px; background: #fafcff; }
+    .metric span { display: block; color: var(--muted); font-size: .75rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .metric strong { display: block; margin-top: 8px; overflow-wrap: anywhere; }
+    form { display: grid; gap: 14px; }
+    fieldset { min-width: 0; margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 14px; }
+    legend { padding: 0 7px; font-weight: 800; }
+    label { display: block; font-weight: 700; }
+    input[type="radio"] { margin-right: 7px; }
+    textarea { width: 100%; min-height: 92px; margin-top: 7px; padding: 12px; resize: vertical; color: var(--ink); background: #fff; border: 1px solid #aab7ca; border-radius: 10px; font: inherit; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    button { padding: 11px 16px; border: 0; border-radius: 10px; color: #fff; background: var(--navy-2); font: inherit; font-weight: 800; cursor: pointer; }
+    button.secondary { color: var(--navy); background: #e8eef7; }
+    button:disabled { color: #6f7887; background: #d9dee7; cursor: not-allowed; }
+    .empty { padding: 28px; border: 2px dashed #bbc6d6; border-radius: 14px; color: var(--muted); text-align: center; background: #fafcff; }
+    .approval-lock { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 18px; align-items: center; padding: 18px; border: 2px solid var(--stop); border-radius: 14px; background: #fff7f7; }
+    footer { padding: 22px 0 40px; color: var(--muted); text-align: center; }
+    @media (max-width: 900px) { .grid, .grid.three, .flow { grid-template-columns: 1fr 1fr; } .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 620px) { .wrap { width: min(100% - 20px,1180px); } section { padding: 20px; } .grid, .grid.three, .flow, .metric-grid, .approval-lock { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Template vazio · design para aprovação</p>
+      <h1>Benchmark Session constante e simples</h1>
+      <p>Duas configurações, uma metodologia. A bateria permanece bloqueada até cache read estar observável e reconciliado.</p>
+      <div class="statusline" aria-label="Status do desenho">
+        <span class="badge stop">⛔ Bateria bloqueada</span>
+        <span class="badge pending">◷ Aguardando prova de cache read</span>
+        <span class="badge neutral">○ Sem resultados reais</span>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Navegação do template"><div class="wrap">
+    <a href="#conclusao">Decisão</a><a href="#alocacao">Alocação</a><a href="#fluxo">Fluxo</a><a href="#cache">Cache read</a><a href="#gates">Gates</a><a href="#resultados">Resultados vazios</a><a href="#aprovacao">Aprovação</a>
+  </div></nav>
+
+  <main class="wrap">
+    <section id="conclusao">
+      <p class="eyebrow" style="color:var(--accent)">Conclusão e limitações primeiro</p>
+      <h2>O desenho está pronto para execução após o gate de cache read</h2>
+      <p class="lead">A proposta elimina caminhos paralelos: um runner, um schema simples, ledger append-only e qualidade apresentada como métricas contra gold. Cache read é reconciliado com evidência instrumental já autorizada; cache write não é operação nem custo do benchmark.</p>
+      <div class="grid">
+        <article class="card arm"><strong>Braço A</strong><p>Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano</p></article>
+        <article class="card arm"><strong>Braço B</strong><p>Session — Terra / Luna</p></article>
+      </div>
+      <div class="callout"><strong>Bloqueio explícito:</strong> se cache read não estiver observável e reconciliado, não há canário nem bateria. Campos brutos de write não entram em gate, comparação ou preço.</div>
+    </section>
+
+    <section id="alocacao">
+      <h2>Alocação por papel</h2>
+      <p class="lead">Os aliases e modelos vêm dos braços e das rate cards locais. OCR, judge, nano/explorador e reasoning/effort acompanham a configuração selecionada.</p>
+      <div class="table-shell"><table>
+        <caption>Proposta antes dos resultados — nenhuma célula real está representada</caption>
+        <thead><tr><th scope="col">Papel</th><th scope="col">Braço A</th><th scope="col">Modelo A</th><th scope="col">Braço B</th><th scope="col">Modelo B</th><th scope="col">Reasoning/effort</th><th scope="col">Estado</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">standard</th><td><code>standard / seiia-ds</code></td><td><code>gpt-5.4</code></td><td><code>standard / seiia-ds-gpt-terra</code></td><td><code>gpt-5.6-terra</code></td><td>A: <code>low</code><br>B: <code>low</code></td><td class="state">✓ configurado pelo arm</td></tr>
+          <tr><th scope="row">subagentes/mini</th><td><code>mini / seiia-ds-mini</code></td><td><code>gpt-5.4-mini</code></td><td><code>mini / seiia-ds-gpt-luna</code></td><td><code>gpt-5.6-luna</code></td><td>observado por generation</td><td class="state">✓ configurado pelo arm</td></tr>
+          <tr><th scope="row">OCR</th><td><code>mini / seiia-ds-mini</code></td><td><code>gpt-5.4-mini</code></td><td><code>mini / seiia-ds-gpt-luna</code></td><td><code>gpt-5.6-luna</code></td><td>sem override de effort</td><td class="state">✓ configurado pelo arm</td></tr>
+          <tr><th scope="row">judge</th><td><code>mini / seiia-ds-mini</code></td><td><code>gpt-5.4-mini</code></td><td><code>mini / seiia-ds-gpt-luna</code></td><td><code>gpt-5.6-luna</code></td><td>A: temperature 0<br>B: sem temperature</td><td class="state">✓ configurado pelo arm</td></tr>
+          <tr><th scope="row">nano/explorador</th><td><code>nano / seiia-ds-nano</code></td><td><code>gpt-5.4-nano</code></td><td><code>nano / seiia-ds-gpt-luna</code></td><td><code>gpt-5.6-luna</code></td><td>observado por generation</td><td class="state">✓ configurado pelo arm</td></tr>
+          <tr><th scope="row">classificador</th><td><code>mini / seiia-ds-mini</code></td><td><code>gpt-5.4-mini</code></td><td><code>mini / seiia-ds-gpt-luna</code></td><td><code>gpt-5.6-luna</code></td><td>observado por generation</td><td class="state">✓ configurado pelo arm</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="fluxo">
+      <h2>Fluxo completo</h2>
+      <p class="lead">O fluxo enumera todas as decisões e separa verificações sem inferência da calibração live futura.</p>
+      <div class="flow">
+        <article class="stage"><h3>Contrato</h3><p>Aprovar template, braços, papéis, métricas e hashes. Não autoriza chamada.</p></article>
+        <article class="stage"><h3>Pre-flight</h3><p>Checks read-only e cache read reconciliado.</p></article>
+        <article class="stage"><h3>Canário</h3><p>Uma tentativa ponta a ponta; não muda metodologia.</p></article>
+        <article class="stage"><h3>Bateria</h3><p>Mesmos casos, N fixo, sequencial, sem retry.</p></article>
+        <article class="stage"><h3>Judge</h3><p>Mesmo judge contra gold e JSON Schema simples.</p></article>
+        <article class="stage"><h3>Agregação</h3><p>Integridade, qualidade, tokens, latência e custo separados.</p></article>
+        <article class="stage"><h3>Relatório HTML</h3><p>Tabelas alinhadas, provenance e limitações explícitas.</p></article>
+        <article class="stage"><h3>Repetição</h3><p>Somente decisão explícita e novo ID; original preservado.</p></article>
+      </div>
+      <div class="card" style="margin-top:16px"><h3>Definição concreta de pre-flight</h3><p>Confere aliases/modelos/papéis/reasoning, endpoint e credenciais, SEI e LiteLLM corretos, Langfuse, rate card, payloads+gold+hashes, <code>no_cache=True</code>, isolamento de rede, diretório/ledger, capacidade, rate limit e o mapeamento ponta a ponta de cache read. Os checks estáticos/read-only não fazem inferência.</p></div>
+    </section>
+
+    <section id="cache">
+      <h2>Fase 1 — validação instrumental de cache read</h2>
+      <p class="lead">A evidência já autorizada deve provar que o contador de cache read atravessa as fronteiras sem renomeação silenciosa. Não existe operação nem custo cache write neste contrato.</p>
+      <div class="table-shell"><table>
+        <caption>Prova de cache read nas quatro fronteiras</caption>
+        <thead><tr><th scope="col">Fronteira</th><th scope="col">Campo observado</th><th scope="col">Critério</th><th scope="col">Status</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Provider/OpenAI bruto via LiteLLM</th><td><code>usage</code> bruto completo e campo nativo de read.</td><td>Contador nativo, não inferido por diferença.</td><td class="state pending">◷ pendente</td></tr>
+          <tr><th scope="row">LiteLLM</th><td><code>cache_read_input_tokens</code>, <code>prompt_tokens_details.cached_tokens</code> ou campo equivalente observado.</td><td>Documentar o nome realmente presente e a versão.</td><td class="state pending">◷ pendente</td></tr>
+          <tr><th scope="row">Langfuse</th><td>Chave canônica-alvo <code>usageDetails.input_cache_read</code>.</td><td>Reconciliar com upstream e preservar provenance.</td><td class="state pending">◷ pendente</td></tr>
+          <tr><th scope="row">Normalizador/agregador</th><td>Chave canônica-alvo <code>cache_read</code>.</td><td>Sem descarte ou renomeação silenciosa.</td><td class="state pending">◷ pendente</td></tr>
+        </tbody>
+      </table></div>
+      <div class="approval-lock" role="status" aria-live="polite">
+        <div><strong>⛔ Gate bloqueante não satisfeito</strong><br><span class="note">Cache read ainda precisa ser marcado como reconciliado. A bateria não pode ser aprovada.</span></div>
+        <button type="button" disabled aria-disabled="true" title="Disponível somente após a prova de cache read">Autorizar bateria</button>
+      </div>
+    </section>
+
+    <section id="gates">
+      <h2>Gates mínimos, sem gate composto de qualidade</h2>
+      <div class="grid three">
+        <article class="card"><h3>1 · Pode iniciar?</h3><p>Checks read-only verdes e cache read provado e reconciliado.</p></article>
+        <article class="card"><h3>2 · Tentativa técnica</h3><p>HTTP 200 + SSE <code>end</code> + trace e artefatos persistidos.</p></article>
+        <article class="card"><h3>3 · Judge</h3><p>JSON válido no schema e invariantes semânticas preservadas.</p></article>
+      </div>
+      <p class="note">Qualidade é sempre um conjunto visível de métricas e flags contra gold. Falha técnica não vira reprovação de qualidade. Não há retry, recovery ou reclassificação automática.</p>
+    </section>
+
+    <section id="escopo">
+      <h2>Manter, mudar e remover</h2>
+      <div class="grid three">
+        <article class="card"><h3>Manter</h3><p>Payloads, gold, N fixo, mesma bateria, ferramentas, preparação, resposta, judge, hashes, input/output/reasoning/cache read, custo e <code>no_cache</code>.</p></article>
+        <article class="card"><h3>Mudar</h3><p>Duas configurações, um runner, schema simples, falha técnica separada da qualidade, artefato append-only e contrato de cache versionado.</p></article>
+        <article class="card"><h3>Remover</h3><p>Gates compostos, múltiplas campanhas sucessoras, classificação retroativa e qualquer recovery/retry automático.</p></article>
+      </div>
+    </section>
+
+    <section id="resultados">
+      <h2>Resultados — estrutura vazia</h2>
+      <p class="lead">Nenhum valor real foi inserido. Quando autorizado, métricas correspondentes serão alinhadas caso a caso e por braço.</p>
+      <div class="metric-grid" aria-label="Métricas obrigatórias vazias">
+        <div class="metric"><span>Input</span><strong>— placeholder obrigatório —</strong></div>
+        <div class="metric"><span>Output</span><strong>— placeholder obrigatório —</strong></div>
+        <div class="metric"><span>Reasoning</span><strong>— placeholder obrigatório —</strong></div>
+        <div class="metric"><span>Cache read</span><strong>— placeholder obrigatório —</strong></div>
+      </div>
+      <div class="empty" style="margin-top:16px">Tabela de resultados por caso, braço, latência, qualidade, ferramentas, preparação, resposta, tokens e custo será gerada somente após autorização e execução válidas.</div>
+    </section>
+
+    <section id="aprovacao">
+      <h2>Controles de revisão do capitão</h2>
+      <p class="lead">Estes controles aprovam ou comentam somente o desenho dos dois arquivos. Não autorizam calibração, canário ou bateria.</p>
+      <form id="review-form">
+        <fieldset><legend>Alocação exata de papéis e reasoning/effort</legend>
+          <label><input type="radio" name="allocation" value="approve"> Aprovar a proposta de alocação</label>
+          <label><input type="radio" name="allocation" value="adjust"> Solicitar ajustes de OCR, judge, nano/classificador ou effort</label>
+          <label>Comentário estruturado<textarea name="allocation_comment" placeholder="Indique papel, braço, alias e reasoning/effort desejado."></textarea></label>
+        </fieldset>
+        <fieldset><legend>Contrato de cache read</legend>
+          <label><input type="radio" name="cache_contract" value="approve"> Aprovar o mapeamento instrumental nas quatro fronteiras</label>
+          <label><input type="radio" name="cache_contract" value="adjust"> Solicitar ajuste antes da bateria</label>
+          <label>Comentário estruturado<textarea name="cache_comment" placeholder="Comente captura upstream, campo LiteLLM, chave canônica ou reconciliação."></textarea></label>
+        </fieldset>
+        <fieldset><legend>Decisão sobre os dois arquivos</legend>
+          <label><input type="radio" name="design" value="approve"> Aprovar plan.md e report-template.html</label>
+          <label><input type="radio" name="design" value="adjust"> Solicitar nova revisão dos arquivos</label>
+          <label>Observações finais<textarea name="final_comment" placeholder="Esta decisão não autoriza calibração, canário ou bateria."></textarea></label>
+        </fieldset>
+        <div class="actions"><button type="submit">Enviar revisão pelo Lavish</button><button type="reset" class="secondary">Limpar formulário</button></div>
+        <p id="form-status" class="note" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="wrap">Template documental · 2026-08-03 · Sem resultados, segredos ou autorização live</footer>
+  <script>
+    document.getElementById('review-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+      const prompt = [
+        'Revisão do desenho do benchmark:',
+        'alocação=' + (data.allocation || 'não selecionada'),
+        'comentário_alocação=' + (data.allocation_comment || 'nenhum'),
+        'contrato_cache=' + (data.cache_contract || 'não selecionado'),
+        'comentário_cache=' + (data.cache_comment || 'nenhum'),
+        'decisão_design=' + (data.design || 'não selecionada'),
+        'observações=' + (data.final_comment || 'nenhuma'),
+        'Escopo: somente plan.md e report-template.html; nenhuma autorização live implícita.'
+      ].join('\n');
+      const status = document.getElementById('form-status');
+      if (window.lavish && typeof window.lavish.queuePrompt === 'function') {
+        window.lavish.queuePrompt(prompt);
+        status.textContent = 'Revisão adicionada à fila do Lavish.';
+      } else {
+        status.textContent = 'Abra este arquivo pelo Lavish para enviar a revisão; o conteúdo do formulário permanece visível.';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "target_alignment",
+    "checklist",
+    "claims",
+    "citation_quality",
+    "negativa_correta",
+    "overall",
+    "rationale"
+  ],
+  "properties": {
+    "target_alignment": {"type": "boolean"},
+    "checklist": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["index", "satisfied"],
+        "properties": {
+          "index": {"type": "integer", "minimum": 1},
+          "satisfied": {"type": "boolean"}
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text",
+          "verdict",
+          "evidence_references",
+          "evidence_basis",
+          "absence_evidence_reference",
+          "citation_present",
+          "invented"
+        ],
+        "properties": {
+          "text": {"type": "string", "minLength": 1},
+          "verdict": {
+            "type": "string",
+            "enum": ["supported", "unsupported", "contradicted"]
+          },
+          "evidence_references": {
+            "type": "array",
+            "items": {"type": "integer", "minimum": 1}
+          },
+          "evidence_basis": {
+            "type": "string",
+            "enum": ["excerpt", "protected_absence", "none"]
+          },
+          "absence_evidence_reference": {
+            "anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]
+          },
+          "citation_present": {"type": "boolean"},
+          "invented": {"type": "boolean"}
+        }
+      }
+    },
+    "citation_quality": {"type": "number", "minimum": 0, "maximum": 1},
+    "negativa_correta": {"anyOf": [{"type": "boolean"}, {"type": "null"}]},
+    "overall": {"type": "number", "minimum": 0, "maximum": 1},
+    "rationale": {"type": "string"}
+  }
+}

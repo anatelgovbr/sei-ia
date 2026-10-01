@@ -1,0 +1,84 @@
+services:
+  gateway-nginx: !reset null
+
+  assistente:
+    build: !reset null
+    image: seiia-bench-1428/assistente:local
+    depends_on: !override
+      infra-postgres:
+        condition: service_healthy
+      infra-redis:
+        condition: service_started
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      ASSISTENTE_LITELLM_PROXY_URL: ${LITELLM_PROXY_URL}
+      ASSISTENTE_LITELLM_PROXY_API_KEY: ${LITELLM_PROXY_API_KEY}
+      LITELLM_STANDARD_MODEL: ${BENCHMARK_STANDARD_MODEL:?defina BENCHMARK_STANDARD_MODEL}
+      LITELLM_MINI_MODEL: ${BENCHMARK_MINI_MODEL:?defina BENCHMARK_MINI_MODEL}
+      LITELLM_NANO_MODEL: ${BENCHMARK_NANO_MODEL:?defina BENCHMARK_NANO_MODEL}
+      ASSISTENTE_OCR_MODEL: ${BENCHMARK_OCR_MODEL:?defina BENCHMARK_OCR_MODEL}
+      ASSISTENTE_SESSION_MAIN_MODEL: principal
+      ASSISTENTE_SESSION_CLASSIFIER_MODEL: classificador
+      ASSISTENTE_SESSION_REASONING_EFFORT: ${BENCHMARK_REASONING_EFFORT:-low}
+      ASSISTENTE_MAX_RETRIES: "0"
+      ASSISTENTE_SEI_API_MAX_RETRIES: ${BENCHMARK_SEI_API_MAX_RETRIES:-5}
+      ASSISTENTE_CTX_LEN_STANDARD_MODEL: ${BENCHMARK_STANDARD_CONTEXT_TOKENS:?defina BENCHMARK_STANDARD_CONTEXT_TOKENS}
+      ASSISTENTE_CTX_LEN_MINI_MODEL: ${BENCHMARK_MINI_CONTEXT_TOKENS:?defina BENCHMARK_MINI_CONTEXT_TOKENS}
+      ASSISTENTE_CTX_LEN_NANO_MODEL: ${BENCHMARK_NANO_CONTEXT_TOKENS:?defina BENCHMARK_NANO_CONTEXT_TOKENS}
+      ASSISTENTE_LANGFUSE_TRUNCATE_PAYLOADS: ${ASSISTENTE_LANGFUSE_TRUNCATE_PAYLOADS:-false}
+      ASSISTENTE_SESSION_WEBRESEARCH_CRAWL_CONCURRENCY: ${ASSISTENTE_SESSION_WEBRESEARCH_CRAWL_CONCURRENCY:-4}
+      ASSISTENTE_SESSION_WEBRESEARCH_EVIDENCE_GATE_ENABLED: ${ASSISTENTE_SESSION_WEBRESEARCH_EVIDENCE_GATE_ENABLED:-false}
+      ASSISTENTE_SESSION_WEBRESEARCH_EVIDENCE_GATE_INPUT_CHARS: ${ASSISTENTE_SESSION_WEBRESEARCH_EVIDENCE_GATE_INPUT_CHARS:-24000}
+      ASSISTENTE_SESSION_PREPARATION_HEARTBEAT_INTERVAL_SECONDS: ${ASSISTENTE_SESSION_PREPARATION_HEARTBEAT_INTERVAL_SECONDS:-1}
+    volumes:
+      - benchmark_session_fs:/var/seiia/sessions
+      - ${BENCHMARK_EVIDENCE_HOST_ROOT:?defina BENCHMARK_EVIDENCE_HOST_ROOT}:/var/seiia/benchmark-evidence:ro
+      - ${BENCHMARK_WORKTREE_ROOT:?defina BENCHMARK_WORKTREE_ROOT}/aplicacoes/assistente/sei_ia:/app/aplicacoes/assistente/sei_ia:ro
+      - ${BENCHMARK_WORKTREE_ROOT:?defina BENCHMARK_WORKTREE_ROOT}/libs/sei_extraction/src/sei_extraction:/app/libs/sei_extraction/src/sei_extraction:ro
+      - ${BENCHMARK_WORKTREE_ROOT:?defina BENCHMARK_WORKTREE_ROOT}/libs/sei_api/src/sei_api:/app/libs/sei_api/src/sei_api:ro
+    networks:
+      seiia: {}
+      benchmark_assistente_frontend:
+        aliases:
+          - api_assistente
+
+  assistente-nginx:
+    build: !reset null
+    image: nginx:1.27-alpine3.19-perl
+    restart: "no"
+    depends_on: !override
+      assistente:
+        condition: service_healthy
+    ports: !override
+      - target: 443
+        published: ${ASSISTENTE_PORT:-8188}
+        protocol: tcp
+    volumes: !override
+      - ${BENCHMARK_WORKTREE_ROOT:?defina BENCHMARK_WORKTREE_ROOT}/aplicacoes/assistente/experimentos/latencia-session-vs-classico/nginx.isolated.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${BENCHMARK_WORKTREE_ROOT:?defina BENCHMARK_WORKTREE_ROOT}/.runtime/certs/seiia.cert.pem:/etc/ssl/certs/seiia.cert.pem:ro
+      - ${BENCHMARK_WORKTREE_ROOT:?defina BENCHMARK_WORKTREE_ROOT}/.runtime/certs/seiia.cert.key:/etc/ssl/private/seiia.cert.key:ro
+    networks: !override
+      - seiia
+      - benchmark_assistente_frontend
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qO- --no-check-certificate https://127.0.0.1:443/health >/dev/null
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  infra-postgres:
+    volumes:
+      - benchmark_postgres:/var/lib/postgresql/data
+
+  infra-searxng:
+    image: seiia-bench-1428/infra-searxng:local
+
+volumes:
+  benchmark_postgres:
+  benchmark_session_fs:
+
+networks:
+  benchmark_assistente_frontend:
+    internal: true

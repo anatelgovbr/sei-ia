@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sei-extraction"
+version = "0.1.0"
+description = "Biblioteca compartilhada de extração e tratamento de documentos do SEI."
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "beautifulsoup4",
+    "lxml",
+    "html5lib",
+]
+
+[project.optional-dependencies]
+text = ["pandas", "tiktoken"]
+extract = ["pymupdf", "pandas", "python-calamine", "openai"]
+docling = ["docling"]
+unstructured = ["unstructured[odfpy]"]
+dev = ["pytest", "pytest-cov", "pymupdf", "pandas", "python-calamine", "openpyxl", "tabulate"]
+
+[dependency-groups]
+# Instalada somente no container efemero que testa a biblioteca na candidata ETL.
+ci-test = ["pytest==9.1.0", "pytest-cov==7.1.0", "openpyxl==3.1.5"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sei_extraction"]
+
+[tool.ruff]
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"langchain".msg = "sei_extraction nao pode depender de langchain (apps divergem em major). Tokenizacao so com tiktoken."
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"

@@ -1,0 +1,16 @@
+services:
+  infra-postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  infra-solr:
+    ports:
+      - "127.0.0.1:8084:8983"
+
+  infra-redis:
+    ports:
+      - "127.0.0.1:8091:6379"
+
+  infra-litellm:
+    ports:
+      - "127.0.0.1:4000:${LITELLM_PORT:-4000}"

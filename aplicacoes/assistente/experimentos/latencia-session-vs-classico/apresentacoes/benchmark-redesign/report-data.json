@@ -1,0 +1,709 @@
+{
+  "schema_version": "benchmark-redesign-report-data-v1",
+  "arms": [
+    {
+      "label": "Session \u2014 GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano",
+      "run_name": "benchmark-redesign-gpt54-full-v2-20260803-10cells",
+      "commit": "4b835df396d9073ed2a4ab3b09928b281228fc71",
+      "models": {
+        "standard": {
+          "deployment": "seiia-ds",
+          "canonical_model": "gpt-5.4",
+          "provider": "openai"
+        },
+        "mini": {
+          "deployment": "seiia-ds-mini",
+          "canonical_model": "gpt-5.4-mini",
+          "provider": "openai"
+        }
+      },
+      "reasoning_effort": "low",
+      "n": 1,
+      "rate_card": {
+        "version": "benchmark-redesign-v2",
+        "effective_on": "2026-07-30",
+        "aggregation_compatibility_key": "openai-session-two-arm-cache-read-v2-2026-08-03",
+        "sha256": "fc23ccea7dbe447890c85779f8a962296310209a2e20f453e2727212e92219da"
+      },
+      "records": 10,
+      "technical": {
+        "topics_reserved": 10,
+        "posts_reserved": 10,
+        "posts_started": 10,
+        "posts_terminal": 10,
+        "streams": 10,
+        "sse_end": 10,
+        "sse_error_frames": 0,
+        "traces": 10,
+        "judge_input_complete": 10
+      },
+      "distributions": {
+        "ttfc_s": {
+          "n": 10,
+          "min": 5.64,
+          "p25": 14.8325,
+          "median": 77.695,
+          "mean": 120.974,
+          "p75": 85.725,
+          "p90": 228.436,
+          "max": 660.76
+        },
+        "total_s": {
+          "n": 10,
+          "min": 8.0,
+          "p25": 22.815,
+          "median": 89.23,
+          "mean": 185.388,
+          "p75": 171.0825,
+          "p90": 607.259,
+          "max": 699.77
+        },
+        "quality_overall": {
+          "n": 10,
+          "min": 0.21,
+          "p25": 0.5925,
+          "median": 0.93,
+          "mean": 0.771,
+          "p75": 0.98,
+          "p90": 0.98,
+          "max": 0.98
+        },
+        "groundedness": {
+          "n": 10,
+          "min": 0.38,
+          "p25": 0.635,
+          "median": 0.87,
+          "mean": 0.774,
+          "p75": 0.9675,
+          "p90": 0.982,
+          "max": 1.0
+        },
+        "completeness": {
+          "n": 10,
+          "min": 0.12,
+          "p25": 0.92,
+          "median": 1.0,
+          "mean": 0.842,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "citation_quality": {
+          "n": 10,
+          "min": 0.62,
+          "p25": 0.75,
+          "median": 0.88,
+          "mean": 0.838,
+          "p75": 0.9225,
+          "p90": 0.953,
+          "max": 0.98
+        },
+        "tool_calls": {
+          "n": 10,
+          "min": 0.0,
+          "p25": 0.0,
+          "median": 3.0,
+          "mean": 17.0,
+          "p75": 13.75,
+          "p90": 32.5,
+          "max": 118.0
+        },
+        "cost_usd": {
+          "n": 10,
+          "min": 0.013345,
+          "p25": 0.127797,
+          "median": 0.151567,
+          "mean": 0.542255,
+          "p75": 0.55964,
+          "p90": 1.226828,
+          "max": 2.669909
+        }
+      },
+      "hallucinations": 3,
+      "cost": {
+        "usd_total": 5.42254675,
+        "usd_complete": true,
+        "brl_available": false
+      },
+      "tokens_by_model": {
+        "seiia-ds": {
+          "input": 689267,
+          "cache_read": 4019712,
+          "output": 21549,
+          "reasoning": 10709,
+          "generations": 95
+        },
+        "seiia-ds-mini": {
+          "input": 29661,
+          "cache_read": 0,
+          "output": 2318,
+          "reasoning": 0,
+          "generations": 20
+        }
+      },
+      "tokens_total": {
+        "input": 718928,
+        "cache_read": 4019712,
+        "output": 23867,
+        "reasoning": 10709,
+        "generations": 115
+      },
+      "tool_calls_by_category": {
+        "filesystem": 152,
+        "subagent": 2,
+        "web": 16
+      },
+      "cases": [
+        {
+          "qid": "WEB-FII-01",
+          "ttfc_s": 660.76,
+          "total_s": 699.77,
+          "overall": 0.39,
+          "groundedness": 0.41,
+          "completeness": 0.46,
+          "citation_quality": 0.72,
+          "hallucination": true,
+          "tool_calls": 118,
+          "cost_usd": 2.6699085,
+          "tokens": {
+            "input": 243395,
+            "cache_read": 2370816,
+            "output": 13239,
+            "reasoning": 7047,
+            "generations": 59
+          }
+        },
+        {
+          "qid": "LARGE-WEB-01",
+          "ttfc_s": 74.11,
+          "total_s": 596.98,
+          "overall": 0.21,
+          "groundedness": 0.38,
+          "completeness": 0.12,
+          "citation_quality": 0.62,
+          "hallucination": true,
+          "tool_calls": 23,
+          "cost_usd": 1.06648525,
+          "tokens": {
+            "input": 112811,
+            "cache_read": 902144,
+            "output": 3400,
+            "reasoning": 948,
+            "generations": 18
+          }
+        },
+        {
+          "qid": "LARGE-NEG-01",
+          "ttfc_s": 86.42,
+          "total_s": 90.72,
+          "overall": 0.98,
+          "groundedness": 0.98,
+          "completeness": 1.0,
+          "citation_quality": 0.93,
+          "hallucination": false,
+          "tool_calls": 7,
+          "cost_usd": 0.1272425,
+          "tokens": {
+            "input": 40190,
+            "cache_read": 78336,
+            "output": 790,
+            "reasoning": 657,
+            "generations": 6
+          }
+        },
+        {
+          "qid": "LARGE-OFICIOS-01",
+          "ttfc_s": 83.64,
+          "total_s": 119.82,
+          "overall": 0.98,
+          "groundedness": 0.97,
+          "completeness": 1.0,
+          "citation_quality": 0.86,
+          "hallucination": false,
+          "tool_calls": 16,
+          "cost_usd": 0.5200555,
+          "tokens": {
+            "input": 67395,
+            "cache_read": 317696,
+            "output": 1803,
+            "reasoning": 787,
+            "generations": 10
+          }
+        },
+        {
+          "qid": "Q23",
+          "ttfc_s": 81.28,
+          "total_s": 87.74,
+          "overall": 0.81,
+          "groundedness": 0.68,
+          "completeness": 0.92,
+          "citation_quality": 0.74,
+          "hallucination": false,
+          "tool_calls": 3,
+          "cost_usd": 0.57283475,
+          "tokens": {
+            "input": 90718,
+            "cache_read": 232192,
+            "output": 964,
+            "reasoning": 511,
+            "generations": 7
+          }
+        },
+        {
+          "qid": "Q19",
+          "ttfc_s": 16.55,
+          "total_s": 20.92,
+          "overall": 0.96,
+          "groundedness": 0.88,
+          "completeness": 1.0,
+          "citation_quality": 0.9,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.15493825,
+          "tokens": {
+            "input": 61508,
+            "cache_read": 2560,
+            "output": 275,
+            "reasoning": 149,
+            "generations": 2
+          }
+        },
+        {
+          "qid": "Q17",
+          "ttfc_s": 14.26,
+          "total_s": 28.5,
+          "overall": 0.9,
+          "groundedness": 0.86,
+          "completeness": 0.92,
+          "citation_quality": 0.9,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.1481965,
+          "tokens": {
+            "input": 53127,
+            "cache_read": 12800,
+            "output": 1315,
+            "reasoning": 223,
+            "generations": 2
+          }
+        },
+        {
+          "qid": "SMALL-WEB-01",
+          "ttfc_s": 180.4,
+          "total_s": 188.17,
+          "overall": 0.52,
+          "groundedness": 0.62,
+          "completeness": 1.0,
+          "citation_quality": 0.78,
+          "hallucination": true,
+          "tool_calls": 3,
+          "cost_usd": 0.12946075,
+          "tokens": {
+            "input": 39744,
+            "cache_read": 88064,
+            "output": 1104,
+            "reasoning": 282,
+            "generations": 7
+          }
+        },
+        {
+          "qid": "SMALL-NEG-01",
+          "ttfc_s": 6.68,
+          "total_s": 8.0,
+          "overall": 0.98,
+          "groundedness": 1.0,
+          "completeness": 1.0,
+          "citation_quality": 0.95,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.0200795,
+          "tokens": {
+            "input": 7531,
+            "cache_read": 4608,
+            "output": 282,
+            "reasoning": 63,
+            "generations": 2
+          }
+        },
+        {
+          "qid": "SMALL-CONF-01",
+          "ttfc_s": 5.64,
+          "total_s": 13.26,
+          "overall": 0.98,
+          "groundedness": 0.96,
+          "completeness": 1.0,
+          "citation_quality": 0.98,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.01334525,
+          "tokens": {
+            "input": 2509,
+            "cache_read": 10496,
+            "output": 695,
+            "reasoning": 42,
+            "generations": 2
+          }
+        }
+      ]
+    },
+    {
+      "label": "Session \u2014 Terra / Luna",
+      "run_name": "benchmark-redesign-terra-luna-full-v2-20260803-10cells",
+      "commit": "4b835df396d9073ed2a4ab3b09928b281228fc71",
+      "models": {
+        "standard": {
+          "deployment": "seiia-ds-gpt-terra",
+          "canonical_model": "gpt-5.6-terra",
+          "provider": "openai"
+        },
+        "mini": {
+          "deployment": "seiia-ds-gpt-luna",
+          "canonical_model": "gpt-5.6-luna",
+          "provider": "openai"
+        }
+      },
+      "reasoning_effort": "low",
+      "n": 1,
+      "rate_card": {
+        "version": "benchmark-redesign-v2",
+        "effective_on": "2026-07-30",
+        "aggregation_compatibility_key": "openai-session-two-arm-cache-read-v2-2026-08-03",
+        "sha256": "fc23ccea7dbe447890c85779f8a962296310209a2e20f453e2727212e92219da"
+      },
+      "records": 10,
+      "technical": {
+        "topics_reserved": 10,
+        "posts_reserved": 10,
+        "posts_started": 10,
+        "posts_terminal": 10,
+        "streams": 10,
+        "sse_end": 10,
+        "sse_error_frames": 0,
+        "traces": 10,
+        "judge_input_complete": 10
+      },
+      "distributions": {
+        "ttfc_s": {
+          "n": 10,
+          "min": 2.93,
+          "p25": 12.195,
+          "median": 48.645,
+          "mean": 85.608,
+          "p75": 137.99,
+          "p90": 209.026,
+          "max": 298.0
+        },
+        "total_s": {
+          "n": 10,
+          "min": 4.96,
+          "p25": 21.9175,
+          "median": 57.095,
+          "mean": 98.691,
+          "p75": 167.0975,
+          "p90": 221.105,
+          "max": 325.91
+        },
+        "quality_overall": {
+          "n": 10,
+          "min": 0.25,
+          "p25": 0.8725,
+          "median": 0.98,
+          "mean": 0.854,
+          "p75": 0.98,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "groundedness": {
+          "n": 10,
+          "min": 0.45,
+          "p25": 0.9,
+          "median": 0.99,
+          "mean": 0.893,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "completeness": {
+          "n": 10,
+          "min": 0.25,
+          "p25": 0.89,
+          "median": 1.0,
+          "mean": 0.853,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "citation_quality": {
+          "n": 10,
+          "min": 0.55,
+          "p25": 0.9,
+          "median": 0.925,
+          "mean": 0.882,
+          "p75": 0.95,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "tool_calls": {
+          "n": 10,
+          "min": 0.0,
+          "p25": 0.0,
+          "median": 1.5,
+          "mean": 4.9,
+          "p75": 6.25,
+          "p90": 11.5,
+          "max": 25.0
+        },
+        "cost_usd": {
+          "n": 10,
+          "min": 0.008968,
+          "p25": 0.086422,
+          "median": 0.127651,
+          "mean": 0.153682,
+          "p75": 0.177452,
+          "p90": 0.245353,
+          "max": 0.522241
+        }
+      },
+      "hallucinations": 2,
+      "cost": {
+        "usd_total": 1.53682018,
+        "usd_complete": true,
+        "brl_available": false
+      },
+      "tokens_by_model": {
+        "seiia-ds-gpt-terra": {
+          "input": 505556,
+          "cache_read": 819200,
+          "output": 6937,
+          "reasoning": 1186,
+          "generations": 36
+        },
+        "seiia-ds-gpt-luna": {
+          "input": 25459,
+          "cache_read": 0,
+          "output": 5643,
+          "reasoning": 4676,
+          "generations": 20
+        },
+        "seiia-ds-nano": {
+          "input": 31442,
+          "cache_read": 38784,
+          "output": 2990,
+          "reasoning": 0,
+          "generations": 20
+        }
+      },
+      "tokens_total": {
+        "input": 562457,
+        "cache_read": 857984,
+        "output": 15570,
+        "reasoning": 5862,
+        "generations": 76
+      },
+      "tool_calls_by_category": {
+        "filesystem": 31,
+        "web": 10,
+        "subagent": 8
+      },
+      "cases": [
+        {
+          "qid": "WEB-FII-01",
+          "ttfc_s": 162.2,
+          "total_s": 199.16,
+          "overall": 0.58,
+          "groundedness": 0.66,
+          "completeness": 0.48,
+          "citation_quality": 0.72,
+          "hallucination": false,
+          "tool_calls": 10,
+          "cost_usd": 0.1528672,
+          "tokens": {
+            "input": 53466,
+            "cache_read": 164864,
+            "output": 2887,
+            "reasoning": 1846,
+            "generations": 11
+          }
+        },
+        {
+          "qid": "LARGE-WEB-01",
+          "ttfc_s": 298.0,
+          "total_s": 325.91,
+          "overall": 0.25,
+          "groundedness": 0.45,
+          "completeness": 0.25,
+          "citation_quality": 0.55,
+          "hallucination": true,
+          "tool_calls": 7,
+          "cost_usd": 0.5222412,
+          "tokens": {
+            "input": 95330,
+            "cache_read": 320000,
+            "output": 2247,
+            "reasoning": 1020,
+            "generations": 11
+          }
+        },
+        {
+          "qid": "LARGE-NEG-01",
+          "ttfc_s": 65.36,
+          "total_s": 70.91,
+          "overall": 0.98,
+          "groundedness": 0.98,
+          "completeness": 1.0,
+          "citation_quality": 0.9,
+          "hallucination": false,
+          "tool_calls": 2,
+          "cost_usd": 0.082362,
+          "tokens": {
+            "input": 37018,
+            "cache_read": 40448,
+            "output": 629,
+            "reasoning": 267,
+            "generations": 5
+          }
+        },
+        {
+          "qid": "LARGE-OFICIOS-01",
+          "ttfc_s": 199.14,
+          "total_s": 209.46,
+          "overall": 0.85,
+          "groundedness": 0.88,
+          "completeness": 0.88,
+          "citation_quality": 0.9,
+          "hallucination": true,
+          "tool_calls": 25,
+          "cost_usd": 0.21458778,
+          "tokens": {
+            "input": 114489,
+            "cache_read": 153472,
+            "output": 5000,
+            "reasoning": 620,
+            "generations": 28
+          }
+        },
+        {
+          "qid": "Q23",
+          "ttfc_s": 55.72,
+          "total_s": 66.03,
+          "overall": 0.98,
+          "groundedness": 1.0,
+          "completeness": 1.0,
+          "citation_quality": 0.95,
+          "hallucination": false,
+          "tool_calls": 1,
+          "cost_usd": 0.1856472,
+          "tokens": {
+            "input": 86508,
+            "cache_read": 62976,
+            "output": 890,
+            "reasoning": 514,
+            "generations": 5
+          }
+        },
+        {
+          "qid": "Q19",
+          "ttfc_s": 17.13,
+          "total_s": 20.19,
+          "overall": 0.98,
+          "groundedness": 1.0,
+          "completeness": 1.0,
+          "citation_quality": 0.9,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.1268776,
+          "tokens": {
+            "input": 64046,
+            "cache_read": 0,
+            "output": 368,
+            "reasoning": 154,
+            "generations": 2
+          }
+        },
+        {
+          "qid": "Q17",
+          "ttfc_s": 10.55,
+          "total_s": 27.1,
+          "overall": 1.0,
+          "groundedness": 1.0,
+          "completeness": 1.0,
+          "citation_quality": 1.0,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.1284252,
+          "tokens": {
+            "input": 61699,
+            "cache_read": 3584,
+            "output": 1219,
+            "reasoning": 338,
+            "generations": 2
+          }
+        },
+        {
+          "qid": "SMALL-WEB-01",
+          "ttfc_s": 41.57,
+          "total_s": 48.16,
+          "overall": 1.0,
+          "groundedness": 1.0,
+          "completeness": 1.0,
+          "citation_quality": 1.0,
+          "hallucination": false,
+          "tool_calls": 4,
+          "cost_usd": 0.0986028,
+          "tokens": {
+            "input": 38818,
+            "cache_read": 98816,
+            "output": 1189,
+            "reasoning": 781,
+            "generations": 8
+          }
+        },
+        {
+          "qid": "SMALL-NEG-01",
+          "ttfc_s": 3.48,
+          "total_s": 4.96,
+          "overall": 0.98,
+          "groundedness": 1.0,
+          "completeness": 1.0,
+          "citation_quality": 0.95,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.0162416,
+          "tokens": {
+            "input": 8459,
+            "cache_read": 3584,
+            "output": 309,
+            "reasoning": 132,
+            "generations": 2
+          }
+        },
+        {
+          "qid": "SMALL-CONF-01",
+          "ttfc_s": 2.93,
+          "total_s": 15.03,
+          "overall": 0.94,
+          "groundedness": 0.96,
+          "completeness": 0.92,
+          "citation_quality": 0.95,
+          "hallucination": false,
+          "tool_calls": 0,
+          "cost_usd": 0.0089676,
+          "tokens": {
+            "input": 2624,
+            "cache_read": 10240,
+            "output": 832,
+            "reasoning": 190,
+            "generations": 2
+          }
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "latency_total_median_reduction_pct": 36.01,
+    "ttfc_median_reduction_pct": 37.39,
+    "quality_median_delta": 0.05,
+    "cost_total_reduction_pct": 71.66,
+    "hallucination_delta": -1
+  }
+}

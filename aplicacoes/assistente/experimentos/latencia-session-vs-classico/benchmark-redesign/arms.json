@@ -1,0 +1,24 @@
+{
+  "schema_version": "benchmark-redesign-arms-1",
+  "n": 1,
+  "canary_qid": "SMALL-NEG-01",
+  "canary_qids": ["SMALL-CONF-01", "SMALL-NEG-01", "SMALL-WEB-01"],
+  "arms": {
+    "gpt54": {
+      "label": "Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano",
+      "standard_model": "seiia-ds",
+      "mini_model": "seiia-ds-mini",
+      "nano_model": "seiia-ds-nano",
+      "reasoning_effort": "low",
+      "rate_card": "../rate_cards/benchmark-redesign-v2.json"
+    },
+    "terra-luna": {
+      "label": "Session — Terra / Luna",
+      "standard_model": "seiia-ds-gpt-terra",
+      "mini_model": "seiia-ds-gpt-luna",
+      "nano_model": "seiia-ds-gpt-luna",
+      "reasoning_effort": "low",
+      "rate_card": "../rate_cards/benchmark-redesign-v2.json"
+    }
+  }
+}
