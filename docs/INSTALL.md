@@ -638,15 +638,15 @@ diferente do certificado e da cadeia servidos pelo Nginx.
 
 ## 5. Executar o deploy
 
-Se os subdiretórios dos volumes ainda não existem e `seiia` não tem acesso a
-`sudo`, solicite à conta administrativa a preparação inicial, usando o
-`default.env` já revisado:
+Antes do primeiro deploy, um usuário com permissão de `sudo` deve preparar os
+volumes, usando o `default.env` já revisado:
 
 ```bash
 sudo make -C /opt/sei-ia ensure-volumes
 ```
 
-Com os subdiretórios já preparados, não é necessário executar esse comando.
+Se os volumes já estão preparados, essa etapa não precisa ser repetida.
+O usuário `seiia` não precisa de permissão de `sudo`.
 
 Depois de preparar o contrato privado e decidir o TLS, execute como `seiia`:
 
