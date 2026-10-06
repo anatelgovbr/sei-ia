@@ -120,12 +120,6 @@ docker buildx version
 Versões mínimas: Docker Engine 27.1.1, Compose 2.29 e Buildx 0.17. O Docker deve ser
 rootful: o checker usa o socket local para validar os contêineres.
 
-O Makefile executa os builds diretamente pelo Docker Buildx Bake, com autorização
-explícita `--allow=network.host`, tanto com Compose 2.x quanto com Compose 5.x.
-O Buildx 0.17 é o mínimo para essa opção do Bake. Os builds usam a rede do host
-para evitar conflitos da rede padrão do Docker com a rede corporativa. Os
-contêineres em execução continuam na rede externa definida em `COMPOSE_NETWORK_NAME`.
-
 ### 1.4. Configurações na rede local do órgão
 
 O servidor precisa de:
@@ -644,23 +638,17 @@ diferente do certificado e da cadeia servidos pelo Nginx.
 
 ## 5. Executar o deploy
 
-Depois de revisar `default.env`, preparar o contrato privado e decidir o TLS,
-prepare os subdiretórios persistentes com a conta administrativa. Eles precisam
-dos proprietários e modos de acesso específicos de Airflow, PostgreSQL, Solr e
-Assistente. A pasta principal configurada em `VOL_SEIIA_DIR` deve existir, conforme
-a seção 2.1; se você alterou esse caminho, crie a nova pasta com o mesmo proprietário
-e modo de acesso antes de continuar.
-
-Abra outro terminal com a conta administrativa e execute:
+Se os subdiretórios dos volumes ainda não existem e `seiia` não tem acesso a
+`sudo`, solicite à conta administrativa a preparação inicial, usando o
+`default.env` já revisado:
 
 ```bash
 sudo make -C /opt/sei-ia ensure-volumes
 ```
 
-Esse comando lê o `default.env` já revisado. Ele cria somente os subdiretórios
-ausentes e preserva os existentes. Não execute todo o deploy com `sudo`.
+Com os subdiretórios já preparados, não é necessário executar esse comando.
 
-Volte à sessão `seiia` aberta na seção 2.1 e execute:
+Depois de preparar o contrato privado e decidir o TLS, execute como `seiia`:
 
 ```bash
 cd /opt/sei-ia
@@ -668,10 +656,8 @@ make up
 ```
 
 `make up` completa `SEARXNG_SECRET_KEY` quando necessário, valida a composição,
-preserva ou gera o certificado, verifica se os diretórios persistentes foram
-preparados e constrói as imagens pelo Bake com autorização de rede host. O helper
-limita a três o número de builds simultâneos; depois o Compose inicia os serviços
-sem reconstruir as imagens. Na primeira execução, o download e o build podem
+preserva ou gera o certificado, verifica os volumes, constrói as imagens e inicia
+os serviços. Na primeira execução, o download e a construção das imagens podem
 demorar. Em um host com menos memória disponível, reduza a concorrência, por exemplo:
 
 ```bash

@@ -38,11 +38,11 @@ Gotcha: o Dockerfile do Assistente espelha a árvore do repo nos metadados (`/ap
 Do raiz do repo:
 
 - `make config` — exige os dois arquivos privados, garante `SEARXNG_SECRET_KEY` em `security.env` via helper dedicado e valida a renderização do Compose sem imprimir segredos.
-- `make up` — executa `config`, garante certificado e verifica os volumes já preparados; `ops/scripts/build_images.py` constrói as imagens distintas pelo Bake com `--allow=network.host --load`, limitando os builds em execução a `BUILD_PARALLELISM` (três por padrão), e o Compose sobe com `--no-build --remove-orphans`.
+- `make up` — executa `config`, garante certificado e volumes; `ops/scripts/build_images.py` constrói as imagens distintas pelo Bake com `--allow=network.host --load`, limitando os builds em execução a `BUILD_PARALLELISM` (três por padrão), e o Compose sobe com `--no-build --remove-orphans`.
 - `make down` — derruba a stack sem remover os bind mounts persistentes.
 - `make check` — constrói somente a imagem de `stack-config-checker` pelo mesmo helper e executa o contêiner efêmero com `--no-build --no-deps`; não para os demais serviços.
 
-As regras ficam no `Makefile` da raiz. O helper usa o próprio Compose para resolver env files, profiles, caminhos e overrides, mas passa somente a configuração de build ao Bake, em memória. `BUILD_PARALLELISM` pode ser reduzido em hosts com menos memória. Na instalação nova, um administrador executa `sudo make -C /opt/sei-ia ensure-volumes` depois da revisão de `default.env`; a raiz configurada em `VOL_SEIIA_DIR` deve existir antes. Esse alvo cria os subdiretórios ausentes com UIDs próprios de Airflow, Postgres e Solr; como `seiia`, apenas verifica a existência e orienta a preparação administrativa quando necessária. A release externa é **somente código-fonte**: não há modo alternativo por imagens próprias pré-publicadas.
+As regras ficam no `Makefile` da raiz. O helper usa o próprio Compose para resolver env files, profiles, caminhos e overrides, mas passa somente a configuração de build ao Bake, em memória. `BUILD_PARALLELISM` pode ser reduzido em hosts com menos memória. `ensure-volumes` mantém os `sudo mkdir`/`sudo chown` para subdiretórios ausentes com UIDs próprios de Airflow, Postgres e Solr; a raiz configurada em `VOL_SEIIA_DIR` deve existir antes. Quando `seiia` não tem sudo, um administrador prepara os volumes uma vez com `sudo make -C /opt/sei-ia ensure-volumes`, após revisar `default.env`. Com os subdiretórios existentes, o alvo dispensa esses comandos privilegiados. A release externa é **somente código-fonte**: não há modo alternativo por imagens próprias pré-publicadas.
 
 ## Configuração de ambiente: `.env` (dev) vs. arquivos de deploy
 

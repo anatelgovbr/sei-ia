@@ -36,25 +36,21 @@ ensure-volumes:
 		exit 2; \
 	fi
 	@echo "$$(date)    INFO: Verificando volumes com permissoes corretas."
-	@set -eu; \
-	if [ "$$(id -u)" -ne 0 ]; then \
-		for directory in airflow_logs_vol airflow_postgres_vol pgvector_all_vol solr_pd_vol session_fs_vol; do \
-			if [ ! -d "$(VOL_SEIIA_DIR)/$$directory" ]; then \
-				echo "ERRO: a preparação inicial dos volumes exige privilégios administrativos." >&2; \
-				echo "Solicite ao administrador: sudo make -C \"$(CURDIR)\" ensure-volumes" >&2; \
-				exit 2; \
-			fi; \
-		done; \
-		exit 0; \
-	fi; \
-	for spec in airflow_logs_vol:750:50000:0 airflow_postgres_vol:700:999:999 pgvector_all_vol:700:999:999 solr_pd_vol:750:8983:8983 session_fs_vol:750:$(NB_UID):$(NB_GID); do \
-		directory="$${spec%%:*}"; spec="$${spec#*:}"; \
-		mode="$${spec%%:*}"; owner="$${spec#*:}"; \
-		if [ ! -d "$(VOL_SEIIA_DIR)/$$directory" ]; then \
-			mkdir --mode="$$mode" "$(VOL_SEIIA_DIR)/$$directory"; \
-			chown "$$owner" "$(VOL_SEIIA_DIR)/$$directory"; \
-		fi; \
-	done
+	@[ -d "$(VOL_SEIIA_DIR)/airflow_logs_vol" ] || \
+		(sudo mkdir --mode=750 "$(VOL_SEIIA_DIR)/airflow_logs_vol" && \
+		 sudo chown 50000:0 "$(VOL_SEIIA_DIR)/airflow_logs_vol")
+	@[ -d "$(VOL_SEIIA_DIR)/airflow_postgres_vol" ] || \
+		(sudo mkdir --mode=700 "$(VOL_SEIIA_DIR)/airflow_postgres_vol" && \
+		 sudo chown 999:999 "$(VOL_SEIIA_DIR)/airflow_postgres_vol")
+	@[ -d "$(VOL_SEIIA_DIR)/pgvector_all_vol" ] || \
+		(sudo mkdir --mode=700 "$(VOL_SEIIA_DIR)/pgvector_all_vol" && \
+		 sudo chown 999:999 "$(VOL_SEIIA_DIR)/pgvector_all_vol")
+	@[ -d "$(VOL_SEIIA_DIR)/solr_pd_vol" ] || \
+		(sudo mkdir --mode=750 "$(VOL_SEIIA_DIR)/solr_pd_vol" && \
+		 sudo chown 8983:8983 "$(VOL_SEIIA_DIR)/solr_pd_vol")
+	@[ -d "$(VOL_SEIIA_DIR)/session_fs_vol" ] || \
+		(sudo mkdir --mode=750 "$(VOL_SEIIA_DIR)/session_fs_vol" && \
+		 sudo chown $(NB_UID):$(NB_GID) "$(VOL_SEIIA_DIR)/session_fs_vol")
 
 ensure-certs:
 	@bash ops/scripts/ensure_certs.sh .
