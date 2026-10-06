@@ -48,7 +48,7 @@ O servidor é baseado em Docker. Recomendamos servidor Linux. **Não recomendamo
 - **Docker**:
   - Docker Engine ≥ 27.1.1
   - Docker Compose ≥ 2.29
-  - Docker Buildx ≥ 0.13
+  - Docker Buildx ≥ 0.17
 - **Servidor Linux** (referência da Anatel em produção):
   - **CPU**: 16 cores @ 2.10 GHz
   - **RAM**: 128 GB

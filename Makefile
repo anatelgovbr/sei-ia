@@ -3,7 +3,7 @@ unexport SEARXNG_SECRET_KEY
 endif
 
 COMPOSE := docker compose -f docker-compose.yml --env-file default.env --env-file security.env --profile web-search
-BUILD_ENV := BUILDX_BUILDER=default COMPOSE_BAKE=false
+BUILD_ENV := BUILDX_BUILDER=default
 # Limita somente builds distintos; serviços que compartilham imagem não têm build próprio.
 BUILD_PARALLELISM ?= 3
 NB_USER := $(shell grep '^NB_USER=' default.env | cut -d'=' -f2- | cut -d'#' -f1 | tr -d '"[:space:]')
@@ -14,7 +14,7 @@ VOL_SEIIA_DIR := $(shell grep '^VOL_SEIIA_DIR=' default.env | cut -d'=' -f2- | c
 .PHONY: up config down down-volumes check ensure-certs ensure-volumes
 
 up: config ensure-certs ensure-volumes
-	$(BUILD_ENV) $(COMPOSE) --parallel $(BUILD_PARALLELISM) build
+	$(BUILD_ENV) python3 ops/scripts/build_images.py --parallel $(BUILD_PARALLELISM) -- $(COMPOSE)
 	$(COMPOSE) up -d --no-build --remove-orphans
 
 config:
@@ -62,4 +62,5 @@ down-volumes:
 	$(COMPOSE) down -v --remove-orphans
 
 check: config ensure-certs
-	$(BUILD_ENV) $(COMPOSE) --profile checks run --build --rm --no-deps stack-config-checker
+	$(BUILD_ENV) python3 ops/scripts/build_images.py --service stack-config-checker -- $(COMPOSE) --profile checks
+	$(COMPOSE) --profile checks run --no-build --rm --no-deps stack-config-checker
