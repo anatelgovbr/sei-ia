@@ -16,7 +16,7 @@ Nos ambientes gerenciados, build e deploy são responsabilidade exclusiva do **G
 ## Pré-requisitos
 
 - **Dev local:** `uv` + Python 3.12 (pin `>=3.12,<3.13` em `aplicacoes/assistente/pyproject.toml:12`). Sempre `.venv`/`uv`, nunca o Python do sistema.
-- **Stack:** Docker Engine ≥ 27.1.1, Compose ≥ 2.29, Buildx ≥ 0.13 — requisitos operacionais completos em `docs/INSTALL.md`.
+- **Stack:** Docker Engine ≥ 27.1.1, Compose ≥ 2.29, Buildx ≥ 0.17 — requisitos operacionais completos em `docs/INSTALL.md`.
 
 ## Dev — buildar uma app
 
@@ -38,11 +38,11 @@ Gotcha: o Dockerfile do Assistente espelha a árvore do repo nos metadados (`/ap
 Do raiz do repo:
 
 - `make config` — exige os dois arquivos privados, garante `SEARXNG_SECRET_KEY` em `security.env` via helper dedicado e valida a renderização do Compose sem imprimir segredos.
-- `make up` — executa `config`, garante certificado e volumes, constrói as imagens distintas com `docker compose --parallel 3 build` (configurável por `BUILD_PARALLELISM`) e sobe com `--no-build --remove-orphans`.
+- `make up` — executa `config`, garante certificado e verifica os volumes já preparados; `ops/scripts/build_images.py` constrói as imagens distintas pelo Bake com `--allow=network.host --load`, limitando os builds em execução a `BUILD_PARALLELISM` (três por padrão), e o Compose sobe com `--no-build --remove-orphans`.
 - `make down` — derruba a stack sem remover os bind mounts persistentes.
-- `make check` — valida a stack já iniciada em um contêiner efêmero; não para os demais serviços.
+- `make check` — constrói somente a imagem de `stack-config-checker` pelo mesmo helper e executa o contêiner efêmero com `--no-build --no-deps`; não para os demais serviços.
 
-As regras ficam em `Makefile:1-66`. `BUILD_PARALLELISM` usa três por padrão e pode ser reduzido em hosts com menos memória. `ensure-volumes` usa `sudo mkdir`/`sudo chown` para subdiretórios com UIDs próprios de Airflow, Postgres e Solr; a raiz configurada em `VOL_SEIIA_DIR` deve existir antes. A release externa é **somente código-fonte**: não há modo alternativo por imagens próprias pré-publicadas.
+As regras ficam no `Makefile` da raiz. O helper usa o próprio Compose para resolver env files, profiles, caminhos e overrides, mas passa somente a configuração de build ao Bake, em memória. `BUILD_PARALLELISM` pode ser reduzido em hosts com menos memória. Na instalação nova, um administrador executa `sudo make -C /opt/sei-ia ensure-volumes` depois da revisão de `default.env`; a raiz configurada em `VOL_SEIIA_DIR` deve existir antes. Esse alvo cria os subdiretórios ausentes com UIDs próprios de Airflow, Postgres e Solr; como `seiia`, apenas verifica a existência e orienta a preparação administrativa quando necessária. A release externa é **somente código-fonte**: não há modo alternativo por imagens próprias pré-publicadas.
 
 ## Configuração de ambiente: `.env` (dev) vs. arquivos de deploy
 
@@ -150,9 +150,7 @@ A promoção `dev → homologação → main`, o isolamento físico dos caches e
 
 ## Rede e builder do Docker (redes corporativas)
 
-Em redes corporativas onde a default bridge do Docker é desativada, os targets Docker declarados no Compose usam `build.network: host` durante os passos `RUN`. Compose 2.33 perde esse campo ao traduzir para Bake; por isso os builds via Compose fixam `COMPOSE_BAKE=false` e usam o caminho nativo, que propaga `network: host` ao BuildKit integrado `default`. O Sonar usa o mesmo driver diretamente com `docker buildx build --builder default --network host`. O modo `host` vale somente durante o build: os containers de runtime continuam na rede externa `docker-host-bridge`, os probes usam `--network none` e o deploy ativa imagens existentes com `--no-build`.
-
-Quando os runners tiverem Compose v2.37.3 ou superior, validado nos próprios runners, o workaround `COMPOSE_BAKE=false` poderá ser reavaliado; até lá ele é uma guarda de rede, não um fallback de builder.
+Em redes corporativas onde a default bridge do Docker é desativada, os targets Docker declarados no Compose usam `build.network: host` durante os passos `RUN`. Na instalação externa, o Makefile chama Bake diretamente pelo helper `ops/scripts/build_images.py`, com `--allow=network.host --load` e o builder integrado `default`. Isso preserva a rede host sem depender da tradução de `docker compose build` nem de `COMPOSE_BAKE=false`, ignorado pelo Compose 5. O modo `host` vale somente durante o build: os containers de runtime continuam na rede externa `docker-host-bridge`, os probes usam `--network none` e o deploy ativa imagens existentes com `--no-build`.
 
 O helper `.gitlab/scripts/ensure_buildx_builder.sh` e `.gitlab/buildkit/buildkitd.toml` permanecem apenas para rollback manual temporário de instalações antigas. O pipeline nunca os chama; o helper exige `BUILDX_LEGACY_ROLLBACK=1`. A mudança não remove um container ou builder legado já existente no host. A configuração de rede e o passo-a-passo completo estão em `docs/INSTALL.md`.
 

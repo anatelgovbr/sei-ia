@@ -3,7 +3,7 @@ unexport SEARXNG_SECRET_KEY
 endif
 
 COMPOSE := docker compose -f docker-compose.yml --env-file default.env --env-file security.env --profile web-search
-BUILD_ENV := BUILDX_BUILDER=default COMPOSE_BAKE=false
+BUILD_ENV := BUILDX_BUILDER=default
 # Limita somente builds distintos; serviços que compartilham imagem não têm build próprio.
 BUILD_PARALLELISM ?= 3
 NB_USER := $(shell grep '^NB_USER=' default.env | cut -d'=' -f2- | cut -d'#' -f1 | tr -d '"[:space:]')
@@ -14,7 +14,7 @@ VOL_SEIIA_DIR := $(shell grep '^VOL_SEIIA_DIR=' default.env | cut -d'=' -f2- | c
 .PHONY: up config down down-volumes check ensure-certs ensure-volumes
 
 up: config ensure-certs ensure-volumes
-	$(BUILD_ENV) $(COMPOSE) --parallel $(BUILD_PARALLELISM) build
+	$(BUILD_ENV) python3 ops/scripts/build_images.py --parallel $(BUILD_PARALLELISM) -- $(COMPOSE)
 	$(COMPOSE) up -d --no-build --remove-orphans
 
 config:
@@ -36,21 +36,25 @@ ensure-volumes:
 		exit 2; \
 	fi
 	@echo "$$(date)    INFO: Verificando volumes com permissoes corretas."
-	@[ -d "$(VOL_SEIIA_DIR)/airflow_logs_vol" ] || \
-		(sudo mkdir --mode=750 "$(VOL_SEIIA_DIR)/airflow_logs_vol" && \
-		 sudo chown 50000:0 "$(VOL_SEIIA_DIR)/airflow_logs_vol")
-	@[ -d "$(VOL_SEIIA_DIR)/airflow_postgres_vol" ] || \
-		(sudo mkdir --mode=700 "$(VOL_SEIIA_DIR)/airflow_postgres_vol" && \
-		 sudo chown 999:999 "$(VOL_SEIIA_DIR)/airflow_postgres_vol")
-	@[ -d "$(VOL_SEIIA_DIR)/pgvector_all_vol" ] || \
-		(sudo mkdir --mode=700 "$(VOL_SEIIA_DIR)/pgvector_all_vol" && \
-		 sudo chown 999:999 "$(VOL_SEIIA_DIR)/pgvector_all_vol")
-	@[ -d "$(VOL_SEIIA_DIR)/solr_pd_vol" ] || \
-		(sudo mkdir --mode=750 "$(VOL_SEIIA_DIR)/solr_pd_vol" && \
-		 sudo chown 8983:8983 "$(VOL_SEIIA_DIR)/solr_pd_vol")
-	@[ -d "$(VOL_SEIIA_DIR)/session_fs_vol" ] || \
-		(sudo mkdir --mode=750 "$(VOL_SEIIA_DIR)/session_fs_vol" && \
-		 sudo chown $(NB_UID):$(NB_GID) "$(VOL_SEIIA_DIR)/session_fs_vol")
+	@set -eu; \
+	if [ "$$(id -u)" -ne 0 ]; then \
+		for directory in airflow_logs_vol airflow_postgres_vol pgvector_all_vol solr_pd_vol session_fs_vol; do \
+			if [ ! -d "$(VOL_SEIIA_DIR)/$$directory" ]; then \
+				echo "ERRO: a preparação inicial dos volumes exige privilégios administrativos." >&2; \
+				echo "Solicite ao administrador: sudo make -C \"$(CURDIR)\" ensure-volumes" >&2; \
+				exit 2; \
+			fi; \
+		done; \
+		exit 0; \
+	fi; \
+	for spec in airflow_logs_vol:750:50000:0 airflow_postgres_vol:700:999:999 pgvector_all_vol:700:999:999 solr_pd_vol:750:8983:8983 session_fs_vol:750:$(NB_UID):$(NB_GID); do \
+		directory="$${spec%%:*}"; spec="$${spec#*:}"; \
+		mode="$${spec%%:*}"; owner="$${spec#*:}"; \
+		if [ ! -d "$(VOL_SEIIA_DIR)/$$directory" ]; then \
+			mkdir --mode="$$mode" "$(VOL_SEIIA_DIR)/$$directory"; \
+			chown "$$owner" "$(VOL_SEIIA_DIR)/$$directory"; \
+		fi; \
+	done
 
 ensure-certs:
 	@bash ops/scripts/ensure_certs.sh .
@@ -62,4 +66,5 @@ down-volumes:
 	$(COMPOSE) down -v --remove-orphans
 
 check: config ensure-certs
-	$(BUILD_ENV) $(COMPOSE) --profile checks run --build --rm --no-deps stack-config-checker
+	$(BUILD_ENV) python3 ops/scripts/build_images.py --service stack-config-checker -- $(COMPOSE) --profile checks
+	$(COMPOSE) --profile checks run --no-build --rm --no-deps stack-config-checker

@@ -117,8 +117,14 @@ docker compose version
 docker buildx version
 ```
 
-Versões mínimas: Docker Engine 27.1.1, Compose 2.29 e Buildx 0.13. O Docker deve ser
+Versões mínimas: Docker Engine 27.1.1, Compose 2.29 e Buildx 0.17. O Docker deve ser
 rootful: o checker usa o socket local para validar os contêineres.
+
+O Makefile executa os builds diretamente pelo Docker Buildx Bake, com autorização
+explícita `--allow=network.host`, tanto com Compose 2.x quanto com Compose 5.x.
+O Buildx 0.17 é o mínimo para essa opção do Bake. Os builds usam a rede do host
+para evitar conflitos da rede padrão do Docker com a rede corporativa. Os
+contêineres em execução continuam na rede externa definida em `COMPOSE_NETWORK_NAME`.
 
 ### 1.4. Configurações na rede local do órgão
 
@@ -175,7 +181,8 @@ getent group 4000 || true
 Se houver conflito, escolha IDs livres e atualize `NB_UID` e `NB_GID` em
 `default.env` antes do primeiro `make up`.
 
-Exemplo com os valores padrão:
+Execute a preparação abaixo com uma conta administrativa que tenha acesso a
+`sudo`. Exemplo com os valores padrão:
 
 ```bash
 sudo useradd --create-home --shell /bin/bash --uid 4000 seiia
@@ -184,12 +191,20 @@ sudo install --directory --owner=seiia --group=docker --mode=0750 /opt/sei-ia
 sudo install --directory --owner=seiia --group=docker --mode=0750 /var/seiia/volumes
 ```
 
-Encerre e abra novamente a sessão do usuário para aplicar o grupo `docker`. Confirme
-sem `sudo`:
+Abra uma sessão como `seiia` a partir da conta administrativa. Não é necessário
+definir uma senha para `seiia`: `sudo` usa a autorização da conta administrativa.
+A nova sessão aplica o grupo `docker`. Confirme o usuário, os grupos e o acesso
+ao Docker:
 
 ```bash
+sudo -iu seiia
+id
 docker info >/dev/null
 ```
+
+Execute os próximos passos nessa sessão. A conta `seiia` não precisa receber
+permissão de `sudo`; a preparação dos volumes na seção 5 será feita pela conta
+administrativa.
 
 Crie a rede externa usada pela stack. Não fixe um subnet sem antes verificar as
 redes corporativas, VPNs e redes Docker existentes. Consulte a equipe de redes e
@@ -228,7 +243,8 @@ e os arquivos de configuração para uso por contêineres conforme a política d
 
 ### 2.2. Baixar uma tag estável
 
-Execute como o usuário `seiia`:
+Execute na sessão do usuário `seiia` aberta com `sudo -iu seiia` na seção 2.1.
+O diretório `/opt/sei-ia` criado nessa etapa deve estar vazio e pertence a `seiia`:
 
 ```bash
 git clone --branch v1.3.0 --single-branch \
@@ -578,8 +594,9 @@ Ela não usa Bing Grounding, Azure AI Agent, `AZURE_WEB_AGENT_ID` nem
 ## 4. Configuração do certificado HTTPS
 
 O gateway Nginx encerra TLS nas três portas públicas. Os backends permanecem HTTP
-dentro da rede Docker. Antes do primeiro `make up`, escolha entre deixar o comando
-gerar um par autoassinado ou fornecer o certificado institucional do órgão.
+dentro da rede Docker. Antes do primeiro `make up`, escolha apenas uma das opções:
+deixar o comando gerar um par autoassinado, conforme a seção 4.1, ou fornecer o
+certificado institucional do órgão, conforme a seção 4.2.
 
 ### 4.1. Certificado gerado automaticamente
 
@@ -597,6 +614,10 @@ Nunca copie a chave privada para o SEI.
 ### 4.2. Certificado emitido pela PKI do órgão
 
 Antes do primeiro `make up`, coloque o par diretamente nos caminhos esperados:
+
+Os caminhos `/caminho/seguro/...` abaixo são exemplos. Substitua-os pelos caminhos
+reais do certificado e da chave privada fornecidos pela PKI do órgão antes de
+executar os comandos.
 
 ```bash
 cd /opt/sei-ia
@@ -623,7 +644,23 @@ diferente do certificado e da cadeia servidos pelo Nginx.
 
 ## 5. Executar o deploy
 
-Depois de preparar o contrato privado e decidir o TLS, execute:
+Depois de revisar `default.env`, preparar o contrato privado e decidir o TLS,
+prepare os subdiretórios persistentes com a conta administrativa. Eles precisam
+dos proprietários e modos de acesso específicos de Airflow, PostgreSQL, Solr e
+Assistente. A pasta principal configurada em `VOL_SEIIA_DIR` deve existir, conforme
+a seção 2.1; se você alterou esse caminho, crie a nova pasta com o mesmo proprietário
+e modo de acesso antes de continuar.
+
+Abra outro terminal com a conta administrativa e execute:
+
+```bash
+sudo make -C /opt/sei-ia ensure-volumes
+```
+
+Esse comando lê o `default.env` já revisado. Ele cria somente os subdiretórios
+ausentes e preserva os existentes. Não execute todo o deploy com `sudo`.
+
+Volte à sessão `seiia` aberta na seção 2.1 e execute:
 
 ```bash
 cd /opt/sei-ia
@@ -631,10 +668,11 @@ make up
 ```
 
 `make up` completa `SEARXNG_SECRET_KEY` quando necessário, valida a composição,
-preserva ou gera o certificado, prepara os diretórios persistentes, limita a três o
-número de builds simultâneos e só então inicia os serviços. Na primeira execução, o
-download e o build podem demorar. Em um host com
-menos memória disponível, reduza a concorrência, por exemplo:
+preserva ou gera o certificado, verifica se os diretórios persistentes foram
+preparados e constrói as imagens pelo Bake com autorização de rede host. O helper
+limita a três o número de builds simultâneos; depois o Compose inicia os serviços
+sem reconstruir as imagens. Na primeira execução, o download e o build podem
+demorar. Em um host com menos memória disponível, reduza a concorrência, por exemplo:
 
 ```bash
 make BUILD_PARALLELISM=2 up
