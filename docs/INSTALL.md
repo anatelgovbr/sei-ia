@@ -181,17 +181,18 @@ Execute a preparação abaixo com uma conta administrativa que tenha acesso a
 ```bash
 sudo useradd --create-home --shell /bin/bash --uid 4000 seiia
 sudo usermod --append --groups docker seiia
+sudo passwd seiia
 sudo install --directory --owner=seiia --group=docker --mode=0750 /opt/sei-ia
 sudo install --directory --owner=seiia --group=docker --mode=0750 /var/seiia/volumes
 ```
 
-Abra uma sessão como `seiia` a partir da conta administrativa. Não é necessário
-definir uma senha para `seiia`: `sudo` usa a autorização da conta administrativa.
-A nova sessão aplica o grupo `docker`. Confirme o usuário, os grupos e o acesso
-ao Docker:
+O comando `sudo passwd seiia` define a senha usada na troca de usuário abaixo.
+Abra uma sessão como `seiia` a partir da conta administrativa. `su - seiia` pede
+a senha de `seiia` e carrega seu ambiente de login. A nova sessão aplica o grupo
+`docker`. Confirme o usuário, os grupos e o acesso ao Docker:
 
 ```bash
-sudo -iu seiia
+su - seiia
 id
 docker info >/dev/null
 ```
@@ -237,7 +238,7 @@ e os arquivos de configuração para uso por contêineres conforme a política d
 
 ### 2.2. Baixar uma tag estável
 
-Execute na sessão do usuário `seiia` aberta com `sudo -iu seiia` na seção 2.1.
+Execute na sessão do usuário `seiia` aberta com `su - seiia` na seção 2.1.
 O diretório `/opt/sei-ia` criado nessa etapa deve estar vazio e pertence a `seiia`:
 
 ```bash
@@ -638,19 +639,30 @@ diferente do certificado e da cadeia servidos pelo Nginx.
 
 ## 5. Executar o deploy
 
-Antes do primeiro deploy, um usuário com permissão de `sudo` deve preparar os
-volumes, usando o `default.env` já revisado:
+Depois de preparar o contrato privado e decidir o TLS, retorne à conta
+administrativa encerrando a sessão de `seiia` aberta com `su - seiia` na seção 2.1:
+
+```bash
+exit
+```
+
+Na sessão administrativa, prepare os volumes antes do primeiro deploy, usando o
+`default.env` já revisado:
 
 ```bash
 sudo make -C /opt/sei-ia ensure-volumes
 ```
 
 Se os volumes já estão preparados, essa etapa não precisa ser repetida.
-O usuário `seiia` não precisa de permissão de `sudo`.
+O usuário `seiia` não precisa de permissão de `sudo`; somente a conta
+administrativa usa `sudo` para preparar os volumes.
 
-Depois de preparar o contrato privado e decidir o TLS, execute como `seiia`:
+Depois da preparação, entre novamente como `seiia` e execute o deploy sem `sudo`.
+Não execute `make up` como a conta administrativa: o `security.env` foi criado por
+`seiia` com permissão `600` e deve ser lido por esse usuário:
 
 ```bash
+su - seiia
 cd /opt/sei-ia
 make up
 ```
@@ -667,7 +679,7 @@ make BUILD_PARALLELISM=2 up
 
 Aguarde até os serviços permanentes ficarem `running` e `healthy`. O contêiner de
 inicialização do Airflow termina com código zero; ele não permanece em execução.
-Depois da subida, execute obrigatoriamente:
+Depois da subida, execute obrigatoriamente na mesma sessão de `seiia`, sem `sudo`:
 
 ```bash
 make check
@@ -832,7 +844,7 @@ caminho físico do volume.
 | Conflito de subnet ou serviço inacessível | Rede Docker sobreposta a LAN/VPN | Inspecione todas as subnets e recrie a rede com uma faixa aprovada pela equipe de rede. |
 | `address already in use` | Porta 8088, 8082, 8086 ou 8081 ocupada | Identifique o processo com `ss -ltnp`; não publique os serviços internos como solução. |
 | Falha de build por DNS/timeout | Host sem egress, proxy ou DNS para BuildKit | Valide resolução e HTTPS no host e no builder; configure o proxy corporativo antes de repetir. |
-| `permission denied` em volume | UID/GID, proprietário ou SELinux incorretos | Compare `default.env`, `ls -ln` e os contextos SELinux; execute `make ensure-volumes` após corrigir a raiz. |
+| `permission denied` em volume | UID/GID, proprietário ou SELinux incorretos | Compare `default.env`, `ls -ln` e os contextos SELinux; como administrador, execute `sudo make -C /opt/sei-ia ensure-volumes` após corrigir a raiz. |
 | Falha TLS por hostname | DNS usado pelo SEI não está no SAN | Corrija `SEIIA_GATEWAY_HOST`/certificado e valide com `openssl x509 -text`; não desative a verificação. |
 | `unable to get local issuer certificate` | CA bundle ausente ou cadeia incorreta no SEI | Monte o PEM/CA correto em `/opt/sei/config/mod-ia/seiia.cert.pem`. |
 | Certificado e chave não formam par | Arquivos de PKI trocados | Compare as chaves públicas e instale o par correto; o script não sobrescreve o material do órgão. |
