@@ -40,7 +40,7 @@ Do raiz do repo:
 - `make config` — exige os dois arquivos privados, garante `SEARXNG_SECRET_KEY` em `security.env` via helper dedicado e valida a renderização do Compose sem imprimir segredos.
 - `make up` — executa `config`, garante certificado e volumes; `ops/scripts/build_images.py` constrói as imagens distintas pelo Bake com `--allow=network.host --load`, limitando os builds em execução a `BUILD_PARALLELISM` (três por padrão), e o Compose sobe com `--no-build --remove-orphans`.
 - `make down` — derruba a stack sem remover os bind mounts persistentes.
-- `make check` — constrói somente a imagem de `stack-config-checker` pelo mesmo helper e executa o contêiner efêmero com `--no-build --no-deps`; não para os demais serviços.
+- `make check` — constrói somente a imagem de `stack-config-checker` pelo mesmo helper e executa o contêiner efêmero com `run --rm --no-deps`, reutilizando a imagem construída.
 
 As regras ficam no `Makefile` da raiz. O helper usa o próprio Compose para resolver env files, profiles, caminhos e overrides, mas passa somente a configuração de build ao Bake, em memória. `BUILD_PARALLELISM` pode ser reduzido em hosts com menos memória. `ensure-volumes` mantém os `sudo mkdir`/`sudo chown` para subdiretórios ausentes com UIDs próprios de Airflow, Postgres e Solr; a raiz configurada em `VOL_SEIIA_DIR` deve existir antes. Um usuário com sudo prepara os volumes uma vez com `sudo make -C /opt/sei-ia ensure-volumes`, após revisar `default.env`. O deploy é executado como `seiia`, sem sudo; com os subdiretórios existentes, o alvo dispensa os comandos privilegiados. A release externa é **somente código-fonte**: não há modo alternativo por imagens próprias pré-publicadas.
 
