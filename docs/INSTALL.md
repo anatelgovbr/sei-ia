@@ -164,6 +164,8 @@ alcança.
 
 ### 2.1. Criar usuário, diretórios e rede Docker
 
+Execute as etapas 2.1 a 2.3 como administrador com acesso a `sudo`.
+
 Os valores versionados usam o usuário `seiia` com UID/GID `4000`. Antes de criá-lo,
 confirme que esses IDs estão livres:
 
@@ -175,30 +177,15 @@ getent group 4000 || true
 Se houver conflito, escolha IDs livres e atualize `NB_UID` e `NB_GID` em
 `default.env` antes do primeiro `make up`.
 
-Execute a preparação abaixo com uma conta administrativa que tenha acesso a
-`sudo`. Exemplo com os valores padrão:
+Com os valores padrão:
 
 ```bash
 sudo useradd --create-home --shell /bin/bash --uid 4000 seiia
 sudo usermod --append --groups docker seiia
-sudo install --directory --owner=seiia --group=docker --mode=0750 /opt/sei-ia
+sudo passwd seiia
+sudo install --directory --owner="$(id -un)" --group=docker --mode=0750 /opt/sei-ia
 sudo install --directory --owner=seiia --group=docker --mode=0750 /var/seiia/volumes
 ```
-
-Abra uma sessão como `seiia` a partir da conta administrativa. Não é necessário
-definir uma senha para `seiia`: `sudo` usa a autorização da conta administrativa.
-A nova sessão aplica o grupo `docker`. Confirme o usuário, os grupos e o acesso
-ao Docker:
-
-```bash
-sudo -iu seiia
-id
-docker info >/dev/null
-```
-
-Execute os próximos passos nessa sessão. A conta `seiia` não precisa receber
-permissão de `sudo`; a preparação dos volumes na seção 5 será feita pela conta
-administrativa.
 
 Crie a rede externa usada pela stack. Não fixe um subnet sem antes verificar as
 redes corporativas, VPNs e redes Docker existentes. Consulte a equipe de redes e
@@ -206,7 +193,7 @@ liste rotas e subnets já utilizadas:
 
 ```bash
 ip route
-docker network ls -q | xargs -r docker network inspect \
+sudo docker network ls -q | xargs -r sudo docker network inspect \
   --format '{{.Name}}: {{range .IPAM.Config}}{{.Subnet}} {{end}}'
 ```
 
@@ -214,7 +201,7 @@ Quando a equipe fornecer uma faixa aprovada, crie a rede com `--subnet` e
 `--gateway`:
 
 ```bash
-docker network create --driver bridge \
+sudo docker network create --driver bridge \
   --subnet <SUBNET_APROVADA> --gateway <GATEWAY_APROVADO> \
   docker-host-bridge
 ```
@@ -224,8 +211,8 @@ escolhida pelo Docker e confirme que ela não se sobrepõe à LAN, VPN ou redes 
 outros hosts antes de iniciar a stack:
 
 ```bash
-docker network create --driver bridge docker-host-bridge
-docker network inspect docker-host-bridge
+sudo docker network create --driver bridge docker-host-bridge
+sudo docker network inspect docker-host-bridge
 ```
 
 Se o órgão usar outro nome, altere somente `COMPOSE_NETWORK_NAME` em `default.env`.
@@ -237,8 +224,7 @@ e os arquivos de configuração para uso por contêineres conforme a política d
 
 ### 2.2. Baixar uma tag estável
 
-Execute na sessão do usuário `seiia` aberta com `sudo -iu seiia` na seção 2.1.
-O diretório `/opt/sei-ia` criado nessa etapa deve estar vazio e pertence a `seiia`:
+Ainda como administrador, baixe a tag no diretório vazio criado na etapa 2.1:
 
 ```bash
 git clone --branch v1.3.0 --single-branch \
@@ -270,6 +256,19 @@ do Solr.
 O `default.env` não recebe credenciais, tokens nem chaves. Esses valores e os
 endpoints específicos do órgão pertencem ao `security.env`, configurado na próxima
 etapa.
+
+Com o `default.env` revisado, prepare os volumes, transfira o repositório para
+`seiia` e entre nesse usuário:
+
+```bash
+sudo make -C /opt/sei-ia ensure-volumes
+sudo chown -R seiia:docker /opt/sei-ia
+su - seiia
+cd /opt/sei-ia
+docker info >/dev/null
+```
+
+A partir da etapa 2.4, execute os comandos como `seiia`, sem `sudo`.
 
 ### 2.4. Configurar o `security.env`
 
@@ -638,17 +637,7 @@ diferente do certificado e da cadeia servidos pelo Nginx.
 
 ## 5. Executar o deploy
 
-Antes do primeiro deploy, um usuário com permissão de `sudo` deve preparar os
-volumes, usando o `default.env` já revisado:
-
-```bash
-sudo make -C /opt/sei-ia ensure-volumes
-```
-
-Se os volumes já estão preparados, essa etapa não precisa ser repetida.
-O usuário `seiia` não precisa de permissão de `sudo`.
-
-Depois de preparar o contrato privado e decidir o TLS, execute como `seiia`:
+Como `seiia`, execute:
 
 ```bash
 cd /opt/sei-ia
@@ -667,7 +656,7 @@ make BUILD_PARALLELISM=2 up
 
 Aguarde até os serviços permanentes ficarem `running` e `healthy`. O contêiner de
 inicialização do Airflow termina com código zero; ele não permanece em execução.
-Depois da subida, execute obrigatoriamente:
+Depois da subida, execute:
 
 ```bash
 make check
@@ -832,7 +821,7 @@ caminho físico do volume.
 | Conflito de subnet ou serviço inacessível | Rede Docker sobreposta a LAN/VPN | Inspecione todas as subnets e recrie a rede com uma faixa aprovada pela equipe de rede. |
 | `address already in use` | Porta 8088, 8082, 8086 ou 8081 ocupada | Identifique o processo com `ss -ltnp`; não publique os serviços internos como solução. |
 | Falha de build por DNS/timeout | Host sem egress, proxy ou DNS para BuildKit | Valide resolução e HTTPS no host e no builder; configure o proxy corporativo antes de repetir. |
-| `permission denied` em volume | UID/GID, proprietário ou SELinux incorretos | Compare `default.env`, `ls -ln` e os contextos SELinux; execute `make ensure-volumes` após corrigir a raiz. |
+| `permission denied` em volume | UID/GID, proprietário ou SELinux incorretos | Compare `default.env`, `ls -ln` e os contextos SELinux; como administrador, execute `sudo make -C /opt/sei-ia ensure-volumes` após corrigir a raiz. |
 | Falha TLS por hostname | DNS usado pelo SEI não está no SAN | Corrija `SEIIA_GATEWAY_HOST`/certificado e valide com `openssl x509 -text`; não desative a verificação. |
 | `unable to get local issuer certificate` | CA bundle ausente ou cadeia incorreta no SEI | Monte o PEM/CA correto em `/opt/sei/config/mod-ia/seiia.cert.pem`. |
 | Certificado e chave não formam par | Arquivos de PKI trocados | Compare as chaves públicas e instale o par correto; o script não sobrescreve o material do órgão. |
