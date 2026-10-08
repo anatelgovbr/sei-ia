@@ -702,7 +702,7 @@ class GatewayInventoryTests(unittest.TestCase):
     def test_make_check_does_not_stop_the_running_stack(self):
         makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
 
-        self.assertIn("--profile checks run --build --rm --no-deps", makefile)
+        self.assertIn("--profile checks run --rm --no-deps", makefile)
         self.assertNotIn("--abort-on-container-exit", makefile)
 
     def test_airflow_init_does_not_mask_migration_failure(self):

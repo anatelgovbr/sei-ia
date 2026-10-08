@@ -63,4 +63,4 @@ down-volumes:
 
 check: config ensure-certs
 	$(BUILD_ENV) python3 ops/scripts/build_images.py --service stack-config-checker -- $(COMPOSE) --profile checks
-	$(COMPOSE) --profile checks run --no-build --rm --no-deps stack-config-checker
+	$(COMPOSE) --profile checks run --rm --no-deps stack-config-checker
