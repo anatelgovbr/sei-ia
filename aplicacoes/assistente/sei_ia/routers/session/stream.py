@@ -1728,10 +1728,11 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
 
                 final_response_content = "".join(response_parts)
                 final_output = {"content": final_response_content}
+                iteration_usage = model_usage.iteration_usage
                 trace_metadata.update(
                     {
                         "usage_schema_version": "session-model-usage-v2",
-                        "iteration_usage": model_usage.iteration_usage,
+                        "iteration_usage": iteration_usage,
                         "model_usage": model_usage.model_usage,
                         "ocr_usage": aggregate_ocr_usage(ocr_usage_records),
                         "cache_percent_formula": (
@@ -1774,12 +1775,10 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
                 "id": f"chatcmpl-{_model_cfg['model_name']}",
                 "id_message": message_id,
                 "created": datetime.now().isoformat(),  # noqa: DTZ005
-                # usage por modelo vive no trace (Langfuse); aqui não medimos por
-                # request — zeros explícitos, não números inventados.
                 "usage": {
-                    "prompt_tokens": 0,
-                    "completion_tokens": 0,
-                    "total_tokens": 0,
+                    "prompt_tokens": iteration_usage["input_total_tokens"],
+                    "completion_tokens": iteration_usage["output_total_tokens"],
+                    "total_tokens": iteration_usage["total_tokens"],
                 },
                 "use_websearch": bool(getattr(request, "use_websearch", False)),
                 "use_thinking": bool(getattr(request, "use_thinking", False)),

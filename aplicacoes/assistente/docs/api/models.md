@@ -423,9 +423,9 @@ Exemplo reduzido dos campos finais emitidos por `/llm_lang/session_stream`:
         "id": "chatcmpl-modelo-configurado",
         "id_message": 12345,
         "usage": {
-            "prompt_tokens": 0,
-            "completion_tokens": 0,
-            "total_tokens": 0
+            "prompt_tokens": 320,
+            "completion_tokens": 80,
+            "total_tokens": 400
         },
         "use_websearch": false,
         "use_thinking": false,
@@ -445,6 +445,13 @@ Exemplo reduzido dos campos finais emitidos por `/llm_lang/session_stream`:
     "timestamp": 1704067230.456
 }
 ```
+
+`usage` soma os tokens informados pelos modelos nas chamadas LangChain concluídas
+no turno (agente, subagentes e pré-processamento), independentemente do Langfuse.
+`prompt_tokens` inclui tokens de entrada em cache; `completion_tokens` inclui
+reasoning; `total_tokens` é a soma dos dois. Chamadas sem usage informado não
+contribuem para a soma. OCR direto permanece contabilizado separadamente no trace.
+`all_tokens_counter` continua sendo a contagem de tokens dos documentos.
 
 `mode` registra a estratégia usada no turno. O valor `injected` indica que o
 conteúdo dos documentos entrou diretamente no contexto do modelo. O valor
