@@ -12,8 +12,10 @@ import pandas as pd
 import pytest
 from fastapi import HTTPException, Request
 from langchain_core.messages import AIMessageChunk
+from langchain_core.outputs import ChatGenerationChunk, LLMResult
 from langchain_openai import StreamChunkTimeoutError
 
+from sei_ia.agents.session_agent.usage import SessionModelUsageHandler
 from sei_ia.data.content_status import ContentStatus
 from sei_ia.data.database.sei_client import SeiDBAPIError
 from sei_ia.data.etl.extract.metadata import fetch_procedimentos_metadata_batch
@@ -1065,6 +1067,13 @@ def _patch_session_langfuse(monkeypatch, stream_module, *, enabled):
     )
 
 
+def _record_model_usage(callbacks, results: tuple[LLMResult, ...]) -> None:
+    for callback in callbacks:
+        if isinstance(callback, SessionModelUsageHandler):
+            for result in results:
+                callback.on_llm_end(result, run_id=None)
+
+
 async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
     # Harness de teste que monta o generator inteiro do session_stream com
     # dublês — cresce a cada novo parâmetro/validação do endpoint (ex.:
@@ -1089,6 +1098,7 @@ async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
     agent_error: BaseException | None = None,
     agent_error_times: int = 1,
     agent_yield_before_error: tuple[str, ...] = (),
+    model_usage_results: tuple[LLMResult, ...] = (),
 ):
     import sei_ia.routers.session.stream as stream_module
 
@@ -1128,6 +1138,7 @@ async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
                 raise agent_error
             if agent_delay:
                 await asyncio.sleep(agent_delay)
+            _record_model_usage(_kwargs["config"]["callbacks"], model_usage_results)
             events.append("agent_done")
             yield ("messages", (AIMessageChunk(content=response_text), {}))
 
@@ -1392,6 +1403,59 @@ async def test_session_stream_metadata_usa_id_request_do_middleware(
     assert result["request"].id_request is None
     assert metadata["data"]["id_message"] == 987654
     assert isinstance(metadata["data"]["id_message"], int)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("use_langfuse", [True, False])
+@pytest.mark.parametrize("has_usage", [True, False])
+async def test_session_stream_metadata_reporta_usage_da_interacao(
+    monkeypatch, tmp_path, use_langfuse, has_usage
+):
+    usage_results = tuple(
+        LLMResult(
+            generations=[
+                [
+                    ChatGenerationChunk(
+                        message=AIMessageChunk(
+                            content="resposta",
+                            usage_metadata={
+                                "input_tokens": input_tokens,
+                                "output_tokens": output_tokens,
+                                "total_tokens": input_tokens + output_tokens,
+                                "input_token_details": {"cache_read": cache_read},
+                                "output_token_details": {"reasoning": reasoning},
+                            },
+                        )
+                    )
+                ]
+            ],
+            llm_output={"model_name": "fake"},
+        )
+        for input_tokens, output_tokens, cache_read, reasoning in (
+            (120, 30, 40, 10),
+            (200, 50, 100, 20),
+        )
+    )
+    result = await _run_session_stream_with_fake_agent(
+        monkeypatch,
+        tmp_path,
+        fail=False,
+        use_langfuse=use_langfuse,
+        model_usage_results=usage_results if has_usage else (),
+    )
+    frames = [
+        json.loads(line.removeprefix("data: "))
+        for line in result["body"].splitlines()
+        if line.startswith("data: ")
+    ]
+
+    assert [frame["type"] for frame in frames[-2:]] == ["metadata", "end"]
+    assert frames[-2]["data"]["usage"] == {
+        "prompt_tokens": 320 if has_usage else 0,
+        "completion_tokens": 80 if has_usage else 0,
+        "total_tokens": 400 if has_usage else 0,
+    }
+    assert frames[-2]["data"]["all_tokens_counter"] == 0
 
 
 @pytest.mark.asyncio
