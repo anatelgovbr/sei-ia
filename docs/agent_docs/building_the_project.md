@@ -52,7 +52,7 @@ O carregamento de config **difere** entre dev e deploy — não confundir.
 
 Cada app lê um `.env` **do próprio diretório** (`aplicacoes/<app>/.env`), porque é de lá que se roda em dev:
 
-- O mesmo `.env` é carregado por **dois mecanismos**: o pydantic `BaseSettings` lê o arquivo direto e preenche o objeto `Settings` tipado (`env_file=".env"`, `aplicacoes/assistente/sei_ia/configs/settings_config.py:20-22`) — caminho principal, consumido via `settings.<CAMPO>`; e `load_dotenv()` (`sei_ia/main.py:42`) exporta as mesmas vars para `os.environ`, cobrindo libs de terceiros que leem o ambiente do processo direto. Preencher o `.env` alimenta os dois; nos containers o compose injeta env vars reais e o `load_dotenv()` é no-op.
+- O mesmo `.env` é carregado por **dois mecanismos**: o pydantic `BaseSettings` lê o arquivo direto e preenche o objeto `Settings` tipado (`env_file=".env"`, `aplicacoes/assistente/sei_ia/configs/settings_config.py:20-22`) — caminho principal, consumido via `settings.<CAMPO>`; e `load_dotenv()` (`sei_ia/main.py:41`) exporta as mesmas vars para `os.environ`, cobrindo libs de terceiros que leem o ambiente do processo direto. Preencher o `.env` alimenta os dois; nos containers o compose injeta env vars reais e o `load_dotenv()` é no-op.
 - O dev cria o `.env` copiando o template versionado `aplicacoes/<app>/.env.example` (`assistente` e `similaridade`; o `etl-airflow` não tem — usa config nativa do Airflow) e preenchendo os valores. O `.env` é **gitignored** (`.gitignore:19`) — cada dev tem o seu.
 
 ### Deploy — `default.env` + `security.env`
@@ -78,8 +78,9 @@ o log informa somente os nomes dos arquivos alterados (`.gitlab/scripts/generate
 
 ### `litellm_config.yaml` — config do proxy LiteLLM
 
-- **Copiado sem expor credenciais** de `litellm_config.template.yaml` no deploy interno e na instalação externa. O YAML é gitignored e mantém modelos, endpoints e chaves como `os.environ/VAR`; `model_name` permanece um alias fixo (`standard`, `mini`, `nano`, `embedding`, `speech-to-text`). Quando o catálogo opcional estiver configurado (ver `git_workflow.md`), o gerador preenche os marcadores com entradas extras e níveis de reasoning dos aliases de texto que apontam para o mesmo modelo físico; as credenciais dessas entradas continuam sendo referências ao ambiente (`litellm_config.template.yaml:1`; `.gitlab/scripts/generate_config_files.sh:138`).
+- **Copiado sem expor credenciais** de `litellm_config.template.yaml` na instalação. O YAML é gitignored e mantém modelos, endpoints e chaves como `os.environ/VAR`; `model_name` permanece um alias fixo (`standard`, `mini`, `nano`, `embedding`, `speech-to-text`) (`litellm_config.template.yaml:1`).
 - **Função:** configura o proxy LiteLLM com cinco aliases fixos, separados dos modelos físicos informados por `LITELLM_{STANDARD,MINI,NANO,EMBEDDING,STT}_MODEL`. Cada entrada declara `tags: ["agents:<papel>"]`, e `router_settings.enable_tag_filtering` restringe cada chamada ao papel enviado pelo Assistente. Não existe mais `think`/`think-low`/`think-none`: `reasoning_effort` é parâmetro de request (`litellm_config.template.yaml:2`; `services/llm_models/get_model.py:32`).
+- **`model_info.mode` nas entradas que não são chat:** `embedding` e `speech-to-text` declaram `mode: embedding`/`mode: audio_transcription` (`litellm_config.template.yaml:52`, `:68`) para o `/health` do LiteLLM não testá-los como chat (motivo em `service_communication_patterns.md`). Mantenha o modo correspondente ao incluir modelos desses papéis na configuração.
 - Os modelos de texto não fixam `max_completion_tokens`, e `get_model` não envia
   `max_tokens`: o limite efetivo da resposta fica a cargo do provider. O
   `session_stream` também não mantém reserva própria de saída; o Deep Agents usa o

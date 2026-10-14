@@ -49,6 +49,7 @@ model_list:
       tags: ["agents:embedding"]
     model_info:
       base_model: os.environ/LITELLM_EMBEDDING_MODEL
+      mode: embedding
 
   # STT via proxy central (openai/<alias>). O backend homologado hoje e um
   # deployment gpt-transcribe, nao o Whisper classico: ele rejeita
@@ -64,6 +65,7 @@ model_list:
       tags: ["agents:audio_transcription"]
     model_info:
       base_model: os.environ/LITELLM_STT_MODEL
+      mode: audio_transcription
 
 # ============================================================================
 # Configuracoes de Retry e Reliability

@@ -46,6 +46,7 @@ from sei_ia.agents.session_agent.inject import build_injected_context
 from sei_ia.agents.session_agent.langfuse_callback import SessionLangfuseCallback
 from sei_ia.agents.session_agent.mode import decide_mode
 from sei_ia.agents.session_agent.status_emitter import SessionStatusHandler
+from sei_ia.agents.session_agent.topic_title import generate_topic_title
 from sei_ia.agents.session_agent.trace import SessionTraceHandler
 from sei_ia.agents.session_agent.usage import (
     SessionModelUsageHandler,
@@ -861,6 +862,17 @@ async def _apply_history_policy(agent, config, resolved, skip_memory, traced) ->
         await _sync_window_from_history(agent, config, resolved, traced)
 
 
+def _is_first_topic_turn(resolved, *, history_checked: bool) -> bool:
+    """Indica se o turno atual é o primeiro do tópico (o SEI grava o turno depois).
+
+    Com o histórico consultado no SEI, vale a contagem de turnos gravados. Sem a
+    consulta (``skip_memory`` ou seed desligado), só uma sessão recém-criada conta.
+    """
+    if history_checked:
+        return resolved.history_turns == 0
+    return resolved.is_new
+
+
 @router.post(
     ENDPOINT_NAME,
     tags=["llm_lang"],
@@ -888,6 +900,7 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
         trace_reasoning_failover = False
         final_response_content: str | None = None
         web_research_state: dict[str, Any] = {}
+        title_task: asyncio.Task[str | None] | None = None
         langfuse_trace_id = _trace_id_for_request(request_starllete)
         request_starllete.state.trace_id = langfuse_trace_id
         request_id = str(message_id)
@@ -1199,6 +1212,7 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
                     len(docs),
                     doc_ids,
                 )
+            history_checked = settings.SESSION_SEED_HISTORY and not request.skip_memory
             resolved = None
             materialization_output: dict[str, Any] = {}
             trace_stage = "session.materialize_documents"
@@ -1212,12 +1226,7 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
                             request.id_topico,
                             docs=docs,
                             fetch_document=fetch,
-                            fetch_history=(
-                                fetch_history
-                                if settings.SESSION_SEED_HISTORY
-                                and not request.skip_memory
-                                else None
-                            ),
+                            fetch_history=(fetch_history if history_checked else None),
                             reset=request.no_cache,
                             proc_metadata=proc_metadata,
                             strict_materialization=benchmark_collect,
@@ -1370,6 +1379,15 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
             preflight_callbacks = [model_usage]
             if langfuse_callback:
                 preflight_callbacks.append(langfuse_callback)
+            # Título do tópico só no 1º turno, em paralelo ao classify e ao agente;
+            # aguardado apenas antes do frame metadata (ver topic_title.py). O benchmark
+            # não gera título para não somar chamadas fora do turno medido.
+            if not benchmark_collect and _is_first_topic_turn(
+                resolved, history_checked=history_checked
+            ):
+                title_task = asyncio.create_task(
+                    generate_topic_title(request.text, callbacks=preflight_callbacks)
+                )
             speculative_queries: list[str] = []
             if mode_decision.mode == "filesystem" or use_websearch:
                 if web_active:
@@ -1770,6 +1788,9 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
                 agent_tag=settings.SESSION_MAIN_MODEL,
                 model_override=model_override,
             )
+            titulo_topico = await title_task if title_task is not None else None
+            if title_task is not None:
+                trace_metadata["titulo_topico"] = titulo_topico
             metadata_data = {
                 # Campos consumidos pelo frontend.
                 "id": f"chatcmpl-{_model_cfg['model_name']}",
@@ -1791,6 +1812,8 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
                 "rag_method": None,
                 "rag_documents_count": len(resolved.meta.doc_ids),
                 "rag_chunks_count": None,
+                # Título curto do tópico; só no 1º turno, None nos demais ou em falha.
+                "titulo_topico": titulo_topico,
                 # --- chaves próprias do session (observabilidade/harness) ---
                 "session_key": resolved.paths.session_key,
                 "is_new_session": resolved.is_new,
@@ -1971,6 +1994,8 @@ async def session_stream(request: SessionStreamRequest, request_starllete: Reque
             status_code, detail = _map_exception(exc)
             yield record_error(status_code, detail, exception=exc)
         finally:
+            if title_task is not None and not title_task.done():
+                title_task.cancel()
             if not trace_finished:
                 _update_langfuse_trace(
                     root_span,

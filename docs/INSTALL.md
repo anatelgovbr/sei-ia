@@ -481,6 +481,11 @@ O template publica cinco aliases fixos: `standard`, `mini`, `nano`, `embedding` 
 `speech-to-text`. O `make check` exige cada alias com suas respectivas tags; uma
 entrada com nome físico e as mesmas tags não substitui esse contrato. Os modelos
 físicos permanecem em `litellm_params.model` e `model_info.base_model` via ambiente.
+Os aliases `embedding` e `speech-to-text` também declaram `model_info.mode`
+(`embedding` e `audio_transcription`). Mantenha esse campo: o `/health` do LiteLLM,
+usado pelo Health Checker, testa cada modelo com uma chamada real e, sem `mode`,
+trata como chat qualquer modelo cujo nome o LiteLLM não reconheça, o que faz a
+verificação falhar ou estourar o tempo limite.
 
 | Alias (`model_name`) | Modelo físico no `security.env` | Papéis autorizados | Uso principal |
 |---|---|---|---|
@@ -493,6 +498,18 @@ físicos permanecem em `litellm_params.model` e `model_info.base_model` via ambi
 Mantenha os aliases da primeira coluna em `model_name`, mesmo quando dois deles
 usam o mesmo modelo. Configure os modelos do provedor nas variáveis correspondentes
 do `security.env`, sem alterar os aliases no template.
+
+O modelo de referência do papel `principal` é **`gpt-6.1-sol`**, servido pelo
+alias `standard`. Configure `LITELLM_STANDARD_MODEL` com o identificador físico
+fornecido pelo provedor (por exemplo, `openai/gpt-6.1-sol` em uma API compatível
+com OpenAI); um deployment pode ter nome diferente do modelo.
+O modelo de referência para os tiers `mini` e `nano` é **`gpt-6-luna`**.
+Configure seus identificadores físicos em `LITELLM_MINI_MODEL` e
+`LITELLM_NANO_MODEL`; o nome do deployment pode continuar diferente do nome canônico.
+Antes da troca, valide uma chamada real ao endpoint, incluindo a Responses API
+usada pela sessão. Se houver catálogo adicional, mantenha a entrada de papel
+`principal` alinhada ao modelo escolhido; não basta mudar o nome exibido.
+Essa validação não comprova OCR/visão nem o efeito de todos os níveis de reasoning.
 
 As tags esperadas são:
 

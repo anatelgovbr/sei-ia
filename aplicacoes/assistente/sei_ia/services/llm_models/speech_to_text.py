@@ -41,7 +41,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import httpx
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, omit
 
 from sei_ia.configs.logging_config import setup_logging
 from sei_ia.configs.settings_config import LITELLM_STT_ALIAS, settings
@@ -60,6 +60,20 @@ _WHISPER_MAX_DURATION_SEC = (
 _STT_MODEL_INFO_TIMEOUT_S = 2.0
 _STT_MODE_TTL_S = 300.0  # 5 min — troca de backend no proxy reflete sem restart do app
 _stt_mode_cache: dict[str, tuple[str, float]] = {}
+
+# Modo literal (endpoint de transcrição pura): chunks menores reduzem o risco
+# de o modelo omitir/condensar trechos — no teste empírico, chunks de 3 min
+# também não apresentaram perda.
+_LITERAL_MAX_DURATION_SEC = 3 * 60
+# Enviado como ``prompt`` em /v1/audio/transcriptions. Na família
+# gpt-transcribe o prompt orienta o estilo da saída; no Whisper clássico ele é
+# lido como texto anterior e pode vazar para a saída em trechos de silêncio.
+_LITERAL_TRANSCRIPTION_PROMPT = (
+    "Transcreva o áudio de forma literal, integral e fiel, palavra por palavra, "
+    "exatamente como foi falado. Nunca resuma, condense, parafraseie, corrija "
+    "ou omita qualquer trecho. Mantenha repetições, hesitações e frases "
+    "incompletas."
+)
 
 _CHAT_AUDIO_PROMPT = (
     "Transcreva o áudio a seguir com precisão, exatamente como falado. "
@@ -83,6 +97,18 @@ _AUDIO_MIME_TYPES: dict[str, str] = {
     "opus": "audio/opus",
     "wma": "audio/x-ms-wma",
 }
+
+
+@dataclass(frozen=True)
+class _WhisperOptions:
+    """Parâmetros extras de /v1/audio/transcriptions usados no modo literal."""
+
+    prompt: str
+    language: str | None = None
+
+
+class LiteralTranscriptionUnsupportedError(RuntimeError):
+    """O backend do alias STT não é de transcrição dedicada (ex.: chat multimodal)."""
 
 
 def _get_audio_mime_type(extensao: str) -> str:
@@ -182,7 +208,12 @@ def _resolve_stt_mode(alias: str) -> str:
 
 
 async def _transcribe_via_whisper(
-    client: AsyncOpenAI, model: str, filename: str, content: bytes, mime: str
+    client: AsyncOpenAI,
+    model: str,
+    filename: str,
+    content: bytes,
+    mime: str,
+    options: _WhisperOptions | None = None,
 ) -> str:
     """Transcreve via /v1/audio/transcriptions (Whisper-like).
 
@@ -193,12 +224,18 @@ async def _transcribe_via_whisper(
     ("response_format 'verbose_json' is not compatible"). ``json`` é aceito
     tanto pelo Whisper clássico quanto pelo ``gpt-transcribe`` e já traz o
     campo ``text``, o único consumido aqui.
+
+    ``options`` só é informado pelo modo literal; sem ele (fluxo de sessão),
+    ``temperature``/``prompt``/``language`` não são enviados.
     """
     transcript = await client.audio.transcriptions.create(
         model=model,
         file=(filename, content, mime),
         response_format="json",
         extra_body={"tags": ["agents:audio_transcription"]},
+        temperature=0.0 if options else omit,
+        prompt=options.prompt if options else omit,
+        language=options.language if options and options.language else omit,
     )
     return transcript.text
 
@@ -238,11 +275,14 @@ async def _transcribe_one(
     content: bytes,
     mime: str,
     extensao: str,
+    options: _WhisperOptions | None = None,
 ) -> str:
     """Despacha a transcrição de um único arquivo/chunk para o modo resolvido."""
     if mode == "chat_audio":
         return await _transcribe_via_chat_audio(client, model, content, extensao)
-    return await _transcribe_via_whisper(client, model, filename, content, mime)
+    return await _transcribe_via_whisper(
+        client, model, filename, content, mime, options
+    )
 
 
 def _transcode_to_ogg(input_path: str) -> str:
@@ -383,9 +423,10 @@ def _split_audio_into_chunks(
 ) -> list[str]:
     """Divide áudio em chunks cortando em pontos de silêncio.
 
-    target_chunk_duration_sec: quando informado, usa esse valor como duração alvo por
-    chunk (útil quando o gatilho foi duração, não tamanho). Caso omitido, calcula a
-    duração alvo a partir de max_bytes e da taxa bytes/s do arquivo.
+    A duração alvo por chunk é derivada de max_bytes e da taxa bytes/s do arquivo.
+    target_chunk_duration_sec, quando informado, limita essa duração — vale o
+    menor dos dois, para que um áudio acima de max_bytes não gere chunks mais
+    longos que o limite de duração.
 
     Returns list of chunk paths (caller is responsible for deletion).
     Raises RuntimeError if ffprobe or ffmpeg fails.
@@ -394,12 +435,11 @@ def _split_audio_into_chunks(
     total_size = path.stat().st_size
     total_duration = _get_audio_duration_sec(input_path)
 
+    # Margem de 5% para não ultrapassar os limites
+    size_per_sec = total_size / total_duration
+    target_duration = (max_bytes / size_per_sec) * 0.95
     if target_chunk_duration_sec is not None:
-        target_duration = target_chunk_duration_sec * 0.95
-    else:
-        # Duração alvo por chunk com margem de 5% para não ultrapassar max_bytes
-        size_per_sec = total_size / total_duration
-        target_duration = (max_bytes / size_per_sec) * 0.95
+        target_duration = min(target_duration, target_chunk_duration_sec * 0.95)
 
     silence_points = _detect_silence_points(input_path)
     logger.debug(
@@ -462,6 +502,17 @@ async def _transcribe_chunks(
     chunks: list[str], client: AsyncOpenAI, model: str, mode: str = "transcriptions"
 ) -> str:
     """Transcreve chunks em paralelo (máx. 2 simultâneos) e remonta na ordem original."""
+    return " ".join(await _transcribe_segments(chunks, client, model, mode))
+
+
+async def _transcribe_segments(
+    chunks: list[str],
+    client: AsyncOpenAI,
+    model: str,
+    mode: str,
+    options: _WhisperOptions | None = None,
+) -> list[str]:
+    """Transcreve chunks em paralelo (máx. 2 simultâneos), na ordem original."""
     semaphore = asyncio.Semaphore(2)
 
     async def _transcrever(idx: int, chunk_path: str) -> tuple[int, str]:
@@ -474,14 +525,14 @@ async def _transcribe_chunks(
                 f"Transcrevendo chunk {idx + 1}/{len(chunks)}: '{Path(chunk_path).name}'"
             )
             texto = await _transcribe_one(
-                mode, client, model, Path(chunk_path).name, content, mime, ext
+                mode, client, model, Path(chunk_path).name, content, mime, ext, options
             )
             return (idx, texto)
 
     resultados = await asyncio.gather(
         *[_transcrever(i, c) for i, c in enumerate(chunks)]
     )
-    return " ".join(texto for _, texto in sorted(resultados, key=lambda x: x[0]))
+    return [texto for _, texto in sorted(resultados, key=lambda x: x[0])]
 
 
 @dataclass
@@ -501,11 +552,21 @@ def _unlink_file(path: str) -> None:
     Path(path).unlink(missing_ok=True)
 
 
+def _build_stt_client() -> AsyncOpenAI:
+    return AsyncOpenAI(
+        api_key=settings.LITELLM_PROXY_API_KEY or "dummy-key",
+        base_url=f"{settings.LITELLM_PROXY_URL}/v1",
+        timeout=float(settings.TIMEOUT_API),
+        max_retries=settings.MAX_RETRIES,
+    )
+
+
 async def _resolve_audio_input(
     file_path: str,
     ext: str,
     loop: asyncio.AbstractEventLoop,
     prep: _AudioPrep,
+    max_duration_sec: float = _WHISPER_MAX_DURATION_SEC,
 ) -> None:
     """Normaliza para OGG e/ou divide em chunks se o áudio ultrapassar os limites da API.
 
@@ -553,18 +614,22 @@ async def _resolve_audio_input(
             f"(> 25 MB). Dividindo em chunks por pontos de silêncio..."
         )
         prep.chunk_paths = await loop.run_in_executor(
-            None, _split_audio_into_chunks, working_path, _WHISPER_MAX_BYTES
+            None,
+            _split_audio_into_chunks,
+            working_path,
+            _WHISPER_MAX_BYTES,
+            max_duration_sec,
         )
         return
 
     working_duration = await loop.run_in_executor(
         None, _get_audio_duration_sec, working_path
     )
-    if working_duration <= _WHISPER_MAX_DURATION_SEC:
+    if working_duration <= max_duration_sec:
         return
 
     working_min = working_duration / 60
-    max_min = _WHISPER_MAX_DURATION_SEC / 60
+    max_min = max_duration_sec / 60
     logger.warning(
         f"Áudio '{Path(working_path).name}' tem "
         f"{working_min:.1f} min (> {max_min:.0f} min). "
@@ -575,7 +640,7 @@ async def _resolve_audio_input(
         _split_audio_into_chunks,
         working_path,
         _WHISPER_MAX_BYTES,
-        _WHISPER_MAX_DURATION_SEC,
+        max_duration_sec,
     )
 
 
@@ -606,12 +671,7 @@ async def transcribe_audio_file(file_path: str, extensao: str) -> str:
         loop = asyncio.get_event_loop()
         await _resolve_audio_input(file_path, ext, loop, prep)
 
-        client = AsyncOpenAI(
-            api_key=settings.LITELLM_PROXY_API_KEY or "dummy-key",
-            base_url=f"{settings.LITELLM_PROXY_URL}/v1",
-            timeout=float(settings.TIMEOUT_API),
-            max_retries=settings.MAX_RETRIES,
-        )
+        client = _build_stt_client()
         mode = await loop.run_in_executor(None, _resolve_stt_mode, LITELLM_STT_ALIAS)
 
         if prep.chunk_paths:
@@ -660,3 +720,75 @@ async def transcribe_audio_file(file_path: str, extensao: str) -> str:
             Path(prep.extracted_path).unlink(missing_ok=True)
         for chunk in prep.chunk_paths:
             Path(chunk).unlink(missing_ok=True)
+
+
+async def transcribe_audio_file_literal(
+    file_path: str, extensao: str, *, language: str | None = None
+) -> str:
+    """Transcreve um arquivo de áudio/vídeo priorizando fidelidade ao falado.
+
+    Usa o mesmo pipeline de ``transcribe_audio_file`` (normalização para OGG e
+    divisão por silêncio), com três diferenças voltadas à transcrição literal:
+
+    - chunks de no máximo ``_LITERAL_MAX_DURATION_SEC``;
+    - ``temperature=0``, ``prompt`` de transcrição literal e, se informado,
+      ``language`` na chamada a /v1/audio/transcriptions;
+    - recusa backends de chat multimodal (modo ``chat_audio``), que respondem
+      a um prompt e tendem a resumir.
+
+    Args:
+        file_path: Caminho completo do arquivo de mídia em disco.
+        extensao: Extensão do arquivo sem ponto (ex: "mp3", "mp4").
+        language: Código ISO-639-1 do idioma falado (ex: "pt"). Omitido, o
+            modelo detecta o idioma.
+
+    Returns:
+        Texto transcrito integral, na ordem do áudio.
+
+    Raises:
+        LiteralTranscriptionUnsupportedError: Se o alias STT apontar para um
+            backend de chat multimodal.
+        RuntimeError: Se a normalização via ffmpeg ou a divisão em chunks falhar.
+        Exception: Em caso de falha na comunicação com o LiteLLM Proxy.
+    """
+    ext = extensao.lower().strip(".")
+    loop = asyncio.get_running_loop()
+
+    mode = await loop.run_in_executor(None, _resolve_stt_mode, LITELLM_STT_ALIAS)
+    if mode != "transcriptions":
+        raise LiteralTranscriptionUnsupportedError(
+            f"O alias '{LITELLM_STT_ALIAS}' aponta para um backend de chat "
+            f"multimodal (modo '{mode}'), que não garante transcrição literal. "
+            "Configure um modelo de transcrição dedicado (ex.: gpt-transcribe, "
+            "whisper)."
+        )
+
+    prep = _AudioPrep()
+    try:
+        await _resolve_audio_input(
+            file_path, ext, loop, prep, max_duration_sec=_LITERAL_MAX_DURATION_SEC
+        )
+        segment_paths = prep.chunk_paths or [prep.extracted_path or file_path]
+        logger.info(
+            f"Transcrição literal de '{Path(file_path).name}' em "
+            f"{len(segment_paths)} chunk(s)"
+        )
+        texts = await _transcribe_segments(
+            segment_paths,
+            _build_stt_client(),
+            LITELLM_STT_ALIAS,
+            mode,
+            _WhisperOptions(prompt=_LITERAL_TRANSCRIPTION_PROMPT, language=language),
+        )
+    finally:
+        if prep.extracted_path:
+            Path(prep.extracted_path).unlink(missing_ok=True)
+        for chunk in prep.chunk_paths:
+            Path(chunk).unlink(missing_ok=True)
+
+    full_text = " ".join(t.strip() for t in texts if t.strip())
+    logger.info(
+        f"Transcrição literal concluída: '{Path(file_path).name}' "
+        f"({len(full_text)} chars, {len(texts)} chunk(s))"
+    )
+    return full_text
