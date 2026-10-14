@@ -558,7 +558,14 @@ class TestTranscribeAudioFileSizeCheck:
         ):
             resultado = asyncio.run(transcribe_audio_file(str(arquivo_mp4), "mp4"))
 
-        mock_split.assert_called_once_with(str(arquivo_ogg), 0)
+        from sei_ia.services.llm_models.speech_to_text import (
+            _WHISPER_MAX_DURATION_SEC,
+        )
+
+        # Corte por tamanho também respeita o limite de duração por chunk.
+        mock_split.assert_called_once_with(
+            str(arquivo_ogg), 0, _WHISPER_MAX_DURATION_SEC
+        )
         assert resultado == "parte um parte dois"
 
     def test_chunks_remontados_na_ordem_correta(self, tmp_path):

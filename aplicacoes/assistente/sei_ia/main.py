@@ -25,6 +25,7 @@ from sei_ia.routers.healthcheck import api_router as healthcheck
 from sei_ia.routers.llm_models import api_router as llm_models_router
 from sei_ia.routers.session import router as session_stream_router
 from sei_ia.routers.tests import api_router as tests_router
+from sei_ia.routers.transcription import router as transcription_router
 from sei_ia.services.embedder.pipeline import embedding_generator
 
 # Suprime warnings do Pydantic sobre conflitos de namespace com a biblioteca docling
@@ -159,6 +160,7 @@ def get_app(
     app.include_router(session_stream_router)
     app.include_router(feedback_router)
     app.include_router(llm_models_router)
+    app.include_router(transcription_router)
 
     return app
 

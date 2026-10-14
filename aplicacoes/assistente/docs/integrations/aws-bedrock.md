@@ -107,7 +107,7 @@ o custo de raciocínio):
 | DeepSeek | r1 | OK | Sem visão | Sempre ligado — não desliga com `none`; só aceita `none`, `low`/`medium`/`high` retornam erro 400 |
 | Qwen | qwen3-32b | OK | Sem visão | Parâmetro aceito, sem efeito (o raciocínio nativo do modelo não é exposto por essa chave nesta integração) |
 | OpenAI (open-weight) | gpt-oss-120b, gpt-oss-20b | OK | Sem visão | Não desliga com `none`; `low`/`medium`/`high` funcionam |
-| OpenAI (gpt-5.x) | gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna | OK | OK | `none`/`low`/`medium`/`high` funcionam, todos com efeito real |
+| OpenAI (gpt-6.x) | gpt-6.1-sol, gpt-6-luna | OK | OK | `none`/`low`/`medium`/`high` funcionam, todos com efeito real |
 
 > **Nota**: esta tabela cobre os modelos de maior adoção no mercado
 > (Anthropic, OpenAI, Qwen, DeepSeek) entre os que passaram pela

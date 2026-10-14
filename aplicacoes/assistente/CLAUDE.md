@@ -2,7 +2,8 @@
 
 Decisões e convenções para agentes de IA trabalhando nesta aplicação. O único
 endpoint público de chat é `/llm_lang/session_stream`, registrado em
-`sei_ia/main.py:159`. Os routers clássico e mini foram removidos.
+`sei_ia/main.py:160`. Os routers clássico e mini foram removidos. `POST /transcription`
+(`sei_ia/routers/transcription.py`) só transcreve mídia, sem chat.
 RAG e benchmark permanecem intocados, incluindo suas dependências clássicas;
 os runners antigos precisarão de atualização antes de novo uso.
 

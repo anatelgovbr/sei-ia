@@ -18,8 +18,12 @@ Monorepo: **3 apps + 2 libs compartilhadas + `ops/`**. Cada app tem `pyproject.t
 ## `assistente` — GenAI (app canônica)
 
 O único endpoint público de chat é `/llm_lang/session_stream`, registrado por
-`get_app()` em `sei_ia/main.py:118,157-161`. Os tiers internos de modelos, incluindo
+`get_app()` em `sei_ia/main.py:119,158-163`. Os tiers internos de modelos, incluindo
 `mini`, permanecem disponíveis aos agentes.
+
+`POST /transcription` (`routers/transcription.py:28`) não é chat: baixa o arquivo
+avulso de áudio/vídeo do SEI pelo mesmo fluxo de upload do chat e devolve a
+transcrição literal, sem agente (ver `service_communication_patterns.md`).
 
 O pacote `routers/session/` contém o POST, os preflights internos e os helpers
 de uploads e observabilidade. Conteúdo multimodal e reasoning compartilhados
@@ -59,7 +63,7 @@ o agente então abre cada path no principal ou no explorador. `session.json` e
 
 Anatomia de `sei_ia/` (onde colocar o quê):
 
-- `routers/` — endpoints HTTP: `session/`, `feedback.py`, `healthcheck.py`, `llm_models.py` e autotestes em `tests/`. Registro em `sei_ia/main.py:157-161`.
+- `routers/` — endpoints HTTP: `session/`, `feedback.py`, `healthcheck.py`, `llm_models.py`, `transcription.py` e autotestes em `tests/`. Registro em `sei_ia/main.py:158-163`.
 - `agents/` — Session em `session_agent/`, busca em `websearch/` e prompts. Somente RAG e pergunta foram preservados sob `scripts/legado/sei_ia/agents/`, com seus prompts e exceções; os demais componentes clássicos foram excluídos.
 - `services/` — **lógica de negócio reutilizável**: `embedder/` (com ABC `EmbeddingProvider`), `cache/`, `session_fs/`, `llm_models/`, `persistance/`, `exceptions/`. Código chamado por routers/agents, sem HTTP.
 - `data/` — **modelos e camada de dados**: `pydantic_models.py` (schemas de request/response), `database/` (ORM, `sei_client.py`, `table_manager.py`), `etl/extract/`.

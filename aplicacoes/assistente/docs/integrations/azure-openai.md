@@ -85,14 +85,20 @@ deployments em recursos Azure diferentes, sem depender uns dos outros.
 Deployments GPT validados por cenário (classificador, explorador, OCR) e
 comportamento real de `reasoning_effort`:
 
+O modelo de referência atual para o papel `principal` é `gpt-6.1-sol`, pelo
+alias `standard`; configure o identificador do deployment em
+`LITELLM_STANDARD_MODEL`. A verificação do endpoint compatível com OpenAI
+confirmou Chat Completions com `none` e Responses API com `low`.
+Isso não equivale à homologação de OCR/visão ou do efeito real de todos os
+níveis de reasoning na tabela abaixo.
+
 | Modelo | Classificador / Explorador | OCR (visão) | `reasoning_effort` |
 |---|---|---|---|
 | gpt-5.4 | OK | OK | `none`/`low`/`medium`/`high` — todos com efeito real e crescente |
 | gpt-5.4-mini | OK | OK | `none`/`low`/`medium`/`high` — todos com efeito real |
 | gpt-5.4-nano | OK | OK | `none`/`low`/`medium`/`high` — todos com efeito real |
 | gpt-5.5 | OK | OK | `none`/`low`/`medium`/`high` — todos com efeito real |
-| gpt-5.6-luna | OK | OK | `none`/`low`/`medium`/`high` — todos com efeito real |
-| gpt-5.6-terra | OK | OK | `none`/`low`/`medium`/`high` — todos com efeito real |
+| gpt-6-luna | OK | OK | `none`/`low`/`medium`/`high` — todos com efeito real |
 | gpt-5.3-chat (`gpt-chat-latest`) | OK | OK | Só aceita `medium` — `low`/`high` são rejeitados com erro explícito (*"Supported values are: 'medium'"*). `none`/`medium` são aceitos, mas nenhum dos dois gera raciocínio de fato — este modelo não expõe reasoning explícito por esse parâmetro |
 
 `text-embedding-3-small`: 1536 dimensões, alias `embedding`.
@@ -261,6 +267,7 @@ model_list:
       tags: ["agents:embedding"]
     model_info:
       base_model: os.environ/LITELLM_EMBEDDING_MODEL
+      mode: embedding                                # tipo usado pelo /health
 
   - model_name: speech-to-text
     litellm_params:
@@ -271,6 +278,7 @@ model_list:
       tags: ["agents:audio_transcription"]
     model_info:
       base_model: os.environ/LITELLM_STT_MODEL
+      mode: audio_transcription                      # tipo usado pelo /health
 
 router_settings:
   enable_tag_filtering: true

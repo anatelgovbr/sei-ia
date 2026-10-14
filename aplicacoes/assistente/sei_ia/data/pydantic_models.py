@@ -390,6 +390,23 @@ class ArquivoAvulsoItem(BaseModel):
 UploadItem = ArquivoAvulsoItem
 
 
+class TranscricaoRequest(ArquivoAvulsoItem):
+    """Requisição de transcrição literal de um arquivo avulso de áudio/vídeo."""
+
+    idioma: str = Field(
+        default="pt",
+        pattern=r"^[a-z]{2}$",
+        description="Código ISO-639-1 do idioma falado.",
+        examples=["pt"],
+    )
+
+
+class TranscricaoResponse(BaseModel):
+    """Resposta da transcrição literal."""
+
+    texto: str = Field(description="Transcrição integral, na ordem do áudio.")
+
+
 class ChatRequest(BaseModel):
     """ChatRequest.
 

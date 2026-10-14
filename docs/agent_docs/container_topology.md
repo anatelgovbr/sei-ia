@@ -8,6 +8,7 @@ Topologia de **runtime**: quais containers a stack sobe, de qual app vêm e por 
 - O compose usa anchors YAML para defaults comuns: `x-websearch-common` (`docker-compose.yml:3`), `x-app-common` (`:10`), `x-airflow-common` (`:20`).
 - **Profiles** decidem o que sobe: serviços sem profile são **sempre-on** no Compose. O comando oficial `make up` também ativa `web-search`; somente `checks` continua sob demanda por `make check` (`Makefile:1,13-15,60-61`).
 - **Recursos**: todos os serviços sempre-on têm limites explícitos. `default.env` representa o servidor dedicado de referência (16 vCPUs, 128 GB RAM): três workers Airflow com concorrência oito e Solr com heap de 2–6 GB. Reduções feitas para laboratórios são overrides locais e não viram defaults de release.
+- **Alocador do Assistente**: `MALLOC_ARENA_MAX: "2"` no ambiente do serviço (`docker-compose.yml:78`) limita as arenas da glibc por processo desde o início do Python/Gunicorn. Não altera workers, threads, paralelismo de OCR nem o limite de memória do Docker. O ajuste exige recriação pelo CD; rollback: remover a variável e recriar pelo mesmo fluxo. Reduzir o limite de memória requer validação de carga da aplicação completa.
 
 ## Serviços sempre-on
 
@@ -16,7 +17,7 @@ Topologia de **runtime**: quais containers a stack sobe, de qual app vêm e por 
 | Container | Imagem / Dockerfile | Papel | Porta (host→cont.) | Depende de |
 |---|---|---|---|---|
 | `gateway-nginx` | Nginx 1.27 Alpine fixado por digest + `ops/gateway/nginx.conf` | Único terminador TLS das APIs do SEI; access log estruturado somente para `4xx`/`5xx`, sem `/health` | 8088→8088, 8082→8082, 8086→8086 | três backends healthy |
-| `assistente` | assistente.dockerfile | GenAI (`gunicorn sei_ia.main:app`) | HTTP 8088 interno (`docker-compose.yml:62-100`) | postgres, redis, litellm |
+| `assistente` | assistente.dockerfile | GenAI (`gunicorn sei_ia.main:app`) | HTTP 8088 interno (`docker-compose.yml:63-114`) | postgres, redis, litellm |
 | `similaridade` | api_sei.dockerfile (`api_sei.main:app`) | API de recomendação (Solr) | HTTP 8082 interno (`docker-compose.yml:164-180`) | postgres, solr |
 | `similaridade-feedback` | **mesma imagem** (`app_api.main:app`) | Coleta de feedback (legado) | HTTP 8086 interno (`docker-compose.yml:192-208`) | postgres |
 

@@ -1099,6 +1099,10 @@ async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
     agent_error_times: int = 1,
     agent_yield_before_error: tuple[str, ...] = (),
     model_usage_results: tuple[LLMResult, ...] = (),
+    resolved_is_new: bool = True,
+    history_turns: int = 0,
+    seed_history: bool = False,
+    topic_title: str | None = "Descrição da imagem",
 ):
     import sei_ia.routers.session.stream as stream_module
 
@@ -1114,8 +1118,8 @@ async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
     resolved = SimpleNamespace(
         paths=SimpleNamespace(root=tmp_path, session_key="1_2"),
         meta=SimpleNamespace(doc_ids=(), documentos={}),
-        is_new=True,
-        history_turns=0,
+        is_new=resolved_is_new,
+        history_turns=history_turns,
         total_content_tokens=0,
         materialization=SessionMaterialization(unavailable=unavailable_document_ids),
     )
@@ -1184,6 +1188,8 @@ async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
     monkeypatch.setattr(
         stream_module, "classify_complexity", AsyncMock(return_value="easy")
     )
+    topic_title_mock = AsyncMock(return_value=topic_title)
+    monkeypatch.setattr(stream_module, "generate_topic_title", topic_title_mock)
 
     def fake_build_session_agent(*_args, **kwargs):
         observed["agent_kwargs"] = kwargs
@@ -1219,7 +1225,7 @@ async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
         stream_module, "cleanup_arquivos_avulsos_temp_files", cleanup_mock
     )
     langfuse = _patch_session_langfuse(monkeypatch, stream_module, enabled=use_langfuse)
-    monkeypatch.setattr(stream_module.settings, "SESSION_SEED_HISTORY", False)
+    monkeypatch.setattr(stream_module.settings, "SESSION_SEED_HISTORY", seed_history)
     monkeypatch.setattr(stream_module.settings, "SESSION_TRACE", False)
 
     request = SessionStreamRequest(
@@ -1277,6 +1283,7 @@ async def _run_session_stream_with_fake_agent(  # noqa: PLR0915
         "get_model_config_calls": get_model_config_calls,
         "validate_reasoning_effort_mock": validate_reasoning_effort_mock,
         "validate_model_override_mock": validate_model_override_mock,
+        "topic_title_mock": topic_title_mock,
     }
 
 
@@ -1403,6 +1410,82 @@ async def test_session_stream_metadata_usa_id_request_do_middleware(
     assert result["request"].id_request is None
     assert metadata["data"]["id_message"] == 987654
     assert isinstance(metadata["data"]["id_message"], int)
+
+
+def _metadata_frame(body: str) -> dict:
+    frames = [
+        json.loads(line.removeprefix("data: "))
+        for line in body.splitlines()
+        if line.startswith("data: ")
+    ]
+    return next(frame for frame in frames if frame["type"] == "metadata")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("seed_history", "resolved_is_new", "history_turns"),
+    [(True, False, 0), (False, True, 0)],
+)
+async def test_session_stream_metadata_traz_titulo_no_primeiro_turno(
+    monkeypatch, tmp_path, seed_history, resolved_is_new, history_turns
+):
+    result = await _run_session_stream_with_fake_agent(
+        monkeypatch,
+        tmp_path,
+        fail=False,
+        seed_history=seed_history,
+        resolved_is_new=resolved_is_new,
+        history_turns=history_turns,
+    )
+
+    metadata = _metadata_frame(result["body"])
+    assert metadata["data"]["titulo_topico"] == "Descrição da imagem"
+    result["topic_title_mock"].assert_awaited_once()
+    assert result["topic_title_mock"].await_args.args == ("descreva a imagem",)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("seed_history", "resolved_is_new", "history_turns"),
+    [(True, True, 3), (False, False, 0)],
+)
+async def test_session_stream_metadata_sem_titulo_fora_do_primeiro_turno(
+    monkeypatch, tmp_path, seed_history, resolved_is_new, history_turns
+):
+    result = await _run_session_stream_with_fake_agent(
+        monkeypatch,
+        tmp_path,
+        fail=False,
+        seed_history=seed_history,
+        resolved_is_new=resolved_is_new,
+        history_turns=history_turns,
+    )
+
+    assert _metadata_frame(result["body"])["data"]["titulo_topico"] is None
+    result["topic_title_mock"].assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_session_stream_metadata_titulo_none_quando_geracao_falha(
+    monkeypatch, tmp_path
+):
+    result = await _run_session_stream_with_fake_agent(
+        monkeypatch, tmp_path, fail=False, topic_title=None
+    )
+
+    metadata = _metadata_frame(result["body"])
+    assert metadata["data"]["titulo_topico"] is None
+    assert '"type": "end"' in result["body"]
+    result["topic_title_mock"].assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_session_stream_benchmark_nao_gera_titulo(monkeypatch, tmp_path):
+    result = await _run_session_stream_with_fake_agent(
+        monkeypatch, tmp_path, fail=False, benchmark_collect=True
+    )
+
+    result["topic_title_mock"].assert_not_called()
 
 
 @pytest.mark.asyncio

@@ -75,6 +75,7 @@ services:
       python -m gunicorn sei_ia.main:app -c /app/aplicacoes/assistente/sei_ia/configs/gunicorn_conf.py
       --forwarded-allow-ips="*"
     environment:
+      MALLOC_ARENA_MAX: "2"
       SEI_API_DB_ADDRESS: ${SEI_ADDRESS}/sei/controlador_ws.php
       # A porta do processo fica fixa na rede Docker; ASSISTENTE_PORT continua
       # sendo a porta publicada pelo gateway para o contrato externo.
