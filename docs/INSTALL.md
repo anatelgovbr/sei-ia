@@ -36,10 +36,10 @@
     - [2.4.4. Integrações e recursos opcionais](#244-integrações-e-recursos-opcionais)
     - [2.4.5. Escolha do DNS do gateway](#245-escolha-do-dns-do-gateway)
     - [2.4.6. Exemplo de preenchimento](#246-exemplo-de-preenchimento)
-    - [2.4.7. Validar o contrato](#247-validar-o-contrato)
 - [3. Configuração dos modelos LLM e LiteLLM](#3-configuração-dos-modelos-llm-e-litellm)
   - [3.1. Prepare o LiteLLM](#31-prepare-o-litellm)
     - [3.1.1. Credenciais do LiteLLM](#311-credenciais-do-litellm)
+    - [3.1.2. Validar o contrato](#312-validar-o-contrato)
   - [3.2. Descrição dos agentes e seus modelos](#32-descrição-dos-agentes-e-seus-modelos)
 - [4. Configuração do certificado HTTPS](#4-configuração-do-certificado-https)
   - [4.1. Certificado gerado automaticamente](#41-certificado-gerado-automaticamente)
@@ -454,21 +454,6 @@ Edite o `security.env` criado na seção 2.4.1 com `cp security_example.env secu
 Não recrie o arquivo copiando apenas o bloco acima: o exemplo não mostra todas as
 variáveis. Preserve as demais linhas e os valores que não precisarem de alteração.
 
-#### 2.4.7. Validar o contrato
-
-Depois de copiar `litellm_config.template.yaml` conforme a
-[seção 3.1](#31-prepare-o-litellm), valide a interpolação do Compose:
-
-```bash
-cd /opt/sei-ia
-make config
-```
-
-O comando gera `SEARXNG_SECRET_KEY` quando necessário e deve terminar com código
-zero. Depois do deploy, `make check` valida o inventário exato dos dois arquivos
-`.env`: variável ausente, extra, duplicada, inválida ou obrigatória vazia reprova a
-instalação.
-
 ## 3. Configuração dos modelos LLM e LiteLLM
 
 O LiteLLM é o proxy local entre as aplicações e os provedores de modelos. Assistente,
@@ -577,6 +562,21 @@ físicos, endpoints e credenciais. Os valores sensíveis permanecem somente no
 `security.env`. O `make check` verifica a saúde do proxy e a presença dos cinco
 aliases com suas oito tags obrigatórias; essa checagem não substitui o teste
 funcional pelo SEI.
+
+#### 3.1.2. Validar o contrato
+
+Com `security.env` preenchido e `litellm_config.yaml` criado, valide a
+interpolação do Compose:
+
+```bash
+cd /opt/sei-ia
+make config
+```
+
+O comando gera `SEARXNG_SECRET_KEY` quando necessário e deve terminar com código
+zero. Depois do deploy, `make check` valida o inventário exato dos dois arquivos
+`.env`: variável ausente, extra, duplicada, inválida ou obrigatória vazia reprova a
+instalação.
 
 ### 3.2. Descrição dos agentes e seus modelos
 
