@@ -681,6 +681,133 @@ def test_check_rejects_source_key_with_unsafe_permissions(
     assert not (migration_fixture["target"] / ".runtime").exists()
 
 
+def _replace_source_certificate(certs: Path, *openssl_args: str) -> None:
+    subprocess.run(
+        [
+            "openssl",
+            "req",
+            "-x509",
+            "-newkey",
+            "rsa:2048",
+            "-nodes",
+            "-batch",
+            "-days",
+            "2",
+            *openssl_args,
+            "-out",
+            str(certs / "seiia.cert.pem"),
+            "-keyout",
+            str(certs / "seiia.cert.key"),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    (certs / "seiia.cert.pem").chmod(0o644)
+    (certs / "seiia.cert.key").chmod(0o600)
+
+
+def test_apply_skips_legacy_self_signed_certificate_without_san(
+    migration_fixture: dict[str, Path],
+) -> None:
+    _replace_source_certificate(migration_fixture["certs"], "-subj", "/CN=seiia")
+
+    check = _run_migration(migration_fixture, "--check")
+
+    assert check.returncode == 0, check.stderr
+    assert "CERTIFICATE_ACTION=regenerate-self-signed" in check.stdout
+    assert "MIGRATION_STATUS=ready" in check.stdout
+
+    result = _run_migration(migration_fixture, "--apply")
+
+    assert result.returncode == 0, result.stderr
+    assert "MIGRATION_STATUS=applied" in result.stdout
+    assert (migration_fixture["target"] / "security.env").exists()
+    assert not (migration_fixture["target"] / ".runtime/certs").exists()
+
+
+def test_check_rejects_ca_issued_certificate_without_san(
+    migration_fixture: dict[str, Path], tmp_path: Path
+) -> None:
+    certs = migration_fixture["certs"]
+    ca_key = tmp_path / "ca.key"
+    ca_cert = tmp_path / "ca.pem"
+    request = tmp_path / "gateway.csr"
+    for command in (
+        [
+            "req",
+            "-x509",
+            "-newkey",
+            "rsa:2048",
+            "-nodes",
+            "-batch",
+            "-days",
+            "2",
+            "-subj",
+            "/CN=CA de teste",
+            "-keyout",
+            str(ca_key),
+            "-out",
+            str(ca_cert),
+        ],
+        [
+            "req",
+            "-new",
+            "-newkey",
+            "rsa:2048",
+            "-nodes",
+            "-batch",
+            "-subj",
+            "/CN=gateway.test",
+            "-keyout",
+            str(certs / "seiia.cert.key"),
+            "-out",
+            str(request),
+        ],
+        [
+            "x509",
+            "-req",
+            "-in",
+            str(request),
+            "-CA",
+            str(ca_cert),
+            "-CAkey",
+            str(ca_key),
+            "-CAcreateserial",
+            "-days",
+            "2",
+            "-out",
+            str(certs / "seiia.cert.pem"),
+        ],
+    ):
+        subprocess.run(["openssl", *command], check=True, capture_output=True)
+    (certs / "seiia.cert.key").chmod(0o600)
+
+    result = _run_migration(migration_fixture, "--check")
+
+    assert result.returncode != 0
+    assert "SEIIA_GATEWAY_HOST no SAN" in result.stderr
+    assert not (migration_fixture["target"] / ".runtime").exists()
+
+
+def test_check_rejects_self_signed_certificate_with_san_for_another_host(
+    migration_fixture: dict[str, Path],
+) -> None:
+    _replace_source_certificate(
+        migration_fixture["certs"],
+        "-subj",
+        "/CN=outro.test",
+        "-addext",
+        "subjectAltName=DNS:outro.test",
+    )
+
+    result = _run_migration(migration_fixture, "--check")
+
+    assert result.returncode != 0
+    assert "SEIIA_GATEWAY_HOST no SAN" in result.stderr
+    assert not (migration_fixture["target"] / ".runtime").exists()
+
+
 def test_check_plans_a_different_target_volume_root_without_writing(
     migration_fixture: dict[str, Path],
 ) -> None:

@@ -205,6 +205,9 @@ fi
 
 cat > "$TEMP_DIR/migration-overrides.env" <<EOF
 # Preencha os valores sem equivalente inequívoco na versão 1.2.
+# Descomente e preencha somente se standard e think da 1.2 usavam modelos diferentes
+# (nome físico do modelo, não o alias).
+# LITELLM_STANDARD_MODEL=
 LITELLM_NANO_MODEL=
 LITELLM_NANO_API_BASE=
 LITELLM_NANO_API_KEY=

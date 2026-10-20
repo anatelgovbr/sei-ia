@@ -84,7 +84,7 @@ class PlannedFile:
 @dataclass(frozen=True)
 class MigrationPlan:
     files: tuple[PlannedFile, ...]
-    certificate_fingerprint: str
+    certificate_fingerprint: str | None
     status: str
     secrets_to_generate: tuple[str, ...] = ()
 
@@ -524,9 +524,33 @@ def _run_openssl(arguments: list[str], *, input_bytes: bytes | None = None) -> b
     return result.stdout
 
 
+def _is_legacy_self_signed_without_san(cert_file: Path, san: str) -> bool:
+    if "Subject Alternative Name" in san:
+        return False
+    names = (
+        _run_openssl(
+            [
+                "x509",
+                "-in",
+                str(cert_file),
+                "-noout",
+                "-subject",
+                "-issuer",
+                "-nameopt",
+                "RFC2253",
+            ]
+        )
+        .decode(errors="replace")
+        .splitlines()
+    )
+    values = [line.split("=", 1)[1].strip() for line in names if "=" in line]
+    return len(values) == 2 and values[0] == values[1]
+
+
 def validate_certificate_pair(
     cert_file: Path, key_file: Path, gateway_host: str
-) -> str:
+) -> str | None:
+    """Retorna o fingerprint do par a preservar ou None quando o make up deve gerar outro."""
     if not cert_file.is_file() or not key_file.is_file():
         raise MigrationError("par TLS 1.2 incompleto")
     _run_openssl(["x509", "-in", str(cert_file), "-checkend", "0", "-noout"])
@@ -544,6 +568,9 @@ def validate_certificate_pair(
         ["x509", "-in", str(cert_file), "-noout", "-ext", "subjectAltName"]
     ).decode(errors="replace")
     dns_names = set(re.findall(r"DNS:([^,\s]+)", san))
+    # Padrao da 1.2.0 (CN=seiia, sem SAN): ensure_certs.sh gera o par com SAN no make up.
+    if _is_legacy_self_signed_without_san(cert_file, san):
+        return None
     if gateway_host not in dns_names:
         raise MigrationError(
             f"certificado 1.2 não contém SEIIA_GATEWAY_HOST no SAN: {gateway_host}"
@@ -678,17 +705,20 @@ def build_plan(
             (deploy_dir / "litellm_config.template.yaml").read_bytes(),
             0o600,
         ),
-        PlannedFile(
-            deploy_dir / ".runtime/certs/seiia.cert.pem",
-            cert_file.read_bytes(),
-            0o644,
-        ),
-        PlannedFile(
-            deploy_dir / ".runtime/certs/seiia.cert.key",
-            key_file.read_bytes(),
-            0o600,
-        ),
     )
+    if fingerprint is not None:
+        files += (
+            PlannedFile(
+                deploy_dir / ".runtime/certs/seiia.cert.pem",
+                cert_file.read_bytes(),
+                0o644,
+            ),
+            PlannedFile(
+                deploy_dir / ".runtime/certs/seiia.cert.key",
+                key_file.read_bytes(),
+                0o600,
+            ),
+        )
     return MigrationPlan(
         files,
         fingerprint,
@@ -801,6 +831,18 @@ def prepare_secrets(
     return plan, sorted(to_persist.keys())
 
 
+def _print_certificate(plan: MigrationPlan) -> None:
+    if plan.certificate_fingerprint is None:
+        print("CERTIFICATE_ACTION=regenerate-self-signed")
+        print(
+            "AVISO: certificado autoassinado 1.2 sem SAN; o make up vai gerar um novo "
+            "par com SAN. Distribua o novo PEM ao SEI.",
+            file=sys.stderr,
+        )
+    else:
+        print(f"CERTIFICATE_SHA256={plan.certificate_fingerprint}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Migra configuração e TLS do Servidor SEI IA 1.2.x para 1.3.x."
@@ -867,7 +909,7 @@ def main() -> int:
             )
             print("SOURCE_VERSION=1.2.x")
             print("TARGET_VERSION=1.3.x")
-            print(f"CERTIFICATE_SHA256={plan.certificate_fingerprint}")
+            _print_certificate(plan)
             if prepared:
                 print(f"PREPARED_SECRETS={','.join(prepared)}")
             print("MIGRATION_STATUS=secrets-prepared")
@@ -890,7 +932,7 @@ def main() -> int:
         )
         print("SOURCE_VERSION=1.2.x")
         print("TARGET_VERSION=1.3.x")
-        print(f"CERTIFICATE_SHA256={plan.certificate_fingerprint}")
+        _print_certificate(plan)
         if args.check_only and plan.secrets_to_generate:
             print(f"MANAGED_SECRETS_TO_GENERATE={','.join(plan.secrets_to_generate)}")
 
