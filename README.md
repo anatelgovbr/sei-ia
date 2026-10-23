@@ -54,7 +54,7 @@ O servidor é baseado em Docker. Recomendamos servidor Linux. **Não recomendamo
   - **RAM**: 128 GB
   - **Disco**: 450 GB
 - **Conjunto compatível desta candidata**:
-  - SEI **5.0.4.22**.
+  - SEI **5.0.5**.
   - Módulo SEI IA **1.5.0**.
   - Servidor de Soluções de IA **1.3.0**.
 
