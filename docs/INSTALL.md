@@ -63,13 +63,13 @@ Instale as três versões como um conjunto:
 
 | Componente | Versão |
 |---|---:|
-| SEI | 5.0.4.22 |
+| SEI | 5.0.5 |
 | Módulo SEI IA | 1.5.0 |
 | Servidor de Soluções de IA | 1.3.0 |
 
 ### 1.2. Instalação do SEI e do Módulo SEI IA
 
-Instale o SEI `5.0.4.22` conforme seu manual oficial. Baixe o Módulo SEI IA `1.5.0`
+Instale o SEI `5.0.5` conforme seu manual oficial. Baixe o Módulo SEI IA `1.5.0`
 em [Releases do módulo](https://github.com/anatelgovbr/mod-sei-ia/releases) e siga o
 README incluído no pacote. O procedimento do módulo é a fonte de verdade para a
 instalação no SEI e no SIP.
