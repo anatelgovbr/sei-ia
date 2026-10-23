@@ -40,7 +40,7 @@ Exemplo:
 | 1.1.x | 1.2.x | [1.1 → 1.2](upgrades/1.1-to-1.2.md) | adoção do proxy LiteLLM e WebSearch da linha antiga |
 | 1.2.x | 1.3.x | [1.2 → 1.3](upgrades/1.2-to-1.3.md) | monorepo, migração de configuração, build local, SearXNG e gateway TLS |
 
-A combinação de destino da última linha usa SEI 5.0.4.22, Módulo SEI IA 1.5.0 e
+A combinação de destino da última linha usa SEI 5.0.5, Módulo SEI IA 1.5.0 e
 Servidor de Soluções de IA 1.3.0. Atualize o SEI e o módulo quando o guia da
 transição exigir.
 
