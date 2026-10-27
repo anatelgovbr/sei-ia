@@ -20,7 +20,7 @@ dependencies = [
     "websockets",
     "httptools",
     "requests",
-    "PyJWT==2.12.1",
+    "PyJWT==2.15.0",
     "pandas==2.2.2",
     "SQLAlchemy>=2.0.0",
     "psycopg2-binary",

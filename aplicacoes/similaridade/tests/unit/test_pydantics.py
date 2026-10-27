@@ -1,20 +1,27 @@
 import unittest
 
-from fastapi import HTTPException
 from pydantic import ValidationError
 
 from api_sei.pydantic_models.document_recommenders import (
-    RecommendationItemDocument, RecommendationResponseDocument)
+    RecommendationItemDocument,
+    RecommendationResponseDocument,
+)
 from api_sei.pydantic_models.log_recommendation import LogRecommendation
-from api_sei.pydantic_models.n_embeddings_recommender import \
-    NEmbeddingRecomenderRequest
 from api_sei.pydantic_models.process_recommenders import (
-    IdField, RecommendationByEmbd, RecommendationByIdProtocoloItem,
-    RecommendationByIdProtocoloResponse, RecommendationItem,
-    RecommendationResponse)
-from api_sei.pydantic_models.solr_mlt import (DebugField, DetailedSolrJson,
-                                              DocsItem, GenericSolrJson,
-                                              SolrMltConfigModel)
+    IdField,
+    RecommendationByEmbd,
+    RecommendationByIdProtocoloItem,
+    RecommendationByIdProtocoloResponse,
+    RecommendationItem,
+    RecommendationResponse,
+)
+from api_sei.pydantic_models.solr_mlt import (
+    DebugField,
+    DetailedSolrJson,
+    DocsItem,
+    GenericSolrJson,
+    SolrMltConfigModel,
+)
 
 
 class TestRecommendationDocuments(unittest.TestCase):
@@ -26,7 +33,9 @@ class TestRecommendationDocuments(unittest.TestCase):
 
         with self.assertRaises(ValidationError) as context:
             RecommendationItemDocument(score=0.95)
-        self.assertIn("1 validation error for RecommendationItemDocument", str(context.exception))
+        self.assertIn(
+            "1 validation error for RecommendationItemDocument", str(context.exception)
+        )
 
     def test_recommendation_response_document(self):
         response_data = {
@@ -44,11 +53,14 @@ class TestRecommendationDocuments(unittest.TestCase):
         with self.assertRaises(ValidationError) as context:
             RecommendationResponseDocument(debug={"info": "debug info"})
         self.assertIn(
-            "1 validation error for RecommendationResponseDocument", str(context.exception)
+            "1 validation error for RecommendationResponseDocument",
+            str(context.exception),
         )
 
         with self.assertRaises(ValidationError) as context:
-            RecommendationResponseDocument(recommendation=[{"id": "123", "score": "invalid"}])
+            RecommendationResponseDocument(
+                recommendation=[{"id": "123", "score": "invalid"}]
+            )
         self.assertIn(
             "1 validation error for RecommendationResponseDocument",
             str(context.exception),
@@ -102,51 +114,6 @@ class TestLogRecommendation(unittest.TestCase):
         }
         log_recommendation = LogRecommendation(**data)
         self.assertIsNone(log_recommendation.created_at)
-
-
-class TestNEmbeddingRecomenderRequest(unittest.TestCase):
-    def test_valid_request(self):
-        data = {"id_protocolo": 123, "fq": [1, 2, 3], "rows": 10}
-        request = NEmbeddingRecomenderRequest(**data)
-        self.assertEqual(request.id_protocolo, 123)
-        self.assertEqual(request.fq, [1, 2, 3])
-        self.assertEqual(request.rows, 10)
-
-    def test_invalid_id_protocolo(self):
-        data = {"id_protocolo": None, "fq": [1, 2, 3], "rows": 10}
-        with self.assertRaises(ValidationError) as context:
-            NEmbeddingRecomenderRequest(**data)
-        self.assertIn("Input should be a valid integer", str(context.exception.errors()))
-
-    def test_invalid_fq(self):
-        data = {"id_protocolo": 123, "fq": [1, "invalid", 3], "rows": 10}
-        with self.assertRaises(ValidationError) as context:
-            NEmbeddingRecomenderRequest(**data)
-        self.assertIn("Input should be a valid integer", str(context.exception.errors()))
-
-    def test_id_protocolo_not_positive(self):
-        data = {"id_protocolo": -5, "fq": [1, 2, 3], "rows": 10}
-        with self.assertRaises(ValidationError) as context:
-            NEmbeddingRecomenderRequest(**data)
-        self.assertIn(
-            "O campo 'id_protocolo' deve ser um inteiro positivo.", str(context.exception)
-        )
-
-    def test_fq_with_non_positive_element(self):
-        data = {"id_protocolo": 123, "fq": [1, -2, 3], "rows": 10}
-        with self.assertRaises(ValidationError) as context:
-            NEmbeddingRecomenderRequest(**data)
-        self.assertIn(
-            "O campo 'fq' deve ser uma lista de inteiros positivos.", str(context.exception)
-        )
-
-    def test_invalid_rows(self):
-        data = {"id_protocolo": 123, "fq": [1, 2, 3], "rows": 0}
-        with self.assertRaises(ValidationError) as context:
-            NEmbeddingRecomenderRequest(**data)
-        self.assertIn(
-            "O campo 'rows' deve ser um número inteiro positivo.", str(context.exception)
-        )
 
 
 class TestRecommendationClasses(unittest.TestCase):
@@ -209,7 +176,9 @@ class TestSolrMltConfigModel(unittest.TestCase):
         # Test missing required fields
         with self.assertRaises(ValidationError) as context:
             SolrMltConfigModel()
-        self.assertIn("2 validation errors for SolrMltConfigModel", str(context.exception))
+        self.assertIn(
+            "2 validation errors for SolrMltConfigModel", str(context.exception)
+        )
 
         # Test invalid extraction method
         data = {
@@ -249,7 +218,10 @@ class TestDetailedSolrJson(unittest.TestCase):
     def test_valid_detailed_solr_json(self):
         data = {
             "response": {"docs": [{"id_protocolo": "123", "score": 0.95}]},
-            "debug": {"explain": {"field1": "explanation"}, "parsedquery": "example parsed query"},
+            "debug": {
+                "explain": {"field1": "explanation"},
+                "parsedquery": "example parsed query",
+            },
             "interesting_terms": [],
         }
         detailed_solr_json = DetailedSolrJson(**data)
@@ -262,7 +234,10 @@ class TestGenericSolrJson(unittest.TestCase):
     def test_valid_generic_solr_json(self):
         data = {
             "response": {"docs": [{"field1": "value1", "field2": "value2"}]},
-            "debug": {"explain": {"field1": "explanation"}, "parsedquery": "example parsed query"},
+            "debug": {
+                "explain": {"field1": "explanation"},
+                "parsedquery": "example parsed query",
+            },
         }
         generic_solr_json = GenericSolrJson(**data)
         self.assertEqual(len(generic_solr_json.response.docs), 1)

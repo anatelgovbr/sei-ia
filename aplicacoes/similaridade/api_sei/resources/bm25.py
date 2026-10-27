@@ -43,7 +43,7 @@ def find_weights(expression: str) -> list:
     list
         Uma lista de pesos encontrados na expressão.
     """
-    return list(map(float, re.findall(r"\^([^\s]+)\s", " {} ".format(expression))))  # noqa: UP032
+    return list(map(float, re.findall(r"\^([^\s^]+)\s", " {} ".format(expression))))  # noqa: UP032
 
 
 def find_field(term: str) -> str:

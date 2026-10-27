@@ -52,7 +52,7 @@ except Exception as e:
 
 @app.get("/process/unindexed/nr_process/{nr_process}")
 async def get_unindexed_process(
-    nr_process: Annotated[str, Path(regex=r"^\d+$")],
+    nr_process: Annotated[str, Path(pattern=r"^\d+$")],
 ) -> list | dict | None:
     """Retorna o processo com o numero de processo informado, sem fazer nenhuma filtragem.
 

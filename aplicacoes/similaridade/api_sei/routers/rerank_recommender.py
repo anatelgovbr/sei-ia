@@ -18,7 +18,6 @@ class VectorStorageSystem(str, Enum):
     """Vector storage system."""
 
     solr = "solr"
-    pgvector = "pgvector"
 
 
 class MltType(str, Enum):
@@ -52,7 +51,7 @@ def rerank_process_recommendations_by_id_protocolo(
     mlt_qf: Annotated[str | None, Query()] = None,
     vector_storage_system: Annotated[
         VectorStorageSystem, Query()
-    ] = VectorStorageSystem.pgvector,
+    ] = VectorStorageSystem.solr,
     mlt_type: Annotated[MltType, Query()] = MltType.wmlt,
 ) -> ProtResponse:
     """Process recommendations mlt and rerank using cosine similarity on bert embeddings by id_protocolo."""

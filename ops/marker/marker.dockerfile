@@ -6,10 +6,9 @@ WORKDIR /app
 RUN --mount=type=cache,id=seiia-pip-python312,target=/root/.cache/pip,sharing=locked \
     pip install \
     pymupdf4llm==0.0.17 \
-    fastapi==0.115.0 \
+    fastapi==0.141.1 \
     "uvicorn[standard]==0.30.6" \
-    httpx==0.27.0 \
-    python-multipart==0.0.9
+    python-multipart==0.0.32
 
 COPY ops/marker/server.py /app/server.py
 

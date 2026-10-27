@@ -6,10 +6,6 @@ from api_sei.services.mlt import (
     mlt_process_recommendations_service,
     wmlt_process_recommendations_service,
 )
-from api_sei.services.n_embeddings import (
-    adapter_protocolo_formatado_id_protocolo,
-    get_similarity_embedding as get_similarity_embedding_service,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +45,7 @@ def rerank_process_recommendations_service(
     top_n=5,
     mlt_config: MLTConfig | None = None,
     rerank=True,
-    vector_storage_system="pgvector",
+    vector_storage_system="solr",
     mlt_type="wmlt",
     id_field="id_protocolo",
 ):
@@ -99,10 +95,6 @@ def rerank_process_recommendations_service(
             if vector_storage_system == "solr":
                 response_knn = solr_embeddings_process_recommendations_service(
                     id_value, top_n, top_ids, filter_query_doc=False, id_field=id_field
-                )
-            elif vector_storage_system == "pgvector":
-                response_knn = adapter_protocolo_formatado_id_protocolo(
-                    get_similarity_embedding_service, id_value, top_ids, top_n
                 )
             else:
                 raise ValueError(vector_storage_system)

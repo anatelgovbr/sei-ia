@@ -158,8 +158,8 @@ class TestRerankProcessRecommendationsService:
                 "api_sei.services.rerank.wmlt_process_recommendations_service"
             ) as mock_wmlt,
             patch(
-                "api_sei.services.rerank.adapter_protocolo_formatado_id_protocolo"
-            ) as mock_adapter,
+                "api_sei.services.rerank.solr_embeddings_process_recommendations_service"
+            ) as mock_solr_emb,
         ):
             mock_wmlt.return_value = (
                 {
@@ -171,47 +171,13 @@ class TestRerankProcessRecommendationsService:
                 mock_service,
             )
             result = rerank_process_recommendations_service(
-                1, 10, None, True, rerank=True, vector_storage_system="pgvector"
+                1, 10, None, True, rerank=True
             )
 
-        mock_adapter.assert_not_called()
+        mock_solr_emb.assert_not_called()
         assert result == {
             "recommendation": [{"id": "1", "score": 0.9}, {"id": "2", "score": 0.5}]
         }
-
-    def test_rerank_pgvector_calls_adapter_and_reorders(self):
-        mock_service = MagicMock()
-        mock_service.mlt.return_value = {"recommendation": [{"id": "2", "score": 0.9}]}
-        with (
-            patch(
-                "api_sei.services.rerank.wmlt_process_recommendations_service"
-            ) as mock_wmlt,
-            patch(
-                "api_sei.services.rerank.adapter_protocolo_formatado_id_protocolo"
-            ) as mock_adapter,
-        ):
-            mock_wmlt.return_value = (
-                {
-                    "recommendation": [
-                        {"id": "1", "score": 0.9},
-                        {"id": "2", "score": 0.5},
-                    ]
-                },
-                mock_service,
-            )
-            mock_adapter.return_value = {"recommendation": [{"id": "2", "score": 0.95}]}
-            result = rerank_process_recommendations_service(
-                1,
-                10,
-                None,
-                True,
-                top_n=5,
-                rerank=True,
-                vector_storage_system="pgvector",
-            )
-
-        assert mock_adapter.call_args.args[1:] == (1, ["2"], 5)
-        assert result["recommendation"][0]["id"] == "2"
 
     def test_rerank_solr_calls_solr_embeddings_service(self):
         mock_service = MagicMock()
@@ -236,13 +202,14 @@ class TestRerankProcessRecommendationsService:
             mock_solr_emb.return_value = {
                 "recommendation": [{"id": "2", "score": 0.95}]
             }
-            rerank_process_recommendations_service(
-                1, 10, None, True, top_n=5, rerank=True, vector_storage_system="solr"
+            result = rerank_process_recommendations_service(
+                1, 10, None, True, top_n=5, rerank=True
             )
 
         mock_solr_emb.assert_called_once_with(
             1, 5, ["2"], filter_query_doc=False, id_field="id_protocolo"
         )
+        assert result["recommendation"][0]["id"] == "2"
 
     def test_unknown_vector_storage_system_raises_value_error(self):
         mock_service = MagicMock()

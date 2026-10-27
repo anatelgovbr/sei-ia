@@ -17,7 +17,7 @@ from tests.integration.mock_solr import mock_requests_get
 
 
 def find_weights(expression):
-    return list(map(float, re.findall(r"\^([^\s]+)\s", " {} ".format(expression))))
+    return list(map(float, re.findall(r"\^([^\s^]+)\s", " {} ".format(expression))))
 
 DOCS = [
     {
