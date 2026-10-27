@@ -13,7 +13,7 @@ O **sei-similaridade** é uma API RESTful que encontra processos e documentos si
 
 ## Pré-requisitos
 
-- Python 3.10+
+- Python 3.12
 - Apache Solr 9.0+
 - PostgreSQL 15+
 

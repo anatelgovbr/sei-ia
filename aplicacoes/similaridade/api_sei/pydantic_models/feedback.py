@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, Field
 
 
 def current_timestamp() -> str:
     """Return an UTC timestamp formatted like the legacy feedback API."""
-    return datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M:%S")
 
 
 class FeedbackItem(BaseModel):

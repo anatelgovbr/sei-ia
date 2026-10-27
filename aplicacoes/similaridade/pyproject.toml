@@ -9,7 +9,7 @@ description = "API de Recomendação de Processos SEI"
 authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.12,<3.13"
 
 dependencies = [
     "python-multipart",
@@ -88,7 +88,7 @@ omit = ["./tests/*", "./.conda/*"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py312"
 exclude = [
     "tests/*",
 ]

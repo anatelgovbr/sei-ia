@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/github/v/release/Anatel/sei-similaridade)](https://img.shields.io/github/v/release/Anatel/sei-similaridade)
 [![Build status](https://img.shields.io/github/actions/workflow/status/Anatel/sei-similaridade/main.yml?branch=main)](https://github.com/Anatel/sei-similaridade/actions/workflows/main.yml?query=branch%3Amain)
-[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 
 API de Recomendação de Processos e Documentos do Sistema Eletrônico de Informações (SEI).
 
@@ -87,7 +87,7 @@ flowchart LR
 | Componente | Tecnologia |
 |------------|------------|
 | **Framework Web** | FastAPI + Uvicorn + Gunicorn |
-| **Linguagem** | Python 3.10+ |
+| **Linguagem** | Python 3.12 |
 | **Busca Textual** | Apache Solr 9.0+ |
 | **Banco de Dados** | PostgreSQL 15+ |
 | **ORM** | SQLAlchemy 2.0+ |

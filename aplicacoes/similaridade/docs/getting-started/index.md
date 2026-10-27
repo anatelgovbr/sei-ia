@@ -10,7 +10,7 @@ Antes de começar, você precisa ter:
 
 | Componente | Versão | Descrição |
 |------------|--------|-----------|
-| Python | 3.10+ | Linguagem de programação |
+| Python | 3.12 | Linguagem de programação |
 | Apache Solr | 9.0+ | Motor de busca textual |
 | PostgreSQL | 15+ | Banco de dados |
 

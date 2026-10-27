@@ -63,9 +63,8 @@ async def async_solr_requests(
             tasks = [client.get(q) for q in queries]
             return await asyncio.gather(*tasks, return_exceptions=True)
 
-    # asyncio.timeout() só existe no Python 3.11+; o runtime aqui é 3.10,
-    # então usamos asyncio.wait_for(), que tem semântica equivalente.
-    return await asyncio.wait_for(_do_requests(), timeout=SEI_API_DB_TIMEOUT)
+    async with asyncio.timeout(SEI_API_DB_TIMEOUT):
+        return await _do_requests()
 
 
 class SolrRequests:
@@ -464,7 +463,7 @@ class SolrRequests:
             response_list = loop.run_until_complete(
                 async_solr_requests(queries, auth=auth)
             )
-        except asyncio.TimeoutError as exc:
+        except TimeoutError as exc:
             logger.error("Tempo limite excedido ao consultar o Solr")
             raise SolrException(
                 status_code=503,
