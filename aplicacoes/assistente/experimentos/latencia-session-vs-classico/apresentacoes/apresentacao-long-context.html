@@ -1,0 +1,1300 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Long Context V2 — apresentação auditável</title>
+    <style>
+      :root {
+        --ink: #14213d;
+        --muted: #62708a;
+        --surface: #ffffff;
+        --canvas: #f4f7fb;
+        --line: #dce3ef;
+        --standard: #1c64f2;
+        --mini: #079669;
+        --classic: #e07622;
+        --warning: #9a6113;
+        --warning-bg: #fff5df;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--canvas);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+      .hero {
+        padding: 64px 0 46px;
+        color: white;
+        background: radial-gradient(circle at 86% 10%, #315faa 0, transparent 31%), linear-gradient(120deg, #0c2340, #162f58);
+      }
+      .eyebrow { margin: 0 0 10px; color: #a8c7ff; font-weight: 700; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; }
+      h1 { max-width: 800px; margin: 0; font-size: clamp(2rem, 5vw, 3.65rem); line-height: 1.08; letter-spacing: -.04em; }
+      .lead { max-width: 760px; margin: 20px 0 0; color: #d7e4fa; font-size: clamp(1rem, 2vw, 1.2rem); }
+      .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+      .pill { border: 1px solid #6986b5; border-radius: 100px; padding: 5px 10px; font-size: .85rem; color: #e7efff; }
+
+      main { padding: 34px 0 60px; }
+      section { margin: 36px 0; scroll-margin-top: 62px; }
+      h2 { margin: 0 0 14px; font-size: clamp(1.35rem, 3vw, 1.8rem); letter-spacing: -.025em; }
+      h3 { margin: 0 0 6px; font-size: 1.05rem; }
+      h4 { margin: 0 0 10px; font-size: 1rem; }
+      p { margin: 0; }
+      a { color: #155ec4; }
+      .subtle { color: var(--muted); }
+      .mono { overflow-wrap: anywhere; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: .84em; }
+      .grid { display: grid; gap: 16px; }
+      .grid.four { grid-template-columns: repeat(4, 1fr); }
+      .grid.three { grid-template-columns: repeat(3, 1fr); }
+      .card, .metric-card, .method-card { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: 0 6px 20px rgba(19, 37, 66, .04); }
+      .metric-card { min-width: 0; min-height: 142px; padding: 20px; }
+      .metric-label { color: var(--muted); font-size: .78rem; font-weight: 800; letter-spacing: .04em; }
+      .metric-value { margin-top: 12px; font-size: 2rem; font-weight: 800; letter-spacing: -.05em; }
+      .metric-footnote { margin-top: 6px; color: var(--muted); font-size: .85rem; }
+
+      .method-card { min-width: 0; padding: 22px; border-top: 5px solid var(--accent); }
+      .method-card.standard { --accent: var(--standard); }
+      .method-card.mini { --accent: var(--mini); }
+      .method-card.classic { --accent: var(--classic); }
+      .tag { display: inline-block; margin-bottom: 12px; padding: 4px 9px; border-radius: 99px; color: var(--accent); background: color-mix(in srgb, var(--accent) 11%, white); font-size: .8rem; font-weight: 800; }
+      .method-number { margin: 17px 0 3px; color: var(--accent); font-size: 2.25rem; font-weight: 850; letter-spacing: -.05em; }
+      .method-note { color: var(--muted); font-size: .9rem; }
+
+      .callout { display: flex; gap: 12px; align-items: flex-start; padding: 17px 19px; border: 1px solid #f2d39a; border-radius: 13px; color: #64420f; background: var(--warning-bg); }
+      .callout strong { display: block; margin-bottom: 2px; }
+      .flow-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+      .flow-grid .method-card { min-height: 168px; }
+
+      .chart { padding: 22px; }
+      .chart-row { display: grid; grid-template-columns: 132px 1fr 80px; gap: 12px; align-items: center; margin: 16px 0; }
+      .chart-label { font-size: .92rem; font-weight: 700; }
+      .rail { overflow: hidden; height: 14px; border-radius: 30px; background: #e8edf5; }
+      .rail.stacked { display: flex; }
+      .bar { height: 100%; min-width: 0; flex: 0 0 auto; border-radius: inherit; }
+      .bar.preparation { background: var(--standard); }
+      .bar.post-preparation { background: var(--mini); }
+      .chart-value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 800; }
+      .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 4px; color: var(--muted); font-size: .85rem; }
+      .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 50%; }
+
+      .table-wrap { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+      table { width: 100%; min-width: 790px; border-collapse: collapse; }
+      th, td { padding: 13px 15px; border-bottom: 1px solid var(--line); text-align: left; font-size: .9rem; }
+      th { color: #44516b; background: #f8faff; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+      tr:last-child td { border-bottom: 0; }
+      td:not(:first-child), th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+      .ok { color: #087452; font-weight: 850; }
+
+      .nav { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.95); backdrop-filter: blur(9px); }
+      .nav .shell { display: flex; gap: 18px; overflow-x: auto; padding-block: 11px; scrollbar-width: thin; }
+      .nav a { flex: 0 0 auto; color: #34415b; font-size: .86rem; font-weight: 750; text-decoration: none; }
+
+      .case-index { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+      .case-index a { min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; color: var(--ink); background: var(--surface); text-decoration: none; }
+      .case-index strong, .case-index small { display: block; }
+      .case-index small { margin-top: 3px; color: var(--muted); overflow-wrap: anywhere; }
+      .audit-list { display: grid; gap: 14px; }
+      .audit-case { min-width: 0; scroll-margin-top: 64px; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: 0 6px 20px rgba(19, 37, 66, .04); }
+      .audit-case > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 18px; align-items: center; padding: 18px 20px; cursor: pointer; list-style-position: inside; }
+      .audit-case > summary:hover, .audit-case > summary:focus-visible { background: #f8faff; }
+      .audit-case[open] > summary { border-bottom: 1px solid var(--line); background: #f8faff; }
+      .case-identity { min-width: 0; }
+      .case-identity strong, .case-identity small { display: block; }
+      .case-identity small { margin-top: 3px; color: var(--muted); overflow-wrap: anywhere; }
+      .case-overall { color: var(--standard); font-size: 1.3rem; font-weight: 850; font-variant-numeric: tabular-nums; text-align: right; }
+      .case-overall small { display: block; color: var(--muted); font-size: .68rem; font-weight: 750; text-transform: uppercase; }
+      .status-badge, .judge-decision { padding: 5px 9px; border-radius: 999px; color: #087452; background: #eaf8f2; font-size: .78rem; font-weight: 850; white-space: nowrap; }
+      .audit-body { min-width: 0; padding: 20px; }
+      .case-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+      .case-meta > span, .case-meta > a { padding: 5px 9px; border: 1px solid var(--line); border-radius: 999px; color: #46536b; background: #fbfcff; font-size: .78rem; text-decoration: none; }
+      .case-meta .trace-link { border-color: #a9d7ca; color: #08745f; background: #e8f7f2; font-weight: 800; }
+      .audit-section { margin: 18px 0 0; padding: 18px; border: 1px solid var(--line); border-radius: 13px; background: #fbfcff; scroll-margin-top: 64px; }
+      .copy-block, .gold-block, .response-preview { overflow-wrap: anywhere; }
+      .copy-block { font-size: .94rem; }
+      .gold-block { padding: 13px 15px; border-left: 4px solid var(--standard); color: #33415d; background: #eef4ff; }
+      .response-preview { padding: 14px 16px; border-left: 4px solid var(--mini); background: #eef9f5; }
+      .criteria-list { margin: 14px 0 0; padding-left: 23px; }
+      .criteria-list li { margin: 6px 0; }
+      .criterion-copy { display: inline; }
+      .criterion-copy p { display: inline; }
+      .criterion-pass { color: #087452; font-weight: 900; }
+      .criterion-fail { color: #a44922; font-weight: 900; }
+      .content-expander, .source-expander { margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; background: white; }
+      .content-expander > summary, .source-expander > summary { padding: 11px 13px; cursor: pointer; color: #33415d; font-weight: 800; }
+      .content-expander[open] > summary, .source-expander[open] > summary { border-bottom: 1px solid var(--line); background: #f8faff; }
+      .content-expander > .response-body { max-height: 620px; overflow: auto; padding: 16px; color: #273650; background: white; font-size: .88rem; line-height: 1.52; overflow-wrap: anywhere; }
+      .hash-line { margin-top: 9px; color: var(--muted); font-size: .77rem; overflow-wrap: anywhere; }
+      .markdown-body p { margin: 0 0 12px; }
+      .markdown-body p:last-child { margin-bottom: 0; }
+      .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 { margin: 18px 0 8px; line-height: 1.25; }
+      .markdown-body h1 { font-size: 1.25rem; }
+      .markdown-body h2 { font-size: 1.15rem; }
+      .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 { font-size: 1rem; }
+      .markdown-body ul, .markdown-body ol { margin: 8px 0 14px; padding-left: 22px; }
+      .markdown-body li { margin: 4px 0; }
+      .markdown-body blockquote { margin: 10px 0; padding: 8px 12px; border-left: 3px solid var(--line); color: var(--muted); background: white; }
+      .markdown-body pre { overflow: auto; padding: 10px; border-radius: 8px; background: #172033; color: #edf3ff; white-space: pre; }
+      .markdown-body code { padding: 1px 4px; border-radius: 4px; background: #edf1f7; font-family: "SFMono-Regular", Consolas, monospace; }
+      .markdown-body pre code { padding: 0; background: transparent; color: inherit; }
+      .markdown-body a { color: #155ec4; overflow-wrap: anywhere; }
+      .markdown-table-wrap { max-width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+      .markdown-table { min-width: 560px; background: white; }
+      .markdown-table th, .markdown-table td { padding: 8px 9px; font-size: .78rem; text-align: left; }
+      .source-tooltip { position: relative; display: inline-flex; align-items: center; justify-content: center; margin: 0 .08em; padding: .08em .42em; border: 1px solid #b8c8e8; border-radius: 999px; color: #155ec4; background: #eef4ff; font-size: .88em; font-weight: 850; line-height: 1.35; vertical-align: .08em; cursor: help; }
+      .source-tooltip:hover, .source-tooltip:focus-visible { border-color: #6e91d2; color: #0d469b; background: #dfeaff; outline: none; }
+      .AssistenteSEIIAfonteWebSearch { border-color: #a9d7ca; color: #08745f; background: #e8f7f2; text-decoration: none; }
+      .AssistenteSEIIAfonteWebSearch:hover, .AssistenteSEIIAfonteWebSearch:focus-visible { border-color: #58a891; color: #075646; background: #d6f0e8; }
+      .source-tooltip::before, .source-tooltip::after { position: absolute; z-index: 30; left: 50%; opacity: 0; pointer-events: none; transition: opacity .14s ease, transform .14s ease; }
+      .source-tooltip::before { content: ""; bottom: calc(100% + 3px); border: 5px solid transparent; border-top-color: #172033; transform: translate(-50%, 3px); }
+      .source-tooltip::after { content: attr(data-tooltip); bottom: calc(100% + 13px); width: max-content; max-width: min(280px, 70vw); padding: 7px 10px; border-radius: 7px; color: #f5f8ff; background: #172033; box-shadow: 0 8px 22px rgba(23, 32, 51, .24); font-size: .75rem; font-weight: 650; line-height: 1.35; text-align: left; white-space: normal; transform: translate(-50%, 5px); }
+      .source-tooltip:hover::before, .source-tooltip:hover::after, .source-tooltip:focus-visible::before, .source-tooltip:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+      .section-title-row { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+      .judge-rationale { margin: 14px 0; padding: 14px 16px; border-left: 4px solid var(--classic); color: #493116; background: #fff8f0; }
+      .judge-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+      .judge-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: white; }
+      .judge-card > strong { display: block; margin: 7px 0; color: var(--standard); font-size: 1.45rem; }
+      .judge-card p { color: var(--muted); font-size: .8rem; }
+      .claims-expander { margin-top: 14px; }
+      .compact-table { border: 0; border-radius: 0; }
+      .compact-table table { min-width: 920px; }
+      .compact-table th, .compact-table td { padding: 9px 10px; font-size: .76rem; vertical-align: top; }
+      .compact-table td.claim-text { min-width: 380px; text-align: left; white-space: normal; }
+      .occurrence-section ul { margin: 8px 0 0; }
+      .source-expander { margin-top: 18px; }
+      .source-expander > :not(summary) { margin-inline: 15px; }
+      .source-list { padding-left: 20px; }
+      .source-list li { margin: 8px 0; overflow-wrap: anywhere; }
+
+      .decision { padding: 28px; border-radius: 18px; color: white; background: linear-gradient(120deg, #0a7c61, #136f9f); }
+      .decision h2 { margin-bottom: 10px; }
+      .decision-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 20px; }
+      .decision-grid div { padding-left: 14px; border-left: 2px solid #7ee6c4; }
+      .decision-grid strong { display: block; margin-bottom: 4px; }
+      .decision-grid span { color: #d3faec; font-size: .9rem; }
+      footer { padding: 20px 0 48px; color: var(--muted); font-size: .83rem; }
+
+      @media (max-width: 900px) {
+        .flow-grid, .judge-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 760px) {
+        .hero { padding: 44px 0 36px; }
+        .grid.four, .grid.three, .decision-grid, .flow-grid, .case-index, .judge-grid { grid-template-columns: 1fr; }
+        .nav .shell { flex-wrap: wrap; gap: 7px 14px; overflow-x: visible; }
+        .nav a { font-size: .78rem; }
+        section, .audit-case, .audit-section { scroll-margin-top: 120px; }
+        .chart { padding: 18px; }
+        .chart-row { grid-template-columns: 92px 1fr 61px; gap: 8px; }
+        .chart-label, .chart-value { font-size: .78rem; }
+        .audit-case > summary { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+        .audit-case > summary .status-badge { grid-column: 1 / -1; justify-self: start; }
+        .audit-body { padding: 14px; }
+        .audit-section { padding: 14px; }
+        .section-title-row { display: block; }
+        .judge-decision { display: inline-block; margin-top: 9px; }
+        .decision { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="shell">
+        <p class="eyebrow">Benchmark Long Context V2 · auditoria item a item</p>
+        <h1>Milhões de tokens, nove respostas rastreáveis</h1>
+        <p class="lead">Bateria controlada do <strong>session_stream</strong> com perguntas, respostas produzidas, critérios esperados, avaliação do judge e trace Langfuse reconciliados para cada item.</p>
+        <div class="meta">
+          <span class="pill">3 corpora: 960k · 5,12M · 6,26M</span>
+          <span class="pill">9 itens oficiais · N=1</span>
+          <span class="pill">8 POSTs fresh + 1 resultado fresh reutilizado</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="Navegação da apresentação">
+      <div class="shell">
+        <a href="#resumo">Resumo</a><a href="#desenho">Desenho</a><a href="#arquitetura">Arquitetura</a><a href="#resultados">Agregado</a><a href="#tempo">Tempo</a><a href="#casos">Caso a caso</a><a href="#achados">Achados</a><a href="#recomendacoes">Recomendações</a><a href="#fontes">Fontes</a>
+      </div>
+    </nav>
+
+    <main class="shell">
+      <section id="resumo" aria-labelledby="resumo-title">
+        <h2 id="resumo-title">Leitura em 20 segundos</h2>
+        <div class="grid four">
+          <article class="metric-card"><div class="metric-label">COBERTURA AUDITÁVEL</div><div class="metric-value">9/9</div><div class="metric-footnote">pergunta + resposta + judge + trace</div></article>
+          <article class="metric-card"><div class="metric-label">GATES FINAIS</div><div class="metric-value">9/9</div><div class="metric-footnote">qualidade, comparabilidade, observabilidade e integridade</div></article>
+          <article class="metric-card"><div class="metric-label">OVERALL MÉDIO</div><div class="metric-value">0,9511</div><div class="metric-footnote">completude média 1,0000</div></article>
+          <article class="metric-card"><div class="metric-label">ALUCINAÇÕES</div><div class="metric-value">0</div><div class="metric-footnote">3/3 negativas corretas</div></article>
+        </div>
+      </section>
+
+      <section id="desenho">
+        <h2>Desenho do experimento</h2>
+        <div class="grid three">
+          <article class="method-card standard"><span class="tag">960 MIL TOKENS</span><h3>59 documentos</h3><p class="subtle">Uma pergunta factual, uma síntese e uma negativa por evidência insuficiente.</p></article>
+          <article class="method-card mini"><span class="tag">5,12 MILHÕES</span><h3>331 documentos</h3><p class="subtle">Mesma distribuição de tipos; maior fan-out documental da bateria.</p></article>
+          <article class="method-card classic"><span class="tag">6,26 MILHÕES</span><h3>61 documentos</h3><p class="subtle">Maior corpus por tokens, com volume materializado semelhante ao de 5,12M.</p></article>
+        </div>
+        <div class="grid four" style="margin-top:16px">
+          <article class="metric-card"><div class="metric-label">ENDPOINT</div><div class="metric-value">SSE</div><div class="metric-footnote">/llm_lang/session_stream</div></article>
+          <article class="metric-card"><div class="metric-label">ESTADO</div><div class="metric-value">fresh</div><div class="metric-footnote">no_cache + reset</div></article>
+          <article class="metric-card"><div class="metric-label">CONCORRÊNCIA</div><div class="metric-value">1</div><div class="metric-footnote">execução sequencial</div></article>
+          <article class="metric-card"><div class="metric-label">REPLAY</div><div class="metric-value">zero</div><div class="metric-footnote">sem retry de inferência</div></article>
+        </div>
+      </section>
+
+      <section id="arquitetura">
+        <h2>Do processo à resposta avaliada</h2>
+        <div class="flow-grid">
+          <article class="method-card standard"><b>1 · Identidade</b><p class="subtle">Manifesto, hashes, modelos, rubrica e evidence index validados.</p></article>
+          <article class="method-card mini"><b>2 · Fresh</b><p class="subtle">Sessão/checkpointer zerados e conteúdo rebuscado do SEI.</p></article>
+          <article class="method-card classic"><b>3 · Materialização</b><p class="subtle">Filesystem por processo, com identidade textual ou binária + pipeline OCR.</p></article>
+          <article class="method-card standard"><b>4 · Disclosure</b><p class="subtle">O agente lista, busca e abre seletivamente os arquivos necessários.</p></article>
+          <article class="method-card mini"><b>5 · Judge</b><p class="subtle">Evidence fresh aberto, scores, decisão, trace e usage passam por readback.</p></article>
+        </div>
+      </section>
+
+      <section id="resultados">
+        <h2>Visão agregada</h2>
+        <div class="grid four">
+          <article class="metric-card"><div class="metric-label">GROUNDEDNESS</div><div class="metric-value">0,8413</div><div class="metric-footnote">média diagnóstica</div></article>
+          <article class="metric-card"><div class="metric-label">COMPLETUDE</div><div class="metric-value">1,0000</div><div class="metric-footnote">todos os critérios obrigatórios</div></article>
+          <article class="metric-card"><div class="metric-label">QUALIDADE DE CITAÇÃO</div><div class="metric-value">0,9678</div><div class="metric-footnote">média dos nove itens</div></article>
+          <article class="metric-card"><div class="metric-label">CUSTO OBSERVADO</div><div class="metric-value">US$ 5,45</div><div class="metric-footnote">agente + judge; OCR indisponível</div></article>
+        </div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table>
+            <thead><tr><th>Faixa</th><th>Docs</th><th>Total médio s</th><th>Prep. média s</th><th>Pós-prep. média s</th><th>Groundedness</th><th>Overall</th><th>Tools</th><th>USD</th></tr></thead>
+            <tbody>
+              <tr><td>960k</td><td>59</td><td>159,36</td><td>61,14</td><td>98,22</td><td>0,8864</td><td>0,9600</td><td>120</td><td>1,6121</td></tr>
+              <tr><td>5,12M</td><td>331</td><td>867,49</td><td>739,97</td><td>127,52</td><td>0,8125</td><td>0,9533</td><td>129</td><td>2,9841</td></tr>
+              <tr><td>6,26M</td><td>61</td><td>107,78</td><td>52,25</td><td>55,52</td><td>0,8251</td><td>0,9400</td><td>43</td><td>0,8545</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tempo">
+        <h2>Tempo até o terminal</h2>
+        <p class="subtle">Cada barra representa o total médio. Preparação e pós-preparação são parcelas do mesmo total, sem dupla contagem.</p>
+        <div class="card chart" style="margin-top:14px">
+          <div class="legend"><span><i style="background:var(--standard)"></i>Preparação incluída</span><span><i style="background:var(--mini)"></i>Pós-preparação</span><span>Escala máxima: 867,49 s</span></div>
+          <div class="chart-row"><div class="chart-label">960k</div><div class="rail stacked" aria-label="960k: 61,14 segundos de preparação e 98,22 pós-preparação"><div class="bar preparation" style="width:7.05%"></div><div class="bar post-preparation" style="width:11.32%"></div></div><div class="chart-value">159,36 s</div></div>
+          <div class="chart-row"><div class="chart-label">5,12M</div><div class="rail stacked" aria-label="5,12M: 739,97 segundos de preparação e 127,52 pós-preparação"><div class="bar preparation" style="width:85.30%"></div><div class="bar post-preparation" style="width:14.70%"></div></div><div class="chart-value">867,49 s</div></div>
+          <div class="chart-row"><div class="chart-label">6,26M</div><div class="rail stacked" aria-label="6,26M: 52,25 segundos de preparação e 55,52 pós-preparação"><div class="bar preparation" style="width:6.02%"></div><div class="bar post-preparation" style="width:6.40%"></div></div><div class="chart-value">107,78 s</div></div>
+        </div>
+      </section>
+
+      <section id="casos">
+        <h2>Caso a caso: pergunta, resposta, judge e trace</h2>
+        <p class="subtle">Os nove itens abaixo foram reconciliados por ID. Abra cada caso para ler pergunta integral, gold answer, resposta efetiva, scores, justificativas, claims e proveniência.</p>
+        <div class="case-index" aria-label="Índice dos nove casos">
+          <a href="#case-0960k-q1-factual"><strong>960k · factual</strong><small>case-0960k-q1-factual</small></a>
+          <a href="#case-0960k-q2-synthesis"><strong>960k · síntese</strong><small>case-0960k-q2-synthesis</small></a>
+          <a href="#case-0960k-q3-insufficient-evidence"><strong>960k · insuficiente</strong><small>case-0960k-q3-insufficient-evidence</small></a>
+          <a href="#case-5120k-q1-factual"><strong>5,12M · factual</strong><small>case-5120k-q1-factual</small></a>
+          <a href="#case-5120k-q2-synthesis"><strong>5,12M · síntese</strong><small>case-5120k-q2-synthesis</small></a>
+          <a href="#case-5120k-q3-insufficient-evidence"><strong>5,12M · insuficiente</strong><small>case-5120k-q3-insufficient-evidence</small></a>
+          <a href="#case-6260k-q1-factual"><strong>6,26M · factual</strong><small>case-6260k-q1-factual</small></a>
+          <a href="#case-6260k-q2-synthesis"><strong>6,26M · síntese</strong><small>case-6260k-q2-synthesis</small></a>
+          <a href="#case-6260k-q3-insufficient-evidence"><strong>6,26M · insuficiente</strong><small>case-6260k-q3-insufficient-evidence</small></a>
+        </div>
+        <div class="audit-list">
+          <!-- LONG CONTEXT CASES GENERATED START -->
+<details class="audit-case" id="case-0960k-q1-factual">
+  <summary>
+    <span class="case-identity"><strong>960k · factual</strong><small class="mono">case-0960k-q1-factual</small></span>
+    <span class="case-overall"><small>overall</small>0,90</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>59 documentos</span>
+      <span>960.682 tokens de corpus</span>
+      <span>125,23 s até terminal</span>
+      <span>29 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/6b861e49b3319821c1fcfbff83174d22" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q1-factual-question">
+      <h4 id="case-0960k-q1-factual-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Estou atualizando a nota de acompanhamento do PAC e preciso deixar claro para a chefia o que, de fato, está sendo monitorado antes de registrar a próxima providência junto à prestadora. Examine o conjunto do processo e redija uma síntese curta que identifique a obrigação regulatória acompanhada, delimite seu alcance territorial conforme o Termo de Autocomposição e informe o termo final previsto, sem confundir o objeto da obrigação com uma exigência nova do ofício.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q1-factual-expected">
+      <h4 id="case-0960k-q1-factual-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Fato documental: o acompanhamento trata do cumprimento da obrigação de manutenção dos serviços de tridígitos nas localidades indicadas na Tabela 1 do Termo de Autocomposição, até 31 de dezembro de 2028. Leitura operacional: o ofício monitora uma obrigação já estabelecida e registra seu prazo final; não cria, por si só, uma obrigação regulatória diferente.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar como objeto a manutenção dos serviços de tridígitos.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Indicar que o alcance se refere às localidades da Tabela 1 do Termo de Autocomposição, ou paráfrase inequívoca desse recorte.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar o termo final de 31 de dezembro de 2028.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Distinguir o monitoramento da obrigação preexistente de uma nova obrigação criada pelo ofício.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q1-factual-answer">
+      <h4 id="case-0960k-q1-factual-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>ALVOS OBRIGATÓRIOS: - Objeto do PAC: /proc<em>14564832/14564839.txt e /proc</em>14564832/14564861.txt - Alcance territorial no TA/MAF: /proc<em>14564832/14688918.txt e /proc</em>14564832/16768876.txt - Exigência instrutória posterior que não deve ser confundida com o objeto da obrigação: /proc<em>14564832/15398592.txt e /proc</em>14564832/16570775.txt EIXOS OBRIGATÓRIOS: 1.…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 2.725 caracteres</summary>
+        <div class="response-body markdown-body"><p>ALVOS OBRIGATÓRIOS:</p>
+<ul><li>Objeto do PAC: /proc<em>14564832/14564839.txt e /proc</em>14564832/14564861.txt</li><li>Alcance territorial no TA/MAF: /proc<em>14564832/14688918.txt e /proc</em>14564832/16768876.txt</li><li>Exigência instrutória posterior que não deve ser confundida com o objeto da obrigação: /proc<em>14564832/15398592.txt e /proc</em>14564832/16570775.txt</li></ul>
+<p>EIXOS OBRIGATÓRIOS:</p>
+<ol><li>Qual obrigação regulatória está sendo acompanhada.</li><li>Qual o alcance territorial dessa obrigação segundo o Termo de Autocomposição/MAF.</li><li>Qual o termo final previsto.</li><li>Como distinguir a obrigação monitorada de pedidos supervenientes de informação/atualização feitos por ofício.Prossegui com os documentos centrais; agora vou confirmar no manual/informe os trechos de alcance territorial e separar isso dos pedidos meramente informacionais dos ofícios.O PAC acompanha a obrigação regulatória assumida pela Oi no Termo de Autocomposição de manter os serviços de tridígitos, e não uma obrigação nova criada pelos ofícios instrutórios <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968275" aria-label="[1]: Documento SEI nº 12968275" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[2]: Documento SEI nº 12968296" role="note" tabindex="0">[2]</span>. Quanto ao alcance, o acompanhamento abrange as localidades relacionadas no Termo, tratadas no MAF como 10.650 localidades do Anexo 1, com distinção entre instituições situadas em localidades previstas na Tabela 1 do Anexo 1 e instituições não situadas nessas localidades, mas com contrato em vigor na data de efetivação do Termo <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13081913" aria-label="[3]: Documento SEI nº 13081913" role="note" tabindex="0">[3]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14981938" aria-label="[4]: Documento SEI nº 14981938" role="note" tabindex="0">[4]</span>. O termo final previsto para esse compromisso é 31.12.2028 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968275" aria-label="[1]: Documento SEI nº 12968275" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13081913" aria-label="[3]: Documento SEI nº 13081913" role="note" tabindex="0">[3]</span>. Já os Ofícios posteriores, como o nº 654/2025 e o nº 1797/2025, veiculam pedidos de complementação, atualização e ajuste do Relatório SUP — inclusive com ampliação informacional para todas as UFs —, servindo à instrução e verificação do cumprimento, sem alterar o objeto material da obrigação monitorada <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13729107" aria-label="[5]: Documento SEI nº 13729107" role="note" tabindex="0">[5]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14799698" aria-label="[6]: Documento SEI nº 14799698" role="note" tabindex="0">[6]</span>.</li></ol></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">b617e75a611c57794d4b2c010b5bab4f1deeb036c38c0e1a9e1c421843ed75d8</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q1-factual-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-0960k-q1-factual-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta: N/D · tentativas: accepted</p></div>
+        <span class="judge-decision">0,90 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta atende ao alvo e cumpre os quatro elementos obrigatórios. Há boa sustentação para objeto, prazo e distinção entre monitoramento e ofícios. O único ponto mais fraco é a formulação do alcance territorial, que adiciona detalhamento não plenamente ancorado no pacote aberto.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>4/4 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>0,7500</strong>
+          <p>3 de 4 claims sustentadas; 1 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>1,00</strong>
+          <p>4/4 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 4 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>O PAC acompanha a obrigação regulatória assumida pela Oi no Termo de Autocomposição de manter os serviços de tridígitos, e não uma obrigação nova criada pelos ofícios instrutórios.</p></td><td>sustentada</td><td>sim</td><td>2, 3, 15, 16, 17</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O acompanhamento abrange as localidades relacionadas no Termo, tratadas no MAF como 10.650 localidades do Anexo 1, com distinção entre instituições situadas em localidades previstas na Tabela 1 do Anexo 1 e instituições não situadas nessas localidades, mas com contrato em vigor na data de efetivação do Termo.</p></td><td>não sustentada</td><td>sim</td><td>6, 7, 8</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O termo final previsto para esse compromisso é 31.12.2028.</p></td><td>sustentada</td><td>sim</td><td>1, 2, 3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Os Ofícios posteriores, como o nº 654/2025 e o nº 1797/2025, veiculam pedidos de complementação, atualização e ajuste do Relatório SUP — inclusive com ampliação informacional para todas as UFs —, servindo à instrução e verificação do cumprimento, sem alterar o objeto material da obrigação monitorada.</p></td><td>sustentada</td><td>sim</td><td>9, 10, 12, 13, 14, 11</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-0960k-q1-factual-occurrences">
+      <h4 id="case-0960k-q1-factual-occurrences">Ocorrências e falhas relevantes</h4>
+      <ul><li class="markdown-body"><p>Resultado factual fresh válido reutilizado; nenhuma nova inferência foi executada para compor a bateria oficial.</p></li></ul>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-0960k-q1-factual/question.txt</span><br><span class="mono">SHA-256 4419405b009f8b4697a10dfd4cb5878e763ffad8a5f36ba9746ae594e3bbf988</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-0960k-q1-factual/gold.txt</span><br><span class="mono">SHA-256 39a09c56bc099551be232e02f14ae68d3a3c2d83a27ab103df8f9dde7ce83fbb</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-0960k-q1-factual/rubric.json</span><br><span class="mono">SHA-256 3093dc88dbbdae303e963d4e9db280c6c2003b1ee69da29e387a2693a05569a7</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">second-canary-output/runs/long-context-v2-canary-factual-ocr-remediation-20260724T012257Z/items/case-0960k-q1-factual/result-protected.json</span><br><span class="mono">SHA-256 d6477a48fd6abf10fb9b2e197cbcb54a9ba5c974897777bbaaedd04c9d29a264</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">d1a17e1f-97bd-4221-a7e1-590fb31c14db</span><br><strong>Trace:</strong> <span class="mono">6b861e49b3319821c1fcfbff83174d22</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-0960k-q2-synthesis">
+  <summary>
+    <span class="case-identity"><strong>960k · síntese</strong><small class="mono">case-0960k-q2-synthesis</small></span>
+    <span class="case-overall"><small>overall</small>1,00</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>59 documentos</span>
+      <span>960.682 tokens de corpus</span>
+      <span>172,53 s até terminal</span>
+      <span>40 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/6688f70f14fb97b7bcab22f3fb03f731" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q2-synthesis-question">
+      <h4 id="case-0960k-q2-synthesis-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Estou preparando uma breve nota para decidir se duas cobranças dirigidas à prestadora podem ser tratadas como a mesma pendência no controle do PAC. Ao mencionar as duas cobranças, considere especificamente Ofício nº 1110/2024/COGE/SCO-ANATEL e Ofício nº 980/2026/COGE/SCO; as demais comunicações do processo não integram esta comparação. Reconstitua, em uma única comparação, o prazo e o conjunto de entregas ou documentos pedido em cada comunicação, indique o marco de contagem dos prazos e explique se a segunda cobrança apenas repete a primeira ou se exige uma manifestação de natureza distinta.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q2-synthesis-expected">
+      <h4 id="case-0960k-q2-synthesis-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Fatos documentais: a primeira comunicação fixou 10 dias, contados do recebimento, para a prestadora apresentar o status dos terminais associados a tridígitos em planilha e cópias dos contratos celebrados com terceiros. A comunicação posterior fixou 15 dias úteis, também contados do recebimento, para manifestação com esclarecimentos e elementos comprobatórios. Interpretação operacional: não são cobranças equivalentes; têm prazos e entregas distintos, de modo que a segunda não deve ser lançada como simples repetição da primeira.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Atribuir à primeira comunicação prazo de 10 dias contado do recebimento.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Atribuir à primeira comunicação o pedido de status dos terminais associados a tridígitos em planilha e de cópias dos contratos celebrados com terceiros.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Atribuir à comunicação posterior prazo de 15 dias úteis contado do recebimento.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Atribuir à comunicação posterior o pedido de manifestação com esclarecimentos e elementos comprobatórios.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Concluir que as cobranças têm objetos e prazos distintos e, portanto, não devem ser tratadas como simples repetição.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q2-synthesis-answer">
+      <h4 id="case-0960k-q2-synthesis-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>Mapeados os alvos obrigatórios; agora vou abrir os dois ofícios e os comprovantes de intimação para fixar o marco de contagem dos prazos.Já confirmei os paths exatos dos dois ofícios e das certidões de intimação; vou delegar a leitura pontual dos documentos-chave para checar cada eixo obrigatório antes da síntese.Em comparação direta, as duas comunicações…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 4.881 caracteres</summary>
+        <div class="response-body markdown-body"><p>Mapeados os alvos obrigatórios; agora vou abrir os dois ofícios e os comprovantes de intimação para fixar o marco de contagem dos prazos.Já confirmei os paths exatos dos dois ofícios e das certidões de intimação; vou delegar a leitura pontual dos documentos-chave para checar cada eixo obrigatório antes da síntese.Em comparação direta, as duas comunicações não têm o mesmo objeto.</p>
+<div class="markdown-table-wrap"><table class="markdown-table"><thead><tr><th>Comunicação</th><th>Prazo</th><th>Marco de contagem</th><th>Entregas / documentos exigidos</th><th>Natureza da manifestação</th></tr></thead><tbody><tr><td><strong>Ofício nº 1110/2024/COGE/SCO-ANATEL</strong></td><td><strong>10 dias</strong></td><td>O próprio ofício fixa a contagem “do recebimento do presente Ofício” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span>. A certidão de intimação registra <strong>Data do Cumprimento em 09/12/2024</strong> e esclarece que é com base nessa data que se iniciam os prazos externos de resposta <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12997748" aria-label="[2]: Documento SEI nº 12997748" role="note" tabindex="0">[2]</span></td><td>(i) <strong>status dos terminais associados a tridígitos</strong>, em <strong>planilha Excel .xlsx</strong>, no layout indicado no ofício; e, adicionalmente, (ii) <strong>cópia dos contratos celebrados com terceiros</strong> para cumprimento da obrigação de manutenção dos serviços de tridígitos <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span></td><td>É uma <strong>cobrança inaugural de informações-base</strong> do PAC: instaura o acompanhamento e pede o panorama inicial dos terminais e a documentação contratual de suporte <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span></td></tr><tr><td><strong>Ofício nº 980/2026/COGE/SCO-ANATEL</strong></td><td><strong>15 dias úteis</strong></td><td>O ofício fixa a contagem “do recebimento deste expediente” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15713283" aria-label="[3]: Documento SEI nº 15713283" role="note" tabindex="0">[3]</span>. A certidão registra <strong>Data do Cumprimento em 19/06/2026</strong> e informa que os prazos externos se iniciam com base exclusiva nessa data, excluído o dia do começo na contagem <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15835292" aria-label="[4]: Documento SEI nº 15835292" role="note" tabindex="0">[4]</span></td><td>O ofício não pede uma planilha inicial nem cópia de contratos como no de 2024. Ele exige que a empresa <strong>se manifeste</strong>, apresentando <strong>esclarecimentos e elementos comprobatórios pertinentes</strong>, em atenção ao <strong>item 7.1 e subitens</strong> do Informe nº 413/2026 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15713283" aria-label="[3]: Documento SEI nº 15713283" role="note" tabindex="0">[3]</span>. Nesse informe, a manifestação é dirigida às <strong>inconsistências cadastrais identificadas pela COGE</strong>, com providências para regularização no <strong>nSAPN/CADUP</strong>, e prevê ainda <strong>nova versão consolidada e atualizada do Relatório SUP</strong> na entrega periódica de <strong>julho de 2026</strong>, corrigindo inconsistências, duplicidades e divergências de números de tradução <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15641002" aria-label="[5]: Documento SEI nº 15641002" role="note" tabindex="0">[5]</span></td><td>É uma <strong>cobrança de saneamento/justificação técnica</strong> sobre inconsistências detectadas na base já enviada, com exigência de regularização cadastral e consolidação de novo Relatório SUP <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15641002" aria-label="[5]: Documento SEI nº 15641002" role="note" tabindex="0">[5]</span></td></tr></tbody></table></div>
+<p><strong>Conclusão:</strong> a segunda cobrança <strong>não apenas repete</strong> a primeira. O Ofício nº 1110/2024 pede o <strong>levantamento inicial</strong> do status dos tridígitos e os <strong>contratos</strong> que embasam a obrigação <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span>. Já o Ofício nº 980/2026, à luz do Informe nº 413/2026, cobra uma <strong>manifestação de natureza distinta</strong>: resposta específica sobre <strong>inconsistências cadastrais</strong>, com <strong>esclarecimentos e provas</strong>, além da <strong>regularização das bases nSAPN/CADUP</strong> e da preparação de <strong>nova versão consolidada do Relatório SUP</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15713283" aria-label="[3]: Documento SEI nº 15713283" role="note" tabindex="0">[3]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15641002" aria-label="[5]: Documento SEI nº 15641002" role="note" tabindex="0">[5]</span>.</p>
+<p>Assim, para controle do PAC, os documentos indicam que as duas cobranças <strong>não devem ser tratadas como a mesma pendência</strong>, porque a segunda pressupõe fase posterior de análise e saneamento de inconsistências, e não mera reiteração do pedido inaugural. <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 15713283" aria-label="[3]: Documento SEI nº 15713283" role="note" tabindex="0">[3]</span></p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">7524d2504aefadfb70570eac3aa79177ce1186ef25d94a9383d6cb9c99f70758</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q2-synthesis-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-0960k-q2-synthesis-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta: N/D · tentativas: accepted</p></div>
+        <span class="judge-decision">1,00 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta atende ao alvo e recupera corretamente os prazos, os pedidos de cada ofício e a distinção operacional entre as cobranças, sem inventar vencimento calendárico.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>5/5 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>1,0000</strong>
+          <p>5 de 5 claims sustentadas; 0 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>1,00</strong>
+          <p>5/5 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 5 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>A primeira comunicação tem prazo de 10 dias contado do recebimento.</p></td><td>sustentada</td><td>sim</td><td>1, 5, 6</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A primeira comunicação pede status dos terminais associados a tridígitos em planilha Excel e cópia dos contratos celebrados com terceiros.</p></td><td>sustentada</td><td>sim</td><td>1, 3, 5</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A segunda comunicação tem prazo de 15 dias úteis contado do recebimento.</p></td><td>sustentada</td><td>sim</td><td>2, 34, 35</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A segunda comunicação pede esclarecimentos e elementos comprobatórios pertinentes.</p></td><td>sustentada</td><td>sim</td><td>2, 31</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>As duas cobranças têm objetos e prazos distintos e a segunda não deve ser tratada como simples repetição da primeira.</p></td><td>sustentada</td><td>sim</td><td>1, 2, 15, 16, 17</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-0960k-q2-synthesis-occurrences">
+      <h4 id="case-0960k-q2-synthesis-occurrences">Ocorrências e falhas relevantes</h4>
+      <ul><li class="markdown-body"><p>Juiz/evidence finalizados a partir do SSE, trace e filesystem fresh preservados, sem novo POST, agente ou OCR.</p></li></ul>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-0960k-q2-synthesis/question.txt</span><br><span class="mono">SHA-256 df01c3aed7a08e962c2473af90df67796cf6b6ea16b5fcfb65a0a1f0c8a59f7f</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-0960k-q2-synthesis/gold.txt</span><br><span class="mono">SHA-256 3af21ac3bba2bb5cd90a2e9c1572e7fb5ff4474a74f08f67489b7bd21265b745</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-0960k-q2-synthesis/rubric.json</span><br><span class="mono">SHA-256 199363efc08ef5ff339b775b572089591b66597be8b7522065a5c4b1fd7db40a</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-0960k-q2-synthesis/items/case-0960k-q2-synthesis/result-protected.json</span><br><span class="mono">SHA-256 29099a341636bd823f9553fe46cd88c6d1bb56cabed4e9e8c4c1b26c53ef7c9b</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">d087611b-a793-4294-8301-bc7f04034481</span><br><strong>Trace:</strong> <span class="mono">6688f70f14fb97b7bcab22f3fb03f731</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-0960k-q3-insufficient-evidence">
+  <summary>
+    <span class="case-identity"><strong>960k · evidência insuficiente</strong><small class="mono">case-0960k-q3-insufficient-evidence</small></span>
+    <span class="case-overall"><small>overall</small>0,98</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>59 documentos</span>
+      <span>960.682 tokens de corpus</span>
+      <span>180,32 s até terminal</span>
+      <span>51 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/0b74a714971f03c5ae999460eb3a393b" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q3-insufficient-evidence-question">
+      <h4 id="case-0960k-q3-insufficient-evidence-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Na reunião de acompanhamento, a chefia quer levar um indicador único sobre a taxa de resposta da prestadora ao longo de todo o período e pediu que a equipe o extraia deste processo. Faça uma checagem de suficiência antes de preencher a planilha gerencial: diga se o corpus permite calcular a taxa, identifique os registros que seriam necessários para formar numerador e denominador e formule a conclusão que pode ser comunicada com segurança, sem substituir a falta de dados por uma estimativa.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q3-insufficient-evidence-expected">
+      <h4 id="case-0960k-q3-insufficient-evidence-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Não é possível calcular a taxa com o corpus preservado. Não há uma taxa de resposta publicada nem uma base consolidada que informe o numerador — a quantidade de respostas recebidas no período — e o denominador — o total de solicitações ou oportunidades de resposta abrangidas pelo período — segundo um critério comum. Portanto, o processo não sustenta um percentual; a nota deve registrar a insuficiência e não inventar nem estimar um valor.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Declarar explicitamente que o corpus não permite calcular a taxa pedida.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Registrar que não há taxa de resposta publicada no material preservado.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar a ausência do numerador, isto é, a contagem consolidada de respostas recebidas no período.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar a ausência de denominador definido ou completo, isto é, o total de solicitações ou oportunidades de resposta do período.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Concluir que nenhum percentual pode ser informado ou estimado com segurança e que a limitação deve ser comunicada.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q3-insufficient-evidence-answer">
+      <h4 id="case-0960k-q3-insufficient-evidence-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>Progresso: delimitei os atos potencialmente relevantes para a taxa como os ofícios que pedem informações/complementações e as respostas/pedidos de dilação da Oi vinculados a eles.Progresso: os documentos centrais já mostram quatro ofícios com exigência de resposta e uma sequência mista de pedidos de dilação, respostas materiais e complementações. Agora…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 10.228 caracteres</summary>
+        <div class="response-body markdown-body"><p>Progresso: delimitei os atos potencialmente relevantes para a taxa como os ofícios que pedem informações/complementações e as respostas/pedidos de dilação da Oi vinculados a eles.Progresso: os documentos centrais já mostram quatro ofícios com exigência de resposta e uma sequência mista de pedidos de dilação, respostas materiais e complementações. Agora estou fechando as datas de ciência/prazo e os marcos de protocolo para testar se a taxa seria realmente calculável.A checagem de suficiência indica que <strong>o corpus não permite calcular com segurança um indicador único de “taxa de resposta da prestadora” ao longo de todo o período</strong>, porque os autos mostram pedidos formais da Anatel e várias manifestações da Oi, mas <strong>não trazem um critério único de contagem</strong> para definir:</p>
+<ol><li>o que entra no <strong>denominador</strong>;  </li><li>o que entra no <strong>numerador</strong>;  </li><li>se contam apenas respostas materiais, ou também pedidos de dilação;  </li><li>se respostas parciais/incompletas contam como “resposta”;  </li><li>como tratar manifestações intermediárias ou supervenientes, como a atualização enviada após reunião de 02/09/2025 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13729107" aria-label="[2]: Documento SEI nº 13729107" role="note" tabindex="0">[2]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14500480" aria-label="[3]: Documento SEI nº 14500480" role="note" tabindex="0">[3]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14799698" aria-label="[4]: Documento SEI nº 14799698" role="note" tabindex="0">[4]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14428112" aria-label="[5]: Documento SEI nº 14428112" role="note" tabindex="0">[5]</span>.</li></ol>
+<p><strong>Denominador mínimo identificável no processo, se o recorte for “atos formais da Anatel que exigiram resposta da prestadora”:</strong></p>
+<ul><li><strong>Ofício nº 1110/2024</strong>: intimou a Oi a apresentar, em 10 dias, o status dos terminais associados a tridígitos e cópia de contratos com terceiros <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span>. A ciência formal consta na certidão de cumprimento de 09/12/2024 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12997748" aria-label="[6]: Documento SEI nº 12997748" role="note" tabindex="0">[6]</span>.  </li><li><strong>Ofício nº 654/2025</strong>: solicitou complemento das informações e envio do Relatório SUP atualizado, em 20 dias <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13729107" aria-label="[2]: Documento SEI nº 13729107" role="note" tabindex="0">[2]</span>. A ciência formal consta em 02/06/2025 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13785154" aria-label="[7]: Documento SEI nº 13785154" role="note" tabindex="0">[7]</span>.  </li><li><strong>Ofício nº 1513/2025</strong>: solicitou justificativas e correção das divergências apontadas, em 15 dias <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14500480" aria-label="[3]: Documento SEI nº 14500480" role="note" tabindex="0">[3]</span>. A ciência formal consta em 20/10/2025 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14590300" aria-label="[8]: Documento SEI nº 14590300" role="note" tabindex="0">[8]</span>.  </li><li><strong>Ofício nº 1797/2025</strong>: exigiu novo arquivo “Relatório SUP”, com campos adicionais, em 15 dias <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14799698" aria-label="[4]: Documento SEI nº 14799698" role="note" tabindex="0">[4]</span>. A ciência formal consta em 28/11/2025 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14828481" aria-label="[9]: Documento SEI nº 14828481" role="note" tabindex="0">[9]</span>.</li></ul>
+<p><strong>Mas esse denominador ainda não é suficiente, por si só, para preencher a planilha</strong>, porque faltaria definir se o indicador deve contar:</p>
+<ul><li>só esses 4 ofícios;  </li><li>também os pedidos complementares surgidos em reunião;  </li><li>cada ofício como 1 evento, ou cada exigência interna do ofício como unidade distinta.  </li></ul>
+<p>Isso é relevante porque, por exemplo, o Ofício nº 1110 reúne mais de uma entrega pedida e o processo depois passa a operar também com complementações e atualizações sucessivas <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12968296" aria-label="[1]: Documento SEI nº 12968296" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14307100" aria-label="[10]: Documento SEI nº 14307100" role="note" tabindex="0">[10]</span>.</p>
+<p><strong>Registros necessários para o numerador, se o critério fosse “manifestações da Oi vinculadas aos atos acima”:</strong></p>
+<ul><li>Para o <strong>Ofício nº 1110/2024</strong>:</li><li>pedido de dilação CT/Oi/GCOR/1774/2024, protocolado em 19/12/2024 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13058901" aria-label="[11]: Documento SEI nº 13058901" role="note" tabindex="0">[11]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13058903" aria-label="[12]: Documento SEI nº 13058903" role="note" tabindex="0">[12]</span>;  </li><li>resposta CT/Oi/GCOR/1809/2025, protocolada em 07/01/2025, com anexos “Relatório SUP” e “Relatório Contratos” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13119191" aria-label="[13]: Documento SEI nº 13119191" role="note" tabindex="0">[13]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13119195" aria-label="[14]: Documento SEI nº 13119195" role="note" tabindex="0">[14]</span>.  </li><li>Para o <strong>Ofício nº 654/2025</strong>:</li><li>pedido de prazo CT/Oi/GCOR/2183/2025, protocolado em 23/06/2025 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13885557" aria-label="[15]: Documento SEI nº 13885557" role="note" tabindex="0">[15]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13885559" aria-label="[16]: Documento SEI nº 13885559" role="note" tabindex="0">[16]</span>;  </li><li>nova manifestação CT/Oi/GCOR/2235/2025, protocolada em 14/07/2025, que <strong>não entrega os dados requeridos</strong> e pede nova dilação/cronograma <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14007609" aria-label="[17]: Documento SEI nº 14007609" role="note" tabindex="0">[17]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14007611" aria-label="[18]: Documento SEI nº 14007611" role="note" tabindex="0">[18]</span>;  </li><li>atualização posterior CT/Oi/GCOR/2404/2025, protocolada em 22/09/2025, enviada após reunião e com base atualizada de SUP <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14428112" aria-label="[5]: Documento SEI nº 14428112" role="note" tabindex="0">[5]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14428114" aria-label="[19]: Documento SEI nº 14428114" role="note" tabindex="0">[19]</span>.  </li><li>Para o <strong>Ofício nº 1513/2025</strong>:</li><li>pedido de dilação CT/Oi/GCOR/2490/2025, protocolado em 04/11/2025 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14695077" aria-label="[20]: Documento SEI nº 14695077" role="note" tabindex="0">[20]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14695080" aria-label="[21]: Documento SEI nº 14695080" role="note" tabindex="0">[21]</span>;  </li><li>resposta CT/Oi/GCOR/2523/2025, protocolada em 19/11/2025, com análise dos 915 casos, mas ainda deixando 48 para análise aprofundada <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14785323" aria-label="[22]: Documento SEI nº 14785323" role="note" tabindex="0">[22]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14785326" aria-label="[23]: Documento SEI nº 14785326" role="note" tabindex="0">[23]</span>.  </li><li>Para o <strong>Ofício nº 1797/2025</strong>:</li><li>resposta CT/Oi/GCOR/2586/2025, protocolada em 15/12/2025, com novo Relatório SUP e apresentação UC4X <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14921003" aria-label="[24]: Documento SEI nº 14921003" role="note" tabindex="0">[24]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14921007" aria-label="[25]: Documento SEI nº 14921007" role="note" tabindex="0">[25]</span>.</li></ul>
+<p><strong>O problema é que esses registros não formam automaticamente um numerador único</strong>, porque o processo mistura:</p>
+<ul><li><strong>pedidos de dilação</strong>;  </li><li><strong>respostas materiais</strong>;  </li><li><strong>respostas parciais</strong>;  </li><li><strong>atualizações supervenientes</strong>;  </li><li><strong>respostas ainda com pendência reconhecida pela própria prestadora</strong>.  </li></ul>
+<p>Exemplos claros:</p>
+<ul><li>em 14/07/2025 a Oi afirma que <strong>“ainda não foi possível efetuar o levantamento e consolidação dos dados requeridos”</strong> e pede nova dilação, em vez de entregar o complemento pedido no Ofício nº 654 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14007609" aria-label="[17]: Documento SEI nº 14007609" role="note" tabindex="0">[17]</span>;  </li><li>em 04/11/2025 a Oi novamente informa que <strong>não foi possível concluir as análises</strong> e pede mais 15 dias sobre o Ofício nº 1513 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14695077" aria-label="[20]: Documento SEI nº 14695077" role="note" tabindex="0">[20]</span>;  </li><li>em 19/11/2025, embora apresente análise dos 915 casos, ainda reconhece que 48 dependem de análise mais aprofundada <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14785323" aria-label="[22]: Documento SEI nº 14785323" role="note" tabindex="0">[22]</span>.</li></ul>
+<p>Além disso, o próprio processo registra <strong>insuficiência e inconsistência dos dados entregues pela Oi</strong>: o Informe nº 1259/2025 aponta ausência de informações essenciais, campos vazios, falta substancial de dados e ausência de relatórios previstos, comprometendo a análise regulatória <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14981938" aria-label="[26]: Documento SEI nº 14981938" role="note" tabindex="0">[26]</span>. Isso não impede contar “manifestações”, mas reforça que <strong>não se pode confundir protocolo de documento com resposta satisfatória/completa</strong>.</p>
+<p><strong>Conclusão segura para comunicar à chefia / lançar na planilha gerencial:</strong></p>
+<blockquote><strong>O corpus permite identificar os principais atos formais da Anatel que demandaram manifestação da prestadora e os protocolos correlatos da Oi, mas não permite calcular com segurança uma taxa única de resposta sem definição metodológica prévia.</strong>  </blockquote>
+<blockquote><strong>Há, no mínimo, 4 ofícios formais com prazo de resposta e múltiplas manifestações da Oi associadas; porém o processo contém pedidos de dilação, respostas parciais, complementações sucessivas e envios posteriores por reunião, o que impede definir, apenas pelos autos, um numerador e um denominador únicos sem risco de arbitrariedade.</strong>  </blockquote>
+<blockquote><strong>Portanto, a recomendação segura é não preencher um percentual único de taxa de resposta com base apenas neste corpus; antes, é necessário fixar o critério de contagem.</strong></blockquote>
+<p>Se for útil, eu posso converter isso em um <strong>texto pronto para a planilha gerencial</strong>, em uma linha só e em linguagem executiva.</p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">a7418d86f7ee77b080ca2ea0072c85ec6880109f8841bc93c170543fc0ee43cd</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-0960k-q3-insufficient-evidence-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-0960k-q3-insufficient-evidence-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta · negativa correta: sim · tentativas: accepted</p></div>
+        <span class="judge-decision">0,98 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta atende ao alvo negativo e conclui pela insuficiência. Quase todas as afirmações centrais estão sustentadas pelos trechos; uma formulação sobre a falta de critério único de contagem ficou sem suporte direto explícito, mas isso não altera o acerto geral.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>5/5 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>0,9091</strong>
+          <p>10 de 11 claims sustentadas; 1 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>0,98</strong>
+          <p>11/11 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 11 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>o corpus não permite calcular com segurança um indicador único de “taxa de resposta da prestadora” ao longo de todo o período</p></td><td>sustentada</td><td>sim</td><td>1, 2, 3, 4, 5, 27, 37, 52, 60</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>os autos mostram pedidos formais da Anatel e várias manifestações da Oi</p></td><td>sustentada</td><td>sim</td><td>1, 3, 21, 22, 46, 68, 72</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>o processo não traz um critério único de contagem para definir o denominador, o numerador, se pedidos de dilação contam, se respostas parciais contam e como tratar manifestações intermediárias ou supervenientes</p></td><td>não sustentada</td><td>sim</td><td>N/D</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>há no mínimo 4 ofícios formais com prazo de resposta</p></td><td>sustentada</td><td>sim</td><td>1, 16, 21, 46, 68</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>o Ofício nº 1110 reúne mais de uma entrega pedida</p></td><td>sustentada</td><td>sim</td><td>1, 3, 16, 75</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>em 14/07/2025 a Oi afirma que ainda não foi possível efetuar o levantamento e consolidação dos dados requeridos e pede nova dilação</p></td><td>sustentada</td><td>sim</td><td>38, 35, 36</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>em 04/11/2025 a Oi novamente informa que não foi possível concluir as análises e pede mais 15 dias sobre o Ofício nº 1513</p></td><td>sustentada</td><td>sim</td><td>56, 54, 52</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>em 19/11/2025 a Oi apresenta análise dos 915 casos, mas ainda reconhece 48 dependem de análise mais aprofundada</p></td><td>sustentada</td><td>sim</td><td>63, 62, 65</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>o processo registra insuficiência e inconsistência dos dados entregues pela Oi</p></td><td>sustentada</td><td>sim</td><td>26, 75, 76, 77</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>não se pode confundir protocolo de documento com resposta satisfatória/completa</p></td><td>sustentada</td><td>sim</td><td>26, 77</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>a recomendação segura é não preencher um percentual único de taxa de resposta com base apenas neste corpus</p></td><td>sustentada</td><td>sim</td><td>1, 3, 16, 21, 22, 26, 35, 46, 52, 65, 75, 76, 77</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-0960k-q3-insufficient-evidence-occurrences">
+      <h4 id="case-0960k-q3-insufficient-evidence-occurrences">Ocorrências e falhas relevantes</h4>
+      <ul><li class="markdown-body"><p>Juiz/evidence finalizados a partir do SSE, trace e filesystem fresh preservados, sem novo POST, agente ou OCR.</p></li></ul>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-0960k-q3-insufficient-evidence/question.txt</span><br><span class="mono">SHA-256 f22de7c67bf944041ed1bc5154c264330c6e7899882904afdd6dd77c067344d7</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-0960k-q3-insufficient-evidence/gold.txt</span><br><span class="mono">SHA-256 88195119935db89cf2ad8ee3f17483a83e7f50fccc46a819c11d6e8d58c96836</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-0960k-q3-insufficient-evidence/rubric.json</span><br><span class="mono">SHA-256 601e0f942a81ce1cc9b68bcd184977e47cb2a88af989c29fe2cd3f7657ddd367</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-0960k-q3-insufficient-evidence/items/case-0960k-q3-insufficient-evidence/result-protected.json</span><br><span class="mono">SHA-256 67bdbde9506a1b6e4efe59e2be532ec6883bc3eb30011221c914282d9f1a801e</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">8139ed86-f98c-468e-9b49-e6b628acf998</span><br><strong>Trace:</strong> <span class="mono">0b74a714971f03c5ae999460eb3a393b</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-5120k-q1-factual">
+  <summary>
+    <span class="case-identity"><strong>5,12M · factual</strong><small class="mono">case-5120k-q1-factual</small></span>
+    <span class="case-overall"><small>overall</small>1,00</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>331 documentos</span>
+      <span>5.120.866 tokens de corpus</span>
+      <span>830,70 s até terminal</span>
+      <span>21 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/675da88325c4192661353dda1701555c" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q1-factual-question">
+      <h4 id="case-5120k-q1-factual-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Estou revisando o quadro de projetos da Agenda Regulatória e preciso explicar à chefia o que esta iniciativa entrega, sem misturá-la com atividades de implantação. A partir do processo, prepare um registro executivo que delimite o objeto da revisão do PGMC, aponte a entrega que deve orientar o cronograma e indique o horizonte previsto para ela, deixando explícito o que essa leitura permite acompanhar no trabalho.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q1-factual-expected">
+      <h4 id="case-5120k-q1-factual-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Fato documental: a iniciativa conduz a segunda revisão dos mercados relevantes e das medidas regulatórias assimétricas previstas no Plano Geral de Metas de Competição (PGMC). A entrega principal indicada é o Relatório de Análise de Impacto Regulatório (AIR), previsto para o primeiro semestre de 2022. Leitura operacional: o cronograma deve acompanhar a produção desse relatório regulatório, não uma alteração de sistemas, que o TAP trata como fora do escopo.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar que se trata da segunda revisão.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Incluir os mercados relevantes no objeto da revisão.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Incluir as medidas regulatórias assimétricas no objeto.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Relacionar o objeto ao PGMC.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Indicar o Relatório de Análise de Impacto Regulatório (AIR) como entrega principal.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar o primeiro semestre de 2022 como horizonte previsto para a entrega.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Distinguir essa entrega regulatória de alteração dos sistemas informatizados, que está fora do escopo.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q1-factual-answer">
+      <h4 id="case-5120k-q1-factual-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>Progresso: identifiquei que os documentos centrais não são as contribuições da consulta, mas peças internas sobre Agenda Regulatória, AIR e cronograma. Agora vou abrir os mais promissores para extrair o recorte exato da iniciativa.<strong>Registro executivo — revisão do PGMC na Agenda Regulatória</strong> <strong>1. Objeto da iniciativa</strong> A leitura do processo mostra que a…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 6.387 caracteres</summary>
+        <div class="response-body markdown-body"><p>Progresso: identifiquei que os documentos centrais não são as contribuições da consulta, mas peças internas sobre Agenda Regulatória, AIR e cronograma. Agora vou abrir os mais promissores para extrair o recorte exato da iniciativa.<strong>Registro executivo — revisão do PGMC na Agenda Regulatória</strong></p>
+<p><strong>1. Objeto da iniciativa</strong><br>A leitura do processo mostra que a iniciativa é, em essência, <strong>uma revisão regulatória</strong> do PGMC: reavaliar os <strong>mercados relevantes</strong> e as <strong>medidas regulatórias assimétricas</strong> do Plano, na revisão quadrienal prevista no próprio regulamento. O escopo também registra, desde a origem, a reavaliação do mercado de distribuição de pacotes ou conteúdos audiovisuais <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6508310" aria-label="[1]: Documento SEI nº 6508310" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6509035" aria-label="[2]: Documento SEI nº 6509035" role="note" tabindex="0">[2]</span>.</p>
+<p>Com o avanço do processo, a Agência passou a tratar <strong>em conjunto</strong> a revisão do PGMC e a reavaliação da regulamentação de <strong>EILD</strong>, pela afinidade de conteúdo, consolidando isso como uma única iniciativa da Agenda Regulatória <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 8973492" aria-label="[3]: Documento SEI nº 8973492" role="note" tabindex="0">[3]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 9723267" aria-label="[4]: Documento SEI nº 9723267" role="note" tabindex="0">[4]</span>.</p>
+<p><strong>2. Entrega que deve orientar o cronograma</strong><br>Se o objetivo é explicar à chefia “o que essa iniciativa entrega”, o marco correto para orientar o cronograma é a <strong>entrega regulatória</strong>, não atividades de implantação. Na origem do projeto, o TAP já indicava como principal entrega o <strong>Relatório de AIR</strong>, acompanhado da proposta normativa decorrente dos estudos <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6508310" aria-label="[1]: Documento SEI nº 6508310" role="note" tabindex="0">[1]</span>.</p>
+<p>Depois, na Agenda 2023-2024, a iniciativa foi explicitada com duas metas regulatórias:</p>
+<ul><li><strong>Consulta Pública</strong>;  </li><li><strong>Aprovação final</strong> da proposta <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 9723267" aria-label="[4]: Documento SEI nº 9723267" role="note" tabindex="0">[4]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 10674872" aria-label="[5]: Documento SEI nº 10674872" role="note" tabindex="0">[5]</span>.  </li></ul>
+<p>Ou seja, para fins de quadro executivo, a entrega a monitorar é a <strong>produção e tramitação da revisão normativa do PGMC/EILD</strong> — AIR, proposta, consulta pública e deliberação final — e não frentes de execução operacional.</p>
+<p><strong>3. O que não deve ser confundido com implantação</strong><br>O próprio TAP separa isso com clareza: <strong>não faz parte do escopo do projeto realizar alterações em sistemas informatizados da Agência que possam decorrer da conclusão do processo regulatório</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6508310" aria-label="[1]: Documento SEI nº 6508310" role="note" tabindex="0">[1]</span>.</p>
+<p>Assim, esta leitura permite afirmar que a iniciativa da Agenda:</p>
+<ul><li><strong>entrega revisão regulatória</strong>;  </li><li><strong>não entrega implantação sistêmica ou operacional</strong>;  </li><li><strong>não deve ser medida por atividades posteriores de execução</strong>, ainda que estas possam ser necessárias após a aprovação da norma.</li></ul>
+<p><strong>4. Horizonte previsto</strong><br>Há três marcos temporais relevantes no processo:</p>
+<ul><li><strong>Origem na Agenda 2021-2022</strong>: meta de concluir a <strong>AIR e a respectiva proposta</strong> no <strong>1º semestre de 2022</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6508310" aria-label="[1]: Documento SEI nº 6508310" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6509035" aria-label="[2]: Documento SEI nº 6509035" role="note" tabindex="0">[2]</span>.  </li><li><strong>Reprogramação na Agenda 2023-2024</strong>: meta de <strong>Consulta Pública no 2º semestre de 2023</strong> e <strong>aprovação final no 2º semestre de 2024</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 9723267" aria-label="[4]: Documento SEI nº 9723267" role="note" tabindex="0">[4]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 10674872" aria-label="[5]: Documento SEI nº 10674872" role="note" tabindex="0">[5]</span>.  </li><li><strong>Atualização posterior</strong>: em 2024, o Conselho retirou da Agenda 2023-2024 a meta de aprovação final em 2024 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 11604117" aria-label="[6]: Documento SEI nº 11604117" role="note" tabindex="0">[6]</span>. Na sequência, a iniciativa passou a constar da Agenda <strong>2025-2026</strong>, com previsão de <strong>aprovação final no 2º semestre de 2025</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13384652" aria-label="[7]: Documento SEI nº 13384652" role="note" tabindex="0">[7]</span>.</li></ul>
+<p><strong>5. O que essa leitura permite acompanhar no trabalho</strong><br>Com base apenas no processo, o acompanhamento executivo que faz sentido é este:</p>
+<ul><li>se a <strong>revisão regulatória</strong> está instruída;  </li><li>se a <strong>AIR</strong> foi produzida;  </li><li>se houve <strong>submissão à Consulta Pública</strong>;  </li><li>se a proposta está em fase de <strong>deliberação/aprovação final</strong>;  </li><li>qual é o <strong>horizonte vigente da Agenda</strong> para conclusão regulatória <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 8973492" aria-label="[3]: Documento SEI nº 8973492" role="note" tabindex="0">[3]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 9723267" aria-label="[4]: Documento SEI nº 9723267" role="note" tabindex="0">[4]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 10674872" aria-label="[5]: Documento SEI nº 10674872" role="note" tabindex="0">[5]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 11604117" aria-label="[6]: Documento SEI nº 11604117" role="note" tabindex="0">[6]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13384652" aria-label="[7]: Documento SEI nº 13384652" role="note" tabindex="0">[7]</span>.</li></ul>
+<p><strong>Síntese para a chefia</strong><br>A iniciativa da Agenda Regulatória não é um projeto de implantação. Ela é um <strong>projeto de revisão normativa do PGMC</strong>, hoje tratado junto com EILD, cuja entrega é a <strong>proposta regulatória resultante da AIR e do processo decisório</strong>. O horizonte originalmente era 2022, depois foi reprogramado para consulta em 2023 e aprovação em 2024, e o horizonte mais recente do processo aponta <strong>aprovação final no 2º semestre de 2025</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13384652" aria-label="[7]: Documento SEI nº 13384652" role="note" tabindex="0">[7]</span>.</p>
+<p>Se quiser, eu posso converter isso em um texto de <strong>1 parágrafo para fala executiva</strong> ou em um <strong>quadro “objeto / entrega / prazo / acompanhamento”</strong>.</p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">c2ec3544f0a08b3fb323859ed792f4907ff868dc1ab831a1ff2288d6dc59bc84</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q1-factual-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-5120k-q1-factual-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta: N/D · tentativas: accepted</p></div>
+        <span class="judge-decision">1,00 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta atende ao alvo e cumpre todos os elementos obrigatórios. As afirmações centrais sobre segunda revisão do PGMC, objeto, AIR, prazo de 1º semestre de 2022 e fora de escopo para sistemas estão sustentadas pelos excertos citados.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>7/7 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>1,0000</strong>
+          <p>7 de 7 claims sustentadas; 0 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>1,00</strong>
+          <p>7/7 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 7 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>a iniciativa é, em essência, uma revisão regulatória do PGMC</p></td><td>sustentada</td><td>sim</td><td>11, 24, 26, 27</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>a revisão é a segunda revisão dos mercados relevantes e das medidas regulatórias assimétricas do PGMC</p></td><td>sustentada</td><td>sim</td><td>1, 11, 20, 26</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>o escopo inclui a reavaliação do mercado de distribuição de pacotes ou conteúdos audiovisuais</p></td><td>sustentada</td><td>sim</td><td>11, 18, 20, 25, 26</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>a Agência passou a tratar em conjunto a revisão do PGMC e a reavaliação da regulamentação de EILD</p></td><td>sustentada</td><td>sim</td><td>12, 13, 14</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>a entrega principal é o Relatório de AIR</p></td><td>sustentada</td><td>sim</td><td>1, 2, 4, 16, 17</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>o horizonte previsto para a entrega é o primeiro semestre de 2022</p></td><td>sustentada</td><td>sim</td><td>1, 2</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>não faz parte do escopo realizar alterações nos sistemas informatizados da Agência</p></td><td>sustentada</td><td>sim</td><td>23</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-5120k-q1-factual-occurrences">
+      <h4 id="case-5120k-q1-factual-occurrences">Ocorrências e falhas relevantes</h4>
+      <ul><li class="markdown-body"><p>Falha local pós-avaliação: lock em 0644 corrigido para 0600 e registrado no ledger, sem repetir inferência ou avaliação.</p></li></ul>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-5120k-q1-factual/question.txt</span><br><span class="mono">SHA-256 4fa2e2d9c3b422dd7eb64c7a5330fd31cb88e24a128899560a72011c9535bc34</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-5120k-q1-factual/gold.txt</span><br><span class="mono">SHA-256 d58d542091e716b0071c47face1f40a495c35fd6755afb90eac3380994649568</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-5120k-q1-factual/rubric.json</span><br><span class="mono">SHA-256 9b8f61ddd9e8309fff3685a028d3989726ca00ed7067566b3c123ec252b6cb2a</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-5120k-q1-factual/items/case-5120k-q1-factual/result-protected.json</span><br><span class="mono">SHA-256 956cfd69f8a83b92d9298e0889f74c1157a05f764b61b7dc24ac1db4d1711345</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">ad6351b5-2efe-45c3-b456-b4b838ef1fd7</span><br><strong>Trace:</strong> <span class="mono">675da88325c4192661353dda1701555c</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-5120k-q2-synthesis">
+  <summary>
+    <span class="case-identity"><strong>5,12M · síntese</strong><small class="mono">case-5120k-q2-synthesis</small></span>
+    <span class="case-overall"><small>overall</small>0,96</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>331 documentos</span>
+      <span>5.120.866 tokens de corpus</span>
+      <span>809,91 s até terminal</span>
+      <span>24 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/1e746810b464f8a2b33c727c1a95eba9" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q2-synthesis-question">
+      <h4 id="case-5120k-q2-synthesis-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Preciso atualizar a diretoria sobre o calendário de participação social que sustenta a revisão do PGMC e evitar que o cronograma da AIR use uma data superada. Redija uma nota de status que reconcilie o prazo aprovado no início com a decisão posterior, registre a data que passou a valer para contribuições e explique, com base nos fundamentos registrados, por que a extensão foi necessária e qual cautela de planejamento decorre disso.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q2-synthesis-expected">
+      <h4 id="case-5120k-q2-synthesis-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Fatos documentais: a Tomada de Subsídios foi aprovada inicialmente por 45 dias. Depois, o prazo para contribuições foi prorrogado até 7 de março de 2022. A decisão posterior registra como fundamentos os pedidos de dilação recebidos, a complexidade do tema e a necessidade de mais tempo de análise pelos agentes envolvidos, além do prazo da Agenda Regulatória para finalizar o relatório de AIR e a respectiva proposta. Interpretação operacional: no cronograma, 7 de março de 2022 é a data posterior de encerramento das contribuições; não se deve tratá-la como prazo inicial nem apagar que o prazo original era de 45 dias.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar que o prazo inicialmente aprovado era de 45 dias.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar que o prazo para contribuições foi prorrogado até 7 de março de 2022.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Registrar os pedidos de dilação recebidos como fundamento da prorrogação.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Registrar a complexidade do tema como fundamento.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Registrar a necessidade de mais tempo de análise pelos agentes envolvidos como fundamento.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Registrar que o prazo da Agenda Regulatória para finalizar o relatório de AIR e a respectiva proposta também foi considerado.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Explicar que a data de 7 de março de 2022 é a data posterior aplicável ao encerramento das contribuições, preservando a cronologia e sem dizer que ela era o prazo inicial.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q2-synthesis-answer">
+      <h4 id="case-5120k-q2-synthesis-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>Buscando nos documentos o prazo inicial, a prorrogação e referências ao cronograma da AIR.ALVOS OBRIGATÓRIOS: prazo inicial da tomada de subsídios, decisão posterior de prorrogação e fundamentos registrados sobre o impacto no cronograma.Lendo um documento posterior que registra o efeito do calendário sobre a AIR para extrair a cautela de…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 4.424 caracteres</summary>
+        <div class="response-body markdown-body"><p>Buscando nos documentos o prazo inicial, a prorrogação e referências ao cronograma da AIR.ALVOS OBRIGATÓRIOS: prazo inicial da tomada de subsídios, decisão posterior de prorrogação e fundamentos registrados sobre o impacto no cronograma.Lendo um documento posterior que registra o efeito do calendário sobre a AIR para extrair a cautela de planejamento.<strong>Nota de status — calendário de participação social da revisão do PGMC</strong></p>
+<p>O prazo originalmente aprovado para a Tomada de Subsídios da revisão do PGMC foi de <strong>45 dias</strong>, justificado desde o início pela meta da Agenda Regulatória 2021-2022 de concluir a AIR e a respectiva proposta no <strong>primeiro semestre de 2022</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7843053" aria-label="[1]: Documento SEI nº 7843053" role="note" tabindex="0">[1]</span>. Na Consulta Pública nº 64/2021, esse prazo foi operacionalizado com encerramento em <strong>7 de fevereiro de 2022, às 23h59</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7843251" aria-label="[2]: Documento SEI nº 7843251" role="note" tabindex="0">[2]</span>.</p>
+<p>Posteriormente, porém, esse marco foi <strong>superado</strong> por decisão formal: o Despacho Decisório nº 1/2022/PRRE/SPR <strong>prorrogou o prazo para contribuições até 7 de março de 2022</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7971157" aria-label="[3]: Documento SEI nº 7971157" role="note" tabindex="0">[3]</span>. Assim, para fins de reporte à Diretoria e de consistência do cronograma da AIR, a <strong>data válida de encerramento da participação social</strong> a considerar é <strong>7/3/2022</strong>, e não mais 7/2/2022 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7971157" aria-label="[3]: Documento SEI nº 7971157" role="note" tabindex="0">[3]</span>.</p>
+<p>Quanto aos fundamentos da extensão, eles aparecem em dois níveis:</p>
+<ul><li>na própria decisão de prorrogação, a SPR registrou: <strong>pedidos de dilação recebidos</strong>, <strong>complexidade do tema</strong> e <strong>necessidade de maior tempo de análise pelos agentes envolvidos</strong>, sem perder de vista a pressão do prazo da Agenda Regulatória <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7971157" aria-label="[3]: Documento SEI nº 7971157" role="note" tabindex="0">[3]</span>;</li><li>nos pedidos juntados aos autos, as entidades detalharam por que o prazo original se mostrou insuficiente: publicação em <strong>23/12/2021</strong>, na véspera das festas de fim de ano, coincidindo com férias e menor disponibilidade das equipes <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7956464" aria-label="[4]: Documento SEI nº 7956464" role="note" tabindex="0">[4]</span>; coincidência com avanço de Covid-19 e influenza, afetando colaboradores <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7949681" aria-label="[5]: Documento SEI nº 7949681" role="note" tabindex="0">[5]</span>; e elevada carga analítica do questionário, com <strong>54 questões</strong>, de alta complexidade e ampla abrangência <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7967898" aria-label="[6]: Documento SEI nº 7967898" role="note" tabindex="0">[6]</span>.</li></ul>
+<p>A reconciliação, portanto, é a seguinte: <strong>o prazo inicial foi deliberadamente comprimido para atender a meta da AIR</strong>, mas a Administração depois reconheceu que, para uma participação social qualificada em matéria tão relevante e complexa, esse desenho precisava ser ajustado <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7843053" aria-label="[1]: Documento SEI nº 7843053" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7971157" aria-label="[3]: Documento SEI nº 7971157" role="note" tabindex="0">[3]</span>.</p>
+<p><strong>Cautela de planejamento decorrente:</strong> o cronograma da AIR não deve continuar reproduzindo a data original de <strong>7/2/2022</strong> como se fosse o marco final da participação social. O marco correto é <strong>7/3/2022</strong>, e o planejamento deve registrar que calendários comprimidos por metas da Agenda podem exigir ajuste quando a complexidade do tema e a necessidade de contribuição social mais qualificada assim o impõem <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 7971157" aria-label="[3]: Documento SEI nº 7971157" role="note" tabindex="0">[3]</span>. Essa cautela é coerente com registro posterior da própria área técnica de que a meta de finalização da proposta de revisão do PGMC na Agenda 2021-2022 <strong>já restava vencida</strong>, o que reforça a necessidade de não perpetuar, em peças de AIR ou de acompanhamento, uma data de participação social já superada <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 8973492" aria-label="[7]: Documento SEI nº 8973492" role="note" tabindex="0">[7]</span>.</p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">ee96133f66e5485124f69a2e9f9dc9eadefbaf97c2311097104383f7b9114266</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q2-synthesis-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-5120k-q2-synthesis-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta: N/D · tentativas: accepted</p></div>
+        <span class="judge-decision">0,96 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta trata o alvo e cumpre os sete elementos obrigatórios. As principais afirmações estão sustentadas pelos trechos abertos; não há claim contradito. A citação é abundante e adequada.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>7/7 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>1,0000</strong>
+          <p>10 de 10 claims sustentadas; 0 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>1,00</strong>
+          <p>10/10 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 10 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>O prazo originalmente aprovado para a Tomada de Subsídios da revisão do PGMC foi de 45 dias.</p></td><td>sustentada</td><td>sim</td><td>1, 9, 10, 12</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Na Consulta Pública nº 64/2021, esse prazo foi operacionalizado com encerramento em 7 de fevereiro de 2022, às 23h59.</p></td><td>sustentada</td><td>sim</td><td>14</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O Despacho Decisório nº 1/2022/PRRE/SPR prorrogou o prazo para contribuições até 7 de março de 2022.</p></td><td>sustentada</td><td>sim</td><td>2, 25</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A decisão de prorrogação registrou pedidos de dilação recebidos, complexidade do tema e necessidade de maior tempo de análise pelos agentes envolvidos.</p></td><td>sustentada</td><td>sim</td><td>2, 24</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Nos pedidos juntados aos autos, as entidades apontaram que a publicação em 23/12/2021 coincidiu com festas de fim de ano e férias, que houve avanço de Covid-19 e influenza, e que o questionário tinha 54 questões.</p></td><td>sustentada</td><td>sim</td><td>16, 17, 18, 19, 20, 21, 22</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A meta da Agenda Regulatória 2021-2022 para finalizar o relatório de AIR e a respectiva proposta foi considerada.</p></td><td>sustentada</td><td>sim</td><td>10, 13, 26</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O marco correto para o encerramento das contribuições é 7/3/2022, e não 7/2/2022.</p></td><td>sustentada</td><td>sim</td><td>2, 14, 25</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O cronograma da AIR não deve continuar reproduzindo a data original de 7/2/2022 como se fosse o marco final da participação social.</p></td><td>sustentada</td><td>sim</td><td>14, 25</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A cautela de planejamento decorre de calendários comprimidos por metas da Agenda que podem exigir ajuste quando a complexidade do tema e a necessidade de contribuição social mais qualificada assim o impõem.</p></td><td>sustentada</td><td>sim</td><td>2, 10, 24</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A meta de finalização da proposta de revisão do PGMC na Agenda 2021-2022 já restava vencida.</p></td><td>sustentada</td><td>sim</td><td>3</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-5120k-q2-synthesis-occurrences">
+      <h4 id="case-5120k-q2-synthesis-occurrences">Ocorrências e falhas relevantes</h4>
+      <p class="subtle">Nenhuma ocorrência ou falha relevante registrada para este item.</p>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-5120k-q2-synthesis/question.txt</span><br><span class="mono">SHA-256 154d5ec4f0a20a12cedd5293348feb2f4ee04e24eff51a4d7d3c6bc9f4fb7c3f</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-5120k-q2-synthesis/gold.txt</span><br><span class="mono">SHA-256 7152fec141eb06f93e8816ef15a1d4b3f0e9c6019ef0ecf4c3e1d3ebc32a311e</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-5120k-q2-synthesis/rubric.json</span><br><span class="mono">SHA-256 fd86ff91c10d1b809e29c0ad3414ad48fd0fff51003435b482a24d6ec6060593</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-5120k-q2-synthesis/items/case-5120k-q2-synthesis/result-protected.json</span><br><span class="mono">SHA-256 de75e83c683500969259caaea9c7d857cbf5bdfc7da025dc4237429ae4351677</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">46d18f3f-f124-4945-a2f2-b0c23ed7f5f8</span><br><strong>Trace:</strong> <span class="mono">1e746810b464f8a2b33c727c1a95eba9</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-5120k-q3-insufficient-evidence">
+  <summary>
+    <span class="case-identity"><strong>5,12M · evidência insuficiente</strong><small class="mono">case-5120k-q3-insufficient-evidence</small></span>
+    <span class="case-overall"><small>overall</small>0,90</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>331 documentos</span>
+      <span>5.120.866 tokens de corpus</span>
+      <span>961,88 s até terminal</span>
+      <span>84 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/c2681ee15d461d5f01df705751237cde" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q3-insufficient-evidence-question">
+      <h4 id="case-5120k-q3-insufficient-evidence-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>A coordenação quer informar à direção, em uma apresentação sobre a Consulta Pública nº 64, o percentual de contribuições que teria sido considerado procedente pela Anatel. Antes de liberar o número, faça uma análise de suficiência do processo: explique se há base para esse indicador, qual contagem formaria o numerador e o denominador e qual encaminhamento seguro deve constar da apresentação se esses dados não estiverem fechados.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q3-insufficient-evidence-expected">
+      <h4 id="case-5120k-q3-insufficient-evidence-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Não há base documental suficiente para publicar esse percentual. Embora o corpus contenha documentos da Tomada de Subsídios e contribuições, não apresenta uma taxa de procedência nem fecha o denominador — o total de contribuições do universo analisado — e o numerador — a quantidade acolhida ou considerada procedente. Sem essas contagens e um critério comum, não se pode calcular ou estimar o indicador; a apresentação deve registrar a limitação e não inventar um valor.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Declarar que não há base documental suficiente para publicar o percentual.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Reconhecer que o corpus contém documentos da Tomada de Subsídios e contribuições, mas isso não fecha o indicador.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar a ausência de uma taxa de procedência já registrada.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar o denominador ausente ou incompleto: total de contribuições do universo analisado.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar o numerador ausente ou incompleto: quantidade acolhida ou considerada procedente.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Concluir que o indicador não pode ser calculado ou estimado e que a apresentação deve registrar a limitação sem inventar valor.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q3-insufficient-evidence-answer">
+      <h4 id="case-5120k-q3-insufficient-evidence-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>Buscando no processo os documentos que tratam da consolidação e análise das contribuições da CP 64.Vou conferir se a planilha de respostas permite uma contagem consistente por status e se houve fechamento decisório posterior que possa alterar a leitura do indicador.Não há base suficientemente segura, nos autos lidos, para divulgar como dado institucional…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 4.803 caracteres</summary>
+        <div class="response-body markdown-body"><p>Buscando no processo os documentos que tratam da consolidação e análise das contribuições da CP 64.Vou conferir se a planilha de respostas permite uma contagem consistente por status e se houve fechamento decisório posterior que possa alterar a leitura do indicador.Não há base suficientemente segura, nos autos lidos, para divulgar como dado institucional fechado um “percentual de contribuições procedentes pela Anatel”.</p>
+<p><strong>1. O que há de base documental</strong><br>A área técnica efetivamente analisou as contribuições e anexou uma planilha com respostas individualizadas à Consulta Pública nº 64/2023; o Informe nº 150/2024 afirma que “todas as contribuições foram respondidas individualmente” e remetidas à planilha SEI nº 13010656 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13010135" aria-label="[1]: Documento SEI nº 13010135" role="note" tabindex="0">[1]</span>.<br>Também há registro formal de que a instrução técnica trabalhou com <strong>296 contribuições recebidas</strong>, sendo <strong>274 pelo Participa Anatel e 22 pelo SEI</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13384652" aria-label="[2]: Documento SEI nº 13384652" role="note" tabindex="0">[2]</span>.</p>
+<p><strong>2. Por que isso não basta para um percentual seguro</strong><br>O problema é que a planilha textualizada disponível no processo não traz um indicador consolidado pronto; ela traz registros por contribuição, com classificações heterogêneas e sem regra oficial de agregação para “procedência”. No arquivo da planilha aparecem, por exemplo, classificações como <strong>ACEITO TOTALMENTE</strong>, <strong>ACEITO PARCIALMENTE</strong>, <strong>NÃO ACEITO</strong> e <strong>FORA DE ESCOPO</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13010656" aria-label="[3]: Documento SEI nº 13010656" role="note" tabindex="0">[3]</span>.<br>Além disso, a própria planilha, na forma em que está textualizada, não é autoexplicativa para fins estatísticos: há duplicação de abas/entradas e a classificação não vem acompanhada, nos autos lidos, de uma memória de cálculo institucional do percentual. Em outras palavras: existe base para análise qualitativa das contribuições, mas <strong>não encontrei um indicador oficial já fechado e validado de “percentual procedente”</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13010656" aria-label="[3]: Documento SEI nº 13010656" role="note" tabindex="0">[3]</span>.</p>
+<p>Há ainda um segundo risco: “considerado procedente pela Anatel” pode ser entendido como posição institucional final do processo, mas a posição final do Conselho não coincidiu integralmente com os encaminhamentos técnicos pós-consulta. Exemplo: a área técnica sustentou mercado relevante de EIR em sua análise pós-consulta, mas depois o Conselho decidiu não acolher essa proposta no novo PGMC <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 14461751" aria-label="[4]: Documento SEI nº 14461751" role="note" tabindex="0">[4]</span>. Portanto, um percentual baseado apenas na planilha técnica pode ser lido como se refletisse a posição final da Agência, o que é metodologicamente arriscado.</p>
+<p><strong>3. Se, ainda assim, alguém quisesse construir o indicador</strong><br>O desenho mais defensável seria:</p>
+<ul><li><strong>Denominador:</strong> total de contribuições efetivamente recebidas na CP 64/2023, isto é, <strong>296</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13384652" aria-label="[2]: Documento SEI nº 13384652" role="note" tabindex="0">[2]</span>.</li><li><strong>Numerador:</strong> contribuições classificadas como <strong>aceitas integral ou parcialmente</strong>, desde que antes se fixe, de modo expresso:</li></ul>
+<ol><li>se “ACEITO TOTALMENTE” e “ACEITO PARCIALMENTE” entram juntos;</li><li>como tratar eventuais rótulos equivalentes/inconsistentes;</li><li>se “FORA DE ESCOPO” fica só fora do numerador ou também fora do denominador;</li><li>como reconciliar a planilha com o total formal de 296 contribuições <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13010656" aria-label="[3]: Documento SEI nº 13010656" role="note" tabindex="0">[3]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 13384652" aria-label="[2]: Documento SEI nº 13384652" role="note" tabindex="0">[2]</span>.</li></ol>
+<p>Sem essa regra de contagem, o número vira uma construção ad hoc, não um dado institucional fechado.</p>
+<p><strong>4. Encaminhamento seguro para a apresentação</strong><br>Minha recomendação é <strong>não liberar percentual</strong> nesta fase. A redação mais segura para o slide é:</p>
+<p><strong>“As contribuições da Consulta Pública nº 64/2023 foram analisadas individualmente pela Anatel, com respostas registradas nos autos. Entretanto, não há, na documentação utilizada para esta apresentação, indicador oficial consolidado e validado de ‘percentual de contribuições procedentes’. Caso se deseje divulgar esse percentual, será necessária reconciliação da base de 296 contribuições recebidas com a planilha de classificação e validação prévia da regra de contagem pela área responsável.”</strong></p>
+<p>Se quiser, eu posso converter isso em texto de slide, com versão curta e versão para fala do apresentador.</p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">57065cd145f07309750e9fc57b517fa8cd70b40d2ae38c97dacbfe281ecca185</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-5120k-q3-insufficient-evidence-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-5120k-q3-insufficient-evidence-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta · negativa correta: sim · tentativas: accepted</p></div>
+        <span class="judge-decision">0,90 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta trata o alvo e, em geral, segue a limitação pedida. As afirmações centrais de insuficiência e de ausência de indicador fechado estão sustentadas; há várias afirmações acessórias sem sustentação explícita, mas não há contradição relevante com o corpus nem invenção do percentual.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>6/6 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>0,4375</strong>
+          <p>7 de 16 claims sustentadas; 9 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>0,93</strong>
+          <p>15/16 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 16 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>Não há base suficientemente segura, nos autos lidos, para divulgar como dado institucional fechado um “percentual de contribuições procedentes pela Anatel”.</p></td><td>sustentada</td><td>sim</td><td>14, 15, 25</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A área técnica efetivamente analisou as contribuições e anexou uma planilha com respostas individualizadas à Consulta Pública nº 64/2023.</p></td><td>sustentada</td><td>sim</td><td>14</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O Informe nº 150/2024 afirma que “todas as contribuições foram respondidas individualmente” e remetidas à planilha SEI nº 13010656.</p></td><td>sustentada</td><td>sim</td><td>14</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Há registro formal de que a instrução técnica trabalhou com 296 contribuições recebidas, sendo 274 pelo Participa Anatel e 22 pelo SEI.</p></td><td>não sustentada</td><td>sim</td><td>15</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A planilha textualizada disponível no processo não traz um indicador consolidado pronto.</p></td><td>não sustentada</td><td>sim</td><td>3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Ela traz registros por contribuição, com classificações heterogêneas e sem regra oficial de agregação para “procedência”.</p></td><td>não sustentada</td><td>sim</td><td>3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>No arquivo da planilha aparecem classificações como ACEITO TOTALMENTE, ACEITO PARCIALMENTE, NÃO ACEITO e FORA DE ESCOPO.</p></td><td>sustentada</td><td>sim</td><td>3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A própria planilha, na forma em que está textualizada, não é autoexplicativa para fins estatísticos.</p></td><td>não sustentada</td><td>sim</td><td>3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Há duplicação de abas/entradas.</p></td><td>não sustentada</td><td>não</td><td>N/D</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Não encontrei um indicador oficial já fechado e validado de “percentual procedente”.</p></td><td>não sustentada</td><td>sim</td><td>3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A posição final do Conselho não coincidiu integralmente com os encaminhamentos técnicos pós-consulta.</p></td><td>sustentada</td><td>sim</td><td>4, 31</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A área técnica sustentou mercado relevante de EIR em sua análise pós-consulta, mas depois o Conselho decidiu não acolher essa proposta no novo PGMC.</p></td><td>sustentada</td><td>sim</td><td>31</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O desenho mais defensável seria denominar o total de contribuições efetivamente recebidas na CP 64/2023 como 296.</p></td><td>não sustentada</td><td>sim</td><td>15</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O numerador seria contribuições classificadas como aceitas integral ou parcialmente, desde que se fixe regra expressa de contagem.</p></td><td>não sustentada</td><td>sim</td><td>3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Sem essa regra de contagem, o número vira uma construção ad hoc, não um dado institucional fechado.</p></td><td>não sustentada</td><td>sim</td><td>3, 15</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Minha recomendação é não liberar percentual nesta fase.</p></td><td>sustentada</td><td>sim</td><td>14, 15, 25</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-5120k-q3-insufficient-evidence-occurrences">
+      <h4 id="case-5120k-q3-insufficient-evidence-occurrences">Ocorrências e falhas relevantes</h4>
+      <ul><li class="markdown-body"><p>O agente concluiu, mas a exportação fresh terminou em HTTP 409 por hash após normalização de newline; resposta, evidence e judge foram recuperados sem replay.</p></li></ul>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-5120k-q3-insufficient-evidence/question.txt</span><br><span class="mono">SHA-256 9425032450ea64a431a1a16507f69b2685917b3a66882814e9dfe36f8ec98e4e</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-5120k-q3-insufficient-evidence/gold.txt</span><br><span class="mono">SHA-256 71b697d53d8d3564d599d08bb48145757719a8a1430fe4605ff554f4a1c6a3a0</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-5120k-q3-insufficient-evidence/rubric.json</span><br><span class="mono">SHA-256 6e3dc6538675bbf1ac50d848bb4ce46f4b58e1f9506bb3d009a5febab58aef39</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-5120k-q3-insufficient-evidence/items/case-5120k-q3-insufficient-evidence/result-protected.json</span><br><span class="mono">SHA-256 a79a0619e6f24667ebc00d0cb93557fc69ff1e00dd9b8d0ed9664a68849d9586</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">4dcd0f45-4c28-4827-8383-cc94eedfb004</span><br><strong>Trace:</strong> <span class="mono">c2681ee15d461d5f01df705751237cde</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-6260k-q1-factual">
+  <summary>
+    <span class="case-identity"><strong>6,26M · factual</strong><small class="mono">case-6260k-q1-factual</small></span>
+    <span class="case-overall"><small>overall</small>0,95</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>61 documentos</span>
+      <span>6.260.548 tokens de corpus</span>
+      <span>77,07 s até terminal</span>
+      <span>7 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/aad80d9a7a2e1ca2af5b9586eb520c3d" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q1-factual-question">
+      <h4 id="case-6260k-q1-factual-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Estou fechando o quadro de acompanhamento da fiscalização nº 24156 e preciso registrar o estado cadastral e a janela de execução antes de decidir se o caso deve ser escalado. Consulte o processo e entregue uma linha de status com a situação, a data de início e a data limite exatamente como constam dos autos; não transforme essas datas, por si sós, em conclusão sobre atraso, encerramento ou resultado da fiscalização.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q1-factual-expected">
+      <h4 id="case-6260k-q1-factual-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>O registro cadastral informa situação “Em andamento”, data de início em 01/01/2020 e data limite em 31/12/2020. Esses são os campos da solicitação; isoladamente, não demonstram encerramento, atraso ou resultado final da fiscalização.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar a situação “Em andamento”.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar a data de início 01/01/2020.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar a data limite 31/12/2020.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Explicar que status e datas são campos cadastrais e, sozinhos, não comprovam atraso, encerramento ou resultado final.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q1-factual-answer">
+      <h4 id="case-6260k-q1-factual-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>ALVOS OBRIGATÓRIOS: fiscalização nº 24156 → /proc<em>5846686/6014081.txt; estado cadastral da entidade no processo → /proc</em>5846686/6014092.txt. EIXOS OBRIGATÓRIOS: situação da fiscalização, data de início, data limite, situação cadastral, sem concluir atraso/encerramento/resultado.Fiscalização nº 24156: situação <strong>Em andamento</strong>, data de início…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 675 caracteres</summary>
+        <div class="response-body markdown-body"><p>ALVOS OBRIGATÓRIOS: fiscalização nº 24156 → /proc<em>5846686/6014081.txt; estado cadastral da entidade no processo → /proc</em>5846686/6014092.txt. EIXOS OBRIGATÓRIOS: situação da fiscalização, data de início, data limite, situação cadastral, sem concluir atraso/encerramento/resultado.Fiscalização nº 24156: situação <strong>Em andamento</strong>, data de início <strong>01/01/2020</strong>, data limite <strong>31/12/2020</strong> e situação cadastral <strong>ATIVA</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297988" aria-label="[2]: Documento SEI nº 5297988" role="note" tabindex="0">[2]</span></p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">d1d1926864e08c26d4dd825bab19c16036fbce821f8f54868e0c5bc756be7a94</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q1-factual-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-6260k-q1-factual-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta: N/D · tentativas: accepted</p></div>
+        <span class="judge-decision">0,95 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta atende ao alvo e recupera corretamente os campos pedidos. A última afirmação interpretativa não está sustentada explicitamente no corpus, embora não contradiga os autos.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>4/4 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>0,8000</strong>
+          <p>4 de 5 claims sustentadas; 1 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>0,90</strong>
+          <p>4/5 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 5 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>A fiscalização nº 24156 está &quot;Em andamento&quot;.</p></td><td>sustentada</td><td>sim</td><td>2, 3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A data de início é 01/01/2020.</p></td><td>sustentada</td><td>sim</td><td>2, 3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A data limite é 31/12/2020.</p></td><td>sustentada</td><td>sim</td><td>2, 3</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A situação cadastral é ATIVA.</p></td><td>sustentada</td><td>sim</td><td>5</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Status e datas são campos cadastrais e, sozinhos, não comprovam atraso, encerramento ou resultado final.</p></td><td>não sustentada</td><td>não</td><td>N/D</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-6260k-q1-factual-occurrences">
+      <h4 id="case-6260k-q1-factual-occurrences">Ocorrências e falhas relevantes</h4>
+      <p class="subtle">Nenhuma ocorrência ou falha relevante registrada para este item.</p>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-6260k-q1-factual/question.txt</span><br><span class="mono">SHA-256 17d03926e1ef6eab822b21109c4316fd42680b759130827b5fe359c573704f81</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-6260k-q1-factual/gold.txt</span><br><span class="mono">SHA-256 7808e3b735fea80f160555dd81e284a08be78824d809f195583dda4594ca0f01</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-6260k-q1-factual/rubric.json</span><br><span class="mono">SHA-256 545a10d671cb8bd00fc84b08689dc28d683303c0e7f4d2ee6d01222e6fed90a2</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-6260k-q1-factual/items/case-6260k-q1-factual/result-protected.json</span><br><span class="mono">SHA-256 2a7405de93749b37220829a8aa803469d5866e64c0d6390af922e771b95a6762</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">3c945b46-8f9a-48a1-8940-0596b734de2c</span><br><strong>Trace:</strong> <span class="mono">aad80d9a7a2e1ca2af5b9586eb520c3d</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-6260k-q2-synthesis">
+  <summary>
+    <span class="case-identity"><strong>6,26M · síntese</strong><small class="mono">case-6260k-q2-synthesis</small></span>
+    <span class="case-overall"><small>overall</small>1,00</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>61 documentos</span>
+      <span>6.260.548 tokens de corpus</span>
+      <span>108,76 s até terminal</span>
+      <span>9 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/b02fd25e43410fe628495a259bd2e8ac" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q2-synthesis-question">
+      <h4 id="case-6260k-q2-synthesis-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Antes de validar os valores apurados para o FUST, a chefia pediu uma nota de conciliação entre a solicitação que originou a fiscalização e o relatório produzido ao final. Reconstitua o exercício tratado no pedido, confira como o objetivo e o resultado esperado aparecem no relatório, registre o exercício e o valor usados na conclusão e indique como a divergência deve ser apresentada para que ninguém corrija o processo sem respaldo.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q2-synthesis-expected">
+      <h4 id="case-6260k-q2-synthesis-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Fatos documentais: a solicitação descreve a apuração referente ao exercício fiscal de 2018, e o relatório mantém 2018 tanto no objetivo quanto no resultado esperado. Contudo, a conclusão do relatório registra “exercício financeiro de 2017” e total de R$ 2.675.706,81. Interpretação operacional: o corpus contém uma inconsistência temporal; a nota deve registrar a divergência e pedir esclarecimento ou revisão antes de associar o valor a um exercício, sem corrigi-la silenciosamente.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar 2018 como exercício fiscal descrito na solicitação.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar 2018 no objetivo do relatório.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar 2018 no resultado esperado do relatório.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar que a conclusão registra exercício financeiro de 2017.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Informar o total de R$ 2.675.706,81.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Explicitar a inconsistência temporal e recomendar que ela seja registrada e esclarecida/revisada, sem atribuir silenciosamente o valor a um dos exercícios.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q2-synthesis-answer">
+      <h4 id="case-6260k-q2-synthesis-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>Nota de conciliação proposta: A solicitação que deu origem à fiscalização foi a SOL<em>AFFO</em>2020_0048, cuja descrição pede “apurar os valores devidos ao Fust (...) referente ao exercício fiscal de 2018” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span>. No Relatório de Fiscalização…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 5.937 caracteres</summary>
+        <div class="response-body markdown-body"><p>Nota de conciliação proposta:</p>
+<p>A solicitação que deu origem à fiscalização foi a SOL<em>AFFO</em>2020_0048, cuja descrição pede “apurar os valores devidos ao Fust (...) referente ao exercício fiscal de 2018” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span>. No Relatório de Fiscalização nº 162/2020/GR01FI1/GR01/SFI, o objeto também foi descrito para 2018: o objetivo é “assegurar o correto recolhimento” do FUST, e o resultado esperado é “apurar os valores devidos ao FUST referentes ao exercício 2018” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span>.</p>
+<p>A reconstituição do exercício tratado no pedido, portanto, é inequívoca: a demanda originária é do exercício de 2018 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span>. Isso é reiterado no próprio relatório, inclusive na descrição da execução, que menciona documentação, análises e planilha de cálculo “para o ano de 2018” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span>.</p>
+<p>A divergência aparece apenas na conclusão do Relatório nº 162/2020: o item 9.1 registra que “os valores apurados para a contribuição ao Fust durante o exercício financeiro de 2017 totalizam (...) R$ 2.675.706,81” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span>. Assim, no mesmo relatório:</p>
+<ul><li>objetivo: compatível com 2018 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li><li>resultado esperado: compatível com 2018 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li><li>desenvolvimento da fiscalização: compatível com 2018 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li><li>conclusão: menciona 2017 e usa o valor de R$ 2.675.706,81 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li></ul>
+<p>Se a validação a ser feita hoje for sobre a reapuração posterior, há um segundo relatório no processo, o Relatório nº 54/2024/UO091/GR09/SFI, que trata expressamente de nova apuração “referente ao exercício de 2018” e conclui por novos valores de FUST no total de R$ 2.598.019,68 para o exercício fiscal de 2018 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12992019" aria-label="[3]: Documento SEI nº 12992019" role="note" tabindex="0">[3]</span>.</p>
+<p>Forma recomendada de apresentar a divergência, sem “corrigir” o processo sem respaldo:</p>
+<ol><li>Registrar que há inconsistência material interna no Relatório nº 162/2020, restrita ao item 9.1, porque a solicitação originária e o restante do relatório convergem para 2018, mas a conclusão consignou 2017 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span>.</li><li>Não afirmar, por conta própria, que o relatório “está corrigido”; afirmar apenas que há forte indicação de erro material de referência ao exercício no item conclusivo, a ser saneado apenas por ato formal da área competente.</li><li>Separar fato de inferência:</li></ol>
+<ul><li>fato documental: solicitação = 2018; objetivo/resultado esperado = 2018; conclusão do RF 162/2020 = 2017 e R$ 2.675.706,81 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li><li>efeito administrativo sugerido: eventual retificação deve ser formalizada por despacho/ato próprio, vedada correção informal no corpo do processo.</li></ul>
+<ol><li>Se for necessário um texto enxuto para a nota: “Verifica-se divergência interna no Relatório de Fiscalização nº 162/2020/GR01FI1/GR01/SFI: a solicitação originária e os itens 1.1, 1.2 e 8 do relatório referem-se ao exercício de 2018, ao passo que o item 9.1 consignou ‘exercício financeiro de 2017’, com valor total de R$ 2.675.706,81. A inconsistência deve ser tratada como possível erro material do item conclusivo, sem alteração informal dos autos, dependendo de manifestação formal da unidade competente para saneamento.” <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li></ol>
+<p>Em resumo:</p>
+<ul><li>exercício do pedido originário: 2018 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5297978" aria-label="[1]: Documento SEI nº 5297978" role="note" tabindex="0">[1]</span></li><li>exercício no objetivo e resultado esperado do RF 162/2020: 2018 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li><li>exercício lançado na conclusão do RF 162/2020: 2017 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li><li>valor lançado nessa conclusão: R$ 2.675.706,81 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[2]: Documento SEI nº 6014416" role="note" tabindex="0">[2]</span></li><li>valor da reapuração posterior, já no RF 54/2024, para 2018: R$ 2.598.019,68 <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12992019" aria-label="[3]: Documento SEI nº 12992019" role="note" tabindex="0">[3]</span></li></ul>
+<p>Se quiser, eu posso transformar isso em uma nota técnica curta, pronta para juntar aos autos.</p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">be0a2e2b719a922b0ec042fafed1469e817597512c84ee840cc1e01156d3e43d</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q2-synthesis-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-6260k-q2-synthesis-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta: N/D · tentativas: accepted</p></div>
+        <span class="judge-decision">1,00 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta atende ao alvo e cobre todos os elementos obrigatórios. Os fatos centrais são suportados pelos excertos; apenas a recomendação procedimental final não está diretamente sustentada pelo pacote, mas não contradiz o corpus.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>6/6 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>0,8571</strong>
+          <p>6 de 7 claims sustentadas; 1 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>1,00</strong>
+          <p>6/7 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 7 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>A solicitação que deu origem à fiscalização foi a SOL<em>AFFO</em>2020_0048, cuja descrição pede apurar os valores devidos ao Fust referente ao exercício fiscal de 2018.</p></td><td>sustentada</td><td>sim</td><td>1, 7, 9</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>No Relatório de Fiscalização nº 162/2020/GR01FI1/GR01/SFI, o objetivo e o resultado esperado estavam ligados a 2018.</p></td><td>sustentada</td><td>sim</td><td>2, 11</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A reconstituição do exercício tratado no pedido é inequívoca e a demanda originária é do exercício de 2018.</p></td><td>sustentada</td><td>sim</td><td>1, 9</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A divergência aparece na conclusão do Relatório nº 162/2020, que registra exercício financeiro de 2017.</p></td><td>sustentada</td><td>sim</td><td>2, 10</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O item 9.1 usa o valor de R$ 2.675.706,81.</p></td><td>sustentada</td><td>sim</td><td>2, 10</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Há um segundo relatório no processo, o Relatório nº 54/2024/UO091/GR09/SFI, que trata de nova apuração referente ao exercício de 2018 e conclui por novos valores de FUST no total de R$ 2.598.019,68.</p></td><td>sustentada</td><td>sim</td><td>3, 4, 5</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A inconsistência deve ser registrada como possível erro material do item conclusivo, sem alteração informal dos autos, dependendo de manifestação formal da unidade competente para saneamento.</p></td><td>não sustentada</td><td>não</td><td>N/D</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-6260k-q2-synthesis-occurrences">
+      <h4 id="case-6260k-q2-synthesis-occurrences">Ocorrências e falhas relevantes</h4>
+      <p class="subtle">Nenhuma ocorrência ou falha relevante registrada para este item.</p>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-6260k-q2-synthesis/question.txt</span><br><span class="mono">SHA-256 a4ec45e268d5507f28a500b5e9e0f8b1fc10ecd1cbd92a40fd0986aa487a48a4</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-6260k-q2-synthesis/gold.txt</span><br><span class="mono">SHA-256 cccee4f32faa9f075bfea0436895945d11735f74208ff17671bf42078e70aef2</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-6260k-q2-synthesis/rubric.json</span><br><span class="mono">SHA-256 1e0c2f29b8bea77204d05050d7eadd7f60337c58adccb21572643114a150b0f4</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-6260k-q2-synthesis/items/case-6260k-q2-synthesis/result-protected.json</span><br><span class="mono">SHA-256 16174048e5abf1395f5899032976f63cfb3e21edfc9d6a019a8f2a8930bc1cf6</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">f8aefefa-23bd-4321-adf5-fe0b8d7a2b06</span><br><strong>Trace:</strong> <span class="mono">b02fd25e43410fe628495a259bd2e8ac</span></p>
+    </details>
+  </div>
+</details>
+
+<details class="audit-case" id="case-6260k-q3-insufficient-evidence">
+  <summary>
+    <span class="case-identity"><strong>6,26M · evidência insuficiente</strong><small class="mono">case-6260k-q3-insufficient-evidence</small></span>
+    <span class="case-overall"><small>overall</small>0,87</span>
+    <span class="status-badge">gate passou</span>
+  </summary>
+  <div class="audit-body">
+    <div class="case-meta">
+      <span>61 documentos</span>
+      <span>6.260.548 tokens de corpus</span>
+      <span>137,49 s até terminal</span>
+      <span>27 tools</span>
+      <a class="trace-link" href="http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/4a48a2f43334e25debdad34ddbace832" target="_blank" rel="noreferrer">Abrir trace Langfuse ↗</a>
+    </div>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q3-insufficient-evidence-question">
+      <h4 id="case-6260k-q3-insufficient-evidence-question">Pergunta integral</h4>
+      <div class="copy-block markdown-body"><p>Para o painel de resultados do Requerimento de Informações, a chefia pediu uma taxa de atendimento considerando o conjunto inteiro de documentos solicitados, não apenas os arquivos que aparecem no relatório de análise. Faça a validação de suficiência do processo e devolva uma recomendação: diga se o indicador pode ser fechado, explicite quais dados faltariam para formar numerador e denominador e registre o limite que deve acompanhar qualquer comunicação à gestão.</p></div>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q3-insufficient-evidence-expected">
+      <h4 id="case-6260k-q3-insufficient-evidence-expected">Gold answer e critérios esperados</h4>
+      <div class="gold-block markdown-body"><p>Não é possível fechar a taxa com o corpus preservado. Os autos mostram o requerimento e documentos analisados, mas não trazem uma taxa publicada nem um universo completo que permita identificar o denominador — o total de documentos ou itens solicitados — e o numerador — quantos foram efetivamente atendidos ou recebidos. A recomendação é registrar a insuficiência e não inferir percentual a partir dos documentos selecionados.</p></div>
+      <ol class="criteria-list"><li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Declarar que a taxa não pode ser fechada com o corpus.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Reconhecer que os autos mostram o requerimento e documentos analisados.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Registrar que não há taxa percentual publicada.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar o denominador ausente ou incompleto: o universo total de documentos ou itens solicitados.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Identificar o numerador ausente ou incompleto: a quantidade efetivamente atendida ou recebida nesse mesmo universo.</p></div></li>
+<li><span class="criterion-pass" aria-label="satisfeito">✓</span><div class="criterion-copy markdown-body"><p>Recomendar que a insuficiência seja comunicada e que não se infira percentual dos documentos selecionados.</p></div></li></ol>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q3-insufficient-evidence-answer">
+      <h4 id="case-6260k-q3-insufficient-evidence-answer">Resposta efetivamente produzida</h4>
+      <div class="response-preview markdown-body"><p>Progresso: identifiquei o conjunto pedido no RI e o que a empresa disse ter entregue; agora estou validando se os autos efetivamente permitem montar numerador e denominador do indicador sem inferências.Progresso: o cruzamento já mostra que o RI tem 10 itens, a resposta da empresa lista 8 grupos e os relatórios trabalham com anexos/mídia não disponíveis nos…</p></div>
+      <details class="content-expander">
+        <summary>Ler resposta integral · 4.421 caracteres</summary>
+        <div class="response-body markdown-body"><p>Progresso: identifiquei o conjunto pedido no RI e o que a empresa disse ter entregue; agora estou validando se os autos efetivamente permitem montar numerador e denominador do indicador sem inferências.Progresso: o cruzamento já mostra que o RI tem 10 itens, a resposta da empresa lista 8 grupos e os relatórios trabalham com anexos/mídia não disponíveis nos autos da sessão. Vou fechar a validação de suficiência com base nisso.Recomendação: <strong>não fechar o indicador</strong> com os autos disponíveis na sessão. O Requerimento de Informações pede 10 subitens, dos quais o 2.1.3 é condicional (“se houver”) e o 2.1.9 depende de ter havido retificação; além disso, os itens 2.1.1 a 2.1.4 podem ser entregues em PDF/Excel e os itens 2.1.5 a 2.1.9 em <code>.sped</code> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5290612" aria-label="[1]: Documento SEI nº 5290612" role="note" tabindex="0">[1]</span>. Já a resposta da empresa declara atendimento aos itens 2.1.1 a 2.1.10, <strong>exceto 2.1.3</strong>, mas só lista 8 grupos documentais/informacionais e não materializa, no próprio documento, o conteúdo anexado; é uma declaração de encaminhamento, não uma prova completa do acervo efetivamente juntado <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 5497932" aria-label="[2]: Documento SEI nº 5497932" role="note" tabindex="0">[2]</span>.</p>
+<p>O ponto crítico é que o Relatório de Fiscalização nº 162/2020 trabalha com <strong>mídia e anexos</strong> que não estão disponíveis como arquivos autônomos na sessão: ele afirma que, em atendimento ao RI, foram recebidos ao menos ECD com recibo, ECF com recibo e arquivos mensais de EFD ICMS, e cita como base de análise a mídia SEI 5498616 e anexos como 6014408, 6014409 e 6014413; porém esses conteúdos não aparecem entre os arquivos disponíveis do processo na sessão <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 6014416" aria-label="[3]: Documento SEI nº 6014416" role="note" tabindex="0">[3]</span>. Assim, <strong>não dá para auditar item a item o conjunto inteiro solicitado</strong>, apenas saber que houve uma análise fiscal baseada em parte desse material.</p>
+<h3>O que falta para formar o indicador</h3>
+<p><strong>Para o denominador</strong></p>
+<ol><li><strong>Regra de contagem</strong> do painel:</li></ol>
+<ul><li>contar por <strong>subitem do RI</strong> (2.1.1 a 2.1.10)?</li><li>contar por <strong>pacote documental</strong>?</li><li>contar por <strong>arquivo individual</strong>?</li></ul>
+<ol><li><strong>Tratamento dos condicionais</strong>:</li></ol>
+<ul><li>confirmação objetiva de que o item <strong>2.1.3</strong> era realmente “não aplicável”;</li><li>confirmação objetiva sobre a existência ou não de <strong>retificações</strong> para os SPEDs do item <strong>2.1.9</strong>.</li></ul>
+<ol><li>Definição se o item <strong>2.1.10</strong> (indicação de representante) entra como “documento solicitado” ou como informação acessória.</li></ol>
+<p><strong>Para o numerador</strong></p>
+<ol><li>O <strong>conteúdo efetivamente recebido</strong> em resposta ao RI, especialmente a mídia/anexos citados no relatório:</li></ol>
+<ul><li>SEI <strong>5498616</strong>;</li><li>anexos referidos pela fiscalização e usados na análise.</li></ul>
+<ol><li>Evidência item a item de presença/ausência de:</li></ol>
+<ul><li>2.1.1 descrição das atividades;</li><li>2.1.2 alíquotas;</li><li>2.1.4 memória de cálculo/conciliações;</li><li>2.1.5 ECD + recibo;</li><li>2.1.6 ECF + recibo;</li><li>2.1.7 EFD Contribuições + recibo;</li><li>2.1.8 EFD ICMS-IPI + recibo;</li><li>2.1.9 originais e retificadoras, se houver;</li><li>2.1.10 dados do representante.</li></ul>
+<ol><li>Distinção entre:</li></ol>
+<ul><li><strong>declaração da empresa de que enviou</strong>; e</li><li><strong>prova verificável de que o arquivo/documento está nos autos</strong>.</li></ul>
+<h3>Sobre os documentos posteriores</h3>
+<p>A documentação da impugnação juntada depois serviu para <strong>revisar a base de cálculo</strong> e corrigir a apuração, inclusive com notas fiscais e planilhas adicionais; isso mostra que a instrução do processo continuou depois, mas <strong>não supre a falta de visibilidade do atendimento original ao RI para fins do indicador</strong> <span class="AssistenteSEIIAfonteResposta source-tooltip" data-tooltip="Documento SEI nº 12992019" aria-label="[4]: Documento SEI nº 12992019" role="note" tabindex="0">[4]</span>.</p>
+<h3>Limite que deve acompanhar qualquer comunicação à gestão</h3>
+<p>O limite recomendado é este:</p>
+<p><strong>“A taxa de atendimento não pôde ser validada sobre o conjunto integral de documentos solicitados no Requerimento de Informações, porque os autos disponíveis não permitem verificar, item a item, todo o material efetivamente entregue pela fiscalizada; há evidência de análise fiscal e de declaração de encaminhamento, mas não de completude auditável do acervo originalmente solicitado.”</strong></p>
+<p>Se quiser, eu posso converter isso em uma nota executiva curta, já no formato de texto para o painel ou para despacho interno.</p></div>
+      </details>
+      <p class="hash-line">SHA-256 da resposta: <span class="mono">25606963053ffb35c3426ca6b69b978d21e2138987cf30dbde2057d638a7ca99</span></p>
+    </section>
+
+    <section class="audit-section" aria-labelledby="case-6260k-q3-insufficient-evidence-judge">
+      <div class="section-title-row">
+        <div><h4 id="case-6260k-q3-insufficient-evidence-judge">Avaliação do judge</h4><p class="subtle">qualidade válida · gate passou · negativa correta · negativa correta: sim · tentativas: rejected → accepted</p></div>
+        <span class="judge-decision">0,87 overall</span>
+      </div>
+      <blockquote class="judge-rationale markdown-body"><p>A resposta trata o alvo pedido e cumpre os itens obrigatórios, recomendando não fechar o indicador, apontando o que falta para numerador e denominador e registrando o limite de comunicação. Há algumas afirmações não sustentadas diretamente pelo pacote aberto, mas sem contradição relevante ao núcleo da recomendação.</p></blockquote>
+      <div class="judge-grid">
+        <article class="judge-card">
+          <span class="metric-label">COMPLETUDE</span><strong>1,00</strong>
+          <p>6/6 critérios obrigatórios satisfeitos. A justificativa item a item está na lista de critérios acima.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">GROUNDEDNESS</span><strong>0,8182</strong>
+          <p>9 de 11 claims sustentadas; 2 não sustentadas e 0 contraditas. O detalhamento claim a claim está abaixo.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">ALUCINAÇÃO</span><strong>não</strong>
+          <p>0 alucinações e 0 claims marcadas como inventadas. Justificativa textual específica: N/D — o schema do judge registra o booleano e o atributo por claim, sem narrativa separada.</p>
+        </article>
+        <article class="judge-card">
+          <span class="metric-label">QUALIDADE DE CITAÇÃO</span><strong>0,90</strong>
+          <p>11/11 claims verificadas têm citação. Referências e presença de citação estão discriminadas na auditoria de claims.</p>
+        </article>
+      </div>
+      <details class="content-expander claims-expander">
+        <summary>Auditar 11 claims avaliadas pelo judge</summary>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Claim</th><th>Veredito</th><th>Citação</th><th>Refs.</th><th>Inventada</th></tr></thead><tbody><tr><td class="claim-text markdown-body"><p>Não dá para auditar item a item o conjunto inteiro solicitado.</p></td><td>sustentada</td><td>sim</td><td>9, 10, 11, 12</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O Requerimento de Informações pede 10 subitens.</p></td><td>sustentada</td><td>sim</td><td>10, 11, 12</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O item 2.1.3 é condicional (&#039;se houver&#039;) e o 2.1.9 depende de ter havido retificação.</p></td><td>sustentada</td><td>sim</td><td>11</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Os itens 2.1.1 a 2.1.4 podem ser entregues em PDF/Excel e os itens 2.1.5 a 2.1.9 em .sped.</p></td><td>sustentada</td><td>sim</td><td>9, 10, 12</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A resposta da empresa declara atendimento aos itens 2.1.1 a 2.1.10, exceto 2.1.3, mas só lista 8 grupos documentais/informacionais.</p></td><td>não sustentada</td><td>sim</td><td>N/D</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>O relatório afirma que, em atendimento ao RI, foram recebidos ao menos ECD com recibo, ECF com recibo e arquivos mensais de EFD ICMS.</p></td><td>sustentada</td><td>sim</td><td>13, 14, 15</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A mídia SEI 5498616 e anexos como 6014408, 6014409 e 6014413 não aparecem entre os arquivos disponíveis do processo na sessão.</p></td><td>não sustentada</td><td>sim</td><td>N/D</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Os documentos posteriores de impugnação serviram para revisar a base de cálculo e corrigir a apuração.</p></td><td>sustentada</td><td>sim</td><td>4, 5, 6</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>A taxa de atendimento não pôde ser validada sobre o conjunto integral de documentos solicitados no Requerimento de Informações.</p></td><td>sustentada</td><td>sim</td><td>9, 10, 11, 12, 13, 14, 15</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Os autos disponíveis não permitem verificar, item a item, todo o material efetivamente entregue pela fiscalizada.</p></td><td>sustentada</td><td>sim</td><td>13, 14, 15</td><td>não</td></tr>
+<tr><td class="claim-text markdown-body"><p>Há evidência de análise fiscal e de declaração de encaminhamento, mas não de completude auditável do acervo originalmente solicitado.</p></td><td>sustentada</td><td>sim</td><td>13, 14, 15, 2, 3</td><td>não</td></tr></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="audit-section occurrence-section" aria-labelledby="case-6260k-q3-insufficient-evidence-occurrences">
+      <h4 id="case-6260k-q3-insufficient-evidence-occurrences">Ocorrências e falhas relevantes</h4>
+      <ul><li class="markdown-body"><p>A primeira saída do judge foi rejeitada pelo contrato; a segunda foi aceita. O retry de avaliação não repetiu o agente.</p></li></ul>
+    </section>
+
+    <details class="source-expander">
+      <summary>Proveniência e reconciliação</summary>
+      <ul class="source-list"><li><strong>Pergunta:</strong> <span class="mono">protected-bundle/items/case-6260k-q3-insufficient-evidence/question.txt</span><br><span class="mono">SHA-256 49d98d4ebbc03c724249d53e20762c22168bae10638971517c86804e116dd00e</span></li>
+<li><strong>Gold answer:</strong> <span class="mono">protected-bundle/items/case-6260k-q3-insufficient-evidence/gold.txt</span><br><span class="mono">SHA-256 c462821edc4bda0c03b0d82a0b0a2814187af87ae4675ac5eadc5eb67cadf21a</span></li>
+<li><strong>Rubrica:</strong> <span class="mono">protected-bundle/items/case-6260k-q3-insufficient-evidence/rubric.json</span><br><span class="mono">SHA-256 27d4eee136942fc873284ccbef99d1c09f2542cec715115f2fbfc061fcdc14a5</span></li>
+<li><strong>Resultado/scoring protegido:</strong> <span class="mono">full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-6260k-q3-insufficient-evidence/items/case-6260k-q3-insufficient-evidence/result-protected.json</span><br><span class="mono">SHA-256 57d0b4a0c09e1bc7c822c5f02d2fd31a76296386c32be2e9aaacd2d23f976e66</span></li>
+<li><strong>Agregado oficial:</strong> <span class="mono">full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json</span></li></ul>
+      <p><strong>Execution:</strong> <span class="mono">7505888d-bffa-46f7-8fbc-2ed2d97b4366</span><br><strong>Trace:</strong> <span class="mono">4a48a2f43334e25debdad34ddbace832</span></p>
+    </details>
+  </div>
+</details>
+          <!-- LONG CONTEXT CASES GENERATED END -->
+        </div>
+      </section>
+
+      <section id="achados">
+        <h2>Achados causais e arquiteturais</h2>
+        <div class="grid three">
+          <article class="method-card standard"><span class="tag">CAPACIDADE</span><h3>Disclosure seletivo funcionou</h3><p class="subtle">O agente encontrou e sintetizou evidência nas três faixas sem injetar o corpus integral no prompt.</p></article>
+          <article class="method-card mini"><span class="tag">TRIGGER DE LATÊNCIA</span><h3>Fan-out documental</h3><p class="subtle">O primeiro ponto de divergência do corpus 5,12M ocorre antes do agente, na materialização fresh de 331 documentos.</p></article>
+          <article class="method-card classic"><span class="tag">LACUNA CAUSAL</span><h3>Preparação sem spans internos</h3><p class="subtle">Ainda faltam tempos separados para SEI, purge, download, OCR, escrita/tokenização e validação.</p></article>
+        </div>
+        <div class="callout" style="margin-top:16px"><div aria-hidden="true">→</div><div><strong>Leitura do caso mais lento</strong> No negativo 5,12M, 719,70 s vieram da preparação e 242,17 s do pós-preparo, com 84 tools. Há duas causas observadas: fan-out fresh e exploração posterior extensa.</div></div>
+      </section>
+
+      <section id="recomendacoes" class="decision">
+        <h2>Recomendações e próximos passos</h2>
+        <p>A bateria prova capacidade operacional e oferece nove trilhas auditáveis; a próxima rodada deve aumentar repetição e granularidade de observabilidade.</p>
+        <div class="decision-grid">
+          <div><strong>Instrumentar preparação</strong><span>Spans por consulta SEI, download, OCR, escrita, tokenização e validação.</span></div>
+          <div><strong>Medir distribuição</strong><span>N≥3 por item, reportando mediana, dispersão e estado de cache.</span></div>
+          <div><strong>Testar fronteiras</strong><span>200k–500k e variação controlada de concorrência, mantendo os gates separados.</span></div>
+        </div>
+      </section>
+
+      <section id="fontes">
+        <h2>Fontes e reprodutibilidade</h2>
+        <div class="grid three">
+          <article class="method-card standard"><h3>Dados auditáveis</h3><p><a href="../artifacts/long-context-presentation-data.json">Artefato versionado dos nove casos</a></p><p class="method-note">Perguntas, respostas, judge, traces, hashes e proveniência exibidos nesta página.</p></article>
+          <article class="method-card mini"><h3>Resultado oficial</h3><p><a href="RELATORIO_LONG_CONTEXT_V2_BATERIA_COMPLETA_2026-07-24.md">Relatório da bateria completa</a></p><p class="method-note">Agregados, incidentes, causalidade, retenção e traces oficiais.</p></article>
+          <article class="method-card classic"><h3>Contrato</h3><p><a href="../dataset/long-context/benchmark-long-context-v2.json">Manifesto Long Context V2</a></p><p class="method-note">IDs, hashes, três corpora e nove itens canônicos.</p></article>
+          <article class="method-card standard"><h3>Metodologia</h3><p><a href="METODOLOGIA_CENTRAL_BENCHMARKS_ASSISTENTE_SEI_IA.md">Metodologia central</a></p><p class="method-note">Regras comuns de execução, judge, custo e auditoria.</p></article>
+          <article class="method-card mini"><h3>Reconstrução</h3><p><span class="mono">node scripts/long-context/build_long_context_presentation.mjs</span></p><p class="method-note">O gerador exige exatamente nove casos com pergunta, resposta, judge, trace e gate aprovado.</p></article>
+          <article class="method-card classic"><h3>Outra apresentação</h3><p><a href="apresentacao-comparativo.html">Session standard, mini, Luna e clássico</a></p><p class="method-note">Benchmark decisório com os quatro métodos e dez QIDs.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer><div class="shell">Bateria Long Context V2 · 24/07/2026 · nove itens oficiais reconciliados por ID.</div></footer>
+    <script>
+      (() => {
+        const revealHash = () => {
+          if (!location.hash) return;
+          const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+          if (target?.matches("details.audit-case")) target.open = true;
+        };
+        addEventListener("hashchange", revealHash);
+        revealHash();
+      })();
+    </script>
+  </body>
+</html>

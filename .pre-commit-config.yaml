@@ -1,0 +1,144 @@
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v5.0.0"
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+        # Docker Compose supports !reset/!override tags that PyYAML does not.
+        # litellm_config.template.yaml: o placeholder ${LITELLM_MODEL_CATALOG_ENTRIES}
+        # injeta um bloco inteiro de model_list via envsubst no deploy — só vira
+        # YAML válido depois da substituição, não como template puro.
+        exclude: "(mkdocs\\.yml|aplicacoes/assistente/experimentos/latencia-session-vs-classico/docker-compose\\.isolated\\.yml|^litellm_config\\.template\\.yaml)$"
+      - id: check-added-large-files
+        args: ['--maxkb=1024']
+        exclude: ^aplicacoes/assistente/tests/fixtures/documents/
+
+  - repo: local
+    hooks:
+      # tests/connectivity_tests.py e .gitlab/scripts/**/*.py: scripts fora
+      # de aplicacoes/*, sem ruff.toml próprio, caem no ruleset default
+      # (estrito) do ruff — débito de lint pré-existente nos arquivos
+      # inteiros (~800 erros em .gitlab/scripts sozinho), sem relação com
+      # commits pontuais. Excluídos até alguém dedicar um passe de limpeza.
+      - id: ruff
+        name: ruff
+        entry: ruff check --fix
+        language: system
+        types: [python]
+        pass_filenames: true
+        exclude: "(^tests/connectivity_tests\\.py$|^\\.gitlab/scripts/)"
+
+      - id: ruff-format
+        name: ruff-format
+        entry: ruff format
+        language: system
+        types: [python]
+        pass_filenames: true
+        exclude: "(^tests/connectivity_tests\\.py$|^\\.gitlab/scripts/)"
+
+      - id: redos-scan
+        name: "ReDoS scanner (regexploit)"
+        entry: bash .gitlab/scripts/redos_check.sh
+        language: python
+        additional_dependencies: ["regexploit==1.0.0"]
+        types: [python]
+        pass_filenames: true
+
+      # Espelha o job linter:assistente do GitLab quando a configuração
+      # de CI muda. O hook ruff acima só recebe arquivos Python alterados;
+      # em mudanças de YAML ele fica sem arquivos e não reproduz o lint
+      # completo que o pipeline executa em aplicacoes/assistente.
+      - id: ruff-assistente-ci-full
+        name: "ruff assistente completo (espelha CI)"
+        entry: bash -c 'cd aplicacoes/assistente && ruff check --statistics .'
+        language: system
+        pass_filenames: false
+        files: "^(\\.gitlab-ci\\.yml|\\.gitlab/ci/quality-and-test\\.yml|aplicacoes/assistente/pyproject\\.toml|aplicacoes/assistente/ruff\\.toml)$"
+
+      # Garante que supressões noqa para regras mapeadas ao SonarQube
+      # também tenham # NOSONAR (os dois mecanismos são independentes).
+      - id: noqa-needs-nosonar
+        name: "noqa (regras SonarQube) precisa de # NOSONAR"
+        language: pygrep
+        entry: "^(?!.*NOSONAR).*# noqa:.*\\b(?:ARG001|ARG002|C901|PLR0912|PLR0915|ERA001|PLW0603|S\\d+)\\b"
+        types: [python]
+        files: "^aplicacoes/assistente/sei_ia/"
+
+      # SonarQube S7483: parâmetro `timeout` com valor padrão.
+      # Não tem equivalente no ruff; checado aqui diretamente.
+      - id: timeout-param-needs-nosonar
+        name: "parâmetro timeout precisa de # NOSONAR (SonarQube S7483)"
+        language: pygrep
+        entry: "^(?!.*NOSONAR)\\s+timeout\\s*:\\s*[A-Za-z][\\w\\[\\]| ]*\\s*="
+        types: [python]
+        files: "^aplicacoes/assistente/sei_ia/"
+
+      # SonarQube S5332: URL http:// em valor padrão de os.getenv().
+      # Ruff não tem regra equivalente; checado via pygrep.
+      # Use https:// ou variável de ambiente sem default http://.
+      - id: no-http-url-in-env-default
+        name: "URL http:// em os.getenv() padrão insegura (SonarQube S5332)"
+        language: pygrep
+        entry: "os\\.getenv\\([^,]+,\\s*['\"]http://"
+        types: [python]
+        files: "^aplicacoes/"
+
+      - id: assistente-unit-tests-pre-push
+        name: "testes unitários completos do Assistente antes do push"
+        entry: bash -c 'cd aplicacoes/assistente && uv run --group ci-test pytest -n auto --maxfail=1 tests/unit'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: "^(aplicacoes/assistente/|libs/(sei_api|sei_extraction)/)"
+
+      - id: assistente-e2e-tests-pre-push
+        name: "testes E2E do Assistente antes do push"
+        entry: bash -c 'cd aplicacoes/assistente && uv run --group ci-test pytest --maxfail=1 tests/e2e/test_session_stream.py -v --tb=short'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: "^(aplicacoes/assistente/|libs/(sei_api|sei_extraction)/)"
+
+      - id: sei-extraction-tests-pre-push
+        name: "testes completos do sei_extraction antes do push"
+        entry: bash -c 'cd libs/sei_extraction && uv run --extra dev --extra extract python -m pytest --maxfail=1 tests -v --tb=short'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: "^(.gitlab/ci/quality-and-test\\.yml|libs/sei_extraction/)"
+
+      - id: candidate-compose-pre-push
+        name: "renderização do Compose usada por build:candidates"
+        entry: python3 .gitlab/scripts/render_candidate_compose.py --repository .
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: "^(docker-compose\\.yml|default\\.env|security_example\\.env|\\.pre-commit-config\\.yaml|\\.gitlab/)"
+
+      - id: migration-1-2-to-1-3-tests-pre-push
+        name: "testes da migração 1.2 para 1.3 antes do push"
+        entry: uv run --project aplicacoes/assistente --frozen python -m pytest tests/test_migration_1_2_to_1_3.py -q
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: "^(migracao/1\\.2_1\\.3/|tests/test_migration_1_2_to_1_3\\.py|security_example\\.env|litellm_config\\.template\\.yaml|default\\.env|\\.gitlab/ci/deploy-config-tests\\.yml|\\.pre-commit-config\\.yaml)"
+
+      - id: stack-checker-contracts-pre-push
+        name: "contratos do checker da stack antes do push"
+        entry: uv run --with pytest --with-requirements ops/healthchecker-requirements.txt python -m pytest tests/test_gateway_contracts.py tests/test_airflow_healthchecker.py -q
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: "^(docker-compose\\.yml|default\\.env|security_example\\.env|litellm_config\\.template\\.yaml|ops/(healthchecker-requirements\\.txt|gateway/)|tests/(airflow_tests|connectivity_tests|test_airflow_healthchecker|test_gateway_contracts)\\.py|\\.gitlab/ci/deploy-config-tests\\.yml|\\.pre-commit-config\\.yaml)"
+
+      # Garante que noqa para regras SonarQube também cubra similaridade.
+      - id: noqa-needs-nosonar-similaridade
+        name: "noqa (regras SonarQube) precisa de # NOSONAR — similaridade"
+        language: pygrep
+        entry: "^(?!.*NOSONAR).*# noqa:.*\\b(?:ARG001|ARG002|C901|S\\d+)\\b"
+        types: [python]
+        files: "^aplicacoes/similaridade/(api_sei|app_api)/"

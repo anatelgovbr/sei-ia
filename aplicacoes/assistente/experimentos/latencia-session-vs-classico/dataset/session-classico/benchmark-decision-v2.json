@@ -1,0 +1,178 @@
+{
+  "dataset_name": "benchmark-decision-v2",
+  "description": "Suite decisoria v2: 10 casos session vs classico, com gabaritos web factuais revisados em 2026-07-14 e politica de citacao separada de alucinacao.",
+  "base_cases_file": "cases.json",
+  "item_metadata": {
+    "benchmark_version": "v2",
+    "gold_reviewed_at": "2026-07-14",
+    "source_policy": "A fonte pode variar; avaliam-se a correcao da informacao e o suporte da fonte citada. Ausencia de citacao nao e, isoladamente, alucinacao."
+  },
+  "qids": [
+    "SMALL-CONF-01",
+    "SMALL-NEG-01",
+    "SMALL-WEB-01",
+    "Q17",
+    "Q19",
+    "Q23",
+    "LARGE-OFICIOS-01",
+    "LARGE-NEG-01",
+    "LARGE-WEB-01",
+    "WEB-FII-01"
+  ],
+  "overrides": {
+    "SMALL-WEB-01": {
+      "input": {
+        "text": "A empresa Internet Mais Ltda, CNPJ 34.058.207/0001-39, citada neste processo, consta atualmente com situacao cadastral ativa? Consulte fontes publicas atualizadas na internet, compare a entidade pelo CNPJ e cite as URLs e a data da consulta."
+      },
+      "expected_output": {
+        "categoria": "websearch",
+        "gold_answer": "Na data de revisao do gabarito (2026-07-14), fontes publicas de dados cadastrais associam o CNPJ 34.058.207/0001-39 a Internet Mais Ltda, com situacao cadastral ATIVA, sede em Campo Grande/MS e atividade principal de Servicos de comunicacao multimidia - SCM. A situacao e volatil e deve ser reconfirmada na execucao.",
+        "gold_answer_exemplo": "Sim. Na fonte consultada, o CNPJ 34.058.207/0001-39 corresponde a Internet Mais Ltda e aparece com situacao cadastral ATIVA, em Campo Grande/MS, tendo Servicos de comunicacao multimidia - SCM como atividade principal. A resposta deve informar a data da consulta e citar a URL que sustenta esses dados.",
+        "elementos_obrigatorios": [
+          "identificar Internet Mais Ltda pelo CNPJ exato 34.058.207/0001-39",
+          "informar a situacao cadastral atual encontrada; referencia revisada em 2026-07-14: ATIVA",
+          "informar Campo Grande/MS e a atividade principal SCM",
+          "citar URL de fonte publica que sustente os dados e informar a data da consulta"
+        ],
+        "credito_parcial": "Credito parcial se acertar entidade, CNPJ e situacao ATIVA, mas omitir municipio ou atividade. A falta de URL reduz citation_quality e groundedness; isoladamente, nao configura alucinacao.",
+        "indicadores_alucinacao": [
+          "atribuir ao CNPJ razao social diferente de Internet Mais Ltda",
+          "usar CNPJ diferente de 34.058.207/0001-39",
+          "afirmar situacao baixada, inapta ou suspensa quando a fonte citada nao sustenta isso",
+          "inventar URL ou atribuir a uma fonte informacao que ela nao apresenta"
+        ],
+        "doc_fonte": "Autos: SEI 15903399, item 8.4, para o vinculo com a empresa. Web: qualquer fonte publica atualizada que identifique inequivocamente o CNPJ e sustente os dados; exemplos verificados em 2026-07-14: cnpj.biz e INFOinvest.",
+        "regra": "Avaliar primeiro a correcao da entidade, do CNPJ e da situacao; nao exigir um dominio especifico. A fonte citada precisa sustentar a afirmacao. Ausencia de citacao e falha de citacao/groundedness, nao alucinacao por si so.",
+        "evidencia": [
+          {
+            "item": "CNPJ citado nos autos",
+            "doc": "SEI 15903399, item 8.4"
+          },
+          {
+            "item": "Internet Mais Ltda; ATIVA; Campo Grande/MS; SCM",
+            "doc": "https://cnpj.biz/34058207000139 e https://www.infoinvest.com.br/consulta-empresa/34058207000139-internet-mais-ltda, consultados em 2026-07-14"
+          }
+        ]
+      }
+    },
+    "Q23": {
+      "input": {
+        "text": "A razao social 'LHG Mining Corumba S.A.' que aparece nos documentos mais recentes do processo confere com o nome empresarial atualmente associado ao CNPJ 03.327.988/0001-96 em fontes publicas atualizadas na internet? Compare explicitamente os dois dados e cite as URLs e a data da consulta."
+      },
+      "expected_output": {
+        "categoria": "websearch",
+        "gold_answer": "Sim. Os documentos recentes do processo usam LHG Mining Corumba S.A. e, na data de revisao do gabarito (2026-07-14), fontes publicas atualizadas associam o CNPJ 03.327.988/0001-96 ao mesmo nome empresarial. Portanto, os dados conferem.",
+        "gold_answer_exemplo": "Nos documentos recentes do processo, o CNPJ 03.327.988/0001-96 aparece como LHG Mining Corumba S.A. A consulta externa atualizada associa o mesmo CNPJ ao nome empresarial LHG Mining Corumba S.A.; portanto, confere. A resposta deve citar separadamente o documento do processo e ao menos uma URL externa, com a data da consulta.",
+        "elementos_obrigatorios": [
+          "informar o CNPJ exato 03.327.988/0001-96",
+          "identificar LHG Mining Corumba S.A. nos documentos recentes do processo",
+          "identificar LHG Mining Corumba S.A. na fonte externa atualizada",
+          "comparar explicitamente e concluir que confere",
+          "citar documento do processo, URL externa e data da consulta"
+        ],
+        "credito_parcial": "Credito parcial se encontrar corretamente os dois nomes, mas nao fizer a comparacao explicita. A falta de URL reduz citation_quality e groundedness; isoladamente, nao configura alucinacao.",
+        "indicadores_alucinacao": [
+          "atribuir ao CNPJ nome empresarial diferente sem fonte atualizada que sustente a divergencia",
+          "usar CNPJ diferente de 03.327.988/0001-96",
+          "concluir que nao confere apesar de processo e fonte externa apresentarem o mesmo nome",
+          "inventar URL ou chamar um agregador privado de consulta oficial da Receita Federal"
+        ],
+        "doc_fonte": "Processo: documentos recentes que registram LHG Mining Corumba S.A. Web: qualquer fonte publica atualizada que associe inequivocamente o CNPJ ao nome; exemplos verificados em 2026-07-14: ficha cadastral CNPJCheck, Econodata e publicacao societaria da propria companhia.",
+        "regra": "Avaliar a correcao da comparacao, nao o dominio escolhido. Nao exigir consulta direta a Receita Federal. A fonte precisa sustentar o nome e o CNPJ. Ausencia de citacao nao e alucinacao por si so.",
+        "evidencia": [
+          {
+            "item": "Nome nos autos",
+            "doc": "documentos de 2025/2026 do processo 8116731"
+          },
+          {
+            "item": "LHG Mining Corumba S.A. associada ao CNPJ 03.327.988/0001-96",
+            "doc": "https://cnpjcheck.com.br/empresa/pdf/03327988000196, https://www.econodata.com.br/consulta-empresa/03327988000196-lhg-mining-corumba-sa e publicacao societaria de 2026, consultados em 2026-07-14"
+          }
+        ]
+      }
+    },
+    "LARGE-NEG-01": {
+      "expected_output": {
+        "elementos_obrigatorios": [
+          "reconhecer que nao consta oficio expedido pela SFI"
+        ],
+        "credito_parcial": "A resposta central e binaria: credito integral se reconhecer corretamente que nao consta oficio da SFI e nao inventar numero/protocolo. Identificar COGE/SCO como a area dos oficios existentes melhora completude e evidencia, mas nao e requisito para responder ao que foi perguntado.",
+        "regra": "A resposta correta e reconhecer a ausencia. A varredura encontrou 8 oficios COGE/SCO-ANATEL e nenhum oficio expedido pela SFI; o contexto COGE/SCO e evidencia adicional, nao obrigacao artificial."
+      }
+    },
+    "LARGE-WEB-01": {
+      "input": {
+        "text": "Pesquise na internet a situacao empresarial e judicial atual da Oi S.A., interessada neste processo. Apresente a linha do tempo recente, diferencie decisao de primeira instancia de seus efeitos atuais e cite as URLs e a data da consulta."
+      },
+      "expected_output": {
+        "categoria": "websearch",
+        "gold_answer": "A falencia do Grupo Oi foi decretada em primeira instancia em 10/11/2025, no contexto da segunda recuperacao judicial e de uma liquidacao ordenada. Em 14/11/2025, decisao monocratica em recurso suspendeu os efeitos da sentenca e determinou o prosseguimento da recuperacao judicial conforme o plano aprovado. Assim, o estado atual nao deve ser descrito simplesmente como falencia definitiva: a companhia permanece em grave crise e sob recuperacao judicial/liquidacao ordenada enquanto a disputa judicial prossegue. Situacao revisada em 2026-07-14 e sujeita a nova verificacao na data da execucao.",
+        "gold_answer_exemplo": "A 7a Vara Empresarial do Rio decretou a falencia do Grupo Oi em 10/11/2025 e determinou a continuidade dos servicos durante uma liquidacao ordenada. Porem, em 14/11/2025, uma decisao em agravo suspendeu os efeitos dessa sentenca e mandou prosseguir a recuperacao judicial. Portanto, na data consultada, nao e correto tratar a falencia como definitiva e em pleno efeito; a Oi segue em situacao financeira critica, sob recuperacao judicial e processo de alienacao/liquidacao de ativos. Cite as URLs que sustentam cada marco e a data da consulta.",
+        "elementos_obrigatorios": [
+          "mencionar a decretacao da falencia em primeira instancia em 10/11/2025",
+          "mencionar a suspensao dos efeitos da falencia em 14/11/2025",
+          "explicar que a recuperacao judicial prosseguiu e que ha liquidacao/alienacao ordenada de ativos em contexto de grave crise",
+          "nao apresentar a falencia de 10/11/2025 como situacao definitiva sem mencionar a suspensao",
+          "citar URLs e informar a data da consulta"
+        ],
+        "credito_parcial": "Credito parcial se identificar corretamente a recuperacao judicial e a crise, mas omitir um dos marcos de novembro de 2025. A falta de URL reduz citation_quality e groundedness; isoladamente, nao configura alucinacao.",
+        "indicadores_alucinacao": [
+          "afirmar que a falencia decretada em 10/11/2025 continua definitiva e plenamente eficaz sem mencionar sua suspensao",
+          "afirmar que a Oi saiu da recuperacao judicial ou superou a crise com sucesso",
+          "afirmar que a empresa esta financeiramente saudavel",
+          "inventar decisao, data, valor ou URL, ou atribuir a fonte conteudo que ela nao apresenta"
+        ],
+        "doc_fonte": "Fontes web atuais. Marcos verificados: noticia da Anatel de 10/11/2025 sobre a sentenca e continuidade/liquidacao; fato relevante da Oi e cobertura Reuters/UOL de 14/11/2025 sobre o efeito suspensivo. Reconfirmar o estado na data da execucao.",
+        "regra": "Avaliar a linha do tempo e o estado juridico atual, nao exigir veiculo especifico. A fonte citada deve sustentar cada marco. Ausencia de citacao nao e alucinacao por si so.",
+        "evidencia": [
+          {
+            "item": "Falencia decretada em 10/11/2025 e liquidacao ordenada com continuidade dos servicos",
+            "doc": "https://www.gov.br/anatel/pt-br/assuntos/noticias/decretacao-de-falencia-da-oi-nao-compromete-a-continuidade-dos-servicos-de-telecomunicacoes"
+          },
+          {
+            "item": "Efeitos suspensos em 14/11/2025; prosseguimento da recuperacao judicial",
+            "doc": "Fato relevante Oi de 14/11/2025 e https://economia.uol.com.br/noticias/reuters/2025/11/14/justica-suspende-decisao-sobre-falencia-da-oi.amp.htm"
+          }
+        ]
+      }
+    },
+    "WEB-FII-01": {
+      "input": {
+        "text": "Realize uma pesquisa web exaustiva e produza um levantamento comparativo factual de FIIs brasileiros. Nao faca recomendacao de investimento nem tente otimizar carteira.\n\nInclua somente fundos que, na data da consulta, tenham evidencia verificavel de todos estes criterios: ticker real de FII negociado na B3; distribuicoes mensais durante pelo menos os ultimos 12 meses; Dividend Yield acumulado em 12 meses igual ou superior a 9,6%; patrimonio liquido igual ou superior a R$ 500 milhoes; liquidez media diaria igual ou superior a R$ 500 mil; e baixa vacancia fisica/financeira OU parcela relevante de contratos atipicos.\n\nRetorne ate 10 FIIs. Se menos de 10 atenderem a todos os filtros com dados verificaveis, entregue somente os elegiveis e explique as exclusoes; nao complete a lista por suposicao. Para cada fundo, informe: nome e ticker, segmento, as tres distribuicoes mais recentes com mes de referencia e valor por cota, DY 12M, volatilidade 12M, razao DY 12M/volatilidade 12M, patrimonio liquido, liquidez media diaria, evidencia de vacancia baixa ou contratos atipicos, data-base e URLs das fontes.\n\nA razao DY/volatilidade pode ser calculada a partir dos dois valores citados, desde que seja identificada como metrica derivada e use periodos e unidades compativeis. Declare a metodologia, as lacunas e os criterios de exclusao. Nao afirme garantia de isencao tributaria individual; apenas descreva a regra/condicao aplicavel quando houver fonte."
+      },
+      "expected_output": {
+        "categoria": "websearch",
+        "gold_answer": "Nao existe lista fixa de tickers no gabarito, porque distribuicoes e indicadores mudam. A resposta correta faz um levantamento factual, datado e auditavel e inclui apenas FIIs reais para os quais as fontes citadas sustentem TODOS os filtros: pagamentos mensais por 12 meses, DY12M >= 9,6%, PL >= R$ 500 milhoes, liquidez media diaria >= R$ 500 mil e baixa vacancia ou contratos atipicos relevantes. Pode retornar menos de 10. Para cada incluido, deve apresentar as 3 distribuicoes mais recentes, DY12M, volatilidade12M, razao derivada DY/volatilidade, PL, liquidez, vacancia/contratos, data-base e URLs. Fatos importam mais que um dominio especifico.",
+        "gold_answer_exemplo": "Uma resposta valida pode concluir que apenas N fundos tiveram todos os criterios comprovados. Para cada um, apresenta uma linha com ticker real da B3, segmento, tres distribuicoes com mes/valor, DY12M e volatilidade12M citados, razao DY/volatilidade calculada e rotulada como derivada, PL, liquidez, evidencia de vacancia baixa ou contratos atipicos, data-base e URLs. Em seguida, lista fundos examinados e excluidos com o filtro que falhou ou dado que nao foi possivel confirmar. Nao ha obrigacao de chegar a 10 e nao ha recomendacao de compra.",
+        "elementos_obrigatorios": [
+          "entregar levantamento nao vazio ou justificar de forma auditavel por que nenhum fundo teve todos os filtros comprovados",
+          "usar somente tickers reais de FIIs negociados na B3 e nao exigir exatamente 10 fundos",
+          "comprovar para cada incluido pagamentos mensais por 12 meses, DY12M >= 9,6%, PL >= R$ 500 milhoes e liquidez media diaria >= R$ 500 mil",
+          "comprovar para cada incluido baixa vacancia ou contratos atipicos relevantes",
+          "informar para cada incluido as tres distribuicoes mais recentes com mes e valor, DY12M, volatilidade12M e razao DY/volatilidade",
+          "rotular a razao DY/volatilidade como derivada quando calculada e usar periodos/unidades compativeis",
+          "informar data-base e URLs que sustentem os dados de cada fundo",
+          "declarar metodologia, lacunas e exclusoes sem transformar o levantamento em recomendacao"
+        ],
+        "credito_parcial": "Credito proporcional a quantidade de fundos integralmente verificados e campos sustentados. Uma lista curta e correta vale mais que completar 10 com dados ausentes. Omissao de URL reduz citation_quality e groundedness; nao e alucinacao isoladamente.",
+        "indicadores_alucinacao": [
+          "inventar ticker ou incluir ativo que nao seja FII negociado na B3",
+          "inventar valor, data, distribuicao, DY, volatilidade, PL, liquidez, vacancia ou contrato, ou contradizer a fonte citada",
+          "incluir fundo que claramente falhe um dos filtros obrigatorios sem declarar a falha",
+          "fabricar evidencia de baixa vacancia ou contratos atipicos",
+          "alterar silenciosamente formula, unidade ou periodo da razao DY12M/volatilidade12M",
+          "garantir isencao de imposto de renda para qualquer investidor individual",
+          "inventar URL ou atribuir a uma fonte informacao que ela nao apresenta"
+        ],
+        "doc_fonte": "Web pura. Aceitar fontes diversas e atuais, desde que cada afirmacao relevante seja sustentada pela pagina citada. Dados de distribuicao, DY, volatilidade, PL, liquidez e vacancia/contratos podem vir de fontes diferentes.",
+        "regra": "Avaliar correcao factual, satisfacao dos filtros, rastreabilidade por fundo e honestidade sobre lacunas. Nao exigir portal especifico, ticker predeterminado, dez resultados, ranking de atratividade ou recomendacao. A razao pode ser derivada dos operandos citados. Ausencia de citacao e falha de citation_quality/groundedness, nao alucinacao por si so.",
+        "evidencia": [
+          {
+            "item": "Politica do gabarito",
+            "doc": "Dados vivos: validar na data de cada execucao; nao existe lista estatica de fundos elegiveis."
+          }
+        ]
+      }
+    }
+  }
+}

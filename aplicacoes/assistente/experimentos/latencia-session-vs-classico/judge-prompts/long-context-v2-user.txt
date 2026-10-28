@@ -1,0 +1,18 @@
+Avalie o objeto JSON fornecido pelo chamador.
+
+Regras de saída:
+1. target_alignment mede somente se a resposta tratou o alvo pedido.
+2. checklist contém exatamente uma linha por elemento obrigatório, na ordem.
+3. claims contém apenas afirmações factuais efetivamente presentes na resposta.
+4. evidence_references usa índices 1-based do evidence_package.
+5. supported exige referência de excerto ou protected absence explicitamente ligado.
+6. contradicted exige referência ou invented=true.
+7. unsupported entra no denominador de groundedness e não liga hallucination.
+8. evidence_basis=none exige evidence_references=[].
+9. citation_quality e overall usam escala contínua de 0 a 1; overall é holístico,
+   não média das demais métricas.
+10. negativa_correta é boolean somente em categoria negativa e null nas demais.
+11. rationale deve ser conciso e não inventar fatos além do objeto recebido.
+
+O JSON de entrada vem depois desta instrução e contém pergunta, resposta, rubrica,
+evidence_package, protected_absence e versões do contrato.

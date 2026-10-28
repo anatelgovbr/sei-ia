@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Benchmark Session — GPT-5.4 versus Terra/Luna</title>
+  <style>
+    :root {
+      --navy:#0b2442; --navy-2:#173f6d; --cyan:#0e7490; --sky:#dff4fa;
+      --ink:#172033; --muted:#5f6b7c; --line:#d7dfeb; --paper:#f5f8fc;
+      --good:#166534; --good-bg:#eaf7ee; --warn:#92400e; --warn-bg:#fff7e6;
+      --white:#fff; --shadow:0 12px 34px rgba(11,36,66,.09);
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif; }
+    .wrap { width:min(1200px,calc(100% - 32px)); margin-inline:auto; min-width:0; }
+    .hero { color:var(--white); background:linear-gradient(135deg,var(--navy),var(--navy-2) 70%,var(--cyan)); padding:54px 0 46px; }
+    .eyebrow { margin:0 0 8px; text-transform:uppercase; letter-spacing:.12em; font-size:.75rem; font-weight:800; opacity:.82; }
+    h1 { margin:0; width:100%; max-width:900px; overflow-wrap:anywhere; font-size:clamp(2rem,5vw,4.2rem); line-height:1.12; letter-spacing:-.04em; padding-bottom:4px; }
+    .hero .lead { max-width:900px; margin:20px 0 0; font-size:1.08rem; color:#dceafb; }
+    .badges { display:flex; flex-wrap:wrap; gap:9px; margin-top:24px; }
+    .badge { display:inline-flex; gap:7px; align-items:center; border:1px solid rgba(255,255,255,.25); border-radius:999px; padding:7px 11px; font-weight:750; background:rgba(255,255,255,.09); }
+    nav { position:sticky; top:0; z-index:4; border-bottom:1px solid var(--line); background:rgba(255,255,255,.94); backdrop-filter:blur(10px); }
+    nav .wrap { display:flex; gap:18px; overflow:auto; padding-block:12px; }
+    nav a { flex:none; color:var(--navy); text-decoration:none; font-weight:750; }
+    main { padding:30px 0 60px; }
+    section { min-width:0; margin:0 0 24px; padding:28px; border:1px solid var(--line); border-radius:18px; background:var(--white); box-shadow:var(--shadow); }
+    h2 { margin:0 0 8px; color:var(--navy); font-size:clamp(1.35rem,2.5vw,2rem); letter-spacing:-.02em; }
+    h3 { margin:0 0 8px; color:var(--navy); }
+    p { margin:8px 0 0; }
+    .lede { margin-top:6px; color:var(--muted); max-width:950px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; min-width:0; }
+    .grid.four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .card { min-width:0; padding:18px; border:1px solid var(--line); border-radius:14px; background:#fbfdff; }
+    .metric small { display:block; color:var(--muted); font-weight:700; }
+    .metric strong { display:block; margin-top:5px; font-size:clamp(1.45rem,3vw,2.3rem); color:var(--navy); letter-spacing:-.03em; }
+    .metric span { display:block; margin-top:3px; color:var(--good); font-weight:800; }
+    .table-shell { max-width:100%; overflow-x:auto; margin-top:16px; border:1px solid var(--line); border-radius:13px; }
+    table { width:100%; border-collapse:collapse; min-width:760px; background:var(--white); }
+    caption { padding:12px 14px; text-align:left; color:var(--muted); font-weight:700; background:#f7faff; }
+    th,td { padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:top; text-align:left; }
+    thead th { color:var(--navy); background:#edf4fb; font-size:.82rem; text-transform:uppercase; letter-spacing:.04em; }
+    tbody tr:last-child th,tbody tr:last-child td { border-bottom:0; }
+    th.num,td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    td.winner { background:var(--good-bg); color:var(--good); font-weight:800; box-shadow:inset 0 0 0 1px rgba(22,101,52,.09); }
+    .winner-legend { display:inline-flex; align-items:center; gap:7px; margin-top:14px; color:var(--muted); font-size:.9rem; }
+    .winner-swatch { display:inline-block; width:16px; height:16px; border:1px solid rgba(22,101,52,.18); border-radius:3px; background:var(--good-bg); }
+    .warning { margin-top:16px; padding:15px 17px; border-left:5px solid var(--warn); border-radius:10px; background:var(--warn-bg); }
+    .status { font-weight:800; }
+    .status.ok { color:var(--good); }
+    code,.mono { overflow-wrap:anywhere; word-break:break-word; font:0.88em ui-monospace,SFMono-Regular,Consolas,monospace; }
+    ul { margin:10px 0 0; padding-left:20px; }
+    .foot { color:var(--muted); text-align:center; padding:12px 0 44px; }
+    @media (max-width:900px) { .grid.four { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:680px) { .wrap { width:min(100% - 18px,1200px); } section { padding:20px; } .grid,.grid.four { grid-template-columns:1fr; } }
+    @media print { nav { display:none; } body { background:white; } section { box-shadow:none; break-inside:avoid; } }
+  </style>
+</head>
+<body>
+<header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Comparativo versionado · N=1 por caso</p>
+      <h1>Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano versus Terra/Luna</h1>
+      <p class="lead">Os mesmos dez casos foram executados uma vez em cada braço. Os números abaixo são uma fotografia operacional; a atribuição de papéis vem da configuração versionada e os tokens observados não são redistribuídos.</p>
+      <div class="badges">
+        <span class="badge">✓ 20/20 SSE end</span>
+        <span class="badge">✓ 0 errors</span>
+        <span class="badge">N=1 por caso</span>
+        <span class="badge">USD com 3 casas</span>
+      </div>
+    </div>
+  </header>
+  <nav><div class="wrap"><a href="#conclusao">Conclusão</a><a href="#metodo">Método</a><a href="#metricas">Métricas</a><a href="#tokens">Tokens</a><a href="#casos">Casos</a><a href="#limites">Limitações</a><a href="#rastreio">Rastreio</a></div></nav>
+  <main class="wrap">
+    <section id="conclusao">
+      <p class="eyebrow" style="color:var(--cyan)">Conclusão executiva</p>
+      <h2>Terra/Luna liderou nos três eixos principais desta bateria</h2>
+      <div class="grid four" style="margin-top:18px">
+        <article class="card metric"><small>Latência total mediana</small><strong>57,095 s</strong><span>-36,010%</span></article>
+        <article class="card metric"><small>Qualidade mediana</small><strong>0,980</strong><span>+0,050</span></article>
+        <article class="card metric"><small>Custo total</small><strong>US$ 1,537</strong><span>-71,660%</span></article>
+        <article class="card metric"><small>Flags de alucinação</small><strong>2 / 10</strong><span>1 a menos</span></article>
+      </div>
+      <p class="lede">Leitura provisória: Terra/Luna apresenta os melhores agregados desta fotografia; a promoção deve aguardar a reconciliação do bucket observado seiia-ds-nano com a alocação Luna.</p>
+    </section>
+
+    <section id="metodo">
+      <h2>Contrato e integridade</h2>
+      <p class="lede">A alocação por papel é calculada de <code>benchmark-redesign/arms.json</code> e resolvida pela rate card. A tabela não aceita aliases fixos no HTML.</p>
+      <div class="table-shell"><table>
+        <caption>Alocação por papel</caption>
+        <thead><tr><th>Papel</th><th>Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano</th><th>Session — Terra / Luna</th></tr></thead>
+        <tbody><tr><th>standard</th><td><code>seiia-ds</code> → <code>gpt-5.4</code></td><td><code>seiia-ds-gpt-terra</code> → <code>gpt-5.6-terra</code></td></tr>
+<tr><th>subagentes/mini</th><td><code>seiia-ds-mini</code> → <code>gpt-5.4-mini</code></td><td><code>seiia-ds-gpt-luna</code> → <code>gpt-5.6-luna</code></td></tr>
+<tr><th>OCR</th><td><code>seiia-ds-mini</code> → <code>gpt-5.4-mini</code></td><td><code>seiia-ds-gpt-luna</code> → <code>gpt-5.6-luna</code></td></tr>
+<tr><th>judge</th><td><code>seiia-ds-mini</code> → <code>gpt-5.4-mini</code></td><td><code>seiia-ds-gpt-luna</code> → <code>gpt-5.6-luna</code></td></tr>
+<tr><th>nano/explorador</th><td><code>seiia-ds-nano</code> → <code>gpt-5.4-nano</code></td><td><code>seiia-ds-gpt-luna</code> → <code>gpt-5.6-luna</code></td></tr>
+<tr><th>classificador</th><td><code>seiia-ds-mini</code> → <code>gpt-5.4-mini</code></td><td><code>seiia-ds-gpt-luna</code> → <code>gpt-5.6-luna</code></td></tr></tbody>
+      </table></div>
+      <div class="table-shell"><table>
+        <caption>Prova técnica</caption>
+        <thead><tr><th>Evidência</th><th>Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano</th><th>Session — Terra / Luna</th></tr></thead>
+        <tbody><tr><th>Casos / POSTs / terminais</th><td class="status ok">10 / 10 / 10</td><td class="status ok">10 / 10 / 10</td></tr>
+<tr><th>SSE end / error</th><td class="status ok">10 / 0</td><td class="status ok">10 / 0</td></tr>
+<tr><th>Traces / judge input completo</th><td class="status ok">10 / 10</td><td class="status ok">10 / 10</td></tr>
+<tr><th>Warmup / Classic / retry</th><td>0 / 0 / 0</td><td>0 / 0 / 0</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <section id="metricas">
+      <h2>Métricas correspondentes</h2>
+      <p class="lede">Todos os valores decimais exibidos, inclusive USD, são arredondados e apresentados com exatamente 3 casas decimais. Os cabeçalhos numéricos ficam alinhados à direita.</p>
+      <div class="table-shell"><table>
+        <caption>Resumo alinhado</caption>
+        <thead><tr><th>Métrica</th><th class="num">Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano</th><th class="num">Session — Terra / Luna</th></tr></thead>
+        <tbody><tr><th>TTFC mediana</th><td class="num">77,695 s</td><td class="num winner">48,645 s</td></tr><tr><th>Latência total mediana</th><td class="num">89,230 s</td><td class="num winner">57,095 s</td></tr><tr><th>Latência total média</th><td class="num">185,388 s</td><td class="num winner">98,691 s</td></tr><tr><th>Quality overall mediana</th><td class="num">0,930</td><td class="num winner">0,980</td></tr><tr><th>Quality overall média</th><td class="num">0,771</td><td class="num winner">0,854</td></tr><tr><th>Groundedness mediana</th><td class="num">0,870</td><td class="num winner">0,990</td></tr><tr><th>Completeness mediana</th><td class="num winner">1,000</td><td class="num winner">1,000</td></tr><tr><th>Citation quality mediana</th><td class="num">0,880</td><td class="num winner">0,925</td></tr><tr><th>Alucinações</th><td class="num">3/10</td><td class="num winner">2/10</td></tr><tr><th>Custo USD total</th><td class="num">US$ 5,423</td><td class="num winner">US$ 1,537</td></tr></tbody>
+      </table></div>
+      <div class="table-shell"><table>
+        <caption>Distribuição de latência total</caption>
+        <thead><tr><th>Braço</th><th class="num">mín.</th><th class="num">p25</th><th class="num">mediana</th><th class="num">média</th><th class="num">p75</th><th class="num">p90</th><th class="num">máx.</th></tr></thead>
+        <tbody><tr><th>Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano</th><td class="num">8,000 s</td><td class="num">22,815 s</td><td class="num">89,230 s</td><td class="num">185,388 s</td><td class="num">171,083 s</td><td class="num">607,259 s</td><td class="num">699,770 s</td></tr><tr><th>Session — Terra / Luna</th><td class="num">4,960 s</td><td class="num">21,918 s</td><td class="num">57,095 s</td><td class="num">98,691 s</td><td class="num">167,098 s</td><td class="num">221,105 s</td><td class="num">325,910 s</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <section id="tokens">
+      <h2>Tokens, custo e ferramentas</h2>
+      <div class="table-shell"><table>
+        <caption>Totais de tokens observados</caption>
+        <thead><tr><th>Braço</th><th class="num">Input</th><th class="num">Cache read</th><th class="num">Output</th><th class="num">Reasoning</th><th class="num">Gerações</th></tr></thead>
+        <tbody>
+          <tr><th>Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano</th><td class="num">718.928</td><td class="num">4.019.712</td><td class="num">23.867</td><td class="num">10.709</td><td class="num">115</td></tr>
+          <tr><th>Session — Terra / Luna</th><td class="num">562.457</td><td class="num">857.984</td><td class="num">15.570</td><td class="num">5.862</td><td class="num">76</td></tr>
+        </tbody>
+      </table></div>
+      <div class="table-shell"><table>
+        <caption>Tokens por deployment observado</caption>
+        <thead><tr><th>Deployment</th><th class="num">Input</th><th class="num">Cache read</th><th class="num">Output</th><th class="num">Reasoning</th><th class="num">Gerações</th></tr></thead>
+        <tbody><tr><th><code>seiia-ds-gpt-luna</code></th><td class="num">25.459</td><td class="num">0</td><td class="num">5.643</td><td class="num">4.676</td><td class="num">20</td></tr>
+<tr><th><code>seiia-ds-gpt-terra</code></th><td class="num">505.556</td><td class="num">819.200</td><td class="num">6.937</td><td class="num">1.186</td><td class="num">36</td></tr>
+<tr><th><code>seiia-ds-nano</code></th><td class="num">31.442</td><td class="num">38.784</td><td class="num">2.990</td><td class="num">0</td><td class="num">20</td></tr></tbody>
+      </table></div>
+      <div class="grid" style="margin-top:16px"><article class="card"><h3>Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano</h3><p>filesystem 152 · subagent 2 · web 16</p></article><article class="card"><h3>Session — Terra / Luna</h3><p>filesystem 31 · subagent 8 · web 10</p></article></div>
+      <div class="warning">⚠ A fonte de tokens registra `seiia-ds-nano` como deployment observado, embora esse alias não esteja na alocação declarada para este braço. A tabela de papéis continua derivada de `arms.json`; o gerador não reassocia tokens históricos. Reconcilie a execução antes de usar a atribuição por deployment como evidência de papel.</div>
+      <p class="lede">Reasoning permanece dentro do output faturado e não é cobrado duas vezes. BRL não é exibido porque a rate card não fixa câmbio.</p>
+    </section>
+
+    <section id="casos">
+      <h2>Comparação caso a caso</h2>
+      <p class="lede">O preenchimento verde marca o vencedor em cada métrica: menor latência, maior qualidade e menor custo. Em empate, os dois valores recebem fill.</p>
+      <div class="table-shell"><table>
+        <caption>Valores por QID — segundos, score e USD</caption>
+        <thead><tr><th>QID</th><th class="num">Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano total</th><th class="num">Session — Terra / Luna total</th><th class="num">Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano quality</th><th class="num">Session — Terra / Luna quality</th><th class="num">Session — GPT-5.4 / GPT-5.4-mini / GPT-5.4-nano USD</th><th class="num">Session — Terra / Luna USD</th></tr></thead>
+        <tbody><tr><th><code>WEB-FII-01</code></th><td class="num">699,770 s</td><td class="num winner">199,160 s</td><td class="num">0,390</td><td class="num winner">0,580</td><td class="num">US$ 2,670</td><td class="num winner">US$ 0,153</td></tr>
+<tr><th><code>LARGE-WEB-01</code></th><td class="num">596,980 s</td><td class="num winner">325,910 s</td><td class="num">0,210</td><td class="num winner">0,250</td><td class="num">US$ 1,066</td><td class="num winner">US$ 0,522</td></tr>
+<tr><th><code>LARGE-NEG-01</code></th><td class="num">90,720 s</td><td class="num winner">70,910 s</td><td class="num winner">0,980</td><td class="num winner">0,980</td><td class="num">US$ 0,127</td><td class="num winner">US$ 0,082</td></tr>
+<tr><th><code>LARGE-OFICIOS-01</code></th><td class="num winner">119,820 s</td><td class="num">209,460 s</td><td class="num winner">0,980</td><td class="num">0,850</td><td class="num">US$ 0,520</td><td class="num winner">US$ 0,215</td></tr>
+<tr><th><code>Q23</code></th><td class="num">87,740 s</td><td class="num winner">66,030 s</td><td class="num">0,810</td><td class="num winner">0,980</td><td class="num">US$ 0,573</td><td class="num winner">US$ 0,186</td></tr>
+<tr><th><code>Q19</code></th><td class="num">20,920 s</td><td class="num winner">20,190 s</td><td class="num">0,960</td><td class="num winner">0,980</td><td class="num">US$ 0,155</td><td class="num winner">US$ 0,127</td></tr>
+<tr><th><code>Q17</code></th><td class="num">28,500 s</td><td class="num winner">27,100 s</td><td class="num">0,900</td><td class="num winner">1,000</td><td class="num">US$ 0,148</td><td class="num winner">US$ 0,128</td></tr>
+<tr><th><code>SMALL-WEB-01</code></th><td class="num">188,170 s</td><td class="num winner">48,160 s</td><td class="num">0,520</td><td class="num winner">1,000</td><td class="num">US$ 0,129</td><td class="num winner">US$ 0,099</td></tr>
+<tr><th><code>SMALL-NEG-01</code></th><td class="num">8,000 s</td><td class="num winner">4,960 s</td><td class="num winner">0,980</td><td class="num winner">0,980</td><td class="num">US$ 0,020</td><td class="num winner">US$ 0,016</td></tr>
+<tr><th><code>SMALL-CONF-01</code></th><td class="num winner">13,260 s</td><td class="num">15,030 s</td><td class="num winner">0,980</td><td class="num">0,940</td><td class="num">US$ 0,013</td><td class="num winner">US$ 0,009</td></tr></tbody>
+      </table></div>
+      <div class="winner-legend"><span class="winner-swatch" aria-hidden="true"></span> vencedor; empates ficam destacados nos dois lados</div>
+    </section>
+
+    <section id="limites">
+      <h2>Limitações antes da decisão</h2>
+      <ul>
+        <li><strong>N=1:</strong> fotografia operacional, sem significância estatística.</li>
+        <li><strong>Cauda web:</strong> os máximos de latência são sensíveis ao caso; leia mediana, média e p90 juntas.</li>
+        <li><strong>Configuração completa:</strong> a bateria não isola causalmente standard, mini, OCR, judge ou nano/explorador.</li>
+        <li><strong>Atribuição por deployment:</strong> a alocação declarada e os tokens observados são apresentados separadamente quando há divergência.</li>
+        <li><strong>BRL:</strong> não há câmbio versionado na rate card.</li>
+      </ul>
+    </section>
+
+    <section id="rastreio">
+      <h2>Rastreabilidade</h2>
+      <p><strong>Run GPT:</strong> <code>benchmark-redesign-gpt54-full-v2-20260803-10cells</code></p>
+      <p><strong>Run Terra/Luna:</strong> <code>benchmark-redesign-terra-luna-full-v2-20260803-10cells</code></p>
+      <p><strong>Commit da execução:</strong> <code>4b835df396d9073ed2a4ab3b09928b281228fc71</code></p>
+      <p><strong>Rate card:</strong> <code>benchmark-redesign-v2</code> · SHA-256 <code>fc23ccea7dbe447890c85779f8a962296310209a2e20f453e2727212e92219da</code></p>
+      <p class="lede">Fonte de dados versionada: <code>report-data.json</code>. Configuração de papéis: <code>benchmark-redesign/arms.json</code>. Template: <code>report-template.html</code>.</p>
+    </section>
+  </main>
+  <footer class="foot wrap">Gerado por <code>benchmark-redesign/build_report.py</code>.</footer>
+</body>
+</html>

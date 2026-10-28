@@ -1,0 +1,2469 @@
+{
+  "schema_version": "long-context-presentation-audit-v1",
+  "campaign": {
+    "name": "benchmark-long-context",
+    "date": "2026-07-24",
+    "status": "completed",
+    "official_items": 9,
+    "fresh_posts": 8,
+    "fresh_reused": 1,
+    "manifest": "dataset/long-context/benchmark-long-context-v2.json",
+    "manifest_sha256": "af9bd8a3cfdaa0cb914dcc04cb8e37c6b514f0655bbc492aad8842dc2a12e833",
+    "official_aggregate_source": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json",
+    "official_aggregate_sha256": "e28c3e42c514dcb992b6b508719e02c0f77e123f1d2ff1d03ae7ceb107c2a20a",
+    "report": "apresentacoes/RELATORIO_LONG_CONTEXT_V2_BATERIA_COMPLETA_2026-07-24.md"
+  },
+  "aggregate": {
+    "groundedness": 0.8413,
+    "completeness": 1.0,
+    "citation_quality": 0.9678,
+    "overall": 0.9511,
+    "total_cost_usd": 5.45067944,
+    "hallucinations": 0,
+    "target_mismatches": 0,
+    "correct_negatives": 3
+  },
+  "items": [
+    {
+      "item_id": "case-0960k-q1-factual",
+      "case_id": "case-0960k",
+      "question_type": "factual",
+      "corpus": {
+        "canonical_manifest_sha256": "0983d6e6613f03a102cf3727c98477d4d3df0fd5e2864bcc5934c547f0bc8cb6",
+        "case_id": "case-0960k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-0960k",
+        "document_count": 59,
+        "document_inventory_sha256": "15f6af1a50070f35181baebbe97e2e97aa62ce757e2e18e3f9207dfa5eedf652",
+        "payload_sha256": "ee60917ba35f6aff06e313a7460f22b997e25f67c93b3a96d5821243a0ad2aa8",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-0960k/process-metadata.json",
+          "sha256": "7aa6a9dad334b707a4b2c65eae97e91d79d64b3809ec211fa6dc32830a116593"
+        },
+        "runtime_bundle_inventory_sha256": "5fae67873d0d40bf6cccbcd874e4b3944f9bbd752b75c0a1861db824acb5ed38",
+        "token_count": 960682,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Estou atualizando a nota de acompanhamento do PAC e preciso deixar claro para a chefia o que, de fato, está sendo monitorado antes de registrar a próxima providência junto à prestadora. Examine o conjunto do processo e redija uma síntese curta que identifique a obrigação regulatória acompanhada, delimite seu alcance territorial conforme o Termo de Autocomposição e informe o termo final previsto, sem confundir o objeto da obrigação com uma exigência nova do ofício.",
+      "gold_answer": "Fato documental: o acompanhamento trata do cumprimento da obrigação de manutenção dos serviços de tridígitos nas localidades indicadas na Tabela 1 do Termo de Autocomposição, até 31 de dezembro de 2028. Leitura operacional: o ofício monitora uma obrigação já estabelecida e registra seu prazo final; não cria, por si só, uma obrigação regulatória diferente.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Identificar como objeto a manutenção dos serviços de tridígitos.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Indicar que o alcance se refere às localidades da Tabela 1 do Termo de Autocomposição, ou paráfrase inequívoca desse recorte.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Informar o termo final de 31 de dezembro de 2028.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Distinguir o monitoramento da obrigação preexistente de uma nova obrigação criada pelo ofício.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "atribuir ao ofício obrigação de natureza diferente",
+        "ampliar o alcance para localidades ou serviços não indicados",
+        "trocar o prazo por outra data",
+        "afirmar que o ofício criou a obrigação material"
+      ],
+      "answer": "ALVOS OBRIGATÓRIOS:\n- Objeto do PAC: /proc_14564832/14564839.txt e /proc_14564832/14564861.txt\n- Alcance territorial no TA/MAF: /proc_14564832/14688918.txt e /proc_14564832/16768876.txt\n- Exigência instrutória posterior que não deve ser confundida com o objeto da obrigação: /proc_14564832/15398592.txt e /proc_14564832/16570775.txt\n\nEIXOS OBRIGATÓRIOS:\n1. Qual obrigação regulatória está sendo acompanhada.\n2. Qual o alcance territorial dessa obrigação segundo o Termo de Autocomposição/MAF.\n3. Qual o termo final previsto.\n4. Como distinguir a obrigação monitorada de pedidos supervenientes de informação/atualização feitos por ofício.Prossegui com os documentos centrais; agora vou confirmar no manual/informe os trechos de alcance territorial e separar isso dos pedidos meramente informacionais dos ofícios.O PAC acompanha a obrigação regulatória assumida pela Oi no Termo de Autocomposição de manter os serviços de tridígitos, e não uma obrigação nova criada pelos ofícios instrutórios <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968275\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[2]</a>. Quanto ao alcance, o acompanhamento abrange as localidades relacionadas no Termo, tratadas no MAF como 10.650 localidades do Anexo 1, com distinção entre instituições situadas em localidades previstas na Tabela 1 do Anexo 1 e instituições não situadas nessas localidades, mas com contrato em vigor na data de efetivação do Termo <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13081913\">[3]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14981938\">[4]</a>. O termo final previsto para esse compromisso é 31.12.2028 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968275\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13081913\">[3]</a>. Já os Ofícios posteriores, como o nº 654/2025 e o nº 1797/2025, veiculam pedidos de complementação, atualização e ajuste do Relatório SUP — inclusive com ampliação informacional para todas as UFs —, servindo à instrução e verificação do cumprimento, sem alterar o objeto material da obrigação monitorada <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13729107\">[5]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14799698\">[6]</a>.",
+      "answer_sha256": "b617e75a611c57794d4b2c010b5bab4f1deeb036c38c0e1a9e1c421843ed75d8",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": null
+      },
+      "scores": {
+        "citation_quality": 1.0,
+        "completeness": 1.0,
+        "groundedness": 0.75,
+        "overall": 0.9
+      },
+      "judge": {
+        "rationale": "A resposta atende ao alvo e cumpre os quatro elementos obrigatórios. Há boa sustentação para objeto, prazo e distinção entre monitoramento e ofícios. O único ponto mais fraco é a formulação do alcance territorial, que adiciona detalhamento não plenamente ancorado no pacote aberto.",
+        "completeness": {
+          "satisfied": 4,
+          "total": 4,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Identificar como objeto a manutenção dos serviços de tridígitos.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Indicar que o alcance se refere às localidades da Tabela 1 do Termo de Autocomposição, ou paráfrase inequívoca desse recorte.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Informar o termo final de 31 de dezembro de 2028.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Distinguir o monitoramento da obrigação preexistente de uma nova obrigação criada pelo ofício.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 3,
+            "unsupported": 1,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                3,
+                15,
+                16,
+                17
+              ],
+              "invented": false,
+              "text": "O PAC acompanha a obrigação regulatória assumida pela Oi no Termo de Autocomposição de manter os serviços de tridígitos, e não uma obrigação nova criada pelos ofícios instrutórios.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                6,
+                7,
+                8
+              ],
+              "invented": false,
+              "text": "O acompanhamento abrange as localidades relacionadas no Termo, tratadas no MAF como 10.650 localidades do Anexo 1, com distinção entre instituições situadas em localidades previstas na Tabela 1 do Anexo 1 e instituições não situadas nessas localidades, mas com contrato em vigor na data de efetivação do Termo.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                2,
+                3
+              ],
+              "invented": false,
+              "text": "O termo final previsto para esse compromisso é 31.12.2028.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                9,
+                10,
+                12,
+                13,
+                14,
+                11
+              ],
+              "invented": false,
+              "text": "Os Ofícios posteriores, como o nº 654/2025 e o nº 1797/2025, veiculam pedidos de complementação, atualização e ajuste do Relatório SUP — inclusive com ampliação informacional para todas as UFs —, servindo à instrução e verificação do cumprimento, sem alterar o objeto material da obrigação monitorada.",
+              "verdict": "supported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 4,
+          "total_claims": 4
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 5.311227145604789,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 62.633132639341056,
+        "session_preparation_s": 62.59749370906502,
+        "stream_terminal_s": 125.23062634840608,
+        "trace_readback_s": 20.439927858300507
+      },
+      "tool_calls": 29,
+      "cost_usd": 0.61587523,
+      "source_kind": "reused_fresh",
+      "occurrences": [
+        "Resultado factual fresh válido reutilizado; nenhuma nova inferência foi executada para compor a bateria oficial."
+      ],
+      "trace_id": "6b861e49b3319821c1fcfbff83174d22",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/6b861e49b3319821c1fcfbff83174d22",
+      "execution_id": "d1a17e1f-97bd-4221-a7e1-590fb31c14db",
+      "sources": {
+        "question": "protected-bundle/items/case-0960k-q1-factual/question.txt",
+        "question_sha256": "4419405b009f8b4697a10dfd4cb5878e763ffad8a5f36ba9746ae594e3bbf988",
+        "gold": "protected-bundle/items/case-0960k-q1-factual/gold.txt",
+        "gold_sha256": "39a09c56bc099551be232e02f14ae68d3a3c2d83a27ab103df8f9dde7ce83fbb",
+        "rubric": "protected-bundle/items/case-0960k-q1-factual/rubric.json",
+        "rubric_sha256": "3093dc88dbbdae303e963d4e9db280c6c2003b1ee69da29e387a2693a05569a7",
+        "result": "second-canary-output/runs/long-context-v2-canary-factual-ocr-remediation-20260724T012257Z/items/case-0960k-q1-factual/result-protected.json",
+        "result_sha256": "d6477a48fd6abf10fb9b2e197cbcb54a9ba5c974897777bbaaedd04c9d29a264",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-0960k-q2-synthesis",
+      "case_id": "case-0960k",
+      "question_type": "synthesis",
+      "corpus": {
+        "canonical_manifest_sha256": "0983d6e6613f03a102cf3727c98477d4d3df0fd5e2864bcc5934c547f0bc8cb6",
+        "case_id": "case-0960k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-0960k",
+        "document_count": 59,
+        "document_inventory_sha256": "15f6af1a50070f35181baebbe97e2e97aa62ce757e2e18e3f9207dfa5eedf652",
+        "payload_sha256": "ee60917ba35f6aff06e313a7460f22b997e25f67c93b3a96d5821243a0ad2aa8",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-0960k/process-metadata.json",
+          "sha256": "7aa6a9dad334b707a4b2c65eae97e91d79d64b3809ec211fa6dc32830a116593"
+        },
+        "runtime_bundle_inventory_sha256": "5fae67873d0d40bf6cccbcd874e4b3944f9bbd752b75c0a1861db824acb5ed38",
+        "token_count": 960682,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Estou preparando uma breve nota para decidir se duas cobranças dirigidas à prestadora podem ser tratadas como a mesma pendência no controle do PAC. Ao mencionar as duas cobranças, considere especificamente Ofício nº 1110/2024/COGE/SCO-ANATEL e Ofício nº 980/2026/COGE/SCO; as demais comunicações do processo não integram esta comparação. Reconstitua, em uma única comparação, o prazo e o conjunto de entregas ou documentos pedido em cada comunicação, indique o marco de contagem dos prazos e explique se a segunda cobrança apenas repete a primeira ou se exige uma manifestação de natureza distinta.",
+      "gold_answer": "Fatos documentais: a primeira comunicação fixou 10 dias, contados do recebimento, para a prestadora apresentar o status dos terminais associados a tridígitos em planilha e cópias dos contratos celebrados com terceiros. A comunicação posterior fixou 15 dias úteis, também contados do recebimento, para manifestação com esclarecimentos e elementos comprobatórios. Interpretação operacional: não são cobranças equivalentes; têm prazos e entregas distintos, de modo que a segunda não deve ser lançada como simples repetição da primeira.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Atribuir à primeira comunicação prazo de 10 dias contado do recebimento.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Atribuir à primeira comunicação o pedido de status dos terminais associados a tridígitos em planilha e de cópias dos contratos celebrados com terceiros.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Atribuir à comunicação posterior prazo de 15 dias úteis contado do recebimento.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Atribuir à comunicação posterior o pedido de manifestação com esclarecimentos e elementos comprobatórios.",
+          "satisfied": true
+        },
+        {
+          "index": 5,
+          "criterion": "Concluir que as cobranças têm objetos e prazos distintos e, portanto, não devem ser tratadas como simples repetição.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "inverter os prazos",
+        "trocar planilha/contratos por esclarecimentos/comprovação ou vice-versa",
+        "omitir ou alterar o marco “contados do recebimento”",
+        "chamar a segunda comunicação de mera prorrogação ou repetição sem apoio",
+        "inventar uma data de vencimento do calendário"
+      ],
+      "answer": "Mapeados os alvos obrigatórios; agora vou abrir os dois ofícios e os comprovantes de intimação para fixar o marco de contagem dos prazos.Já confirmei os paths exatos dos dois ofícios e das certidões de intimação; vou delegar a leitura pontual dos documentos-chave para checar cada eixo obrigatório antes da síntese.Em comparação direta, as duas comunicações não têm o mesmo objeto.\n\n| Comunicação | Prazo | Marco de contagem | Entregas / documentos exigidos | Natureza da manifestação |\n|---|---|---|---|---|\n| **Ofício nº 1110/2024/COGE/SCO-ANATEL** | **10 dias** | O próprio ofício fixa a contagem “do recebimento do presente Ofício” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a>. A certidão de intimação registra **Data do Cumprimento em 09/12/2024** e esclarece que é com base nessa data que se iniciam os prazos externos de resposta <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12997748\">[2]</a> | (i) **status dos terminais associados a tridígitos**, em **planilha Excel .xlsx**, no layout indicado no ofício; e, adicionalmente, (ii) **cópia dos contratos celebrados com terceiros** para cumprimento da obrigação de manutenção dos serviços de tridígitos <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a> | É uma **cobrança inaugural de informações-base** do PAC: instaura o acompanhamento e pede o panorama inicial dos terminais e a documentação contratual de suporte <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a> |\n| **Ofício nº 980/2026/COGE/SCO-ANATEL** | **15 dias úteis** | O ofício fixa a contagem “do recebimento deste expediente” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15713283\">[3]</a>. A certidão registra **Data do Cumprimento em 19/06/2026** e informa que os prazos externos se iniciam com base exclusiva nessa data, excluído o dia do começo na contagem <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15835292\">[4]</a> | O ofício não pede uma planilha inicial nem cópia de contratos como no de 2024. Ele exige que a empresa **se manifeste**, apresentando **esclarecimentos e elementos comprobatórios pertinentes**, em atenção ao **item 7.1 e subitens** do Informe nº 413/2026 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15713283\">[3]</a>. Nesse informe, a manifestação é dirigida às **inconsistências cadastrais identificadas pela COGE**, com providências para regularização no **nSAPN/CADUP**, e prevê ainda **nova versão consolidada e atualizada do Relatório SUP** na entrega periódica de **julho de 2026**, corrigindo inconsistências, duplicidades e divergências de números de tradução <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15641002\">[5]</a> | É uma **cobrança de saneamento/justificação técnica** sobre inconsistências detectadas na base já enviada, com exigência de regularização cadastral e consolidação de novo Relatório SUP <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15641002\">[5]</a> |\n\n**Conclusão:** a segunda cobrança **não apenas repete** a primeira. O Ofício nº 1110/2024 pede o **levantamento inicial** do status dos tridígitos e os **contratos** que embasam a obrigação <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a>. Já o Ofício nº 980/2026, à luz do Informe nº 413/2026, cobra uma **manifestação de natureza distinta**: resposta específica sobre **inconsistências cadastrais**, com **esclarecimentos e provas**, além da **regularização das bases nSAPN/CADUP** e da preparação de **nova versão consolidada do Relatório SUP** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15713283\">[3]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15641002\">[5]</a>.\n\nAssim, para controle do PAC, os documentos indicam que as duas cobranças **não devem ser tratadas como a mesma pendência**, porque a segunda pressupõe fase posterior de análise e saneamento de inconsistências, e não mera reiteração do pedido inaugural. <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 15713283\">[3]</a>",
+      "answer_sha256": "7524d2504aefadfb70570eac3aa79177ce1186ef25d94a9383d6cb9c99f70758",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": null
+      },
+      "scores": {
+        "citation_quality": 1.0,
+        "completeness": 1.0,
+        "groundedness": 1.0,
+        "overall": 1.0
+      },
+      "judge": {
+        "rationale": "A resposta atende ao alvo e recupera corretamente os prazos, os pedidos de cada ofício e a distinção operacional entre as cobranças, sem inventar vencimento calendárico.",
+        "completeness": {
+          "satisfied": 5,
+          "total": 5,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Atribuir à primeira comunicação prazo de 10 dias contado do recebimento.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Atribuir à primeira comunicação o pedido de status dos terminais associados a tridígitos em planilha e de cópias dos contratos celebrados com terceiros.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Atribuir à comunicação posterior prazo de 15 dias úteis contado do recebimento.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Atribuir à comunicação posterior o pedido de manifestação com esclarecimentos e elementos comprobatórios.",
+              "satisfied": true
+            },
+            {
+              "index": 5,
+              "criterion": "Concluir que as cobranças têm objetos e prazos distintos e, portanto, não devem ser tratadas como simples repetição.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 5,
+            "unsupported": 0,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                5,
+                6
+              ],
+              "invented": false,
+              "text": "A primeira comunicação tem prazo de 10 dias contado do recebimento.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                3,
+                5
+              ],
+              "invented": false,
+              "text": "A primeira comunicação pede status dos terminais associados a tridígitos em planilha Excel e cópia dos contratos celebrados com terceiros.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                34,
+                35
+              ],
+              "invented": false,
+              "text": "A segunda comunicação tem prazo de 15 dias úteis contado do recebimento.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                31
+              ],
+              "invented": false,
+              "text": "A segunda comunicação pede esclarecimentos e elementos comprobatórios pertinentes.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                2,
+                15,
+                16,
+                17
+              ],
+              "invented": false,
+              "text": "As duas cobranças têm objetos e prazos distintos e a segunda não deve ser tratada como simples repetição da primeira.",
+              "verdict": "supported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 5,
+          "total_claims": 5
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 5.676895829848945,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 102.89924374874681,
+        "session_preparation_s": 69.63524339348078,
+        "stream_terminal_s": 172.5344871422276,
+        "trace_readback_s": 27.340616361238062
+      },
+      "tool_calls": 40,
+      "cost_usd": 0.50057972,
+      "source_kind": "fresh_execution",
+      "occurrences": [
+        "Juiz/evidence finalizados a partir do SSE, trace e filesystem fresh preservados, sem novo POST, agente ou OCR."
+      ],
+      "trace_id": "6688f70f14fb97b7bcab22f3fb03f731",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/6688f70f14fb97b7bcab22f3fb03f731",
+      "execution_id": "d087611b-a793-4294-8301-bc7f04034481",
+      "sources": {
+        "question": "protected-bundle/items/case-0960k-q2-synthesis/question.txt",
+        "question_sha256": "df01c3aed7a08e962c2473af90df67796cf6b6ea16b5fcfb65a0a1f0c8a59f7f",
+        "gold": "protected-bundle/items/case-0960k-q2-synthesis/gold.txt",
+        "gold_sha256": "3af21ac3bba2bb5cd90a2e9c1572e7fb5ff4474a74f08f67489b7bd21265b745",
+        "rubric": "protected-bundle/items/case-0960k-q2-synthesis/rubric.json",
+        "rubric_sha256": "199363efc08ef5ff339b775b572089591b66597be8b7522065a5c4b1fd7db40a",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-0960k-q2-synthesis/items/case-0960k-q2-synthesis/result-protected.json",
+        "result_sha256": "29099a341636bd823f9553fe46cd88c6d1bb56cabed4e9e8c4c1b26c53ef7c9b",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-0960k-q3-insufficient-evidence",
+      "case_id": "case-0960k",
+      "question_type": "insufficient-evidence",
+      "corpus": {
+        "canonical_manifest_sha256": "0983d6e6613f03a102cf3727c98477d4d3df0fd5e2864bcc5934c547f0bc8cb6",
+        "case_id": "case-0960k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-0960k",
+        "document_count": 59,
+        "document_inventory_sha256": "15f6af1a50070f35181baebbe97e2e97aa62ce757e2e18e3f9207dfa5eedf652",
+        "payload_sha256": "ee60917ba35f6aff06e313a7460f22b997e25f67c93b3a96d5821243a0ad2aa8",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-0960k/process-metadata.json",
+          "sha256": "7aa6a9dad334b707a4b2c65eae97e91d79d64b3809ec211fa6dc32830a116593"
+        },
+        "runtime_bundle_inventory_sha256": "5fae67873d0d40bf6cccbcd874e4b3944f9bbd752b75c0a1861db824acb5ed38",
+        "token_count": 960682,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Na reunião de acompanhamento, a chefia quer levar um indicador único sobre a taxa de resposta da prestadora ao longo de todo o período e pediu que a equipe o extraia deste processo. Faça uma checagem de suficiência antes de preencher a planilha gerencial: diga se o corpus permite calcular a taxa, identifique os registros que seriam necessários para formar numerador e denominador e formule a conclusão que pode ser comunicada com segurança, sem substituir a falta de dados por uma estimativa.",
+      "gold_answer": "Não é possível calcular a taxa com o corpus preservado. Não há uma taxa de resposta publicada nem uma base consolidada que informe o numerador — a quantidade de respostas recebidas no período — e o denominador — o total de solicitações ou oportunidades de resposta abrangidas pelo período — segundo um critério comum. Portanto, o processo não sustenta um percentual; a nota deve registrar a insuficiência e não inventar nem estimar um valor.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Declarar explicitamente que o corpus não permite calcular a taxa pedida.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Registrar que não há taxa de resposta publicada no material preservado.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Identificar a ausência do numerador, isto é, a contagem consolidada de respostas recebidas no período.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Identificar a ausência de denominador definido ou completo, isto é, o total de solicitações ou oportunidades de resposta do período.",
+          "satisfied": true
+        },
+        {
+          "index": 5,
+          "criterion": "Concluir que nenhum percentual pode ser informado ou estimado com segurança e que a limitação deve ser comunicada.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "apresentar qualquer percentual",
+        "dividir o número de documentos por algum total não definido",
+        "contar manifestações isoladas como todas as respostas",
+        "afirmar uma taxa de atendimento ou cumprimento como substituta",
+        "declarar que a prestadora respondeu integralmente sem base"
+      ],
+      "answer": "Progresso: delimitei os atos potencialmente relevantes para a taxa como os ofícios que pedem informações/complementações e as respostas/pedidos de dilação da Oi vinculados a eles.Progresso: os documentos centrais já mostram quatro ofícios com exigência de resposta e uma sequência mista de pedidos de dilação, respostas materiais e complementações. Agora estou fechando as datas de ciência/prazo e os marcos de protocolo para testar se a taxa seria realmente calculável.A checagem de suficiência indica que **o corpus não permite calcular com segurança um indicador único de “taxa de resposta da prestadora” ao longo de todo o período**, porque os autos mostram pedidos formais da Anatel e várias manifestações da Oi, mas **não trazem um critério único de contagem** para definir:  \n1) o que entra no **denominador**;  \n2) o que entra no **numerador**;  \n3) se contam apenas respostas materiais, ou também pedidos de dilação;  \n4) se respostas parciais/incompletas contam como “resposta”;  \n5) como tratar manifestações intermediárias ou supervenientes, como a atualização enviada após reunião de 02/09/2025 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13729107\">[2]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14500480\">[3]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14799698\">[4]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14428112\">[5]</a>.\n\n**Denominador mínimo identificável no processo, se o recorte for “atos formais da Anatel que exigiram resposta da prestadora”:**\n- **Ofício nº 1110/2024**: intimou a Oi a apresentar, em 10 dias, o status dos terminais associados a tridígitos e cópia de contratos com terceiros <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a>. A ciência formal consta na certidão de cumprimento de 09/12/2024 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12997748\">[6]</a>.  \n- **Ofício nº 654/2025**: solicitou complemento das informações e envio do Relatório SUP atualizado, em 20 dias <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13729107\">[2]</a>. A ciência formal consta em 02/06/2025 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13785154\">[7]</a>.  \n- **Ofício nº 1513/2025**: solicitou justificativas e correção das divergências apontadas, em 15 dias <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14500480\">[3]</a>. A ciência formal consta em 20/10/2025 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14590300\">[8]</a>.  \n- **Ofício nº 1797/2025**: exigiu novo arquivo “Relatório SUP”, com campos adicionais, em 15 dias <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14799698\">[4]</a>. A ciência formal consta em 28/11/2025 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14828481\">[9]</a>.\n\n**Mas esse denominador ainda não é suficiente, por si só, para preencher a planilha**, porque faltaria definir se o indicador deve contar:\n- só esses 4 ofícios;  \n- também os pedidos complementares surgidos em reunião;  \n- cada ofício como 1 evento, ou cada exigência interna do ofício como unidade distinta.  \nIsso é relevante porque, por exemplo, o Ofício nº 1110 reúne mais de uma entrega pedida e o processo depois passa a operar também com complementações e atualizações sucessivas <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12968296\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14307100\">[10]</a>.\n\n**Registros necessários para o numerador, se o critério fosse “manifestações da Oi vinculadas aos atos acima”:**\n- Para o **Ofício nº 1110/2024**:\n  - pedido de dilação CT/Oi/GCOR/1774/2024, protocolado em 19/12/2024 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13058901\">[11]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13058903\">[12]</a>;  \n  - resposta CT/Oi/GCOR/1809/2025, protocolada em 07/01/2025, com anexos “Relatório SUP” e “Relatório Contratos” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13119191\">[13]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13119195\">[14]</a>.  \n- Para o **Ofício nº 654/2025**:\n  - pedido de prazo CT/Oi/GCOR/2183/2025, protocolado em 23/06/2025 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13885557\">[15]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13885559\">[16]</a>;  \n  - nova manifestação CT/Oi/GCOR/2235/2025, protocolada em 14/07/2025, que **não entrega os dados requeridos** e pede nova dilação/cronograma <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14007609\">[17]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14007611\">[18]</a>;  \n  - atualização posterior CT/Oi/GCOR/2404/2025, protocolada em 22/09/2025, enviada após reunião e com base atualizada de SUP <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14428112\">[5]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14428114\">[19]</a>.  \n- Para o **Ofício nº 1513/2025**:\n  - pedido de dilação CT/Oi/GCOR/2490/2025, protocolado em 04/11/2025 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14695077\">[20]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14695080\">[21]</a>;  \n  - resposta CT/Oi/GCOR/2523/2025, protocolada em 19/11/2025, com análise dos 915 casos, mas ainda deixando 48 para análise aprofundada <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14785323\">[22]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14785326\">[23]</a>.  \n- Para o **Ofício nº 1797/2025**:\n  - resposta CT/Oi/GCOR/2586/2025, protocolada em 15/12/2025, com novo Relatório SUP e apresentação UC4X <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14921003\">[24]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14921007\">[25]</a>.\n\n**O problema é que esses registros não formam automaticamente um numerador único**, porque o processo mistura:\n- **pedidos de dilação**;  \n- **respostas materiais**;  \n- **respostas parciais**;  \n- **atualizações supervenientes**;  \n- **respostas ainda com pendência reconhecida pela própria prestadora**.  \n\nExemplos claros:\n- em 14/07/2025 a Oi afirma que **“ainda não foi possível efetuar o levantamento e consolidação dos dados requeridos”** e pede nova dilação, em vez de entregar o complemento pedido no Ofício nº 654 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14007609\">[17]</a>;  \n- em 04/11/2025 a Oi novamente informa que **não foi possível concluir as análises** e pede mais 15 dias sobre o Ofício nº 1513 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14695077\">[20]</a>;  \n- em 19/11/2025, embora apresente análise dos 915 casos, ainda reconhece que 48 dependem de análise mais aprofundada <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14785323\">[22]</a>.\n\nAlém disso, o próprio processo registra **insuficiência e inconsistência dos dados entregues pela Oi**: o Informe nº 1259/2025 aponta ausência de informações essenciais, campos vazios, falta substancial de dados e ausência de relatórios previstos, comprometendo a análise regulatória <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14981938\">[26]</a>. Isso não impede contar “manifestações”, mas reforça que **não se pode confundir protocolo de documento com resposta satisfatória/completa**.\n\n**Conclusão segura para comunicar à chefia / lançar na planilha gerencial:**\n\n> **O corpus permite identificar os principais atos formais da Anatel que demandaram manifestação da prestadora e os protocolos correlatos da Oi, mas não permite calcular com segurança uma taxa única de resposta sem definição metodológica prévia.**  \n> **Há, no mínimo, 4 ofícios formais com prazo de resposta e múltiplas manifestações da Oi associadas; porém o processo contém pedidos de dilação, respostas parciais, complementações sucessivas e envios posteriores por reunião, o que impede definir, apenas pelos autos, um numerador e um denominador únicos sem risco de arbitrariedade.**  \n> **Portanto, a recomendação segura é não preencher um percentual único de taxa de resposta com base apenas neste corpus; antes, é necessário fixar o critério de contagem.**\n\nSe for útil, eu posso converter isso em um **texto pronto para a planilha gerencial**, em uma linha só e em linguagem executiva.",
+      "answer_sha256": "a7418d86f7ee77b080ca2ea0072c85ec6880109f8841bc93c170543fc0ee43cd",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": true
+      },
+      "scores": {
+        "citation_quality": 0.98,
+        "completeness": 1.0,
+        "groundedness": 0.9090909090909091,
+        "overall": 0.98
+      },
+      "judge": {
+        "rationale": "A resposta atende ao alvo negativo e conclui pela insuficiência. Quase todas as afirmações centrais estão sustentadas pelos trechos; uma formulação sobre a falta de critério único de contagem ficou sem suporte direto explícito, mas isso não altera o acerto geral.",
+        "completeness": {
+          "satisfied": 5,
+          "total": 5,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Declarar explicitamente que o corpus não permite calcular a taxa pedida.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Registrar que não há taxa de resposta publicada no material preservado.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Identificar a ausência do numerador, isto é, a contagem consolidada de respostas recebidas no período.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Identificar a ausência de denominador definido ou completo, isto é, o total de solicitações ou oportunidades de resposta do período.",
+              "satisfied": true
+            },
+            {
+              "index": 5,
+              "criterion": "Concluir que nenhum percentual pode ser informado ou estimado com segurança e que a limitação deve ser comunicada.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 10,
+            "unsupported": 1,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                27,
+                37,
+                52,
+                60
+              ],
+              "invented": false,
+              "text": "o corpus não permite calcular com segurança um indicador único de “taxa de resposta da prestadora” ao longo de todo o período",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                3,
+                21,
+                22,
+                46,
+                68,
+                72
+              ],
+              "invented": false,
+              "text": "os autos mostram pedidos formais da Anatel e várias manifestações da Oi",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "none",
+              "evidence_references": [],
+              "invented": false,
+              "text": "o processo não traz um critério único de contagem para definir o denominador, o numerador, se pedidos de dilação contam, se respostas parciais contam e como tratar manifestações intermediárias ou supervenientes",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                16,
+                21,
+                46,
+                68
+              ],
+              "invented": false,
+              "text": "há no mínimo 4 ofícios formais com prazo de resposta",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                3,
+                16,
+                75
+              ],
+              "invented": false,
+              "text": "o Ofício nº 1110 reúne mais de uma entrega pedida",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                38,
+                35,
+                36
+              ],
+              "invented": false,
+              "text": "em 14/07/2025 a Oi afirma que ainda não foi possível efetuar o levantamento e consolidação dos dados requeridos e pede nova dilação",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                56,
+                54,
+                52
+              ],
+              "invented": false,
+              "text": "em 04/11/2025 a Oi novamente informa que não foi possível concluir as análises e pede mais 15 dias sobre o Ofício nº 1513",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                63,
+                62,
+                65
+              ],
+              "invented": false,
+              "text": "em 19/11/2025 a Oi apresenta análise dos 915 casos, mas ainda reconhece 48 dependem de análise mais aprofundada",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                26,
+                75,
+                76,
+                77
+              ],
+              "invented": false,
+              "text": "o processo registra insuficiência e inconsistência dos dados entregues pela Oi",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                26,
+                77
+              ],
+              "invented": false,
+              "text": "não se pode confundir protocolo de documento com resposta satisfatória/completa",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                3,
+                16,
+                21,
+                22,
+                26,
+                35,
+                46,
+                52,
+                65,
+                75,
+                76,
+                77
+              ],
+              "invented": false,
+              "text": "a recomendação segura é não preencher um percentual único de taxa de resposta com base apenas neste corpus",
+              "verdict": "supported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 11,
+          "total_claims": 11
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 5.265829220414162,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 129.13591763190925,
+        "session_preparation_s": 51.188814194872975,
+        "stream_terminal_s": 180.32473182678223,
+        "trace_readback_s": 21.071746876463294
+      },
+      "tool_calls": 51,
+      "cost_usd": 0.49564324,
+      "source_kind": "fresh_execution",
+      "occurrences": [
+        "Juiz/evidence finalizados a partir do SSE, trace e filesystem fresh preservados, sem novo POST, agente ou OCR."
+      ],
+      "trace_id": "0b74a714971f03c5ae999460eb3a393b",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/0b74a714971f03c5ae999460eb3a393b",
+      "execution_id": "8139ed86-f98c-468e-9b49-e6b628acf998",
+      "sources": {
+        "question": "protected-bundle/items/case-0960k-q3-insufficient-evidence/question.txt",
+        "question_sha256": "f22de7c67bf944041ed1bc5154c264330c6e7899882904afdd6dd77c067344d7",
+        "gold": "protected-bundle/items/case-0960k-q3-insufficient-evidence/gold.txt",
+        "gold_sha256": "88195119935db89cf2ad8ee3f17483a83e7f50fccc46a819c11d6e8d58c96836",
+        "rubric": "protected-bundle/items/case-0960k-q3-insufficient-evidence/rubric.json",
+        "rubric_sha256": "601e0f942a81ce1cc9b68bcd184977e47cb2a88af989c29fe2cd3f7657ddd367",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-0960k-q3-insufficient-evidence/items/case-0960k-q3-insufficient-evidence/result-protected.json",
+        "result_sha256": "67bdbde9506a1b6e4efe59e2be532ec6883bc3eb30011221c914282d9f1a801e",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-5120k-q1-factual",
+      "case_id": "case-5120k",
+      "question_type": "factual",
+      "corpus": {
+        "canonical_manifest_sha256": "eef63f9a7127ff9417b5f0c24a409f4e195247469f07b215e8c9badc9848eeae",
+        "case_id": "case-5120k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-5120k",
+        "document_count": 331,
+        "document_inventory_sha256": "d82a497ac3d7a28cf14739864d00c970c5ba1c6b15ed41397694f145989533b0",
+        "payload_sha256": "7cb1ba5480b317ba52d4fedfccf19f175c06713c6eb8b2450f4c3aa04b163bb4",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-5120k/process-metadata.json",
+          "sha256": "527658759b0e05e1a1584d5a1598f7cec3802dcd61c906fe6550e96c04534c07"
+        },
+        "runtime_bundle_inventory_sha256": "3986f4d15cef9b05345d23a531624ba77a0c6b086c67e99ede170af342ee0a64",
+        "token_count": 5120866,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Estou revisando o quadro de projetos da Agenda Regulatória e preciso explicar à chefia o que esta iniciativa entrega, sem misturá-la com atividades de implantação. A partir do processo, prepare um registro executivo que delimite o objeto da revisão do PGMC, aponte a entrega que deve orientar o cronograma e indique o horizonte previsto para ela, deixando explícito o que essa leitura permite acompanhar no trabalho.",
+      "gold_answer": "Fato documental: a iniciativa conduz a segunda revisão dos mercados relevantes e das medidas regulatórias assimétricas previstas no Plano Geral de Metas de Competição (PGMC). A entrega principal indicada é o Relatório de Análise de Impacto Regulatório (AIR), previsto para o primeiro semestre de 2022. Leitura operacional: o cronograma deve acompanhar a produção desse relatório regulatório, não uma alteração de sistemas, que o TAP trata como fora do escopo.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Identificar que se trata da segunda revisão.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Incluir os mercados relevantes no objeto da revisão.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Incluir as medidas regulatórias assimétricas no objeto.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Relacionar o objeto ao PGMC.",
+          "satisfied": true
+        },
+        {
+          "index": 5,
+          "criterion": "Indicar o Relatório de Análise de Impacto Regulatório (AIR) como entrega principal.",
+          "satisfied": true
+        },
+        {
+          "index": 6,
+          "criterion": "Informar o primeiro semestre de 2022 como horizonte previsto para a entrega.",
+          "satisfied": true
+        },
+        {
+          "index": 7,
+          "criterion": "Distinguir essa entrega regulatória de alteração dos sistemas informatizados, que está fora do escopo.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "chamar o projeto de implantação ou alteração de sistema",
+        "dizer que é a primeira revisão",
+        "trocar PGMC por outro programa",
+        "atribuir outra entrega",
+        "trocar o relatório AIR por resolução já concluída",
+        "inventar prazo diferente"
+      ],
+      "answer": "Progresso: identifiquei que os documentos centrais não são as contribuições da consulta, mas peças internas sobre Agenda Regulatória, AIR e cronograma. Agora vou abrir os mais promissores para extrair o recorte exato da iniciativa.**Registro executivo — revisão do PGMC na Agenda Regulatória**\n\n**1. Objeto da iniciativa**  \nA leitura do processo mostra que a iniciativa é, em essência, **uma revisão regulatória** do PGMC: reavaliar os **mercados relevantes** e as **medidas regulatórias assimétricas** do Plano, na revisão quadrienal prevista no próprio regulamento. O escopo também registra, desde a origem, a reavaliação do mercado de distribuição de pacotes ou conteúdos audiovisuais <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6508310\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6509035\">[2]</a>.  \n\nCom o avanço do processo, a Agência passou a tratar **em conjunto** a revisão do PGMC e a reavaliação da regulamentação de **EILD**, pela afinidade de conteúdo, consolidando isso como uma única iniciativa da Agenda Regulatória <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 8973492\">[3]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 9723267\">[4]</a>.\n\n**2. Entrega que deve orientar o cronograma**  \nSe o objetivo é explicar à chefia “o que essa iniciativa entrega”, o marco correto para orientar o cronograma é a **entrega regulatória**, não atividades de implantação. Na origem do projeto, o TAP já indicava como principal entrega o **Relatório de AIR**, acompanhado da proposta normativa decorrente dos estudos <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6508310\">[1]</a>.  \n\nDepois, na Agenda 2023-2024, a iniciativa foi explicitada com duas metas regulatórias:  \n- **Consulta Pública**;  \n- **Aprovação final** da proposta <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 9723267\">[4]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 10674872\">[5]</a>.  \n\nOu seja, para fins de quadro executivo, a entrega a monitorar é a **produção e tramitação da revisão normativa do PGMC/EILD** — AIR, proposta, consulta pública e deliberação final — e não frentes de execução operacional.\n\n**3. O que não deve ser confundido com implantação**  \nO próprio TAP separa isso com clareza: **não faz parte do escopo do projeto realizar alterações em sistemas informatizados da Agência que possam decorrer da conclusão do processo regulatório** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6508310\">[1]</a>.  \n\nAssim, esta leitura permite afirmar que a iniciativa da Agenda:  \n- **entrega revisão regulatória**;  \n- **não entrega implantação sistêmica ou operacional**;  \n- **não deve ser medida por atividades posteriores de execução**, ainda que estas possam ser necessárias após a aprovação da norma.\n\n**4. Horizonte previsto**  \nHá três marcos temporais relevantes no processo:\n\n- **Origem na Agenda 2021-2022**: meta de concluir a **AIR e a respectiva proposta** no **1º semestre de 2022** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6508310\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6509035\">[2]</a>.  \n- **Reprogramação na Agenda 2023-2024**: meta de **Consulta Pública no 2º semestre de 2023** e **aprovação final no 2º semestre de 2024** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 9723267\">[4]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 10674872\">[5]</a>.  \n- **Atualização posterior**: em 2024, o Conselho retirou da Agenda 2023-2024 a meta de aprovação final em 2024 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 11604117\">[6]</a>. Na sequência, a iniciativa passou a constar da Agenda **2025-2026**, com previsão de **aprovação final no 2º semestre de 2025** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13384652\">[7]</a>.\n\n**5. O que essa leitura permite acompanhar no trabalho**  \nCom base apenas no processo, o acompanhamento executivo que faz sentido é este:\n\n- se a **revisão regulatória** está instruída;  \n- se a **AIR** foi produzida;  \n- se houve **submissão à Consulta Pública**;  \n- se a proposta está em fase de **deliberação/aprovação final**;  \n- qual é o **horizonte vigente da Agenda** para conclusão regulatória <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 8973492\">[3]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 9723267\">[4]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 10674872\">[5]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 11604117\">[6]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13384652\">[7]</a>.\n\n**Síntese para a chefia**  \nA iniciativa da Agenda Regulatória não é um projeto de implantação. Ela é um **projeto de revisão normativa do PGMC**, hoje tratado junto com EILD, cuja entrega é a **proposta regulatória resultante da AIR e do processo decisório**. O horizonte originalmente era 2022, depois foi reprogramado para consulta em 2023 e aprovação em 2024, e o horizonte mais recente do processo aponta **aprovação final no 2º semestre de 2025** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13384652\">[7]</a>.  \n\nSe quiser, eu posso converter isso em um texto de **1 parágrafo para fala executiva** ou em um **quadro “objeto / entrega / prazo / acompanhamento”**.",
+      "answer_sha256": "c2ec3544f0a08b3fb323859ed792f4907ff868dc1ab831a1ff2288d6dc59bc84",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": null
+      },
+      "scores": {
+        "citation_quality": 1.0,
+        "completeness": 1.0,
+        "groundedness": 1.0,
+        "overall": 1.0
+      },
+      "judge": {
+        "rationale": "A resposta atende ao alvo e cumpre todos os elementos obrigatórios. As afirmações centrais sobre segunda revisão do PGMC, objeto, AIR, prazo de 1º semestre de 2022 e fora de escopo para sistemas estão sustentadas pelos excertos citados.",
+        "completeness": {
+          "satisfied": 7,
+          "total": 7,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Identificar que se trata da segunda revisão.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Incluir os mercados relevantes no objeto da revisão.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Incluir as medidas regulatórias assimétricas no objeto.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Relacionar o objeto ao PGMC.",
+              "satisfied": true
+            },
+            {
+              "index": 5,
+              "criterion": "Indicar o Relatório de Análise de Impacto Regulatório (AIR) como entrega principal.",
+              "satisfied": true
+            },
+            {
+              "index": 6,
+              "criterion": "Informar o primeiro semestre de 2022 como horizonte previsto para a entrega.",
+              "satisfied": true
+            },
+            {
+              "index": 7,
+              "criterion": "Distinguir essa entrega regulatória de alteração dos sistemas informatizados, que está fora do escopo.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 7,
+            "unsupported": 0,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                11,
+                24,
+                26,
+                27
+              ],
+              "invented": false,
+              "text": "a iniciativa é, em essência, uma revisão regulatória do PGMC",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                11,
+                20,
+                26
+              ],
+              "invented": false,
+              "text": "a revisão é a segunda revisão dos mercados relevantes e das medidas regulatórias assimétricas do PGMC",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                11,
+                18,
+                20,
+                25,
+                26
+              ],
+              "invented": false,
+              "text": "o escopo inclui a reavaliação do mercado de distribuição de pacotes ou conteúdos audiovisuais",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                12,
+                13,
+                14
+              ],
+              "invented": false,
+              "text": "a Agência passou a tratar em conjunto a revisão do PGMC e a reavaliação da regulamentação de EILD",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                2,
+                4,
+                16,
+                17
+              ],
+              "invented": false,
+              "text": "a entrega principal é o Relatório de AIR",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                2
+              ],
+              "invented": false,
+              "text": "o horizonte previsto para a entrega é o primeiro semestre de 2022",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                23
+              ],
+              "invented": false,
+              "text": "não faz parte do escopo realizar alterações nos sistemas informatizados da Agência",
+              "verdict": "supported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 7,
+          "total_claims": 7
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 3.0566601660102606,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 73.45943535957485,
+        "session_preparation_s": 757.2395078502595,
+        "stream_terminal_s": 830.6989432098344,
+        "trace_readback_s": 21.604477785527706
+      },
+      "tool_calls": 21,
+      "cost_usd": 0.62149175,
+      "source_kind": "fresh_execution",
+      "occurrences": [
+        "Falha local pós-avaliação: lock em 0644 corrigido para 0600 e registrado no ledger, sem repetir inferência ou avaliação."
+      ],
+      "trace_id": "675da88325c4192661353dda1701555c",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/675da88325c4192661353dda1701555c",
+      "execution_id": "ad6351b5-2efe-45c3-b456-b4b838ef1fd7",
+      "sources": {
+        "question": "protected-bundle/items/case-5120k-q1-factual/question.txt",
+        "question_sha256": "4fa2e2d9c3b422dd7eb64c7a5330fd31cb88e24a128899560a72011c9535bc34",
+        "gold": "protected-bundle/items/case-5120k-q1-factual/gold.txt",
+        "gold_sha256": "d58d542091e716b0071c47face1f40a495c35fd6755afb90eac3380994649568",
+        "rubric": "protected-bundle/items/case-5120k-q1-factual/rubric.json",
+        "rubric_sha256": "9b8f61ddd9e8309fff3685a028d3989726ca00ed7067566b3c123ec252b6cb2a",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-5120k-q1-factual/items/case-5120k-q1-factual/result-protected.json",
+        "result_sha256": "956cfd69f8a83b92d9298e0889f74c1157a05f764b61b7dc24ac1db4d1711345",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-5120k-q2-synthesis",
+      "case_id": "case-5120k",
+      "question_type": "synthesis",
+      "corpus": {
+        "canonical_manifest_sha256": "eef63f9a7127ff9417b5f0c24a409f4e195247469f07b215e8c9badc9848eeae",
+        "case_id": "case-5120k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-5120k",
+        "document_count": 331,
+        "document_inventory_sha256": "d82a497ac3d7a28cf14739864d00c970c5ba1c6b15ed41397694f145989533b0",
+        "payload_sha256": "7cb1ba5480b317ba52d4fedfccf19f175c06713c6eb8b2450f4c3aa04b163bb4",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-5120k/process-metadata.json",
+          "sha256": "527658759b0e05e1a1584d5a1598f7cec3802dcd61c906fe6550e96c04534c07"
+        },
+        "runtime_bundle_inventory_sha256": "3986f4d15cef9b05345d23a531624ba77a0c6b086c67e99ede170af342ee0a64",
+        "token_count": 5120866,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Preciso atualizar a diretoria sobre o calendário de participação social que sustenta a revisão do PGMC e evitar que o cronograma da AIR use uma data superada. Redija uma nota de status que reconcilie o prazo aprovado no início com a decisão posterior, registre a data que passou a valer para contribuições e explique, com base nos fundamentos registrados, por que a extensão foi necessária e qual cautela de planejamento decorre disso.",
+      "gold_answer": "Fatos documentais: a Tomada de Subsídios foi aprovada inicialmente por 45 dias. Depois, o prazo para contribuições foi prorrogado até 7 de março de 2022. A decisão posterior registra como fundamentos os pedidos de dilação recebidos, a complexidade do tema e a necessidade de mais tempo de análise pelos agentes envolvidos, além do prazo da Agenda Regulatória para finalizar o relatório de AIR e a respectiva proposta. Interpretação operacional: no cronograma, 7 de março de 2022 é a data posterior de encerramento das contribuições; não se deve tratá-la como prazo inicial nem apagar que o prazo original era de 45 dias.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Informar que o prazo inicialmente aprovado era de 45 dias.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Informar que o prazo para contribuições foi prorrogado até 7 de março de 2022.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Registrar os pedidos de dilação recebidos como fundamento da prorrogação.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Registrar a complexidade do tema como fundamento.",
+          "satisfied": true
+        },
+        {
+          "index": 5,
+          "criterion": "Registrar a necessidade de mais tempo de análise pelos agentes envolvidos como fundamento.",
+          "satisfied": true
+        },
+        {
+          "index": 6,
+          "criterion": "Registrar que o prazo da Agenda Regulatória para finalizar o relatório de AIR e a respectiva proposta também foi considerado.",
+          "satisfied": true
+        },
+        {
+          "index": 7,
+          "criterion": "Explicar que a data de 7 de março de 2022 é a data posterior aplicável ao encerramento das contribuições, preservando a cronologia e sem dizer que ela era o prazo inicial.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "afirmar que 7 de março era o prazo original",
+        "omitir a prorrogação e tratar 45 dias como prazo final",
+        "atribuir a extensão a motivo não registrado",
+        "afirmar que a prorrogação decorreu de resultado da Consulta Pública",
+        "trocar AIR por outra entrega ou inventar nova data"
+      ],
+      "answer": "Buscando nos documentos o prazo inicial, a prorrogação e referências ao cronograma da AIR.ALVOS OBRIGATÓRIOS: prazo inicial da tomada de subsídios, decisão posterior de prorrogação e fundamentos registrados sobre o impacto no cronograma.Lendo um documento posterior que registra o efeito do calendário sobre a AIR para extrair a cautela de planejamento.**Nota de status — calendário de participação social da revisão do PGMC**\n\nO prazo originalmente aprovado para a Tomada de Subsídios da revisão do PGMC foi de **45 dias**, justificado desde o início pela meta da Agenda Regulatória 2021-2022 de concluir a AIR e a respectiva proposta no **primeiro semestre de 2022** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7843053\">[1]</a>. Na Consulta Pública nº 64/2021, esse prazo foi operacionalizado com encerramento em **7 de fevereiro de 2022, às 23h59** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7843251\">[2]</a>.\n\nPosteriormente, porém, esse marco foi **superado** por decisão formal: o Despacho Decisório nº 1/2022/PRRE/SPR **prorrogou o prazo para contribuições até 7 de março de 2022** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7971157\">[3]</a>. Assim, para fins de reporte à Diretoria e de consistência do cronograma da AIR, a **data válida de encerramento da participação social** a considerar é **7/3/2022**, e não mais 7/2/2022 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7971157\">[3]</a>.\n\nQuanto aos fundamentos da extensão, eles aparecem em dois níveis:\n\n- na própria decisão de prorrogação, a SPR registrou: **pedidos de dilação recebidos**, **complexidade do tema** e **necessidade de maior tempo de análise pelos agentes envolvidos**, sem perder de vista a pressão do prazo da Agenda Regulatória <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7971157\">[3]</a>;\n- nos pedidos juntados aos autos, as entidades detalharam por que o prazo original se mostrou insuficiente: publicação em **23/12/2021**, na véspera das festas de fim de ano, coincidindo com férias e menor disponibilidade das equipes <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7956464\">[4]</a>; coincidência com avanço de Covid-19 e influenza, afetando colaboradores <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7949681\">[5]</a>; e elevada carga analítica do questionário, com **54 questões**, de alta complexidade e ampla abrangência <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7967898\">[6]</a>.\n\nA reconciliação, portanto, é a seguinte: **o prazo inicial foi deliberadamente comprimido para atender a meta da AIR**, mas a Administração depois reconheceu que, para uma participação social qualificada em matéria tão relevante e complexa, esse desenho precisava ser ajustado <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7843053\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7971157\">[3]</a>.\n\n**Cautela de planejamento decorrente:** o cronograma da AIR não deve continuar reproduzindo a data original de **7/2/2022** como se fosse o marco final da participação social. O marco correto é **7/3/2022**, e o planejamento deve registrar que calendários comprimidos por metas da Agenda podem exigir ajuste quando a complexidade do tema e a necessidade de contribuição social mais qualificada assim o impõem <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 7971157\">[3]</a>. Essa cautela é coerente com registro posterior da própria área técnica de que a meta de finalização da proposta de revisão do PGMC na Agenda 2021-2022 **já restava vencida**, o que reforça a necessidade de não perpetuar, em peças de AIR ou de acompanhamento, uma data de participação social já superada <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 8973492\">[7]</a>.",
+      "answer_sha256": "ee96133f66e5485124f69a2e9f9dc9eadefbaf97c2311097104383f7b9114266",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": null
+      },
+      "scores": {
+        "citation_quality": 1.0,
+        "completeness": 1.0,
+        "groundedness": 1.0,
+        "overall": 0.96
+      },
+      "judge": {
+        "rationale": "A resposta trata o alvo e cumpre os sete elementos obrigatórios. As principais afirmações estão sustentadas pelos trechos abertos; não há claim contradito. A citação é abundante e adequada.",
+        "completeness": {
+          "satisfied": 7,
+          "total": 7,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Informar que o prazo inicialmente aprovado era de 45 dias.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Informar que o prazo para contribuições foi prorrogado até 7 de março de 2022.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Registrar os pedidos de dilação recebidos como fundamento da prorrogação.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Registrar a complexidade do tema como fundamento.",
+              "satisfied": true
+            },
+            {
+              "index": 5,
+              "criterion": "Registrar a necessidade de mais tempo de análise pelos agentes envolvidos como fundamento.",
+              "satisfied": true
+            },
+            {
+              "index": 6,
+              "criterion": "Registrar que o prazo da Agenda Regulatória para finalizar o relatório de AIR e a respectiva proposta também foi considerado.",
+              "satisfied": true
+            },
+            {
+              "index": 7,
+              "criterion": "Explicar que a data de 7 de março de 2022 é a data posterior aplicável ao encerramento das contribuições, preservando a cronologia e sem dizer que ela era o prazo inicial.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 10,
+            "unsupported": 0,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                9,
+                10,
+                12
+              ],
+              "invented": false,
+              "text": "O prazo originalmente aprovado para a Tomada de Subsídios da revisão do PGMC foi de 45 dias.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                14
+              ],
+              "invented": false,
+              "text": "Na Consulta Pública nº 64/2021, esse prazo foi operacionalizado com encerramento em 7 de fevereiro de 2022, às 23h59.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                25
+              ],
+              "invented": false,
+              "text": "O Despacho Decisório nº 1/2022/PRRE/SPR prorrogou o prazo para contribuições até 7 de março de 2022.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                24
+              ],
+              "invented": false,
+              "text": "A decisão de prorrogação registrou pedidos de dilação recebidos, complexidade do tema e necessidade de maior tempo de análise pelos agentes envolvidos.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22
+              ],
+              "invented": false,
+              "text": "Nos pedidos juntados aos autos, as entidades apontaram que a publicação em 23/12/2021 coincidiu com festas de fim de ano e férias, que houve avanço de Covid-19 e influenza, e que o questionário tinha 54 questões.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                10,
+                13,
+                26
+              ],
+              "invented": false,
+              "text": "A meta da Agenda Regulatória 2021-2022 para finalizar o relatório de AIR e a respectiva proposta foi considerada.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                14,
+                25
+              ],
+              "invented": false,
+              "text": "O marco correto para o encerramento das contribuições é 7/3/2022, e não 7/2/2022.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                14,
+                25
+              ],
+              "invented": false,
+              "text": "O cronograma da AIR não deve continuar reproduzindo a data original de 7/2/2022 como se fosse o marco final da participação social.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                10,
+                24
+              ],
+              "invented": false,
+              "text": "A cautela de planejamento decorre de calendários comprimidos por metas da Agenda que podem exigir ajuste quando a complexidade do tema e a necessidade de contribuição social mais qualificada assim o impõem.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3
+              ],
+              "invented": false,
+              "text": "A meta de finalização da proposta de revisão do PGMC na Agenda 2021-2022 já restava vencida.",
+              "verdict": "supported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 10,
+          "total_claims": 10
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 4.859947224147618,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 66.93000287842005,
+        "session_preparation_s": 742.9787759613246,
+        "stream_terminal_s": 809.9087788397446,
+        "trace_readback_s": 25.983455029316247
+      },
+      "tool_calls": 24,
+      "cost_usd": 0.6816695,
+      "source_kind": "fresh_execution",
+      "occurrences": [],
+      "trace_id": "1e746810b464f8a2b33c727c1a95eba9",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/1e746810b464f8a2b33c727c1a95eba9",
+      "execution_id": "46d18f3f-f124-4945-a2f2-b0c23ed7f5f8",
+      "sources": {
+        "question": "protected-bundle/items/case-5120k-q2-synthesis/question.txt",
+        "question_sha256": "154d5ec4f0a20a12cedd5293348feb2f4ee04e24eff51a4d7d3c6bc9f4fb7c3f",
+        "gold": "protected-bundle/items/case-5120k-q2-synthesis/gold.txt",
+        "gold_sha256": "7152fec141eb06f93e8816ef15a1d4b3f0e9c6019ef0ecf4c3e1d3ebc32a311e",
+        "rubric": "protected-bundle/items/case-5120k-q2-synthesis/rubric.json",
+        "rubric_sha256": "fd86ff91c10d1b809e29c0ad3414ad48fd0fff51003435b482a24d6ec6060593",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-5120k-q2-synthesis/items/case-5120k-q2-synthesis/result-protected.json",
+        "result_sha256": "de75e83c683500969259caaea9c7d857cbf5bdfc7da025dc4237429ae4351677",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-5120k-q3-insufficient-evidence",
+      "case_id": "case-5120k",
+      "question_type": "insufficient-evidence",
+      "corpus": {
+        "canonical_manifest_sha256": "eef63f9a7127ff9417b5f0c24a409f4e195247469f07b215e8c9badc9848eeae",
+        "case_id": "case-5120k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-5120k",
+        "document_count": 331,
+        "document_inventory_sha256": "d82a497ac3d7a28cf14739864d00c970c5ba1c6b15ed41397694f145989533b0",
+        "payload_sha256": "7cb1ba5480b317ba52d4fedfccf19f175c06713c6eb8b2450f4c3aa04b163bb4",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-5120k/process-metadata.json",
+          "sha256": "527658759b0e05e1a1584d5a1598f7cec3802dcd61c906fe6550e96c04534c07"
+        },
+        "runtime_bundle_inventory_sha256": "3986f4d15cef9b05345d23a531624ba77a0c6b086c67e99ede170af342ee0a64",
+        "token_count": 5120866,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "A coordenação quer informar à direção, em uma apresentação sobre a Consulta Pública nº 64, o percentual de contribuições que teria sido considerado procedente pela Anatel. Antes de liberar o número, faça uma análise de suficiência do processo: explique se há base para esse indicador, qual contagem formaria o numerador e o denominador e qual encaminhamento seguro deve constar da apresentação se esses dados não estiverem fechados.",
+      "gold_answer": "Não há base documental suficiente para publicar esse percentual. Embora o corpus contenha documentos da Tomada de Subsídios e contribuições, não apresenta uma taxa de procedência nem fecha o denominador — o total de contribuições do universo analisado — e o numerador — a quantidade acolhida ou considerada procedente. Sem essas contagens e um critério comum, não se pode calcular ou estimar o indicador; a apresentação deve registrar a limitação e não inventar um valor.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Declarar que não há base documental suficiente para publicar o percentual.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Reconhecer que o corpus contém documentos da Tomada de Subsídios e contribuições, mas isso não fecha o indicador.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Identificar a ausência de uma taxa de procedência já registrada.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Identificar o denominador ausente ou incompleto: total de contribuições do universo analisado.",
+          "satisfied": true
+        },
+        {
+          "index": 5,
+          "criterion": "Identificar o numerador ausente ou incompleto: quantidade acolhida ou considerada procedente.",
+          "satisfied": true
+        },
+        {
+          "index": 6,
+          "criterion": "Concluir que o indicador não pode ser calculado ou estimado e que a apresentação deve registrar a limitação sem inventar valor.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "calcular percentual a partir de documentos encontrados",
+        "tratar número de documentos do corpus como denominador",
+        "apresentar qualquer taxa de acolhimento/procedência",
+        "afirmar que uma contribuição foi acolhida como se fechasse o universo",
+        "inventar classificação ou total"
+      ],
+      "answer": "Buscando no processo os documentos que tratam da consolidação e análise das contribuições da CP 64.Vou conferir se a planilha de respostas permite uma contagem consistente por status e se houve fechamento decisório posterior que possa alterar a leitura do indicador.Não há base suficientemente segura, nos autos lidos, para divulgar como dado institucional fechado um “percentual de contribuições procedentes pela Anatel”.\n\n**1. O que há de base documental**\nA área técnica efetivamente analisou as contribuições e anexou uma planilha com respostas individualizadas à Consulta Pública nº 64/2023; o Informe nº 150/2024 afirma que “todas as contribuições foram respondidas individualmente” e remetidas à planilha SEI nº 13010656 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13010135\">[1]</a>.  \nTambém há registro formal de que a instrução técnica trabalhou com **296 contribuições recebidas**, sendo **274 pelo Participa Anatel e 22 pelo SEI** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13384652\">[2]</a>.\n\n**2. Por que isso não basta para um percentual seguro**\nO problema é que a planilha textualizada disponível no processo não traz um indicador consolidado pronto; ela traz registros por contribuição, com classificações heterogêneas e sem regra oficial de agregação para “procedência”. No arquivo da planilha aparecem, por exemplo, classificações como **ACEITO TOTALMENTE**, **ACEITO PARCIALMENTE**, **NÃO ACEITO** e **FORA DE ESCOPO** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13010656\">[3]</a>.  \nAlém disso, a própria planilha, na forma em que está textualizada, não é autoexplicativa para fins estatísticos: há duplicação de abas/entradas e a classificação não vem acompanhada, nos autos lidos, de uma memória de cálculo institucional do percentual. Em outras palavras: existe base para análise qualitativa das contribuições, mas **não encontrei um indicador oficial já fechado e validado de “percentual procedente”** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13010656\">[3]</a>.\n\nHá ainda um segundo risco: “considerado procedente pela Anatel” pode ser entendido como posição institucional final do processo, mas a posição final do Conselho não coincidiu integralmente com os encaminhamentos técnicos pós-consulta. Exemplo: a área técnica sustentou mercado relevante de EIR em sua análise pós-consulta, mas depois o Conselho decidiu não acolher essa proposta no novo PGMC <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 14461751\">[4]</a>. Portanto, um percentual baseado apenas na planilha técnica pode ser lido como se refletisse a posição final da Agência, o que é metodologicamente arriscado.\n\n**3. Se, ainda assim, alguém quisesse construir o indicador**\nO desenho mais defensável seria:\n\n- **Denominador:** total de contribuições efetivamente recebidas na CP 64/2023, isto é, **296** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13384652\">[2]</a>.\n- **Numerador:** contribuições classificadas como **aceitas integral ou parcialmente**, desde que antes se fixe, de modo expresso:\n  1. se “ACEITO TOTALMENTE” e “ACEITO PARCIALMENTE” entram juntos;\n  2. como tratar eventuais rótulos equivalentes/inconsistentes;\n  3. se “FORA DE ESCOPO” fica só fora do numerador ou também fora do denominador;\n  4. como reconciliar a planilha com o total formal de 296 contribuições <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13010656\">[3]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 13384652\">[2]</a>.\n\nSem essa regra de contagem, o número vira uma construção ad hoc, não um dado institucional fechado.\n\n**4. Encaminhamento seguro para a apresentação**\nMinha recomendação é **não liberar percentual** nesta fase. A redação mais segura para o slide é:\n\n**“As contribuições da Consulta Pública nº 64/2023 foram analisadas individualmente pela Anatel, com respostas registradas nos autos. Entretanto, não há, na documentação utilizada para esta apresentação, indicador oficial consolidado e validado de ‘percentual de contribuições procedentes’. Caso se deseje divulgar esse percentual, será necessária reconciliação da base de 296 contribuições recebidas com a planilha de classificação e validação prévia da regra de contagem pela área responsável.”**\n\nSe quiser, eu posso converter isso em texto de slide, com versão curta e versão para fala do apresentador.",
+      "answer_sha256": "57065cd145f07309750e9fc57b517fa8cd70b40d2ae38c97dacbfe281ecca185",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": true
+      },
+      "scores": {
+        "citation_quality": 0.93,
+        "completeness": 1.0,
+        "groundedness": 0.4375,
+        "overall": 0.9
+      },
+      "judge": {
+        "rationale": "A resposta trata o alvo e, em geral, segue a limitação pedida. As afirmações centrais de insuficiência e de ausência de indicador fechado estão sustentadas; há várias afirmações acessórias sem sustentação explícita, mas não há contradição relevante com o corpus nem invenção do percentual.",
+        "completeness": {
+          "satisfied": 6,
+          "total": 6,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Declarar que não há base documental suficiente para publicar o percentual.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Reconhecer que o corpus contém documentos da Tomada de Subsídios e contribuições, mas isso não fecha o indicador.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Identificar a ausência de uma taxa de procedência já registrada.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Identificar o denominador ausente ou incompleto: total de contribuições do universo analisado.",
+              "satisfied": true
+            },
+            {
+              "index": 5,
+              "criterion": "Identificar o numerador ausente ou incompleto: quantidade acolhida ou considerada procedente.",
+              "satisfied": true
+            },
+            {
+              "index": 6,
+              "criterion": "Concluir que o indicador não pode ser calculado ou estimado e que a apresentação deve registrar a limitação sem inventar valor.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 7,
+            "unsupported": 9,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                14,
+                15,
+                25
+              ],
+              "invented": false,
+              "text": "Não há base suficientemente segura, nos autos lidos, para divulgar como dado institucional fechado um “percentual de contribuições procedentes pela Anatel”.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                14
+              ],
+              "invented": false,
+              "text": "A área técnica efetivamente analisou as contribuições e anexou uma planilha com respostas individualizadas à Consulta Pública nº 64/2023.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                14
+              ],
+              "invented": false,
+              "text": "O Informe nº 150/2024 afirma que “todas as contribuições foram respondidas individualmente” e remetidas à planilha SEI nº 13010656.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                15
+              ],
+              "invented": false,
+              "text": "Há registro formal de que a instrução técnica trabalhou com 296 contribuições recebidas, sendo 274 pelo Participa Anatel e 22 pelo SEI.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3
+              ],
+              "invented": false,
+              "text": "A planilha textualizada disponível no processo não traz um indicador consolidado pronto.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3
+              ],
+              "invented": false,
+              "text": "Ela traz registros por contribuição, com classificações heterogêneas e sem regra oficial de agregação para “procedência”.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3
+              ],
+              "invented": false,
+              "text": "No arquivo da planilha aparecem classificações como ACEITO TOTALMENTE, ACEITO PARCIALMENTE, NÃO ACEITO e FORA DE ESCOPO.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3
+              ],
+              "invented": false,
+              "text": "A própria planilha, na forma em que está textualizada, não é autoexplicativa para fins estatísticos.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": false,
+              "evidence_basis": "none",
+              "evidence_references": [],
+              "invented": false,
+              "text": "Há duplicação de abas/entradas.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3
+              ],
+              "invented": false,
+              "text": "Não encontrei um indicador oficial já fechado e validado de “percentual procedente”.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                4,
+                31
+              ],
+              "invented": false,
+              "text": "A posição final do Conselho não coincidiu integralmente com os encaminhamentos técnicos pós-consulta.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                31
+              ],
+              "invented": false,
+              "text": "A área técnica sustentou mercado relevante de EIR em sua análise pós-consulta, mas depois o Conselho decidiu não acolher essa proposta no novo PGMC.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                15
+              ],
+              "invented": false,
+              "text": "O desenho mais defensável seria denominar o total de contribuições efetivamente recebidas na CP 64/2023 como 296.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3
+              ],
+              "invented": false,
+              "text": "O numerador seria contribuições classificadas como aceitas integral ou parcialmente, desde que se fixe regra expressa de contagem.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3,
+                15
+              ],
+              "invented": false,
+              "text": "Sem essa regra de contagem, o número vira uma construção ad hoc, não um dado institucional fechado.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                14,
+                15,
+                25
+              ],
+              "invented": false,
+              "text": "Minha recomendação é não liberar percentual nesta fase.",
+              "verdict": "supported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 15,
+          "total_claims": 16
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 9.064824034459889,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 242.17211304139346,
+        "session_preparation_s": 719.7032322883606,
+        "stream_terminal_s": 961.875345329754,
+        "trace_readback_s": 43.11093524284661
+      },
+      "tool_calls": 84,
+      "cost_usd": 1.680967,
+      "source_kind": "fresh_execution",
+      "occurrences": [
+        "O agente concluiu, mas a exportação fresh terminou em HTTP 409 por hash após normalização de newline; resposta, evidence e judge foram recuperados sem replay."
+      ],
+      "trace_id": "c2681ee15d461d5f01df705751237cde",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/c2681ee15d461d5f01df705751237cde",
+      "execution_id": "4dcd0f45-4c28-4827-8383-cc94eedfb004",
+      "sources": {
+        "question": "protected-bundle/items/case-5120k-q3-insufficient-evidence/question.txt",
+        "question_sha256": "9425032450ea64a431a1a16507f69b2685917b3a66882814e9dfe36f8ec98e4e",
+        "gold": "protected-bundle/items/case-5120k-q3-insufficient-evidence/gold.txt",
+        "gold_sha256": "71b697d53d8d3564d599d08bb48145757719a8a1430fe4605ff554f4a1c6a3a0",
+        "rubric": "protected-bundle/items/case-5120k-q3-insufficient-evidence/rubric.json",
+        "rubric_sha256": "6e3dc6538675bbf1ac50d848bb4ce46f4b58e1f9506bb3d009a5febab58aef39",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-5120k-q3-insufficient-evidence/items/case-5120k-q3-insufficient-evidence/result-protected.json",
+        "result_sha256": "a79a0619e6f24667ebc00d0cb93557fc69ff1e00dd9b8d0ed9664a68849d9586",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-6260k-q1-factual",
+      "case_id": "case-6260k",
+      "question_type": "factual",
+      "corpus": {
+        "canonical_manifest_sha256": "43665a6faabb1bb5403cd84d285378531baeffd333f92e388c4cd2e806cdd101",
+        "case_id": "case-6260k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-6260k",
+        "document_count": 61,
+        "document_inventory_sha256": "3a36c4407c07222159afb20a0e554e6170ba752320e917ad351d2f83df05a279",
+        "payload_sha256": "47f25dcc091a4f3bc1be9f8d82b6320b82048ce50eec05269cd945545af2dfb5",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-6260k/process-metadata.json",
+          "sha256": "d8aa1ce0e1db782a0c82172f7c12014d69f96473490927da37871f0da88f7bb2"
+        },
+        "runtime_bundle_inventory_sha256": "c70a2d4bd6f75c5792d15f872e56c4d95d4c4afeaeab0111f4d2066795747e85",
+        "token_count": 6260548,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Estou fechando o quadro de acompanhamento da fiscalização nº 24156 e preciso registrar o estado cadastral e a janela de execução antes de decidir se o caso deve ser escalado. Consulte o processo e entregue uma linha de status com a situação, a data de início e a data limite exatamente como constam dos autos; não transforme essas datas, por si sós, em conclusão sobre atraso, encerramento ou resultado da fiscalização.",
+      "gold_answer": "O registro cadastral informa situação “Em andamento”, data de início em 01/01/2020 e data limite em 31/12/2020. Esses são os campos da solicitação; isoladamente, não demonstram encerramento, atraso ou resultado final da fiscalização.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Informar a situação “Em andamento”.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Informar a data de início 01/01/2020.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Informar a data limite 31/12/2020.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Explicar que status e datas são campos cadastrais e, sozinhos, não comprovam atraso, encerramento ou resultado final.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "trocar o status",
+        "inverter ou alterar as datas",
+        "declarar fiscalização concluída ou atrasada apenas com base nesses campos",
+        "atribuir resultado material não registrado"
+      ],
+      "answer": "ALVOS OBRIGATÓRIOS: fiscalização nº 24156 → /proc_5846686/6014081.txt; estado cadastral da entidade no processo → /proc_5846686/6014092.txt. EIXOS OBRIGATÓRIOS: situação da fiscalização, data de início, data limite, situação cadastral, sem concluir atraso/encerramento/resultado.Fiscalização nº 24156: situação **Em andamento**, data de início **01/01/2020**, data limite **31/12/2020** e situação cadastral **ATIVA** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297978\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297988\">[2]</a>",
+      "answer_sha256": "d1d1926864e08c26d4dd825bab19c16036fbce821f8f54868e0c5bc756be7a94",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": null
+      },
+      "scores": {
+        "citation_quality": 0.9,
+        "completeness": 1.0,
+        "groundedness": 0.8,
+        "overall": 0.95
+      },
+      "judge": {
+        "rationale": "A resposta atende ao alvo e recupera corretamente os campos pedidos. A última afirmação interpretativa não está sustentada explicitamente no corpus, embora não contradiga os autos.",
+        "completeness": {
+          "satisfied": 4,
+          "total": 4,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Informar a situação “Em andamento”.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Informar a data de início 01/01/2020.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Informar a data limite 31/12/2020.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Explicar que status e datas são campos cadastrais e, sozinhos, não comprovam atraso, encerramento ou resultado final.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 4,
+            "unsupported": 1,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                3
+              ],
+              "invented": false,
+              "text": "A fiscalização nº 24156 está \"Em andamento\".",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                3
+              ],
+              "invented": false,
+              "text": "A data de início é 01/01/2020.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                3
+              ],
+              "invented": false,
+              "text": "A data limite é 31/12/2020.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                5
+              ],
+              "invented": false,
+              "text": "A situação cadastral é ATIVA.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": false,
+              "evidence_basis": "none",
+              "evidence_references": [],
+              "invented": false,
+              "text": "Status e datas são campos cadastrais e, sozinhos, não comprovam atraso, encerramento ou resultado final.",
+              "verdict": "unsupported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 4,
+          "total_claims": 5
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 2.429304120130837,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 29.10374985449016,
+        "session_preparation_s": 47.968222269788384,
+        "stream_terminal_s": 77.07197212427855,
+        "trace_readback_s": 24.689142055809498
+      },
+      "tool_calls": 7,
+      "cost_usd": 0.1526365,
+      "source_kind": "fresh_execution",
+      "occurrences": [],
+      "trace_id": "aad80d9a7a2e1ca2af5b9586eb520c3d",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/aad80d9a7a2e1ca2af5b9586eb520c3d",
+      "execution_id": "3c945b46-8f9a-48a1-8940-0596b734de2c",
+      "sources": {
+        "question": "protected-bundle/items/case-6260k-q1-factual/question.txt",
+        "question_sha256": "17d03926e1ef6eab822b21109c4316fd42680b759130827b5fe359c573704f81",
+        "gold": "protected-bundle/items/case-6260k-q1-factual/gold.txt",
+        "gold_sha256": "7808e3b735fea80f160555dd81e284a08be78824d809f195583dda4594ca0f01",
+        "rubric": "protected-bundle/items/case-6260k-q1-factual/rubric.json",
+        "rubric_sha256": "545a10d671cb8bd00fc84b08689dc28d683303c0e7f4d2ee6d01222e6fed90a2",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-6260k-q1-factual/items/case-6260k-q1-factual/result-protected.json",
+        "result_sha256": "2a7405de93749b37220829a8aa803469d5866e64c0d6390af922e771b95a6762",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-6260k-q2-synthesis",
+      "case_id": "case-6260k",
+      "question_type": "synthesis",
+      "corpus": {
+        "canonical_manifest_sha256": "43665a6faabb1bb5403cd84d285378531baeffd333f92e388c4cd2e806cdd101",
+        "case_id": "case-6260k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-6260k",
+        "document_count": 61,
+        "document_inventory_sha256": "3a36c4407c07222159afb20a0e554e6170ba752320e917ad351d2f83df05a279",
+        "payload_sha256": "47f25dcc091a4f3bc1be9f8d82b6320b82048ce50eec05269cd945545af2dfb5",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-6260k/process-metadata.json",
+          "sha256": "d8aa1ce0e1db782a0c82172f7c12014d69f96473490927da37871f0da88f7bb2"
+        },
+        "runtime_bundle_inventory_sha256": "c70a2d4bd6f75c5792d15f872e56c4d95d4c4afeaeab0111f4d2066795747e85",
+        "token_count": 6260548,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Antes de validar os valores apurados para o FUST, a chefia pediu uma nota de conciliação entre a solicitação que originou a fiscalização e o relatório produzido ao final. Reconstitua o exercício tratado no pedido, confira como o objetivo e o resultado esperado aparecem no relatório, registre o exercício e o valor usados na conclusão e indique como a divergência deve ser apresentada para que ninguém corrija o processo sem respaldo.",
+      "gold_answer": "Fatos documentais: a solicitação descreve a apuração referente ao exercício fiscal de 2018, e o relatório mantém 2018 tanto no objetivo quanto no resultado esperado. Contudo, a conclusão do relatório registra “exercício financeiro de 2017” e total de R$ 2.675.706,81. Interpretação operacional: o corpus contém uma inconsistência temporal; a nota deve registrar a divergência e pedir esclarecimento ou revisão antes de associar o valor a um exercício, sem corrigi-la silenciosamente.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Informar 2018 como exercício fiscal descrito na solicitação.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Informar 2018 no objetivo do relatório.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Informar 2018 no resultado esperado do relatório.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Informar que a conclusão registra exercício financeiro de 2017.",
+          "satisfied": true
+        },
+        {
+          "index": 5,
+          "criterion": "Informar o total de R$ 2.675.706,81.",
+          "satisfied": true
+        },
+        {
+          "index": 6,
+          "criterion": "Explicitar a inconsistência temporal e recomendar que ela seja registrada e esclarecida/revisada, sem atribuir silenciosamente o valor a um dos exercícios.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "apagar ou harmonizar a divergência",
+        "atribuir o total a 2018 ou 2017 sem ressalva",
+        "trocar o valor",
+        "tratar objetivo/resultado esperado como se fossem a conclusão",
+        "inventar explicação para a diferença ou novo cálculo"
+      ],
+      "answer": "Nota de conciliação proposta:\n\nA solicitação que deu origem à fiscalização foi a SOL_AFFO_2020_0048, cuja descrição pede “apurar os valores devidos ao Fust (...) referente ao exercício fiscal de 2018” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297978\">[1]</a>. No Relatório de Fiscalização nº 162/2020/GR01FI1/GR01/SFI, o objeto também foi descrito para 2018: o objetivo é “assegurar o correto recolhimento” do FUST, e o resultado esperado é “apurar os valores devidos ao FUST referentes ao exercício 2018” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>.\n\nA reconstituição do exercício tratado no pedido, portanto, é inequívoca: a demanda originária é do exercício de 2018 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297978\">[1]</a>. Isso é reiterado no próprio relatório, inclusive na descrição da execução, que menciona documentação, análises e planilha de cálculo “para o ano de 2018” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>.\n\nA divergência aparece apenas na conclusão do Relatório nº 162/2020: o item 9.1 registra que “os valores apurados para a contribuição ao Fust durante o exercício financeiro de 2017 totalizam (...) R$ 2.675.706,81” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>. Assim, no mesmo relatório:\n- objetivo: compatível com 2018 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n- resultado esperado: compatível com 2018 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n- desenvolvimento da fiscalização: compatível com 2018 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n- conclusão: menciona 2017 e usa o valor de R$ 2.675.706,81 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n\nSe a validação a ser feita hoje for sobre a reapuração posterior, há um segundo relatório no processo, o Relatório nº 54/2024/UO091/GR09/SFI, que trata expressamente de nova apuração “referente ao exercício de 2018” e conclui por novos valores de FUST no total de R$ 2.598.019,68 para o exercício fiscal de 2018 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12992019\">[3]</a>.\n\nForma recomendada de apresentar a divergência, sem “corrigir” o processo sem respaldo:\n1. Registrar que há inconsistência material interna no Relatório nº 162/2020, restrita ao item 9.1, porque a solicitação originária e o restante do relatório convergem para 2018, mas a conclusão consignou 2017 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297978\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>.\n2. Não afirmar, por conta própria, que o relatório “está corrigido”; afirmar apenas que há forte indicação de erro material de referência ao exercício no item conclusivo, a ser saneado apenas por ato formal da área competente.\n3. Separar fato de inferência:\n   - fato documental: solicitação = 2018; objetivo/resultado esperado = 2018; conclusão do RF 162/2020 = 2017 e R$ 2.675.706,81 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297978\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n   - efeito administrativo sugerido: eventual retificação deve ser formalizada por despacho/ato próprio, vedada correção informal no corpo do processo.\n4. Se for necessário um texto enxuto para a nota: “Verifica-se divergência interna no Relatório de Fiscalização nº 162/2020/GR01FI1/GR01/SFI: a solicitação originária e os itens 1.1, 1.2 e 8 do relatório referem-se ao exercício de 2018, ao passo que o item 9.1 consignou ‘exercício financeiro de 2017’, com valor total de R$ 2.675.706,81. A inconsistência deve ser tratada como possível erro material do item conclusivo, sem alteração informal dos autos, dependendo de manifestação formal da unidade competente para saneamento.” <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297978\">[1]</a> <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n\nEm resumo:\n- exercício do pedido originário: 2018 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5297978\">[1]</a>\n- exercício no objetivo e resultado esperado do RF 162/2020: 2018 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n- exercício lançado na conclusão do RF 162/2020: 2017 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n- valor lançado nessa conclusão: R$ 2.675.706,81 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[2]</a>\n- valor da reapuração posterior, já no RF 54/2024, para 2018: R$ 2.598.019,68 <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12992019\">[3]</a>\n\nSe quiser, eu posso transformar isso em uma nota técnica curta, pronta para juntar aos autos.",
+      "answer_sha256": "be0a2e2b719a922b0ec042fafed1469e817597512c84ee840cc1e01156d3e43d",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": null
+      },
+      "scores": {
+        "citation_quality": 1.0,
+        "completeness": 1.0,
+        "groundedness": 0.8571428571428571,
+        "overall": 1.0
+      },
+      "judge": {
+        "rationale": "A resposta atende ao alvo e cobre todos os elementos obrigatórios. Os fatos centrais são suportados pelos excertos; apenas a recomendação procedimental final não está diretamente sustentada pelo pacote, mas não contradiz o corpus.",
+        "completeness": {
+          "satisfied": 6,
+          "total": 6,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Informar 2018 como exercício fiscal descrito na solicitação.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Informar 2018 no objetivo do relatório.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Informar 2018 no resultado esperado do relatório.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Informar que a conclusão registra exercício financeiro de 2017.",
+              "satisfied": true
+            },
+            {
+              "index": 5,
+              "criterion": "Informar o total de R$ 2.675.706,81.",
+              "satisfied": true
+            },
+            {
+              "index": 6,
+              "criterion": "Explicitar a inconsistência temporal e recomendar que ela seja registrada e esclarecida/revisada, sem atribuir silenciosamente o valor a um dos exercícios.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 6,
+            "unsupported": 1,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                7,
+                9
+              ],
+              "invented": false,
+              "text": "A solicitação que deu origem à fiscalização foi a SOL_AFFO_2020_0048, cuja descrição pede apurar os valores devidos ao Fust referente ao exercício fiscal de 2018.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                11
+              ],
+              "invented": false,
+              "text": "No Relatório de Fiscalização nº 162/2020/GR01FI1/GR01/SFI, o objetivo e o resultado esperado estavam ligados a 2018.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                1,
+                9
+              ],
+              "invented": false,
+              "text": "A reconstituição do exercício tratado no pedido é inequívoca e a demanda originária é do exercício de 2018.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                10
+              ],
+              "invented": false,
+              "text": "A divergência aparece na conclusão do Relatório nº 162/2020, que registra exercício financeiro de 2017.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                2,
+                10
+              ],
+              "invented": false,
+              "text": "O item 9.1 usa o valor de R$ 2.675.706,81.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                3,
+                4,
+                5
+              ],
+              "invented": false,
+              "text": "Há um segundo relatório no processo, o Relatório nº 54/2024/UO091/GR09/SFI, que trata de nova apuração referente ao exercício de 2018 e conclui por novos valores de FUST no total de R$ 2.598.019,68.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": false,
+              "evidence_basis": "none",
+              "evidence_references": [],
+              "invented": false,
+              "text": "A inconsistência deve ser registrada como possível erro material do item conclusivo, sem alteração informal dos autos, dependendo de manifestação formal da unidade competente para saneamento.",
+              "verdict": "unsupported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 6,
+          "total_claims": 7
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 3.3264757497236133,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 47.960795070044696,
+        "session_preparation_s": 60.803057154640555,
+        "stream_terminal_s": 108.76385222468525,
+        "trace_readback_s": 16.080811573192477
+      },
+      "tool_calls": 9,
+      "cost_usd": 0.285063,
+      "source_kind": "fresh_execution",
+      "occurrences": [],
+      "trace_id": "b02fd25e43410fe628495a259bd2e8ac",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/b02fd25e43410fe628495a259bd2e8ac",
+      "execution_id": "f8aefefa-23bd-4321-adf5-fe0b8d7a2b06",
+      "sources": {
+        "question": "protected-bundle/items/case-6260k-q2-synthesis/question.txt",
+        "question_sha256": "a4ec45e268d5507f28a500b5e9e0f8b1fc10ecd1cbd92a40fd0986aa487a48a4",
+        "gold": "protected-bundle/items/case-6260k-q2-synthesis/gold.txt",
+        "gold_sha256": "cccee4f32faa9f075bfea0436895945d11735f74208ff17671bf42078e70aef2",
+        "rubric": "protected-bundle/items/case-6260k-q2-synthesis/rubric.json",
+        "rubric_sha256": "1e0c2f29b8bea77204d05050d7eadd7f60337c58adccb21572643114a150b0f4",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-6260k-q2-synthesis/items/case-6260k-q2-synthesis/result-protected.json",
+        "result_sha256": "16174048e5abf1395f5899032976f63cfb3e21edfc9d6a019a8f2a8930bc1cf6",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    },
+    {
+      "item_id": "case-6260k-q3-insufficient-evidence",
+      "case_id": "case-6260k",
+      "question_type": "insufficient-evidence",
+      "corpus": {
+        "canonical_manifest_sha256": "43665a6faabb1bb5403cd84d285378531baeffd333f92e388c4cd2e806cdd101",
+        "case_id": "case-6260k",
+        "corpus_ref": "protected://benchmark-long-context-v2/evidence-sources/case-6260k",
+        "document_count": 61,
+        "document_inventory_sha256": "3a36c4407c07222159afb20a0e554e6170ba752320e917ad351d2f83df05a279",
+        "payload_sha256": "47f25dcc091a4f3bc1be9f8d82b6320b82048ce50eec05269cd945545af2dfb5",
+        "process_metadata_ref": {
+          "ref": "protected://benchmark-long-context-v2/corpora/case-6260k/process-metadata.json",
+          "sha256": "d8aa1ce0e1db782a0c82172f7c12014d69f96473490927da37871f0da88f7bb2"
+        },
+        "runtime_bundle_inventory_sha256": "c70a2d4bd6f75c5792d15f872e56c4d95d4c4afeaeab0111f4d2066795747e85",
+        "token_count": 6260548,
+        "token_count_semantics": "tiktoken_o200k_base_full_payload_serialization"
+      },
+      "question": "Para o painel de resultados do Requerimento de Informações, a chefia pediu uma taxa de atendimento considerando o conjunto inteiro de documentos solicitados, não apenas os arquivos que aparecem no relatório de análise. Faça a validação de suficiência do processo e devolva uma recomendação: diga se o indicador pode ser fechado, explicite quais dados faltariam para formar numerador e denominador e registre o limite que deve acompanhar qualquer comunicação à gestão.",
+      "gold_answer": "Não é possível fechar a taxa com o corpus preservado. Os autos mostram o requerimento e documentos analisados, mas não trazem uma taxa publicada nem um universo completo que permita identificar o denominador — o total de documentos ou itens solicitados — e o numerador — quantos foram efetivamente atendidos ou recebidos. A recomendação é registrar a insuficiência e não inferir percentual a partir dos documentos selecionados.",
+      "expected_criteria": [
+        {
+          "index": 1,
+          "criterion": "Declarar que a taxa não pode ser fechada com o corpus.",
+          "satisfied": true
+        },
+        {
+          "index": 2,
+          "criterion": "Reconhecer que os autos mostram o requerimento e documentos analisados.",
+          "satisfied": true
+        },
+        {
+          "index": 3,
+          "criterion": "Registrar que não há taxa percentual publicada.",
+          "satisfied": true
+        },
+        {
+          "index": 4,
+          "criterion": "Identificar o denominador ausente ou incompleto: o universo total de documentos ou itens solicitados.",
+          "satisfied": true
+        },
+        {
+          "index": 5,
+          "criterion": "Identificar o numerador ausente ou incompleto: a quantidade efetivamente atendida ou recebida nesse mesmo universo.",
+          "satisfied": true
+        },
+        {
+          "index": 6,
+          "criterion": "Recomendar que a insuficiência seja comunicada e que não se infira percentual dos documentos selecionados.",
+          "satisfied": true
+        }
+      ],
+      "hallucination_indicators": [
+        "dividir documentos analisados por documentos solicitados sem base de completude",
+        "apresentar qualquer taxa",
+        "tratar arquivos selecionados como o universo total",
+        "afirmar atendimento integral ou parcial sem contagem",
+        "inventar resposta ausente"
+      ],
+      "answer": "Progresso: identifiquei o conjunto pedido no RI e o que a empresa disse ter entregue; agora estou validando se os autos efetivamente permitem montar numerador e denominador do indicador sem inferências.Progresso: o cruzamento já mostra que o RI tem 10 itens, a resposta da empresa lista 8 grupos e os relatórios trabalham com anexos/mídia não disponíveis nos autos da sessão. Vou fechar a validação de suficiência com base nisso.Recomendação: **não fechar o indicador** com os autos disponíveis na sessão. O Requerimento de Informações pede 10 subitens, dos quais o 2.1.3 é condicional (“se houver”) e o 2.1.9 depende de ter havido retificação; além disso, os itens 2.1.1 a 2.1.4 podem ser entregues em PDF/Excel e os itens 2.1.5 a 2.1.9 em `.sped` <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5290612\">[1]</a>. Já a resposta da empresa declara atendimento aos itens 2.1.1 a 2.1.10, **exceto 2.1.3**, mas só lista 8 grupos documentais/informacionais e não materializa, no próprio documento, o conteúdo anexado; é uma declaração de encaminhamento, não uma prova completa do acervo efetivamente juntado <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 5497932\">[2]</a>.\n\nO ponto crítico é que o Relatório de Fiscalização nº 162/2020 trabalha com **mídia e anexos** que não estão disponíveis como arquivos autônomos na sessão: ele afirma que, em atendimento ao RI, foram recebidos ao menos ECD com recibo, ECF com recibo e arquivos mensais de EFD ICMS, e cita como base de análise a mídia SEI 5498616 e anexos como 6014408, 6014409 e 6014413; porém esses conteúdos não aparecem entre os arquivos disponíveis do processo na sessão <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 6014416\">[3]</a>. Assim, **não dá para auditar item a item o conjunto inteiro solicitado**, apenas saber que houve uma análise fiscal baseada em parte desse material.\n\n### O que falta para formar o indicador\n\n**Para o denominador**\n1. **Regra de contagem** do painel:\n   - contar por **subitem do RI** (2.1.1 a 2.1.10)?\n   - contar por **pacote documental**?\n   - contar por **arquivo individual**?\n2. **Tratamento dos condicionais**:\n   - confirmação objetiva de que o item **2.1.3** era realmente “não aplicável”;\n   - confirmação objetiva sobre a existência ou não de **retificações** para os SPEDs do item **2.1.9**.\n3. Definição se o item **2.1.10** (indicação de representante) entra como “documento solicitado” ou como informação acessória.\n\n**Para o numerador**\n1. O **conteúdo efetivamente recebido** em resposta ao RI, especialmente a mídia/anexos citados no relatório:\n   - SEI **5498616**;\n   - anexos referidos pela fiscalização e usados na análise.\n2. Evidência item a item de presença/ausência de:\n   - 2.1.1 descrição das atividades;\n   - 2.1.2 alíquotas;\n   - 2.1.4 memória de cálculo/conciliações;\n   - 2.1.5 ECD + recibo;\n   - 2.1.6 ECF + recibo;\n   - 2.1.7 EFD Contribuições + recibo;\n   - 2.1.8 EFD ICMS-IPI + recibo;\n   - 2.1.9 originais e retificadoras, se houver;\n   - 2.1.10 dados do representante.\n3. Distinção entre:\n   - **declaração da empresa de que enviou**; e\n   - **prova verificável de que o arquivo/documento está nos autos**.\n\n### Sobre os documentos posteriores\nA documentação da impugnação juntada depois serviu para **revisar a base de cálculo** e corrigir a apuração, inclusive com notas fiscais e planilhas adicionais; isso mostra que a instrução do processo continuou depois, mas **não supre a falta de visibilidade do atendimento original ao RI para fins do indicador** <a href=\"#\" data-toggle=\"tooltip\" data-html=\"true\" class=\"AssistenteSEIIAfonteResposta\" title=\"Documento SEI nº 12992019\">[4]</a>.\n\n### Limite que deve acompanhar qualquer comunicação à gestão\nO limite recomendado é este:\n\n**“A taxa de atendimento não pôde ser validada sobre o conjunto integral de documentos solicitados no Requerimento de Informações, porque os autos disponíveis não permitem verificar, item a item, todo o material efetivamente entregue pela fiscalizada; há evidência de análise fiscal e de declaração de encaminhamento, mas não de completude auditável do acervo originalmente solicitado.”**\n\nSe quiser, eu posso converter isso em uma nota executiva curta, já no formato de texto para o painel ou para despacho interno.",
+      "answer_sha256": "25606963053ffb35c3426ca6b69b978d21e2138987cf30dbde2057d638a7ca99",
+      "classification": {
+        "quality": "válida",
+        "gate": "passed",
+        "target_alignment": true,
+        "hallucination": false,
+        "negativa_correta": true
+      },
+      "scores": {
+        "citation_quality": 0.9,
+        "completeness": 1.0,
+        "groundedness": 0.8181818181818182,
+        "overall": 0.87
+      },
+      "judge": {
+        "rationale": "A resposta trata o alvo pedido e cumpre os itens obrigatórios, recomendando não fechar o indicador, apontando o que falta para numerador e denominador e registrando o limite de comunicação. Há algumas afirmações não sustentadas diretamente pelo pacote aberto, mas sem contradição relevante ao núcleo da recomendação.",
+        "completeness": {
+          "satisfied": 6,
+          "total": 6,
+          "criteria": [
+            {
+              "index": 1,
+              "criterion": "Declarar que a taxa não pode ser fechada com o corpus.",
+              "satisfied": true
+            },
+            {
+              "index": 2,
+              "criterion": "Reconhecer que os autos mostram o requerimento e documentos analisados.",
+              "satisfied": true
+            },
+            {
+              "index": 3,
+              "criterion": "Registrar que não há taxa percentual publicada.",
+              "satisfied": true
+            },
+            {
+              "index": 4,
+              "criterion": "Identificar o denominador ausente ou incompleto: o universo total de documentos ou itens solicitados.",
+              "satisfied": true
+            },
+            {
+              "index": 5,
+              "criterion": "Identificar o numerador ausente ou incompleto: a quantidade efetivamente atendida ou recebida nesse mesmo universo.",
+              "satisfied": true
+            },
+            {
+              "index": 6,
+              "criterion": "Recomendar que a insuficiência seja comunicada e que não se infira percentual dos documentos selecionados.",
+              "satisfied": true
+            }
+          ]
+        },
+        "groundedness": {
+          "verdict_counts": {
+            "supported": 9,
+            "unsupported": 2,
+            "contradicted": 0
+          },
+          "claims": [
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                9,
+                10,
+                11,
+                12
+              ],
+              "invented": false,
+              "text": "Não dá para auditar item a item o conjunto inteiro solicitado.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                10,
+                11,
+                12
+              ],
+              "invented": false,
+              "text": "O Requerimento de Informações pede 10 subitens.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                11
+              ],
+              "invented": false,
+              "text": "O item 2.1.3 é condicional ('se houver') e o 2.1.9 depende de ter havido retificação.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                9,
+                10,
+                12
+              ],
+              "invented": false,
+              "text": "Os itens 2.1.1 a 2.1.4 podem ser entregues em PDF/Excel e os itens 2.1.5 a 2.1.9 em .sped.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "none",
+              "evidence_references": [],
+              "invented": false,
+              "text": "A resposta da empresa declara atendimento aos itens 2.1.1 a 2.1.10, exceto 2.1.3, mas só lista 8 grupos documentais/informacionais.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                13,
+                14,
+                15
+              ],
+              "invented": false,
+              "text": "O relatório afirma que, em atendimento ao RI, foram recebidos ao menos ECD com recibo, ECF com recibo e arquivos mensais de EFD ICMS.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "none",
+              "evidence_references": [],
+              "invented": false,
+              "text": "A mídia SEI 5498616 e anexos como 6014408, 6014409 e 6014413 não aparecem entre os arquivos disponíveis do processo na sessão.",
+              "verdict": "unsupported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                4,
+                5,
+                6
+              ],
+              "invented": false,
+              "text": "Os documentos posteriores de impugnação serviram para revisar a base de cálculo e corrigir a apuração.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15
+              ],
+              "invented": false,
+              "text": "A taxa de atendimento não pôde ser validada sobre o conjunto integral de documentos solicitados no Requerimento de Informações.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                13,
+                14,
+                15
+              ],
+              "invented": false,
+              "text": "Os autos disponíveis não permitem verificar, item a item, todo o material efetivamente entregue pela fiscalizada.",
+              "verdict": "supported"
+            },
+            {
+              "absence_evidence_reference": null,
+              "citation_present": true,
+              "evidence_basis": "excerpt",
+              "evidence_references": [
+                13,
+                14,
+                15,
+                2,
+                3
+              ],
+              "invented": false,
+              "text": "Há evidência de análise fiscal e de declaração de encaminhamento, mas não de completude auditável do acervo originalmente solicitado.",
+              "verdict": "supported"
+            }
+          ]
+        },
+        "citation_quality": {
+          "cited_claims": 11,
+          "total_claims": 11
+        },
+        "hallucination": {
+          "value": false,
+          "count": 0,
+          "invented_claims": 0,
+          "specific_rationale": null
+        },
+        "attempts": [
+          "rejected",
+          "accepted"
+        ]
+      },
+      "latency": {
+        "evaluation_s": 11.160618520341814,
+        "excluded_from_inference_latency": [
+          "evaluation_s",
+          "trace_readback_s"
+        ],
+        "inference_latency_scope": "session_preparation + post_preparation_stream",
+        "post_preparation_stream_s": 89.50153274741024,
+        "session_preparation_s": 47.99056656472385,
+        "stream_terminal_s": 137.4920993121341,
+        "trace_readback_s": 23.153495015576482
+      },
+      "tool_calls": 27,
+      "cost_usd": 0.4167535,
+      "source_kind": "fresh_execution",
+      "occurrences": [
+        "A primeira saída do judge foi rejeitada pelo contrato; a segunda foi aceita. O retry de avaliação não repetiu o agente."
+      ],
+      "trace_id": "4a48a2f43334e25debdad34ddbace832",
+      "trace_url": "http://rhgicdpdin02:3005/project/cmqqnj62q0001rv07o827in1i/traces/4a48a2f43334e25debdad34ddbace832",
+      "execution_id": "7505888d-bffa-46f7-8fbc-2ed2d97b4366",
+      "sources": {
+        "question": "protected-bundle/items/case-6260k-q3-insufficient-evidence/question.txt",
+        "question_sha256": "49d98d4ebbc03c724249d53e20762c22168bae10638971517c86804e116dd00e",
+        "gold": "protected-bundle/items/case-6260k-q3-insufficient-evidence/gold.txt",
+        "gold_sha256": "c462821edc4bda0c03b0d82a0b0a2814187af87ae4675ac5eadc5eb67cadf21a",
+        "rubric": "protected-bundle/items/case-6260k-q3-insufficient-evidence/rubric.json",
+        "rubric_sha256": "27d4eee136942fc873284ccbef99d1c09f2542cec715115f2fbfc061fcdc14a5",
+        "result": "full-battery-output/runs/long-context-v2-full-battery-20260724T022501Z--case-6260k-q3-insufficient-evidence/items/case-6260k-q3-insufficient-evidence/result-protected.json",
+        "result_sha256": "57d0b4a0c09e1bc7c822c5f02d2fd31a76296386c32be2e9aaacd2d23f976e66",
+        "official_aggregate": "full-battery-output/batteries/long-context-v2-full-battery-20260724T022501Z/full-battery-result-protected.json"
+      }
+    }
+  ]
+}

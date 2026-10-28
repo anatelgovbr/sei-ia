@@ -1,0 +1,113 @@
+# keep_only restringe a lista de engines APENAS aos nomeados — sem isto, uma
+# lista `engines:` no topo apenas MESCLA com os ~80 engines default (google,
+# duckduckgo, startpage, etc.), que continuam ativos, são bloqueados no IP de
+# datacenter (403/captcha/429), geram suspensões em massa e poluem os resultados.
+# As demais seções (server, search, outgoing, ...) continuam herdando os defaults.
+use_default_settings:
+  engines:
+    keep_only:
+      - bing
+      - mojeek
+      - qwant
+      - brave
+      - wikipedia
+      - bing news
+
+server:
+  secret_key: "change_me_to_a_real_random_secret"
+  bind_address: "0.0.0.0"
+  port: 8080
+  limiter: false
+  image_proxy: false
+  method: "GET"
+  public_instance: false
+
+search:
+  safe_search: 0
+  autocomplete: ''
+  formats:
+    - html
+    - json
+  # Backoff exponencial por falhas consecutivas: começa em 30s, dobra a cada falha,
+  # até 30min. Reduz drasticamente requisições a engines cronicamente bloqueados.
+  ban_time_on_fail: 30
+  max_ban_time_on_fail: 1800
+  suspended_times:
+    # Engine retornou 403 / acesso negado → suspende 15min
+    SearxEngineAccessDenied: 900
+    # CAPTCHA detectado → suspende 30min (IP marcado como bot)
+    SearxEngineCaptcha: 300
+    # Rate limit (429) → suspende 5min e tenta novamente
+    SearxEngineTooManyRequests: 300
+    # Cloudflare bloqueou → suspende 2h (bloqueio mais persistente)
+    cf_SearxEngineCaptcha: 7200
+    cf_SearxEngineAccessDenied: 7200
+    # reCAPTCHA → suspende 2h
+    recaptcha_SearxEngineCaptcha: 7200
+
+outgoing:
+  request_timeout: 8.0
+  retries: 1
+  pool_connections: 100
+  pool_maxsize: 10
+  enable_http2: true
+
+cache:
+  db_url: "/var/cache/searxng/cache.db"
+  MAXHOLD_TIME: 3600
+  MAINTENANCE_PERIOD: 1800
+  MAINTENANCE_MODE: "auto"
+
+ui:
+  static_use_hash: true
+  enabled: false
+
+engines:
+  # --- Busca geral ---
+  # Bing: primário — engine que responde de forma confiável a partir de IP de datacenter.
+  - name: bing
+    engine: bing
+    disabled: false
+    categories: [general, web]
+    weight: 3
+    timeout: 6.0
+
+  # Mojeek: índice próprio independente, tolerante a datacenter — diversidade real.
+  - name: mojeek
+    engine: mojeek
+    disabled: false
+    categories: [general, web]
+    weight: 2
+    timeout: 6.0
+
+  # Qwant: índice próprio europeu (+ Bing), boa cobertura PT/EU.
+  - name: qwant
+    engine: qwant
+    disabled: false
+    categories: [general, web]
+    weight: 2
+    timeout: 6.0
+
+  # Brave: índice próprio. Obs.: o modo scraped pode ser bloqueado a partir de IP
+  # de datacenter; reliability plena exige a Brave Search API (key) via json_engine.
+  - name: brave
+    engine: brave
+    disabled: false
+    categories: [general, web]
+    weight: 2
+    timeout: 6.0
+
+  # --- Engines especializados ---
+  - name: wikipedia
+    engine: wikipedia
+    disabled: false
+    categories: [general]
+    weight: 2
+    timeout: 5.0
+
+  - name: bing news
+    engine: bing_news
+    disabled: false
+    categories: [news, general]
+    weight: 2
+    timeout: 6.0

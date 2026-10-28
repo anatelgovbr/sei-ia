@@ -1,0 +1,3 @@
+Hello world
+Sample fixture for plain text extraction.
+CANARY_UPLOAD_TXT

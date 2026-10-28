@@ -1,0 +1,95 @@
+site_name: sei-similaridade
+repo_url: https://git.anatel.gov.br/processo_eletronico/sei-ia/sei-similaridade
+site_url: https://Anatel.github.io/sei-similaridade
+site_description: API de Recomendação de Processos SEI. Módulo responsável pela busca e recomendação de processos e documentos similares.
+site_author: Anatel
+edit_uri: edit/main/docs/
+repo_name: sei-similaridade
+copyright: Maintained by <a href="https://Anatel.com">Anatel</a>.
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Instalação: getting-started/index.md
+    - Variáveis de Ambiente: getting-started/environment-variables.md
+  - WMLT - Recomendação de Processos:
+    - Visão Geral: wmlt/index.md
+    - Fluxo Passo a Passo: wmlt/fluxo-passo-a-passo.md
+    - Sistema de Pesos: wmlt/pesos-e-configuracao.md
+    - Métodos de Extração: wmlt/metodos-extracao.md
+  - Doc2Doc - Busca de Jurisprudência:
+    - Visão Geral: doc2doc/index.md
+    - Fluxo Passo a Passo: doc2doc/fluxo-passo-a-passo.md
+    - Parâmetro text_weight: doc2doc/text-weight.md
+  - Camada de Dados:
+    - Visão Geral: dados/index.md
+    - Apache Solr: dados/solr.md
+    - PostgreSQL: dados/postgresql.md
+    - Jobs API: dados/jobs-api.md
+  - API Reference: api-reference/index.md
+
+plugins:
+  - search
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/gitlab
+
+extra:
+  social:
+    - icon: fontawesome/brands/gitlab
+      link: https://git.anatel.gov.br/processo_eletronico/sei-ia/sei-similaridade
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/sei-similaridade
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true

@@ -1,656 +1,614 @@
-"""
-Módulo de testes de conexões.
+"""Testes de conectividade do healthchecker local."""
 
-Este módulo permite configurar e testar a conectividade com uma lista de serviços,
-como bancos de dados, Solr, e APIs, conforme especificado nas variáveis de ambiente.
-A configuração é derivada de um DataFrame de comparação (`comparison_df`), contendo
-os dados de variáveis de ambiente.
+from __future__ import annotations
 
-Exemplo de uso:
-
-1. Testando a conectividade com todos os serviços:
-
-    ```python
-    print("\n==================== TESTE DE CONECTIVIDADE ==================== \n ")
-    config = create_connectivity_config(comparison_df)  # VEM DO TESTE DE ENV
-    results = test_connectivity_all(config)
-    print("\n==================== TESTE DE CONECTIVIDADE - RESUMO ==================== \n ")
-    erros_conn = connectivity_report(results)
-    ```
-2. Testando a conectividade com o Solr:
-
-```python
-print("\n==================== TESTE DE CONEXÃO COM SOLR ==================== \n")
-solr_config = create_solr_config(comparison_df)
-solr_results = test_connectivity_all_solr(solr_config)
-solr_erros = connectivity_report(solr_results)
-```
-
-3. Testando a conectividade com o Solr:
-
-```python
-print("\n==================== TESTE DE SAUDE DOS ENDPOINTS ==================== \n")
-health_results = test_api_connectivity_and_response_all(health_testes_urls)
-health_erros = connectivity_report(health_results)
-```
-
-4. Testando a conectividade com bancos de dados externos:
-```python
-print("================== EXTERNOS ==================")
-DB_SEI_SCHEMA, db_instance = test_conn.create_external_sei_config(comparison_df)
-print("============== TABELAS DO SEI ================")
-if db_instance:
-    db_sei_results = test_conn.verify_all_tables(db_instance, test_conn.sei_externo_tables, DB_SEI_SCHEMA,verbose=False)
-    db_sei_erros = test_conn.connectivity_report(db_sei_results)
-```
-
-5. Testando a conectividade com bancos de dados internos (Postgres):
-
-```python
-postgres_config, assistente_db_instance, similaridade_db_instance = create_postgres_config(comparison_df)
-
-if assistente_db_instance:
-    assistente_results = verify_all_tables(assistente_db_instance, assistente_tables, verbose=True)
-    print("\n==================== RESULTADO DE TABELAS DO ASSISTENTE ==================== \n")
-    connectivity_report(assistente_results)
-
-if similaridade_db_instance:
-    similaridade_results = verify_all_tables(similaridade_db_instance, similaridade_tables, verbose=True)
-    print("\n==================== RESULTADO DE TABELAS DE SIMILARIDADE ==================== \n")
-    connectivity_report(similaridade_results)
-```
-
-Funções:
-    - create_external_sei_config:     Configura e conecta-se ao banco de dados externo do SEI com base nas variáveis de ambiente.
-    - create_postgres_config: Configura e conecta-se aos bancos de dados Postgres.
-    - verify_table: Verifica se uma tabela específica existe no banco.
-    - verify_all_tables: Verifica todas as tabelas especificadas em um banco.
-    - create_connectivity_config: Cria uma configuração de conectividade a partir de um DataFrame de comparação.
-    - create_solr_config: Cria uma configuração específica para os serviços Solr.
-    - test_connectivity: Testa a conectividade com um serviço específico (geral).
-    - test_connectivity_all: Testa a conectividade com todos os serviços especificados (geral).
-    - test_connectivity_all_solr: Testa a conectividade com todos os cores Solr.
-    - connectivity_report: Gera um resumo da conectividade com os serviços e retorna o número de falhas.
-    - test_api_connectivity_and_response: Testa a conectividade e resposta de uma API específica, verificando se a API responde com o status esperado.
-    - test_api_connectivity_and_response_all: Executa testes de conectividade e resposta para múltiplas URLs de serviços, gerando um relatório detalhado com o resultado.
-"""
-
-import socket
+import logging
 import os
+import socket
+import ssl
+import time
+import warnings
+from typing import Any
+from urllib.parse import urlsplit
+
 import pandas as pd
 import requests
-import logging
-from tests.db_connect import DBConnector
-from requests.auth import HTTPBasicAuth
 import urllib3
-import warnings
+from requests.auth import HTTPBasicAuth
+
+from tests.db_connect import DBConnector
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.simplefilter("ignore", category=urllib3.exceptions.InsecureRequestWarning)
 
-assistente_tables = [
-    'feedback', 'ip_message',
-    'messages', 'models'
-    ]
+assistente_tables = ["feedback", "ip_message", "messages", "models"]
 
 similaridade_tables = [
-    'document_mlt_recommendation', 'log_consume', 'log_update_mlt',
-    'process_weighted_mlt_recommendation', 'queue_update_mlt',
-    'version_register'
-    ]
+    "document_mlt_recommendation",
+    "log_consume",
+    "log_update_mlt",
+    "process_weighted_mlt_recommendation",
+    "queue_update_mlt",
+    "version_register",
+]
 
-sei_externo_tables = [
-    'md_ia_adm_cfg_assi_ia_usu', 'md_ia_topico_chat',
-    'md_ia_adm_config_assist_ia', 'md_ia_adm_config_similar', 'md_ia_adm_doc_relev',
-    'md_ia_adm_integ_funcion','md_ia_adm_integracao', 'md_ia_adm_meta_ods',
-    'md_ia_adm_metadado', 'md_ia_adm_objetivo_ods', 'md_ia_adm_ods_onu',
-    'md_ia_adm_perc_relev_met', 'md_ia_adm_pesq_doc', 'md_ia_adm_seg_doc_relev',
-    'md_ia_adm_tp_doc_pesq', 'md_ia_adm_unidade_alerta', 'md_ia_class_meta_ods',
-    'md_ia_classificacao_ods', 'md_ia_hist_class', 'md_ia_interacao_chat',
-    ]
+GATEWAY_TLS_HOST = os.getenv("SEIIA_GATEWAY_HOST") or "seiia"
+GATEWAY_CA_CERT = os.getenv("GATEWAY_CA_CERT") or ("/etc/ssl/certs/seiia.cert.pem")
+EXPECTED_LITELLM_ALIASES = {
+    "standard": ("agents:principal",),
+    "mini": ("agents:classificador", "agents:busca_web"),
+    "nano": ("agents:explorador", "agents:ocr", "agents:triagem_busca"),
+    "embedding": ("agents:embedding",),
+    "speech-to-text": ("agents:audio_transcription",),
+}
+EXPECTED_LITELLM_AGENT_TAGS = tuple(
+    tag for tags in EXPECTED_LITELLM_ALIASES.values() for tag in tags
+)
 
 
-def create_postgres_config(comparison_df: pd.DataFrame) -> tuple[dict, DBConnector, DBConnector]:
-    """
-    Configura e conecta-se aos bancos de dados Postgres especificados no DataFrame.
+def test_gateway_certificate_sans(cert_path: str | None = None) -> dict:
+    """Confirma validade temporal e todos os nomes usados no certificado do gateway."""
+    cert_path = cert_path or GATEWAY_CA_CERT
+    configured_dns = {
+        name.strip()
+        for name in os.getenv("SEIIA_CERT_DNS", "").split(",")
+        if name.strip()
+    }
+    expected_dns = configured_dns | {GATEWAY_TLS_HOST}
 
-    Args:
-        comparison_df (pd.DataFrame): DataFrame contendo variáveis de ambiente.
-
-    Returns:
-        tuple:
-            - dict: Configuração dos bancos de dados e instâncias conectadas.
-            - DBConnector: Instância de conexão com o banco de dados assistente.
-            - DBConnector: Instância de conexão com o banco de dados similaridade.
-    """
     try:
-        POSTGRES_USER = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_USER']['value'].values[0]
-        POSTGRES_PASSWORD = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_PWD']['value'].values[0]
-        ASSISTENTE_PGVECTOR_HOST = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_HOST']['value'].values[0]
-        ASSISTENTE_PGVECTOR_PORT = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_PORT']['value'].values[0]
-        ASSISTENTE_PGVECTOR_DB = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_ASSISTENTE']['value'].values[0]
-        POSTGRES_DATABASE = comparison_df[comparison_df['variavel'] == 'DB_SEIIA_SIMILARIDADE']['value'].values[0]
+        certificate = ssl._ssl._test_decode_cert(cert_path)  # type: ignore[attr-defined]
+        san_dns = {
+            value
+            for kind, value in certificate.get("subjectAltName", ())
+            if kind == "DNS"
+        }
+        now = time.time()
+        not_before = ssl.cert_time_to_seconds(certificate["notBefore"])
+        not_after = ssl.cert_time_to_seconds(certificate["notAfter"])
+        missing = sorted(expected_dns - san_dns)
+        return {
+            "Reachable": not missing and not_before <= now <= not_after,
+            "Host": ",".join(sorted(expected_dns)),
+            "Port": "TLS",
+            "Endpoint": cert_path,
+            "MissingSAN": ",".join(missing),
+        }
+    except (OSError, KeyError, ValueError, ssl.SSLError) as exc:
+        logging.error("Falha ao validar o certificado do gateway: %s", exc)
+        return {
+            "Reachable": False,
+            "Host": ",".join(sorted(expected_dns)),
+            "Port": "TLS",
+            "Endpoint": cert_path,
+            "MissingSAN": "certificado-invalido",
+        }
+
+
+def create_postgres_config(
+    comparison_df: pd.DataFrame,
+) -> tuple[dict, DBConnector | None, DBConnector | None]:
+    try:
+        postgres_user = comparison_df[comparison_df["variavel"] == "DB_SEIIA_USER"][
+            "value"
+        ].values[0]
+        postgres_password = comparison_df[comparison_df["variavel"] == "DB_SEIIA_PWD"][
+            "value"
+        ].values[0]
+        pgvector_host = comparison_df[comparison_df["variavel"] == "DB_SEIIA_HOST"][
+            "value"
+        ].values[0]
+        pgvector_port = comparison_df[comparison_df["variavel"] == "DB_SEIIA_PORT"][
+            "value"
+        ].values[0]
+        assistente_db_name = comparison_df[
+            comparison_df["variavel"] == "DB_SEIIA_ASSISTENTE"
+        ]["value"].values[0]
+        similaridade_db_name = comparison_df[
+            comparison_df["variavel"] == "DB_SEIIA_SIMILARIDADE"
+        ]["value"].values[0]
     except IndexError:
-        logging.error("Variáveis faltantes para configuração do Banco de dados INTERNO.")
+        logging.error("Variaveis faltantes para configuracao do banco interno.")
         return {}, None, None
 
-    assistente_conn_string = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{ASSISTENTE_PGVECTOR_HOST}:{ASSISTENTE_PGVECTOR_PORT}/{ASSISTENTE_PGVECTOR_DB}"
-    similaridade_conn_string = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{ASSISTENTE_PGVECTOR_HOST}:{ASSISTENTE_PGVECTOR_PORT}/{POSTGRES_DATABASE}"
+    assistente_conn_string = (
+        f"postgresql+psycopg2://{postgres_user}:{postgres_password}"
+        f"@{pgvector_host}:{pgvector_port}/{assistente_db_name}"
+    )
+    similaridade_conn_string = (
+        f"postgresql+psycopg2://{postgres_user}:{postgres_password}"
+        f"@{pgvector_host}:{pgvector_port}/{similaridade_db_name}"
+    )
 
     try:
         assistente_db_instance = DBConnector(assistente_conn_string, schema="")
         similaridade_db_instance = DBConnector(similaridade_conn_string, schema="")
-        return {
-            "ASSISTENTE": {"conn_string": assistente_conn_string},
-            "SIMILARIDADE": {"conn_string": similaridade_conn_string}
-        }, assistente_db_instance, similaridade_db_instance
-    except Exception as e:
-        logging.error("Erro ao conectar aos bancos de dados internos:", e)
+        return (
+            {
+                "ASSISTENTE": {"conn_string": assistente_conn_string},
+                "SIMILARIDADE": {"conn_string": similaridade_conn_string},
+            },
+            assistente_db_instance,
+            similaridade_db_instance,
+        )
+    except Exception:
+        logging.exception("Erro ao conectar aos bancos internos.")
         return {}, None, None
 
-def verify_table(instance: DBConnector, table: str, schema: str = None,database_type: str = None, verbose: bool = False) -> bool:
-    """
-    Verifica a existência de uma tabela em um banco de dados Postgres.
 
-    Args:
-        instance (DBConnector): Instância de conexão com o banco de dados.
-        table (str): Nome da tabela a ser verificada.
-        schema (str, optional): Nome do schema do banco de dados. Default é None.
-        verbose (bool, optional): Indica se deve exibir mensagens de status. Default é False.
-
-    Returns:
-        bool: True se a tabela existir, False caso contrário.
-    """
-    if verbose:
-        logging.debug(f"Verificando se a tabela {table} existe.")
+def verify_table(
+    instance: DBConnector,
+    table: str,
+    schema: str | None = None,
+    database_type: str | None = None,
+    verbose: bool = False,
+) -> bool:
     try:
         if schema:
             sql = f"SELECT * FROM {schema}.{table}"
         else:
             sql = f"SELECT * FROM {table}"
-        if database_type == "mysql":
-            sql += ' LIMIT 1'
-        elif database_type == "oracle":
-            sql += ' WHERE ROWNUM = 1'
-        elif database_type == "mssql":
-            sql = f"SELECT TOP 1 * FROM {schema}.{table}" if schema else f"SELECT TOP 1 * FROM {table}"
-        if verbose:
-            logging.debug(sql)
+        if database_type == "postgres":
+            sql += " LIMIT 1"
         instance.execute_query(sql)
-        if verbose:
-            logging.debug(f"Tabela {table} existe.")
         return True
-    except Exception as e:
+    except Exception as exc:
         if verbose:
-            logging.error(f"Tabela {table} não existe. Erro: {e}")
+            logging.error("Tabela %s nao existe. Erro: %s", table, exc)
         return False
 
-def verify_all_tables(instance: DBConnector, tables: list[str], schema: str = None, database_type: str = None, verbose: bool = True) -> dict[str, dict]:
-    """
-    Verifica a existência de várias tabelas em um banco de dados Postgres.
 
-    Args:
-        instance (DBConnector): Instância de conexão com o banco de dados.
-        tables (list[str]): Lista de nomes de tabelas a serem verificadas.
-        schema (str, optional): Nome do schema do banco de dados. Default é None.
-        verbose (bool, optional): Indica se deve exibir mensagens de status. Default é False.
-
-    Returns:
-        dict: Dicionário com o status de cada tabela, com True para tabelas existentes e False para ausentes.
-    """
+def verify_all_tables(
+    instance: DBConnector,
+    tables: list[str],
+    schema: str | None = None,
+    database_type: str | None = None,
+    verbose: bool = True,
+) -> dict[str, dict]:
     result = {}
     for table in tables:
-        result[table] = {"Reachable": verify_table(instance, table, schema, database_type, verbose)}
+        result[table] = {
+            "Reachable": verify_table(instance, table, schema, database_type, verbose)
+        }
     return result
 
+
 def create_solr_config(comparison_df: pd.DataFrame) -> dict:
-    """
-    Cria a configuração dos serviços Solr a partir de um DataFrame contendo as variáveis de ambiente.
-
-    Args:
-        comparison_df (pd.DataFrame): DataFrame contendo variáveis de ambiente.
-
-    Returns:
-        dict: Dicionário com a configuração dos serviços Solr.
-    """
+    solr_address = comparison_df[comparison_df["variavel"] == "SOLR_ADDRESS"][
+        "value"
+    ].values[0]
+    solr_host = solr_address.split(":")[1].replace("//", "")
+    solr_port = int(solr_address.split(":")[2])
     return {
-        "Solr_Interno_documento": {
-            "host": comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
-            "port": int(comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[2]),
-            "core": comparison_df[comparison_df['variavel'] == 'SOLR_MLT_JURISPRUDENCE_CORE']['value'].values[0],
-            "interno": True
+        "Solr_documento": {
+            "host": solr_host,
+            "port": solr_port,
+            "core": comparison_df[
+                comparison_df["variavel"] == "SOLR_MLT_JURISPRUDENCE_CORE"
+            ]["value"].values[0],
+            "interno": True,
         },
-        "Solr_Interno_processo": {
-            "host": comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
-            "port": int(comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[2]),
-            "core": comparison_df[comparison_df['variavel'] == 'SOLR_MLT_PROCESS_CORE']['value'].values[0],
-            "interno": True
-        }
+        "Solr_processo": {
+            "host": solr_host,
+            "port": solr_port,
+            "core": comparison_df[comparison_df["variavel"] == "SOLR_MLT_PROCESS_CORE"][
+                "value"
+            ].values[0],
+            "interno": True,
+        },
     }
 
-def verify_solr_status(host: str, port: int, core: str, interno: bool, verbose: bool = False) -> dict:
-    """
-    Verifica o status de um core específico no Solr.
 
-    Parameters:
-    - host (str): Endereço do servidor Solr.
-    - port (int): Porta do servidor Solr.
-    - core (str): Nome do core Solr.
-    - verbose (bool): verbose.
-
-    Returns:
-    - dict: Dicionário com o resultado da conexão e detalhes.
-    """
-
+def verify_solr_status(
+    host: str, port: int, core: str, interno: bool, verbose: bool = False
+) -> dict:
     try:
-        if interno:
-            url = f"https://{host}:{port}/solr/{core}/admin/ping"
-            response = requests.get(url, verify=False, auth=HTTPBasicAuth(os.getenv("SOLR_USER"), os.getenv("SOLR_PASSWORD")))
-        else:
-            url = f"http://{host}:{port}/solr/{core}/admin/ping"
-            response = requests.get(url)
+        url = f"https://{host}:{port}/solr/{core}/admin/ping"
+        response = requests.get(
+            url,
+            verify=False,
+            auth=HTTPBasicAuth(os.getenv("SOLR_USER"), os.getenv("SOLR_PASSWORD")),
+            timeout=10,
+        )
         response.raise_for_status()
-
-        if response.status_code == 200:
-            if verbose:
-                logging.debug(f"Conexão ao core '{core}' bem-sucedida.")
-            return {"Reachable": True, "Host": host, "Port": port, "Core": core}
-        else:
-            if verbose:
-                logging.error(f"Core '{core}' não encontrado ou inativo.")
-            return {"Reachable": False, "Host": host, "Port": port, "Core": core}
-
-    except requests.exceptions.RequestException as e:
+        return {
+            "Reachable": response.status_code == 200,
+            "Host": host,
+            "Port": port,
+            "Core": core,
+        }
+    except requests.exceptions.RequestException as exc:
         if verbose:
-            logging.error(f"Erro ao conectar ao Solr '{core}':", e)
+            logging.error("Erro ao conectar ao Solr %s: %s", core, exc)
         return {"Reachable": False, "Host": host, "Port": port, "Core": core}
 
-def test_connectivity_all_solr(solr_config:dict, verbose:bool = True) -> dict:
-    """
-    Testa a conectividade com todos os serviços Solr especificados.
 
-    Parameters:
-    - solr_config (dict): Configuração dos serviços Solr.
-    - verbose (bool): verbose.
-
-    Returns:
-    - dict: Resultados dos testes de conectividade com cada serviço Solr.
-    """
+def test_connectivity_all_solr(solr_config: dict, verbose: bool = True) -> dict:
     results = {}
     for service_name, config in solr_config.items():
-        result = verify_solr_status(config["host"], config["port"], config["core"], config["interno"], verbose)
-        results[service_name] = result
+        results[service_name] = verify_solr_status(
+            config["host"],
+            config["port"],
+            config["core"],
+            config["interno"],
+            verbose,
+        )
     return results
 
-def connectivity_report(results:dict , return_df:bool=False, path:str = None)->tuple[int,pd.DataFrame]:
-    """
-    Gera um relatório da conectividade com os serviços e retorna o número de falhas.
 
-    Parameters:
-    - results (dict): Dicionário contendo o resultado de conectividade para cada serviço.
-    - return_df (bool): Se True, retorna o DataFrame dos resultados junto com o número de falhas.
-    - path (str) : caminho para salvar o report
-
-    Returns:
-    - int: Número de serviços que falharam na conexão.
-    - pd.DataFrame (opcional): DataFrame contendo os resultados detalhados se return_df for True.
-    """
+def connectivity_report(
+    results: dict, return_df: bool = False, path: str | None = None
+) -> tuple[int, pd.DataFrame | None]:
     try:
         results_df = pd.DataFrame.from_dict(results, orient="index")
     except Exception:
         results_df = pd.DataFrame.from_dict(results)
-    error_count = len(results_df[results_df["Reachable"] == False])
 
+    error_count = len(results_df[~results_df["Reachable"]])
     if error_count > 0:
         logging.error("\nHouve falha nos testes abaixo:\n")
-        # logging.info(results_df[results_df["Reachable"] == False][["Host", "Port", "Core", "Reachable"]].to_markdown())
-        logging.error(results_df[results_df["Reachable"] == False].to_markdown())
+        logging.error(results_df[~results_df["Reachable"]].to_markdown())
     else:
         logging.info("\nTodos os testes passaram.\n")
 
     if path:
-        results_df.to_csv(path,index=False)
+        results_df.to_csv(path, index=False)
     if return_df:
         return error_count, results_df
     return error_count, None
 
+
 def create_connectivity_config(comparison_df: pd.DataFrame) -> dict:
-    """
-    Cria uma configuração de conectividade a partir de um DataFrame de variáveis de ambiente.
-
-    Parameters:
-    - comparison_df (pd.DataFrame): DataFrame contendo variáveis de ambiente com colunas
-      'variavel' e 'value', onde 'variavel' identifica o serviço e 'value' armazena o valor.
-
-    Returns:
-    - dict: Dicionário com a configuração de conectividade, contendo hosts e portas dos serviços.
-    """
-    # Extrair URL do LiteLLM Proxy da variável de ambiente
-    litellm_proxy_url = os.getenv("ASSISTENTE_LITELLM_PROXY_URL", "http://litellm:4000")
-
-    # Parse da URL do LiteLLM para extrair host e porta
+    litellm_proxy_url = os.getenv("LITELLM_PROXY_URL") or "http://infra-litellm:4000"
     try:
-        # Remove protocolo (http:// ou https://)
-        litellm_url_parts = litellm_proxy_url.replace("http://", "").replace("https://", "")
+        litellm_url_parts = litellm_proxy_url.replace("http://", "").replace(
+            "https://", ""
+        )
         if ":" in litellm_url_parts:
             litellm_host, litellm_port = litellm_url_parts.split(":")
             litellm_port = int(litellm_port)
         else:
             litellm_host = litellm_url_parts
-            litellm_port = 80  # porta padrão se não especificada
+            litellm_port = 80
     except Exception:
-        litellm_host = "litellm"
+        litellm_host = "infra-litellm"
         litellm_port = 4000
 
+    solr_address = comparison_df[comparison_df["variavel"] == "SOLR_ADDRESS"][
+        "value"
+    ].values[0]
     return {
         "DB_INTERNO": {
-            "host": comparison_df[comparison_df['variavel'] == 'DB_SEIIA_HOST']['value'].values[0],
-            "port": int(comparison_df[comparison_df['variavel'] == 'DB_SEIIA_PORT']['value'].values[0])
+            "host": comparison_df[comparison_df["variavel"] == "DB_SEIIA_HOST"][
+                "value"
+            ].values[0],
+            "port": int(
+                comparison_df[comparison_df["variavel"] == "DB_SEIIA_PORT"][
+                    "value"
+                ].values[0]
+            ),
         },
         "Solr_Interno": {
-            "host": comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[1].replace("//", ""),
-            "port": int(comparison_df[comparison_df['variavel'] == 'SOLR_ADDRESS']['value'].values[0].split(":")[2].replace("//", ""))
+            "host": solr_address.split(":")[1].replace("//", ""),
+            "port": int(solr_address.split(":")[2]),
         },
-        "API_SEI": {
-            "host": "api_sei",
-            "port": 8082
+        "API_SIMILARIDADE": {"host": "similaridade", "port": 8082},
+        "API_SIMILARIDADE_FEEDBACK": {"host": "similaridade-feedback", "port": 8086},
+        "API_JOBS_INTERNA": {"host": "etl-airflow-api", "port": 8642},
+        "API_ASSISTENTE": {"host": "assistente", "port": 8088},
+        "GATEWAY_ASSISTENTE": {"host": GATEWAY_TLS_HOST, "port": 8088},
+        "GATEWAY_SIMILARIDADE": {"host": GATEWAY_TLS_HOST, "port": 8082},
+        "GATEWAY_SIMILARIDADE_FEEDBACK": {
+            "host": GATEWAY_TLS_HOST,
+            "port": 8086,
         },
-        "API_JOBS": {
-            "host": "jobs_api",
-            "port": 8642
-        },
-        "API_SEI_FEEDBACK": {
-            "host": "app-api-feedback",
-            "port": 8086
-        },
-        "API_ASSISTENTE": {
-            "host": "nginx_assistente",
-            "port": 80
-        },
-        "AIRFLOW": {
-            "host": "airflow-webserver-pd",
-            "port": 8080
-        },
-        "LITELLM_PROXY": {
-            "host": litellm_host,
-            "port": litellm_port
-        }
+        "AIRFLOW": {"host": "etl-airflow-webserver", "port": 8080},
+        "LITELLM_PROXY": {"host": litellm_host, "port": litellm_port},
     }
 
 
-def test_connectivity(host: str, port: int, service_name: str, verbose: bool = True) -> bool:
-    """
-    Testa a conectividade com um serviço específico.
-
-    Parameters:
-    - host (str): Endereço do host do serviço.
-    - port (int): Porta do serviço.
-    - service_name (str): Nome do serviço para identificação no relatório.
-
-    Returns:
-    - bool: Retorna True se a conexão for bem-sucedida, False caso contrário.
-    """
+def test_connectivity(
+    host: str, port: int, service_name: str, verbose: bool = True
+) -> bool:
     if verbose:
-        logging.debug(f"Testando a conexao {service_name}({host}:{port})...")
+        logging.debug("Testando conexao %s(%s:%s)", service_name, host, port)
     try:
         with socket.create_connection((host, port), timeout=5):
-            if verbose:
-                logging.debug(f"Conexao {service_name} bem sucedida!")
             return True
-    except (socket.timeout, socket.error) as e:
+    except (socket.timeout, socket.error) as exc:
         if verbose:
-            logging.error(f"Falha ao conectar ao {service_name}. Erro: {e}")
+            logging.error("Falha ao conectar ao %s: %s", service_name, exc)
         return False
 
+
 def test_connectivity_all(config: dict, verbose: bool = False) -> dict:
-    """
-    Testa a conectividade com todos os serviços especificados na configuração.
-
-    Parameters:
-    - config (dict): Dicionário com a configuração de conectividade contendo
-      hosts e portas dos serviços a serem testados.
-
-    Returns:
-    - dict: Dicionário contendo o resultado de cada teste, com True para conexões bem-sucedidas
-      e False para falhas.
-    """
     results = {}
     for service_name, settings in config.items():
         host = settings["host"]
         port = settings["port"]
-        result = test_connectivity(host, port, service_name, verbose)
-        results[service_name] = {"Reachable": result, "Host": host, "Port": port}
+        results[service_name] = {
+            "Reachable": test_connectivity(host, port, service_name, verbose),
+            "Host": host,
+            "Port": port,
+        }
     return results
 
 
 def get_health_testes_urls() -> dict:
-    """
-    Retorna o dicionário de URLs de testes de health, usando variáveis de ambiente quando disponíveis.
-
-    Returns:
-        dict: Dicionário com URLs e endpoints para testes de health
-    """
-    litellm_proxy_url = os.getenv("ASSISTENTE_LITELLM_PROXY_URL", "http://litellm:4000")
-
+    litellm_proxy_url = os.getenv("LITELLM_PROXY_URL") or "http://infra-litellm:4000"
+    searx_base_url = os.getenv("SEARX_BASE_URL") or "http://infra-searxng:8080"
+    gateway_url = f"https://{GATEWAY_TLS_HOST}"
+    assistente_contract = [
+        {"path": "/health", "expected_json": {"status": "OK"}},
+        {
+            "path": "/openapi.json",
+            "openapi_operations": {
+                "/llm_lang/session_stream": {"post": {"request_body": True}},
+                "/feedback/feedback": {"post": {"request_body": True}},
+            },
+        },
+    ]
+    similaridade_contract = [
+        {"path": "/health", "expected_json": {"status": "OK"}},
+        {
+            "path": "/openapi.json",
+            "openapi_operations": {
+                (
+                    "/process-recommenders/weighted-mlt-recommender/"
+                    "recommendations/{id_protocolo}"
+                ): {
+                    "get": {
+                        "parameters": {
+                            "id_protocolo": "path",
+                            "id_user": "query",
+                            "rows": "query",
+                        }
+                    }
+                },
+                (
+                    "/process-recommenders/weighted-mlt-recommender/"
+                    "indexed-ids/{id_protocolo}"
+                ): {"get": {}},
+                "/document-recommenders/mlt-recommender/recommendations": {
+                    "get": {
+                        "parameters": {
+                            "list_id_doc": "query",
+                            "text": "query",
+                            "rows": "query",
+                        }
+                    }
+                },
+            },
+        },
+    ]
+    feedback_contract = [
+        {"path": "/health", "expected_json": {"status": "OK"}},
+        {
+            "path": "/openapi.json",
+            "openapi_operations": {
+                "/process-recommenders/feedbacks": {"post": {"request_body": True}},
+                "/document-recommenders/feedbacks": {"post": {"request_body": True}},
+            },
+        },
+    ]
     return {
-        "api_recomendacao": {"https://api_sei:8082":[
-            "/health",
-            "/health/database",
-            # "/health/process-recommendation",
-            # "/health/document-recommendation"
-        ]},
-        "api_feedback": {"https://app-api-feedback:8086":["/health"]},
-        "api_assistente": {"http://api_assistente:8088":["/health"]},
-        "litellm_proxy": {litellm_proxy_url:["/health"]}
+        "similaridade": {
+            "http://similaridade:8082": [
+                *similaridade_contract,
+                {"path": "/health/database"},
+                {"path": "/health/solr"},
+            ]
+        },
+        "similaridade_feedback": {
+            "http://similaridade-feedback:8086": feedback_contract
+        },
+        "jobs_interna": {"http://etl-airflow-api:8642": [{"path": "/health"}]},
+        "assistente": {"http://assistente:8088": assistente_contract},
+        "gateway_assistente": {
+            f"{gateway_url}:8088": [
+                {**check, "verify": GATEWAY_CA_CERT} for check in assistente_contract
+            ]
+        },
+        "gateway_similaridade": {
+            f"{gateway_url}:8082": [
+                {**check, "verify": GATEWAY_CA_CERT} for check in similaridade_contract
+            ]
+        },
+        "gateway_similaridade_feedback": {
+            f"{gateway_url}:8086": [
+                {**check, "verify": GATEWAY_CA_CERT} for check in feedback_contract
+            ]
+        },
+        "litellm_proxy": {
+            litellm_proxy_url: [
+                {
+                    "path": "/health",
+                    "headers": {
+                        "Authorization": (
+                            "Bearer " + (os.getenv("LITELLM_PROXY_API_KEY") or "")
+                        )
+                    },
+                }
+            ]
+        },
+        "searxng": {searx_base_url: [{"path": "/healthz"}]},
     }
 
-# Compatibilidade: manter health_testes_urls como variável global
+
 health_testes_urls = get_health_testes_urls()
 
 
-def test_api_connectivity_and_response(api_url: str, expected_status: int = 200) -> bool:
-    """
-    Testa a conectividade e resposta de uma API específica, verificando se a API responde com o status esperado.
+def _matches_openapi_operation(operation: Any, constraints: dict[str, Any]) -> bool:
+    if not isinstance(operation, dict):
+        return False
+    request_body = constraints.get("request_body")
+    if (
+        request_body is not None
+        and bool(operation.get("requestBody")) is not request_body
+    ):
+        return False
+    actual_parameters = {
+        parameter.get("name"): parameter.get("in")
+        for parameter in operation.get("parameters") or []
+        if isinstance(parameter, dict)
+    }
+    return all(
+        actual_parameters.get(name) == location
+        for name, location in (constraints.get("parameters") or {}).items()
+    )
 
-    Parâmetros:
-        api_url (str): A URL da API a ser testada.
-        expected_status (int, opcional): Código de status HTTP esperado para a resposta (padrão é 200).
 
-    Retorna:
-        bool: Retorna `True` se a API responder com o status esperado; caso contrário, retorna `False`.
-
-    Exceções:
-        - Em caso de falha na conexão ou qualquer erro de requisição, a função registra o erro no log e retorna `False`.
-    """
+def _matches_http_contract(response: requests.Response, check: dict[str, Any]) -> bool:
+    if response.status_code != check.get("expected_status", 200):
+        return False
+    expected_json = check.get("expected_json")
+    openapi_operations = check.get("openapi_operations")
+    if not expected_json and not openapi_operations:
+        return True
     try:
-        response = requests.get(api_url, headers={'accept': 'application/json'}, verify=False)
-        if response.status_code == expected_status:
-            logging.debug(f"API {api_url} respondeu com o status esperado: {expected_status}")
-            return True
-        else:
-            logging.error(f"API {api_url} respondeu com status inesperado: {response.status_code}")
-            return False
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Falha ao conectar à API {api_url}. Erro: {e}")
+        payload = response.json()
+    except requests.exceptions.JSONDecodeError:
+        return False
+    if expected_json and any(
+        payload.get(key) != value for key, value in expected_json.items()
+    ):
+        return False
+    paths = payload.get("paths") or {}
+    return all(
+        _matches_openapi_operation((paths.get(path) or {}).get(method), constraints)
+        for path, expected_methods in (openapi_operations or {}).items()
+        for method, constraints in expected_methods.items()
+    )
+
+
+def test_api_connectivity_and_response(api_url: str, check: dict[str, Any]) -> bool:
+    try:
+        headers = {"accept": "application/json", **check.get("headers", {})}
+        response = requests.get(
+            api_url,
+            headers=headers,
+            verify=check.get("verify", False),
+            timeout=15,
+        )
+        return _matches_http_contract(response, check)
+    except requests.exceptions.RequestException as exc:
+        logging.error("Falha ao conectar a API %s: %s", api_url, exc)
         return False
 
-def test_api_connectivity_and_response_all(health_tests_urls: dict, expected_status: int = 200) -> list:
-    """
-    Executa testes de conectividade e resposta para múltiplas URLs de serviços, gerando um relatório detalhado com o resultado.
 
-    Parâmetros:
-        health_tests_urls (dict): Dicionário contendo URLs e endpoints para diferentes serviços.
-                                  Estrutura esperada: { "servico": { "url": ["endpoint1", "endpoint2", ...] } }
-        expected_status (int, opcional): Código de status HTTP esperado para cada resposta (padrão é 200).
-
-    Retorna:
-        list: Uma lista de dicionários contendo o relatório de cada teste, incluindo serviço, status de conectividade,
-              host, porta e endpoint.
-    """
+def test_api_connectivity_and_response_all(
+    health_tests_urls: dict, expected_status: int = 200
+) -> list[dict]:
     report = []
-    for servico in health_tests_urls.keys():
+    for servico in health_tests_urls:
         for url in health_tests_urls[servico]:
-            for check in health_tests_urls[servico][url]:
-                report.append({
-                    "Servico": servico,
-                    "Reachable": test_api_connectivity_and_response(f'{url}{check}', expected_status),
-                    "Host": url.split(":")[1].replace("//", ""),
-                    "Port": url.split(":")[2],
-                    "Endpoint": check
-                })
+            for raw_check in health_tests_urls[servico][url]:
+                check = (
+                    {"path": raw_check, "expected_status": expected_status}
+                    if isinstance(raw_check, str)
+                    else {"expected_status": expected_status, **raw_check}
+                )
+                parsed_url = urlsplit(url)
+                report.append(
+                    {
+                        "Servico": servico,
+                        "Reachable": test_api_connectivity_and_response(
+                            f"{url}{check['path']}", check
+                        ),
+                        "Host": parsed_url.hostname,
+                        "Port": parsed_url.port,
+                        "Endpoint": check["path"],
+                    }
+                )
     return report
 
 
-def test_litellm_proxy_models(proxy_url: str = None) -> dict:
-    """
-    Testa se o LiteLLM Proxy está rodando e se os modelos esperados (standard, mini, think, embedding) estão disponíveis.
-
-    Parâmetros:
-        proxy_url (str): URL base do LiteLLM Proxy. Se None, usa a variável de ambiente ASSISTENTE_LITELLM_PROXY_URL
-                        (padrão: http://litellm:4000)
-
-    Retorna:
-        dict: Dicionário com o status de cada modelo e informações de erro, se houver.
-              Estrutura: {
-                  "proxy_health": bool,
-                  "models": {
-                      "standard": {"available": bool, "details": dict},
-                      "mini": {"available": bool, "details": dict},
-                      "think": {"available": bool, "details": dict},
-                      "embedding": {"available": bool, "details": dict}
-                  },
-                  "error": str (se houver)
-              }
-    """
-    # Se proxy_url não foi fornecido, usa a variável de ambiente
+def test_litellm_proxy_models(proxy_url: str | None = None) -> dict:
+    # Cada alias fixo precisa existir com seus próprios papéis. Uma entrada extra
+    # com a mesma tag não substitui o contrato chamado pelos clientes.
     if proxy_url is None:
-        proxy_url = os.getenv("ASSISTENTE_LITELLM_PROXY_URL", "http://litellm:4000")
-
-    logging.info(f"Testando LiteLLM Proxy em: {proxy_url}")
+        proxy_url = os.getenv("LITELLM_PROXY_URL") or "http://infra-litellm:4000"
+    proxy_key = os.getenv("LITELLM_PROXY_API_KEY") or ""
+    headers = {"Authorization": f"Bearer {proxy_key}"}
 
     result = {
         "proxy_health": False,
         "proxy_url": proxy_url,
-        "models": {
-            "standard": {"available": False, "details": {}},
-            "mini": {"available": False, "details": {}},
-            "think": {"available": False, "details": {}},
-            "embedding": {"available": False, "details": {}}
-        },
-        "error": None
+        "models": {},
+        "error": None,
     }
 
-    required_models = ["standard", "mini", "think", "embedding"]
-
     try:
-        # Testar health do proxy
-        health_response = requests.get(f"{proxy_url}/health", timeout=10)
-        if health_response.status_code == 200:
-            result["proxy_health"] = True
-            logging.info("LiteLLM Proxy está rodando e respondendo ao /health")
-        else:
-            result["error"] = f"LiteLLM Proxy /health retornou status {health_response.status_code}"
-            logging.error(result["error"])
+        health_response = requests.get(
+            f"{proxy_url}/health/readiness", headers=headers, timeout=15
+        )
+        result["proxy_health"] = health_response.status_code == 200
+        if not result["proxy_health"]:
+            result["error"] = (
+                f"Proxy health check falhou com status {health_response.status_code}"
+            )
             return result
 
-        # Listar modelos disponíveis
-        models_response = requests.get(f"{proxy_url}/v1/models", timeout=10)
+        models_response = requests.get(
+            f"{proxy_url}/model/info", headers=headers, timeout=15
+        )
+        models_response.raise_for_status()
+        models_data = models_response.json()
+        entries = models_data.get("data", [])
+        tags_by_alias: dict[str, set[str]] = {}
+        for entry in entries:
+            alias = entry.get("model_name")
+            tags_by_alias.setdefault(alias, set()).update(
+                entry.get("litellm_params", {}).get("tags") or []
+            )
 
-        if models_response.status_code == 200:
-            models_data = models_response.json()
-            available_models = []
-
-            # Extrair nomes dos modelos disponíveis
-            if "data" in models_data:
-                available_models = [model.get("id") for model in models_data["data"]]
-                logging.debug(f"Modelos disponíveis no LiteLLM: {available_models}")
-
-            # Verificar cada modelo requerido
-            for model_name in required_models:
-                if model_name in available_models:
-                    result["models"][model_name]["available"] = True
-                    result["models"][model_name]["details"] = {
-                        "status": "OK",
-                        "message": f"Modelo '{model_name}' está disponível"
-                    }
-                    logging.info(f"✅ Modelo '{model_name}' encontrado no LiteLLM Proxy")
-                else:
-                    result["models"][model_name]["available"] = False
-                    result["models"][model_name]["details"] = {
-                        "status": "MISSING",
-                        "message": f"Modelo '{model_name}' NÃO está disponível"
-                    }
-                    logging.error(f"❌ Modelo '{model_name}' NÃO encontrado no LiteLLM Proxy")
-        else:
-            result["error"] = f"Falha ao listar modelos do LiteLLM: HTTP {models_response.status_code}"
-            logging.error(result["error"])
-
-    except requests.exceptions.RequestException as e:
-        result["error"] = f"Erro ao conectar ao LiteLLM Proxy: {str(e)}"
-        logging.error(result["error"])
-    except Exception as e:
-        result["error"] = f"Erro inesperado ao testar LiteLLM Proxy: {str(e)}"
-        logging.error(result["error"])
-
-    return result
+        for alias, required_tags in EXPECTED_LITELLM_ALIASES.items():
+            tags = tags_by_alias.get(alias, set())
+            missing_tags = sorted(set(required_tags) - tags)
+            result["models"][alias] = {
+                "available": alias in tags_by_alias and not missing_tags,
+                "details": {"tags": sorted(tags), "missing_tags": missing_tags},
+            }
+        return result
+    except requests.exceptions.RequestException as exc:
+        result["error"] = f"Erro ao conectar ao LiteLLM Proxy: {exc}"
+        return result
+    except Exception as exc:
+        result["error"] = f"Erro inesperado no teste do LiteLLM Proxy: {exc}"
+        return result
 
 
 def report_litellm_proxy_status(test_result: dict) -> int:
-    """
-    Gera um relatório do status do LiteLLM Proxy e retorna o número de erros encontrados.
-
-    Parâmetros:
-        test_result (dict): Resultado do teste de modelos do LiteLLM Proxy
-
-    Retorna:
-        int: Número de erros encontrados (proxy down + modelos faltando)
-    """
-    error_count = 0
-
     logging.info("\n========== STATUS DO LITELLM PROXY ===========")
-    logging.info(f"URL do Proxy: {test_result.get('proxy_url', 'N/A')}")
+    logging.info("URL do Proxy: %s", test_result["proxy_url"])
 
-    # Verificar saúde do proxy
-    if test_result["proxy_health"]:
-        logging.info("✅ LiteLLM Proxy: OK (respondendo)")
-    else:
-        logging.error("❌ LiteLLM Proxy: FALHOU (não está respondendo)")
-        error_count += 1
+    if not test_result["proxy_health"]:
+        logging.error("LiteLLM Proxy nao esta saudavel.")
         if test_result["error"]:
-            logging.error(f"   Erro: {test_result['error']}")
-        return error_count  # Se o proxy não está rodando, retornar imediatamente
+            logging.error("Erro: %s", test_result["error"])
+        return 1
 
-    # Verificar modelos
-    logging.info("\n---------- Modelos Configurados --------------")
-    models_status = []
-    for model_name, model_info in test_result["models"].items():
+    logging.info("LiteLLM Proxy esta saudavel.")
+    missing_models = []
+    for alias, model_info in test_result["models"].items():
         if model_info["available"]:
-            status_icon = "✅"
-            status_text = "DISPONÍVEL"
+            logging.info(
+                "Alias '%s' esta disponivel (%s).",
+                alias,
+                model_info["details"]["tags"],
+            )
         else:
-            status_icon = "❌"
-            status_text = "FALTANDO"
-            error_count += 1
+            logging.error("Alias '%s' ausente ou com papeis incompletos.", alias)
+            missing_models.append(alias)
 
-        models_status.append({
-            "Modelo": model_name,
-            "Status": f"{status_icon} {status_text}",
-            "Mensagem": model_info["details"].get("message", "")
-        })
+    if test_result["error"]:
+        logging.error("Erro durante o teste: %s", test_result["error"])
+        return 1
+    if missing_models:
+        logging.error(
+            "Aliases invalidos no LiteLLM Proxy: %s", ", ".join(missing_models)
+        )
+        return len(missing_models)
 
-        logging.info(f"{status_icon} {model_name}: {status_text}")
-
-    # Resumo
-    total_models = len(test_result["models"])
-    available_models = sum(1 for m in test_result["models"].values() if m["available"])
-
-    logging.info(f"\n---------- Resumo ----------------------------")
-    logging.info(f"Total de modelos esperados: {total_models}")
-    logging.info(f"Modelos disponíveis: {available_models}")
-    logging.info(f"Modelos faltando: {total_models - available_models}")
-
-    if error_count == 0:
-        logging.info("\n✅ Todos os modelos do LiteLLM Proxy estão OK!")
-    else:
-        logging.error(f"\n❌ Encontrados {error_count} erro(s) no LiteLLM Proxy")
-
-    return error_count
+    logging.info("Todos os modelos esperados estao disponiveis no LiteLLM Proxy.")
+    return 0

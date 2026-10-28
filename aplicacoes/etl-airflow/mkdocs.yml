@@ -1,0 +1,86 @@
+site_name: SEI-Similaridade Jobs
+repo_url: https://git.anatel.gov.br/processo_eletronico/sei-ia/sei-similaridade/jobs
+site_url: https://git.anatel.gov.br/processo_eletronico/sei-ia/sei-similaridade/jobs
+site_description: Sistema de ETL que processa dados do SEI e disponibiliza para outros sistemas.
+site_author: Anatel
+edit_uri: edit/main/docs/
+repo_name: sei-similaridade/jobs
+copyright: Maintained by <a href="https://anatel.gov.br">Anatel</a>.
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Variáveis de Ambiente: getting-started/environment-variables.md
+  - ETL Pipelines:
+    - Visão Geral: etl/index.md
+    - Indexação de Processos: etl/indexacao-processos.md
+    - Indexação de Documentos: etl/indexacao-documentos.md
+    - Embeddings: etl/embeddings.md
+    - DAGs de Manutenção: etl/dags-manutencao.md
+  - Módulos: modules.md
+
+plugins:
+  - search
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/gitlab
+
+extra:
+  social:
+    - icon: fontawesome/brands/gitlab
+      link: https://git.anatel.gov.br/processo_eletronico/sei-ia/sei-similaridade/jobs
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/jobs
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
