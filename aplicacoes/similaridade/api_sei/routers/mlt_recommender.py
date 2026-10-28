@@ -2,7 +2,7 @@
 """MLT Recommender Router."""
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Path, Query
@@ -77,7 +77,7 @@ def wmlt_process_recommendations_by_id_protocolo(
         id_field="id_protocolo",
         extraction_method=ExtractionMethodEnum.solr,
         id_user=id_user,
-        requested_at=datetime.now(timezone.utc),
+        requested_at=datetime.now(UTC),
     )
 
 

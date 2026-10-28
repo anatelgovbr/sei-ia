@@ -21,7 +21,6 @@ from api_sei.routers.autotests import router as autoteste_router
 from api_sei.routers.healthcheck import router as rerank_healthcheck
 from api_sei.routers.jurisprudence_recommender import router as jurisprudence_router
 from api_sei.routers.mlt_recommender import router as mlt_router
-from api_sei.routers.n_embeddings_recommender import router as n_embd_router
 from api_sei.routers.rerank_recommender import router as rerank_router
 
 logger = logging.getLogger(__name__)
@@ -54,7 +53,6 @@ if not SolrRequests().check_core_exists(SOLR_ADDRESS, SOLR_MLT_PROCESS_CORE, aut
 # ROUTERS
 app.include_router(router=mlt_router)
 app.include_router(router=rerank_router)
-app.include_router(router=n_embd_router)
 app.include_router(router=jurisprudence_router)
 app.include_router(router=rerank_healthcheck)
 app.include_router(router=autoteste_router)

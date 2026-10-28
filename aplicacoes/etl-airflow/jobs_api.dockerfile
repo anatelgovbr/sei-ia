@@ -53,7 +53,7 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 RUN mkdir "/home/${NB_USER}/work" && \
     fix-permissions "/home/${NB_USER}"
 
-ARG PYTHON_VERSION=3.10.18
+ARG PYTHON_VERSION=3.12.11
 
 USER ${NB_USER}
 
@@ -65,7 +65,7 @@ WORKDIR /home/${NB_USER}/app
 
 # O UV instala um CPython exato no home do usuario e cria um virtualenv
 # isolado. Nenhum comando escreve no Python do UBI.
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv python install "${PYTHON_VERSION}" \
     && /bin/uv venv --python "${PYTHON_VERSION}" "${VIRTUAL_ENV}"
 
@@ -80,7 +80,7 @@ RUN /bin/uv export --quiet --directory /home/${NB_USER}/app --frozen --no-dev \
 
 # O export fixa versoes e hashes; a estrategia permite buscar no PyPI
 # dependencias que o indice do PyTorch tambem anuncia, mas nao hospeda.
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
       --extra-index-url https://download.pytorch.org/whl/cpu \
       --index-strategy unsafe-best-match \
@@ -89,7 +89,7 @@ RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sha
 COPY --chown=${NB_UID}:${NB_GID} ./libs/sei_extraction /home/${NB_USER}/libs/sei_extraction
 COPY --chown=${NB_UID}:${NB_GID} ./libs/sei_api /home/${NB_USER}/libs/sei_api
 
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
       --no-deps -e "/home/${NB_USER}/libs/sei_extraction[extract]" \
     && /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
@@ -99,7 +99,7 @@ COPY --chown=${NB_UID}:${NB_GID} ./aplicacoes/etl-airflow/jobs /home/${NB_USER}/
 COPY --chown=${NB_UID}:${NB_GID} ./aplicacoes/etl-airflow/document_extraction /home/${NB_USER}/app/document_extraction
 COPY --chown=${NB_UID}:${NB_GID} LICENSE /home/${NB_USER}/app/LICENSE
 
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
       --no-deps -e .
 

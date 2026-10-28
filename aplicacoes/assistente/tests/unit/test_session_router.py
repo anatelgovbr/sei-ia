@@ -56,7 +56,7 @@ from sei_ia.services.session_fs.types import SessionDocumentSpec
 def test_rota_registrada_e_reexportada():
     assert ENDPOINT_NAME == "/llm_lang/session_stream"
     assert pkg_router is not stream_router
-    assert ENDPOINT_NAME in [r.path for r in pkg_router.routes]
+    assert ENDPOINT_NAME in [r.path for r in stream_router.routes]
 
 
 @pytest.mark.parametrize(
@@ -213,7 +213,9 @@ def test_preflight_benchmark_sem_corpus_expoe_apenas_configuracao_segura(monkeyp
     monkeypatch.setattr(benchmark_module.settings, "MAX_RETRIES", 7)
     monkeypatch.setattr(benchmark_module.settings, "CTX_LEN_MINI_MODEL", 500000)
     monkeypatch.setattr(benchmark_module.settings, "CTX_LEN_NANO_MODEL", 500000)
-    assert BENCHMARK_PREFLIGHT_ENDPOINT in [route.path for route in pkg_router.routes]
+    assert BENCHMARK_PREFLIGHT_ENDPOINT in [
+        route.path for route in benchmark_module.router.routes
+    ]
     assert session_benchmark_preflight() == {
         "status": "ready",
         "endpoint": ENDPOINT_NAME,
@@ -271,7 +273,7 @@ async def test_live_preflight_uses_effective_container_client_and_returns_only_h
     result = await session_benchmark_live_preflight("proc-1")
 
     assert BENCHMARK_LIVE_PREFLIGHT_ENDPOINT in [
-        route.path for route in pkg_router.routes
+        route.path for route in benchmark_module.router.routes
     ]
     assert result["status"] == "passed"
     assert result["live_query_performed"] is True

@@ -1,7 +1,7 @@
 """Recomenda es de documentos baseados em outros documentos ou texto."""
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -77,6 +77,6 @@ async def get_doc2doc_search(
         text_weight=text_weight,
         normalized=normalized,
         fq=None,
-        requested_at=datetime.now(tz=timezone.utc),
+        requested_at=datetime.now(tz=UTC),
         id_user=id_user,
     )

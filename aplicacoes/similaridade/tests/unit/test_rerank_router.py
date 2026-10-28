@@ -29,7 +29,7 @@ class TestRerankProcessRecommendationsByIdProtocolo:
         assert mlt_config.mindf == 5
         assert mlt_config.boost is False
         assert args[6] is True  # rerank default
-        assert args[7] == VectorStorageSystem.pgvector
+        assert args[7] == VectorStorageSystem.solr
         assert args[8] == MltType.wmlt
         assert kwargs["id_field"] == "id_protocolo"
 

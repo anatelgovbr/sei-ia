@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "sei-extraction"
 version = "0.1.0"
 description = "Biblioteca compartilhada de extração e tratamento de documentos do SEI."
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "beautifulsoup4",
     "lxml",
@@ -28,7 +28,7 @@ ci-test = ["pytest==9.1.0", "pytest-cov==7.1.0", "openpyxl==3.1.5"]
 packages = ["src/sei_extraction"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py312"
 src = ["src", "tests"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]

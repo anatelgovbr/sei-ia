@@ -49,7 +49,16 @@ class DBConnector:
                 pool_recycle=360,
                 pool_pre_ping=True,
             )
-            self.base.metadata.create_all(engine)
+            # Os workers do Gunicorn importam o app ao mesmo tempo; num banco vazio,
+            # dois create_all concorrentes colidem no catálogo do Postgres. O lock
+            # de transação serializa o DDL e o segundo worker só confere as tabelas.
+            with engine.begin() as conn:
+                conn.execute(
+                    text(
+                        "SELECT pg_advisory_xact_lock(hashtext('similaridade.create_all'))"
+                    )
+                )
+                self.base.metadata.create_all(conn)
         except SQLAlchemyError as exc:
             masked = self.hide_pwd(self.connection_string)
             logging.exception("Falha ao conectar no banco relacional.")
@@ -65,7 +74,6 @@ class DBConnector:
 
     def get_session(self) -> Session:
         """Return a new SQLAlchemy session."""
-        self.base.metadata.create_all(self.engine)
         session_maker = sessionmaker(bind=self.engine)
         return session_maker()
 

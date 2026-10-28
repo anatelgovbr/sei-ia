@@ -2,7 +2,7 @@
 
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -149,7 +149,7 @@ def get_health_process_recommendation() -> HealthCheck:
             id_field="id_protocolo",
             extraction_method=ExtractionMethodEnum.solr,
             id_user=None,
-            requested_at=datetime.now(timezone.utc),
+            requested_at=datetime.now(UTC),
         )
     except Exception as e:
         logger.exception("Error in process recommendation health check")
@@ -204,7 +204,7 @@ def get_health_document_recommendation() -> HealthCheck:
             text_weight=0.5,
             normalized=False,
             fq=[],
-            requested_at=datetime.now(timezone.utc),
+            requested_at=datetime.now(UTC),
             id_user=None,
         )
     except Exception as e:

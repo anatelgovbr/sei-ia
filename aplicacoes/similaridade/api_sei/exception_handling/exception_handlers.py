@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Exception Handlers."""
 
-import traceback
+import logging
 
 import psycopg2
 from fastapi import HTTPException, Request
@@ -14,6 +14,8 @@ from api_sei.exception_handling.exceptions import (
     SolrCommunicationError,
     SQLAlchemySelectError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def resource_not_found_exception_handler(
@@ -56,16 +58,13 @@ exception_handlers = {
 
 def global_exception_handler(_request: Request, exc: Exception) -> JSONResponse:
     """Global exception handler."""
-    tb = traceback.extract_tb(exc.__traceback__) if exc.__traceback__ else []
-
-    file_path, line_num = tb[-1][:2] if tb else (None, None)
-
-    exception_info = [type(exc).__name__, line_num, file_path]
+    logger.exception("Unhandled exception", exc_info=exc)
+    exception_info = [type(exc).__name__]
 
     if isinstance(exc, HTTPException):
         return JSONResponse(
             status_code=exc.status_code,
-            content={"detail": exception_info + [exc.detail]},  # noqa: RUF005
+            content={"detail": [*exception_info, exc.detail]},
         )
     if isinstance(exc, FileNotFoundError):
         return JSONResponse(status_code=444, content={"detail": exception_info})

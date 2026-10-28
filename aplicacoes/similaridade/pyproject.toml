@@ -9,7 +9,7 @@ description = "API de Recomendação de Processos SEI"
 authors = [{name = "Anatel", email = "seiia@anatel.gov.br"}]
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.12,<3.13"
 
 dependencies = [
     "python-multipart",
@@ -20,7 +20,7 @@ dependencies = [
     "websockets",
     "httptools",
     "requests",
-    "PyJWT==2.12.1",
+    "PyJWT==2.15.0",
     "pandas==2.2.2",
     "SQLAlchemy>=2.0.0",
     "psycopg2-binary",
@@ -88,7 +88,7 @@ omit = ["./tests/*", "./.conda/*"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py312"
 exclude = [
     "tests/*",
 ]

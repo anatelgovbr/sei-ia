@@ -91,32 +91,6 @@ class ResourceNotFoundException(HTTPException):
         super().__init__(status_code=status_code, detail=self.detail)
 
 
-class TableEmbeddingNotFoundException(HTTPException):
-    """Exception to use when a Table does not exist in the database."""
-
-    @staticmethod
-    def detail(resource_name: str) -> str:
-        """Gera uma mensagem de erro indicando que uma tabela de embedding não foi encontrada.
-
-        Parameters:
-        resource_name (str): O nome da tabela de embedding que não foi encontrada.
-
-        Returns:
-        str: Uma mensagem de erro formatada indicando que a tabela de embedding não foi encontrada.
-        """
-        return f"Tabela embedding: {resource_name} não encontrado"
-
-    def __init__(self, status_code: int = 404, resource_name: str = "Resource") -> None:
-        """Inicializa uma TableEmbeddingNotFoundException com um código de status e uma mensagem de detalhes.
-
-        Parameters:
-        status_code (int): O código de status HTTP da exceção. O padrão é 404.
-        resource_name (str): O nome da tabela de embedding que não foi encontrada. O padrão é "Resource".
-        """
-        self.detail = self.detail(resource_name)
-        super().__init__(status_code=status_code, detail=self.detail)
-
-
 class JsonFieldException(HTTPException):
     """Exceção a ser usada quando houver um erro com os parâmetros."""
 

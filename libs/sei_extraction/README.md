@@ -14,10 +14,10 @@ A função `html_to_markdown` (em `sei_extraction.text`) e o extrator `extract_h
 
 ## Piso de versão
 
-Python 3.10 (os apps vão de 3.10 a 3.12). Toda a lib é escrita em sintaxe 3.10. Não pode depender de `langchain` (lint proíbe via ruff `banned-api`).
+Python 3.12, o mesmo de todos os apps. Não pode depender de `langchain` (lint proíbe via ruff `banned-api`).
 
 ## Testes
 
-    uv venv --python 3.10 .venv
+    uv venv --python 3.12 .venv
     uv pip install -e ".[dev]"
     uv run pytest tests -v

@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/badge/release-1.1.7-blue)](https://git.anatel.gov.br/processo_eletronico/sei-ia/sei-similaridade/jobs)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://git.anatel.gov.br/processo_eletronico/sei-ia/sei-similaridade/jobs/-/pipelines)
-[![Python](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
 [![Airflow](https://img.shields.io/badge/airflow-2.9.3-orange)](https://airflow.apache.org/)
 
 Sistema de processamento ETL para preparar dados do SEI (Sistema Eletrônico de Informações) da Anatel.

@@ -368,7 +368,7 @@ Embeddings também são gerados via LiteLLM Proxy:
 O sistema trata erros de conexão com o proxy/Azure:
 
 ```python
-from litellm.exceptions import APIConnectionError
+from openai import APIConnectionError
 
 try:
     response = model.invoke(prompt)

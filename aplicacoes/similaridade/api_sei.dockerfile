@@ -49,7 +49,7 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 RUN mkdir "/home/${NB_USER}/work" && \
     fix-permissions "/home/${NB_USER}"
 
-ARG PYTHON_VERSION=3.10.18
+ARG PYTHON_VERSION=3.12.11
 
 USER ${NB_USER}
 
@@ -64,7 +64,7 @@ ENV VIRTUAL_ENV="/home/${NB_USER}/.venv" \
     UV_PYTHON_INSTALL_DIR="/home/${NB_USER}/.local/share/uv/python" \
     PATH="/home/${NB_USER}/.venv/bin:${PATH}"
 
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv python install "${PYTHON_VERSION}" \
     && /bin/uv venv --python "${PYTHON_VERSION}" "${VIRTUAL_ENV}"
 
@@ -77,7 +77,7 @@ RUN /bin/uv export --quiet --directory /home/${NB_USER}/app --frozen --no-dev --
       --no-emit-project --no-emit-package sei-extraction --no-emit-package sei-api \
       --output-file /tmp/requirements-similaridade.txt
 
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
       -r /tmp/requirements-similaridade.txt
 
@@ -87,10 +87,10 @@ RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sha
 # sei-extraction, entao sei_extraction tem de ser instalado primeiro.
 COPY --chown=${NB_USER}:${NB_GID} ./libs/sei_extraction /home/${NB_USER}/libs/sei_extraction
 COPY --chown=${NB_USER}:${NB_GID} ./libs/sei_api /home/${NB_USER}/libs/sei_api
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
       --no-deps -e "/home/${NB_USER}/libs/sei_extraction"
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
       --no-deps -e "/home/${NB_USER}/libs/sei_api"
 
@@ -101,7 +101,7 @@ COPY LICENSE /home/${NB_USER}/app/LICENSE
 RUN chown -R ${NB_USER}:${NB_GID} /home/${NB_USER}/app
 
 USER ${NB_USER}
-RUN --mount=type=cache,id=seiia-uv-uid4000-python310-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
+RUN --mount=type=cache,id=seiia-uv-uid4000-python312-v1,target=/tmp/uv-cache,sharing=locked,uid=4000,gid=4000,mode=0770 \
     /bin/uv pip install --python "${VIRTUAL_ENV}/bin/python" \
       --no-deps -e ".[otel]"
 RUN /bin/uv pip check --python "${VIRTUAL_ENV}/bin/python" \

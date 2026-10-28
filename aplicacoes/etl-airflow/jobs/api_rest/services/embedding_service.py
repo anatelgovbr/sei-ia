@@ -3,7 +3,7 @@
 import logging
 from pathlib import Path
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter as RecursiveSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter as RecursiveSplitter
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 

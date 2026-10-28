@@ -1,4 +1,5 @@
 """Tests for the exception classes themselves (constructors/str)."""
+
 import unittest
 
 from api_sei.exception_handling.exceptions import (
@@ -7,7 +8,6 @@ from api_sei.exception_handling.exceptions import (
     ParsedQueryFieldException,
     SolrException,
     SolrRequestError,
-    TableEmbeddingNotFoundException,
 )
 
 
@@ -35,13 +35,6 @@ class TestParsedQueryFieldException(unittest.TestCase):
         exc = ParsedQueryFieldException(field="metadata_x")
         self.assertEqual(exc.status_code, 201)
         self.assertEqual(exc.detail, "Field metadata_x not found")
-
-
-class TestTableEmbeddingNotFoundException(unittest.TestCase):
-    def test_detail_mentions_resource(self):
-        exc = TableEmbeddingNotFoundException(resource_name="embd_doc_x")
-        self.assertEqual(exc.status_code, 404)
-        self.assertEqual(exc.detail, "Tabela embedding: embd_doc_x não encontrado")
 
 
 class TestSolrException(unittest.TestCase):
