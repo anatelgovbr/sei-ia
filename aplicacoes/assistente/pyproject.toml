@@ -14,7 +14,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi[standard]==0.141.1",
     "uvicorn==0.30.5",
-    "python-dotenv==1.0.1",
+    "python-dotenv==1.2.2",
     "langchain-core>=1.4.7,<2.0.0",
     "langchain>=1.3.9,<2.0.0",
     "langchain-openai==1.2.2",
@@ -92,17 +92,17 @@ dev = [
 otel = [
     'Deprecated>=1.3.1',
     'importlib_metadata==8.5.0',
-    'opentelemetry-api==1.33.1',
-    'opentelemetry-distro==0.54b1',
-    'opentelemetry-instrumentation==0.54b1',
-    'opentelemetry-sdk==1.33.1',
-    'opentelemetry-semantic-conventions==0.54b1',
-    'opentelemetry-exporter-otlp==1.33.1',
-    'opentelemetry-instrumentation-fastapi==0.54b1',
-    'opentelemetry-instrumentation-requests==0.54b1',
-    'opentelemetry-instrumentation-sqlalchemy==0.54b1',
-    'opentelemetry-instrumentation-logging==0.54b1',
-    'opentelemetry-instrumentation-httpx==0.54b1',
+    'opentelemetry-api==1.45.1',
+    'opentelemetry-distro==0.66b1',
+    'opentelemetry-instrumentation==0.66b1',
+    'opentelemetry-sdk==1.45.1',
+    'opentelemetry-semantic-conventions==0.66b1',
+    'opentelemetry-exporter-otlp==1.45.1',
+    'opentelemetry-instrumentation-fastapi==0.66b1',
+    'opentelemetry-instrumentation-requests==0.66b1',
+    'opentelemetry-instrumentation-sqlalchemy==0.66b1',
+    'opentelemetry-instrumentation-logging==0.66b1',
+    'opentelemetry-instrumentation-httpx==0.66b1',
     'zipp==3.21.0'
 ]
 
