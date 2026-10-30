@@ -30,7 +30,7 @@ dependencies = [
     "SQLAlchemy>=2.0.0",
     "pandas==2.2.2",
     "psycopg2-binary==2.9.9",
-    "cryptography==50.0.0",
+    "cryptography==50.0.2",
     "pgvector==0.2.5",
     "defusedxml>=0.7.1",
     "langfuse==3.9.3",
